@@ -2,7 +2,7 @@
 
 # Kubernetes 0-1 使用preStop优雅终止Pod
 
-![image](https://fs.poneding.com/images/1*UnrkdMdY3XBHOUSx9H-sJw.png)
+![image](https://fs.poneding.com/images/kubernetes.png)
 
 Kubernetes允许Pod终止之前，执行自定义逻辑。
 
