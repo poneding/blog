@@ -1,0 +1,114 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content='我的博客 / Golang 编程 / Golang 发布类库 - 2
+Golang 发布类库 - 2 # 本页介绍如何在 Github 上升级我们已发布的 Golang 类库。
+Go 类库版本规则 # go 类库版本的规则：主版本号.次版本号.修订号，其中：
+主版本号：类库进行了不可向下兼容的修改，例如功能重构，这时候主版本号往上追加； 次版本号：类库进行了可向下兼容的修改，例如新增功能，这时候次版本号往上追加； 修订号：类库进行了可向下兼容的修改（修改的规模更小），例如修复或优化功能，这时候修订好往上追加。 Go 类库发版示例 # 同样以 github.com/poneding/common-go 类库为示例。
+小版本升级 # 主版本不升级，次版本或修订版本升级。
+v0.x.x 版本升级至 v1.x.x 也是可以直接升级的。
+当前版本是 v1.0.0，现对该类库进行了功能修改，发布 v1.0.1 版本：
+1、切换至 v1 分支：
+git checkout v1 2、修改类库代码：
+hello/hello.go：
+package hello import "fmt" func Say(name string) { fmt.Printf("Hello, %s\n", name) fmt.Println("common-go version: v1.0.1") } 3、提交代码并发布：
+git add .'><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/go/go-publish-package-02/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content='我的博客 / Golang 编程 / Golang 发布类库 - 2
+Golang 发布类库 - 2 # 本页介绍如何在 Github 上升级我们已发布的 Golang 类库。
+Go 类库版本规则 # go 类库版本的规则：主版本号.次版本号.修订号，其中：
+主版本号：类库进行了不可向下兼容的修改，例如功能重构，这时候主版本号往上追加； 次版本号：类库进行了可向下兼容的修改，例如新增功能，这时候次版本号往上追加； 修订号：类库进行了可向下兼容的修改（修改的规模更小），例如修复或优化功能，这时候修订好往上追加。 Go 类库发版示例 # 同样以 github.com/poneding/common-go 类库为示例。
+小版本升级 # 主版本不升级，次版本或修订版本升级。
+v0.x.x 版本升级至 v1.x.x 也是可以直接升级的。
+当前版本是 v1.0.0，现对该类库进行了功能修改，发布 v1.0.1 版本：
+1、切换至 v1 分支：
+git checkout v1 2、修改类库代码：
+hello/hello.go：
+package hello import "fmt" func Say(name string) { fmt.Printf("Hello, %s\n", name) fmt.Println("common-go version: v1.0.1") } 3、提交代码并发布：
+git add .'><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="go"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Go Publish Package 02 | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/go/go-publish-package-02/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Go Publish Package 02</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#go-类库版本规则>Go 类库版本规则</a></li><li><a href=#go-类库发版示例>Go 类库发版示例</a><ul><li><a href=#小版本升级>小版本升级</a></li><li><a href=#大版本升级>大版本升级</a></li></ul></li><li><a href=#使用本地-go-类库>使用本地 go 类库</a></li><li><a href=#结束语>结束语</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/go/>Golang 编程</a> / Golang 发布类库 - 2</p><h1 id=golang-发布类库---2>Golang 发布类库 - 2
+<a class=anchor href=#golang-%e5%8f%91%e5%b8%83%e7%b1%bb%e5%ba%93---2>#</a></h1><p><img src=https://fs.poneding.com/images/golang.png alt=golang></p><p>本页介绍如何在 Github 上升级我们已发布的 Golang 类库。</p><h2 id=go-类库版本规则>Go 类库版本规则
+<a class=anchor href=#go-%e7%b1%bb%e5%ba%93%e7%89%88%e6%9c%ac%e8%a7%84%e5%88%99>#</a></h2><p>go 类库版本的规则：<code>主版本号.次版本号.修订号</code>，其中：</p><ul><li>主版本号：类库进行了不可向下兼容的修改，例如功能重构，这时候主版本号往上追加；</li><li>次版本号：类库进行了可向下兼容的修改，例如新增功能，这时候次版本号往上追加；</li><li>修订号：类库进行了可向下兼容的修改（修改的规模更小），例如修复或优化功能，这时候修订好往上追加。</li></ul><h2 id=go-类库发版示例>Go 类库发版示例
+<a class=anchor href=#go-%e7%b1%bb%e5%ba%93%e5%8f%91%e7%89%88%e7%a4%ba%e4%be%8b>#</a></h2><p>同样以 <code>github.com/poneding/common-go</code> 类库为示例。</p><h3 id=小版本升级>小版本升级
+<a class=anchor href=#%e5%b0%8f%e7%89%88%e6%9c%ac%e5%8d%87%e7%ba%a7>#</a></h3><blockquote><p>主版本不升级，次版本或修订版本升级。</p><p><code>v0.x.x</code> 版本升级至 <code>v1.x.x</code> 也是可以直接升级的。</p></blockquote><p>当前版本是 <code>v1.0.0</code>，现对该类库进行了功能修改，发布 <code>v1.0.1</code> 版本：</p><p><strong>1、切换至 <code>v1</code> 分支</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>git checkout v1
+</span></span></code></pre></div><p><strong>2、修改类库代码</strong>：</p><p><em>hello/hello.go</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>hello</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> <span style=color:#e6db74>&#34;fmt&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>Say</span>(<span style=color:#a6e22e>name</span> <span style=color:#66d9ef>string</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;Hello, %s\n&#34;</span>, <span style=color:#a6e22e>name</span>)
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;common-go version: v1.0.1&#34;</span>)
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>3、提交代码并发布</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>git add .
+</span></span><span style=display:flex><span>git commit -m <span style=color:#e6db74>&#34;update hello&#34;</span>
+</span></span><span style=display:flex><span>git push
+</span></span><span style=display:flex><span>git tag v1.0.1
+</span></span><span style=display:flex><span>git push --tags 
+</span></span></code></pre></div><p><strong>4、使用 <code>demo-go</code> 测试，升级版本</strong>：</p><p>升级类库方式：</p><ul><li>使用 <code>go get -u github.com/poneding/common-go</code> 或 <code>go get github.com/poneding/common-go@latest</code> 升级至该主版本号下最新版本；</li><li>使用 <code>go get github.com/poneding/common-go@v1.0.0</code> 升级至指定版本。</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ go get - u github.com/poneding/common-go
+</span></span><span style=display:flex><span>go: downloading github.com/poneding/common-go v1.0.1
+</span></span><span style=display:flex><span>go: found github.com/poneding/common-go/hello in github.com/poneding/common-go v1.0.1
+</span></span><span style=display:flex><span>go: github.com/poneding/common-go upgrade <span style=color:#f92672>=</span>&gt; v1.0.1
+</span></span></code></pre></div><p>查看 <code>demo-go</code> 下的 <code>go.mod</code> 文件，确实升级到了新版本：</p><p><em>go.mod</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#a6e22e>module</span> <span style=color:#a6e22e>demo</span><span style=color:#f92672>-</span><span style=color:#66d9ef>go</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>go</span> <span style=color:#ae81ff>1.16</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>require</span> <span style=color:#a6e22e>github</span>.<span style=color:#a6e22e>com</span><span style=color:#f92672>/</span><span style=color:#a6e22e>poneding</span><span style=color:#f92672>/</span><span style=color:#a6e22e>common</span><span style=color:#f92672>-</span><span style=color:#66d9ef>go</span> <span style=color:#a6e22e>v1</span><span style=color:#ae81ff>.0.1</span>
+</span></span></code></pre></div><p><strong>5、运行测试</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ go run main.go
+</span></span><span style=display:flex><span>Hello, Jay
+</span></span><span style=display:flex><span>common-go version: v1.0.1
+</span></span></code></pre></div><h3 id=大版本升级>大版本升级
+<a class=anchor href=#%e5%a4%a7%e7%89%88%e6%9c%ac%e5%8d%87%e7%ba%a7>#</a></h3><blockquote><p>主版本升级。</p><p>值得注意的是，使用 <code>go get -u github.com/poneding/common-go</code> 升级类库版本时，无法跨主版本升级，只能升级至当前主版本下最新版本；</p><p>v0.x.x 升级至 v1.x.x 是个例外，可以直接使用 <code>go get -u github.com/poneding/common-go</code> 命令升级。</p></blockquote><p>当前版本是 <code>v1.0.1</code>，现对该类库进行了功能重构，发布 <code>v2.0.0</code> 版本：</p><p><strong>1、继续按照最佳实践，创建 <code>v2</code> 版本的分支</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>git checkout -b v2
+</span></span></code></pre></div><p><strong>2、修改 module 名称至新版</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>go mod edit -module github.com/poneding/common-go/v2
+</span></span></code></pre></div><p><strong>3、v2 版本重构功能</strong>：</p><p><em>hello/hello.go</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>hello</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> <span style=color:#e6db74>&#34;fmt&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>Say</span>(<span style=color:#a6e22e>firstname</span>, <span style=color:#a6e22e>lastname</span> <span style=color:#66d9ef>string</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;Hello, %s %s\n&#34;</span>, <span style=color:#a6e22e>firstname</span>, <span style=color:#a6e22e>lastname</span>)
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;common-go version: v2.0.0&#34;</span>)
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>4、提交代码并发布</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>git add .
+</span></span><span style=display:flex><span>git commit -m <span style=color:#e6db74>&#34;refacte hello&#34;</span>
+</span></span><span style=display:flex><span>git push -u origin v2
+</span></span><span style=display:flex><span>git tag v2.0.0
+</span></span><span style=display:flex><span>git push --tags
+</span></span></code></pre></div><p><strong>5、使用 <code>demo-go</code> 测试，升级版本</strong>：</p><p>注意，此时无法通过 <code>go get -u github.com/poneding/common-go</code> 升级至不同于当前主版本的最新版本，需要使用 <code>go get github.com/poneding/common-go/v2</code> 升级：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>go get github.com/poneding/common-go/v2
+</span></span></code></pre></div><p>查看 <code>go.mod</code> 文件，已经添加了 <code>v2</code> 版本依赖包</p><p><em>go.mod</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#a6e22e>module</span> <span style=color:#a6e22e>demo</span><span style=color:#f92672>-</span><span style=color:#66d9ef>go</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>go</span> <span style=color:#ae81ff>1.16</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>require</span> <span style=color:#a6e22e>github</span>.<span style=color:#a6e22e>com</span><span style=color:#f92672>/</span><span style=color:#a6e22e>poneding</span><span style=color:#f92672>/</span><span style=color:#a6e22e>common</span><span style=color:#f92672>-</span><span style=color:#66d9ef>go</span> <span style=color:#a6e22e>v1</span><span style=color:#ae81ff>.0.1</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>require</span> <span style=color:#a6e22e>github</span>.<span style=color:#a6e22e>com</span><span style=color:#f92672>/</span><span style=color:#a6e22e>poneding</span><span style=color:#f92672>/</span><span style=color:#a6e22e>common</span><span style=color:#f92672>-</span><span style=color:#66d9ef>go</span><span style=color:#f92672>/</span><span style=color:#a6e22e>v2</span> <span style=color:#a6e22e>v2</span><span style=color:#ae81ff>.0.0</span>
+</span></span></code></pre></div><p><strong>6、修改测试代码</strong>：</p><p>同时使用 <code>v1</code> 版本和 <code>v2</code> 版本的包函数：</p><p><em>main.go</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;github.com/poneding/common-go/hello&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>hellov2</span> <span style=color:#e6db74>&#34;github.com/poneding/common-go/v2/hello&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>hello</span>.<span style=color:#a6e22e>Say</span>(<span style=color:#e6db74>&#34;Jay&#34;</span>)
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>hellov2</span>.<span style=color:#a6e22e>Say</span>(<span style=color:#e6db74>&#34;Jay Chou&#34;</span>)
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>8、运行测试</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ go run main.go
+</span></span><span style=display:flex><span>test hello:
+</span></span><span style=display:flex><span>Hello, Jay
+</span></span><span style=display:flex><span>common-go version: v1.0.1
+</span></span><span style=display:flex><span>Hello, Jay Chou
+</span></span><span style=display:flex><span>common-go version: v2.0.0
+</span></span></code></pre></div><h2 id=使用本地-go-类库>使用本地 go 类库
+<a class=anchor href=#%e4%bd%bf%e7%94%a8%e6%9c%ac%e5%9c%b0-go-%e7%b1%bb%e5%ba%93>#</a></h2><p>如果本地的 go 类库暂未维护到远端，如何引用本地类库的包呢？</p><p>在 go.mod 文件中使用 replace 引用本地 go 类库，这个方式有时候更方便于开发。</p><blockquote><p>common-go 的 module 名称为 <code>github.com/poneding/common-go</code></p><p>replace 使用 go 类库相对路径替换 module 的引用</p></blockquote><p>以下示例将 go 类库的引用切换为本地引用。</p><p><em>go.mod</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#a6e22e>module</span> <span style=color:#a6e22e>demo</span><span style=color:#f92672>-</span><span style=color:#66d9ef>go</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>go</span> <span style=color:#ae81ff>1.16</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>require</span> (
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>github</span>.<span style=color:#a6e22e>com</span><span style=color:#f92672>/</span><span style=color:#a6e22e>poneding</span><span style=color:#f92672>/</span><span style=color:#a6e22e>common</span><span style=color:#f92672>-</span><span style=color:#66d9ef>go</span> <span style=color:#a6e22e>v1</span><span style=color:#ae81ff>.0.1</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>github</span>.<span style=color:#a6e22e>com</span><span style=color:#f92672>/</span><span style=color:#a6e22e>poneding</span><span style=color:#f92672>/</span><span style=color:#a6e22e>common</span><span style=color:#f92672>-</span><span style=color:#66d9ef>go</span><span style=color:#f92672>/</span><span style=color:#a6e22e>v2</span> <span style=color:#a6e22e>v2</span><span style=color:#ae81ff>.0.0</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>replace</span> (
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>github</span>.<span style=color:#a6e22e>com</span><span style=color:#f92672>/</span><span style=color:#a6e22e>poneding</span><span style=color:#f92672>/</span><span style=color:#a6e22e>common</span><span style=color:#f92672>-</span><span style=color:#66d9ef>go</span><span style=color:#f92672>/</span><span style=color:#a6e22e>v2</span> =&gt; ..<span style=color:#f92672>/</span><span style=color:#a6e22e>common</span><span style=color:#f92672>-</span><span style=color:#66d9ef>go</span>
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><p>由于是本地引用，版本号只需在主版本号的范围内即可。</p><h2 id=结束语>结束语
+<a class=anchor href=#%e7%bb%93%e6%9d%9f%e8%af%ad>#</a></h2><p>主版本升级会给代码的维护和版本的维护增加难度，并且需要下游用户迁移版本。最好是当存在令人信服的原因时才对类库主版本进行升级，例如为了优化代码大规模重构。</p><hr><p><a href=/go/go-publish-package-01/>« Golang 发布类库 - 1</a></p><p><a href=/go/go-solid/>» Go 程序 SOLID 设计原则</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/go/go-publish-package-02.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#go-类库版本规则>Go 类库版本规则</a></li><li><a href=#go-类库发版示例>Go 类库发版示例</a><ul><li><a href=#小版本升级>小版本升级</a></li><li><a href=#大版本升级>大版本升级</a></li></ul></li><li><a href=#使用本地-go-类库>使用本地 go 类库</a></li><li><a href=#结束语>结束语</a></li></ul></nav></div></aside></main></body></html>

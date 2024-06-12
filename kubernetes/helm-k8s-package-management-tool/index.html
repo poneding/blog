@@ -1,0 +1,157 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / Kubernetes / Kubernetes 0-1 Helm Kubernetes 的包管理工具
+Kubernetes 0-1 Helm Kubernetes 的包管理工具 # Helm is the best way to find, share, and use software built for Kubernetes.
+Helm是为Kubernetes寻找，共享和使用软件构建的最佳方式。
+简介 # Helm帮助管理Kubernetes应用程序，即使是面对复杂的K8s引用，Helm Charts也可以轻松实现定义，安装和升级。
+Helm是CNCF的毕业项目，由Helm社区维护。
+Charts：
+Charts可以看作是Helm的程序包，一个Chart是描述Kubernetes资源集的文件集合。
+Repository：
+存储和共享Charts，可以看作是Kubernetes程序包的存储中心。
+Release：
+由一个Chart运行起来的实例，这将在kubernetes集群中生成或更新一组资源，可以使用同一个chart运行成多个release。例如，如果你想运行多个redis服务，你可以通过多次安装redis的chart得到。
+看到以上三个概念，你可能会觉得似曾相识，没错，与docker三个概念——image，registry，container如出一辙，也许现在你会加深点理解了。
+安装 # 可以方便的使用脚本安装
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 chmod 700 ./get-helm.sh ./get-helm.sh 也可以下载指定版本手动安装
+下载地址： https://github.com/helm/helm/releases
+wget https://get.helm.sh/helm-v3.5.2-linux-amd64.tar.gz tar -zxvf ./helm-v3.5.2-linux-amd64.tar.gz sudo mv linux-amd64/helm /usr/local/bin/helm 第一个helm命令
+helm help 更多安装方式可查看： https://helm."><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/kubernetes/helm-k8s-package-management-tool/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / Kubernetes / Kubernetes 0-1 Helm Kubernetes 的包管理工具
+Kubernetes 0-1 Helm Kubernetes 的包管理工具 # Helm is the best way to find, share, and use software built for Kubernetes.
+Helm是为Kubernetes寻找，共享和使用软件构建的最佳方式。
+简介 # Helm帮助管理Kubernetes应用程序，即使是面对复杂的K8s引用，Helm Charts也可以轻松实现定义，安装和升级。
+Helm是CNCF的毕业项目，由Helm社区维护。
+Charts：
+Charts可以看作是Helm的程序包，一个Chart是描述Kubernetes资源集的文件集合。
+Repository：
+存储和共享Charts，可以看作是Kubernetes程序包的存储中心。
+Release：
+由一个Chart运行起来的实例，这将在kubernetes集群中生成或更新一组资源，可以使用同一个chart运行成多个release。例如，如果你想运行多个redis服务，你可以通过多次安装redis的chart得到。
+看到以上三个概念，你可能会觉得似曾相识，没错，与docker三个概念——image，registry，container如出一辙，也许现在你会加深点理解了。
+安装 # 可以方便的使用脚本安装
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 chmod 700 ./get-helm.sh ./get-helm.sh 也可以下载指定版本手动安装
+下载地址： https://github.com/helm/helm/releases
+wget https://get.helm.sh/helm-v3.5.2-linux-amd64.tar.gz tar -zxvf ./helm-v3.5.2-linux-amd64.tar.gz sudo mv linux-amd64/helm /usr/local/bin/helm 第一个helm命令
+helm help 更多安装方式可查看： https://helm."><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="kubernetes"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Helm K8s Package Management Tool | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/helm-k8s-package-management-tool/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Helm K8s Package Management Tool</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#简介>简介</a></li><li><a href=#安装>安装</a></li><li><a href=#使用>使用</a></li><li><a href=#定制>定制</a></li><li><a href=#常用命令>常用命令</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/kubernetes/>Kubernetes</a> / Kubernetes 0-1 Helm Kubernetes 的包管理工具</p><h1 id=kubernetes-0-1-helm-kubernetes-的包管理工具>Kubernetes 0-1 Helm Kubernetes 的包管理工具
+<a class=anchor href=#kubernetes-0-1-helm-kubernetes-%e7%9a%84%e5%8c%85%e7%ae%a1%e7%90%86%e5%b7%a5%e5%85%b7>#</a></h1><p><img src=https://fs.poneding.com/images/image-20210205103617348.png alt=image-20210205103617348></p><p>Helm is the best way to find, share, and use software built for Kubernetes.</p><p>Helm是为Kubernetes寻找，共享和使用软件构建的最佳方式。</p><h2 id=简介>简介
+<a class=anchor href=#%e7%ae%80%e4%bb%8b>#</a></h2><p>Helm帮助管理Kubernetes应用程序，即使是面对复杂的K8s引用，Helm Charts也可以轻松实现定义，安装和升级。</p><p>Helm是CNCF的毕业项目，由Helm社区维护。</p><p><strong>Charts</strong>：</p><p>Charts可以看作是Helm的程序包，一个Chart是描述Kubernetes资源集的文件集合。</p><p><strong>Repository</strong>：</p><p>存储和共享Charts，可以看作是Kubernetes程序包的存储中心。</p><p><strong>Release</strong>：</p><p>由一个Chart运行起来的实例，这将在kubernetes集群中生成或更新一组资源，可以使用同一个chart运行成多个release。例如，如果你想运行多个redis服务，你可以通过多次安装redis的chart得到。</p><p>看到以上三个概念，你可能会觉得似曾相识，没错，与docker三个概念——image，registry，container如出一辙，也许现在你会加深点理解了。</p><h2 id=安装>安装
+<a class=anchor href=#%e5%ae%89%e8%a3%85>#</a></h2><p>可以方便的使用脚本安装</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+</span></span><span style=display:flex><span>chmod <span style=color:#ae81ff>700</span> ./get-helm.sh
+</span></span><span style=display:flex><span>./get-helm.sh
+</span></span></code></pre></div><p>也可以下载指定版本手动安装</p><p>下载地址：
+<a href=https://github.com/helm/helm/releases>https://github.com/helm/helm/releases</a></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>wget https://get.helm.sh/helm-v3.5.2-linux-amd64.tar.gz
+</span></span><span style=display:flex><span>tar -zxvf ./helm-v3.5.2-linux-amd64.tar.gz
+</span></span><span style=display:flex><span>sudo mv linux-amd64/helm /usr/local/bin/helm
+</span></span></code></pre></div><p>第一个helm命令</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>helm help
+</span></span></code></pre></div><p>更多安装方式可查看：
+<a href=https://helm.sh/docs/intro/install/>https://helm.sh/docs/intro/install/</a></p><h2 id=使用>使用
+<a class=anchor href=#%e4%bd%bf%e7%94%a8>#</a></h2><p><strong>初始化Helm Chart仓库</strong>：</p><p>首先添加helm官方的helm stable charts仓库</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>helm repo add stable https://charts.helm.sh/stable
+</span></span></code></pre></div><p><strong>查询charts仓库</strong>：</p><p>例如你想查找prometheus应用仓库，打开
+<a href=https://artifacthub.io/%e7%ab%99%e7%82%b9%ef%bc%8c%e5%9c%a8%e6%9f%a5%e8%af%a2%e8%be%93%e5%85%a5%e6%a1%86%e4%b8%ad%e8%be%93%e5%85%a5prometheus%e4%b9%8b%e5%90%8e%ef%bc%8c%e6%90%9c%e7%b4%a2%e5%8f%af%e4%bb%a5%e5%be%97%e5%88%b0%e5%ae%98%e6%96%b9%e6%88%96%e6%b0%91%e9%97%b4%e7%9a%84%e4%bb%93%e5%ba%93%e3%80%82>https://artifacthub.io/站点，在查询输入框中输入prometheus之后，搜索可以得到官方或民间的仓库。</a></p><p><img src=https://fs.poneding.com/images/image-20210207095836149.png alt=image-20210207095836149></p><p><img src=https://fs.poneding.com/images/image-20210207095854693.png alt=image-20210207095854693></p><p>一般选择具有官方标志的仓库，进入该仓库的主页，里面会有charts的基本信息，以及安装命令的帮助。</p><p><img src=https://fs.poneding.com/images/image-20210207100040044.png alt=image-20210207100040044></p><p>添加Prometheus的官方Charts仓库</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+</span></span></code></pre></div><p>添加仓库后，就可以在当前已经添加的仓库中搜索你需要的kubernetes应用了</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ helm search repo prometheus
+</span></span><span style=display:flex><span>NAME                                                    CHART VERSION   APP VERSION     DESCRIPTION                                       
+</span></span><span style=display:flex><span>prometheus-community/kube-prometheus-stack              13.5.0          0.45.0          kube-prometheus-stack collects Kubernetes manif...
+</span></span><span style=display:flex><span>prometheus-community/prometheus                         13.2.1          2.24.0          Prometheus is a monitoring system and time seri...
+</span></span><span style=display:flex><span>prometheus-community/prometheus-adapter                 2.11.1          v0.8.3          A Helm chart <span style=color:#66d9ef>for</span> k8s prometheus adapter
+</span></span><span style=display:flex><span>...
+</span></span></code></pre></div><p><strong>创建release</strong>：</p><p>使用特定的chart安装kubernetes应用</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ helm install prometheus prometheus-community/prometheus
+</span></span><span style=display:flex><span>NAME: prometheus
+</span></span><span style=display:flex><span>LAST DEPLOYED: Sun Feb  <span style=color:#ae81ff>7</span> 02:04:59 <span style=color:#ae81ff>2021</span>
+</span></span><span style=display:flex><span>NAMESPACE: default
+</span></span><span style=display:flex><span>STATUS: deployed
+</span></span><span style=display:flex><span>REVISION: <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>...
+</span></span></code></pre></div><p><strong>查看release</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ helm ls
+</span></span><span style=display:flex><span>NAME        NAMESPACE  REVISION  UPDATED              STATUS    CHART              APP VERSION
+</span></span><span style=display:flex><span>prometheus  default    <span style=color:#ae81ff>1</span>         2021-02-07 02:04:59  deployed  prometheus-13.2.1  2.24.0 
+</span></span><span style=display:flex><span>$ helm status prometheus
+</span></span><span style=display:flex><span>NAME: prometheus
+</span></span><span style=display:flex><span>LAST DEPLOYED: Sun Feb  <span style=color:#ae81ff>7</span> 02:04:59 <span style=color:#ae81ff>2021</span>
+</span></span><span style=display:flex><span>NAMESPACE: default
+</span></span><span style=display:flex><span>STATUS: deployed
+</span></span><span style=display:flex><span>REVISION: <span style=color:#ae81ff>1</span>
+</span></span></code></pre></div><p>并且可以查看K8s集群是否正在创建你需要的应用</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ kubectl get pod
+</span></span><span style=display:flex><span>NAME                                                        READY   STATUS              RESTARTS   AGE
+</span></span><span style=display:flex><span>prometheus-alertmanager-5dbfffbbc4-jppgj         0/2     Pending             <span style=color:#ae81ff>0</span>          36s
+</span></span><span style=display:flex><span>prometheus-kube-state-metrics-66c4db67ff-r65tg   0/1     ContainerCreating   <span style=color:#ae81ff>0</span>          36s
+</span></span><span style=display:flex><span>prometheus-node-exporter-tvjnx                   1/1     Running             <span style=color:#ae81ff>0</span>          36s
+</span></span><span style=display:flex><span>prometheus-pushgateway-798b886754-x4fvq          0/1     ContainerCreating   <span style=color:#ae81ff>0</span>          36s
+</span></span><span style=display:flex><span>prometheus-server-74656c5bbc-k4m6x               0/2     Pending             <span style=color:#ae81ff>0</span>          36s
+</span></span></code></pre></div><p><strong>删除 release</strong>：</p><p>以下命令会删除所有install创建的所有Kubernetes资源</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ helm uninstall prometheus
+</span></span><span style=display:flex><span>release <span style=color:#e6db74>&#34;prometheus&#34;</span> uninstalled
+</span></span></code></pre></div><p>如果你想保存安装的历史信息，方便以后查看发布审计或者回滚发布，可以使用<code>--keep-history</code>命令标识。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ helm uninstall prometheus --keep-history
+</span></span><span style=display:flex><span>release <span style=color:#e6db74>&#34;prometheus&#34;</span> uninstalled
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 此时查看安装状态将变成uninstalled</span>
+</span></span><span style=display:flex><span>$ helm ls
+</span></span><span style=display:flex><span>NAME    NAMESPACE       REVISION        UPDATED STATUS  CHART   APP VERSION
+</span></span><span style=display:flex><span>$ helm ls -a
+</span></span><span style=display:flex><span>NAME        NAMESPACE  REVISION  UPDATED             STATUS       CHART              APP VERSION
+</span></span><span style=display:flex><span>prometheus  default    <span style=color:#ae81ff>1</span>         2021-02-07 02:12:46 uninstalled  prometheus-13.2.1  2.24.0   
+</span></span><span style=display:flex><span>$ helm status prometheus
+</span></span><span style=display:flex><span>NAME: prometheus
+</span></span><span style=display:flex><span>LAST DEPLOYED: Sat Feb  <span style=color:#ae81ff>6</span> 02:49:41 <span style=color:#ae81ff>2021</span>
+</span></span><span style=display:flex><span>NAMESPACE: default
+</span></span><span style=display:flex><span>STATUS: uninstalled
+</span></span><span style=display:flex><span>REVISION: <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>...
+</span></span></code></pre></div><p><strong>将删除release重新安装/回滚回来</strong>：</p><p>每次成功的install或upgrade release后，我们都会得到release的REVISION，在回滚release时需要使用到这个版本号</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ helm rollback prometheus <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>Rollback was a success! Happy Helming!
+</span></span></code></pre></div><h2 id=定制>定制
+<a class=anchor href=#%e5%ae%9a%e5%88%b6>#</a></h2><p>Charts是允许用户定制的，例如你想修改应用端口，或者应用的副本数量，可以通过修改charts的资源文件，然后依据资源文件创建release。</p><p>首先，下载应用的charts文件集合到本地</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ helm repo add bitnami https://charts.bitnami.com/bitnami
+</span></span><span style=display:flex><span><span style=color:#e6db74>&#34;bitnami&#34;</span> has been added to your repositories
+</span></span><span style=display:flex><span>$ mkdir nginx
+</span></span><span style=display:flex><span>$ helm show values bitnami/nginx &gt; ./nginx/values.yaml
+</span></span></code></pre></div><p>修改values.yaml文件，如果你对K8s资源的定义有所了解，那么你能轻松的修改该文件。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ vim ./nginx/values.yaml
+</span></span><span style=display:flex><span>...
+</span></span><span style=display:flex><span><span style=color:#75715e># 修改nginx deployment副本数为2</span>
+</span></span><span style=display:flex><span>replicaCount: <span style=color:#ae81ff>2</span>
+</span></span><span style=display:flex><span>...
+</span></span></code></pre></div><p>文件修改完成后，使用如下命令安装</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ helm install nginx -f ./nginx/values.yaml bitnami/nginx
+</span></span><span style=display:flex><span>NAME: nginx
+</span></span><span style=display:flex><span>LAST DEPLOYED: Sun Feb  <span style=color:#ae81ff>7</span> 02:59:48 <span style=color:#ae81ff>2021</span>
+</span></span><span style=display:flex><span>NAMESPACE: default
+</span></span><span style=display:flex><span>STATUS: deployed
+</span></span><span style=display:flex><span>REVISION: <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>...
+</span></span></code></pre></div><p>以上操作可以使用如下命令代替：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>helm install nginx --set replicaCount<span style=color:#f92672>=</span><span style=color:#ae81ff>2</span> bitnami/nginx
+</span></span></code></pre></div><p>使用&ndash;set设置配置说明：</p><ul><li><p>如果同时指定了values.yaml文件和使用&ndash;set设置配置，那么&ndash;set设置的配置优先级更高</p></li><li><p>多组配置：&ndash;set a=1,b=2</p></li><li><p>层级：&ndash;set user.name=jaychou</p></li><li><p>数组：&ndash;set users={jay,jack,john} &ndash;set users[0].name=jaychou</p></li></ul><p><strong>由于文件更易管理和迁移，更推荐修改values.yaml的方式定制Chart</strong>：</p><p>查看release的资源创建情况</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ kubectl get pod
+</span></span><span style=display:flex><span>NAME                            READY   STATUS    RESTARTS   AGE
+</span></span><span style=display:flex><span>nginx-78956d9896-5qvdl          1/1     Running   <span style=color:#ae81ff>0</span>          32s
+</span></span><span style=display:flex><span>nginx-78956d9896-fhw5w          1/1     Running   <span style=color:#ae81ff>0</span>          32s
+</span></span></code></pre></div><p>确实，如我们所愿，创建了2个副本实例。</p><p><strong>更新Release</strong>：</p><p>已经安装了的release，修改定制文件后升级发布</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ helm upgrade nginx -f ./values.yaml bitnami/nginx
+</span></span><span style=display:flex><span>Release <span style=color:#e6db74>&#34;nginx&#34;</span> has been upgraded. Happy Helming!
+</span></span><span style=display:flex><span>NAME: nginx
+</span></span><span style=display:flex><span>LAST DEPLOYED: Sun Feb <span style=color:#ae81ff>7</span> 03:05:26 <span style=color:#ae81ff>2021</span>
+</span></span><span style=display:flex><span>NAMESPACE: default
+</span></span><span style=display:flex><span>STATUS: deployed
+</span></span><span style=display:flex><span>REVISION: <span style=color:#ae81ff>2</span>
+</span></span><span style=display:flex><span>TEST SUITE: None
+</span></span><span style=display:flex><span>...
+</span></span></code></pre></div><h2 id=常用命令>常用命令
+<a class=anchor href=#%e5%b8%b8%e7%94%a8%e5%91%bd%e4%bb%a4>#</a></h2><p>帮助命令</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>helm help
+</span></span><span style=display:flex><span>helm get -h
+</span></span></code></pre></div><p>更新charts仓库</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>helm repo update 
+</span></span></code></pre></div><p>更多helm install的方式</p><ul><li><p>从chart仓库安装，我们上面使用的方式</p></li><li><p>本地编写chart模板和values.yaml等文件，然后使用以下命令安装</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>helm install nginx /path/to/nginx-chart
+</span></span></code></pre></div></li><li><p>得到chart压缩文件，使用以下命令安装</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>helm install nginx nginx-chart.tgz
+</span></span></code></pre></div></li><li><p>chart压缩文件的http url，使用以下命令安装</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>helm install nginx https://xxx.com/charts/ngin-chart.tgz
+</span></span></code></pre></div></li></ul><p>如果你有兴趣，你可以创建自己的charts，执行以下命令会在目录下生成charts文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ helm create my-nginx
+</span></span><span style=display:flex><span>Creating my-nginx
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 定制后</span>
+</span></span><span style=display:flex><span>$ helm package my-nginx
+</span></span><span style=display:flex><span>Successfully packaged chart and saved it to: /path/to/my-nginx-0.1.0.tgz
+</span></span><span style=display:flex><span>$ helm install my-nginx ./my-nginx-0.1.0.tgz
+</span></span><span style=display:flex><span>NAME: nginx2
+</span></span><span style=display:flex><span>LAST DEPLOYED: Sun Feb <span style=color:#ae81ff>28</span> 14:20:53 <span style=color:#ae81ff>2021</span>
+</span></span><span style=display:flex><span>NAMESPACE: default
+</span></span><span style=display:flex><span>STATUS: deployed
+</span></span><span style=display:flex><span>REVISION: <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>...
+</span></span></code></pre></div><p>更多了解请前往
+<a href=https://helm.sh/docs/>官方文档</a></p><p><img src=https://fs.poneding.com/images/gzh.png alt=gzh></p><hr><p><a href=/kubernetes/gateway-api-practice/>« Gateway API 实践</a></p><p><a href=/kubernetes/hpa-usage/>» Kubernetes 0-1 实现Pod自动扩缩HPA</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/kubernetes/helm-k8s-package-management-tool.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#简介>简介</a></li><li><a href=#安装>安装</a></li><li><a href=#使用>使用</a></li><li><a href=#定制>定制</a></li><li><a href=#常用命令>常用命令</a></li></ul></nav></div></aside></main></body></html>

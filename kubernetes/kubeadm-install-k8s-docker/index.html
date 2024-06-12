@@ -1,0 +1,144 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / Kubernetes / kubeadm 安装 Kubernetes (Docker)
+kubeadm 安装 Kubernetes (Docker) # 使用 kubeadm 安装 k8s 集群，是社区推荐的安装方式，本文档将介绍使用 kubeadm 安装 k8s 集群（使用 Docker 作为容器运行时）的详细过程。
+Notes:
+随着 kubeadm & k8s 版本的更新，安装过程可能会有所不同，截至目前，本文档使用的是 kubeadm v1.28.3 & k8s v1.28.3 版本； 本文档使用的操作系统是 Ubuntu 22.04，其他操作系统可能会有所不同。 要求 # 至少一台物理机或虚拟机（例如：Ubuntu 22.04）作为集群节点，最少 2 核 2G 内存； 多节点之前网络互通，且节点主机名不冲突； Master 节点需要开放以下端口：6443、2379-2380、10250、10251、10252； 准备工作 # 禁用交换分区：
+# 临时禁用交换分区 sudo swapoff -a vim /etc/fstab # 注释掉 swap 分区的配置 配置系统：
+cat <<EOF | sudo tee /etc/modules-load."><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/kubernetes/kubeadm-install-k8s-docker/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / Kubernetes / kubeadm 安装 Kubernetes (Docker)
+kubeadm 安装 Kubernetes (Docker) # 使用 kubeadm 安装 k8s 集群，是社区推荐的安装方式，本文档将介绍使用 kubeadm 安装 k8s 集群（使用 Docker 作为容器运行时）的详细过程。
+Notes:
+随着 kubeadm & k8s 版本的更新，安装过程可能会有所不同，截至目前，本文档使用的是 kubeadm v1.28.3 & k8s v1.28.3 版本； 本文档使用的操作系统是 Ubuntu 22.04，其他操作系统可能会有所不同。 要求 # 至少一台物理机或虚拟机（例如：Ubuntu 22.04）作为集群节点，最少 2 核 2G 内存； 多节点之前网络互通，且节点主机名不冲突； Master 节点需要开放以下端口：6443、2379-2380、10250、10251、10252； 准备工作 # 禁用交换分区：
+# 临时禁用交换分区 sudo swapoff -a vim /etc/fstab # 注释掉 swap 分区的配置 配置系统：
+cat <<EOF | sudo tee /etc/modules-load."><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="kubernetes"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Kubeadm Install K8s Docker | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/kubeadm-install-k8s-docker/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Kubeadm Install K8s Docker</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#要求>要求</a></li><li><a href=#准备工作>准备工作</a></li><li><a href=#安装-docker>安装 Docker</a></li><li><a href=#安装-cri-dockerd>安装 cri-dockerd</a></li><li><a href=#安装-kubeadmkubelet-和-kubectl>安装 kubeadm、kubelet 和 kubectl</a></li><li><a href=#配置-cgroup-driver>配置 cgroup-driver</a></li><li><a href=#安装集群>安装集群</a></li><li><a href=#安装网络插件>安装网络插件</a></li><li><a href=#安装-metrics-server>安装 metrics-server</a></li><li><a href=#部署应用>部署应用</a></li><li><a href=#参考>参考</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/kubernetes/>Kubernetes</a> / kubeadm 安装 Kubernetes (Docker)</p><h1 id=kubeadm-安装-kubernetes-docker>kubeadm 安装 Kubernetes (Docker)
+<a class=anchor href=#kubeadm-%e5%ae%89%e8%a3%85-kubernetes-docker>#</a></h1><p>使用 kubeadm 安装 k8s 集群，是社区推荐的安装方式，本文档将介绍使用 kubeadm 安装 k8s 集群（使用 Docker 作为容器运行时）的详细过程。</p><p>Notes:</p><ol><li>随着 kubeadm & k8s 版本的更新，安装过程可能会有所不同，截至目前，本文档使用的是 kubeadm v1.28.3 & k8s v1.28.3 版本；</li><li>本文档使用的操作系统是 Ubuntu 22.04，其他操作系统可能会有所不同。</li></ol><h2 id=要求>要求
+<a class=anchor href=#%e8%a6%81%e6%b1%82>#</a></h2><ul><li>至少一台物理机或虚拟机（例如：Ubuntu 22.04）作为集群节点，最少 2 核 2G 内存；</li><li>多节点之前网络互通，且节点主机名不冲突；</li><li>Master 节点需要开放以下端口：6443、2379-2380、10250、10251、10252；</li></ul><h2 id=准备工作>准备工作
+<a class=anchor href=#%e5%87%86%e5%a4%87%e5%b7%a5%e4%bd%9c>#</a></h2><p>禁用交换分区：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 临时禁用交换分区</span>
+</span></span><span style=display:flex><span>sudo swapoff -a
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>vim /etc/fstab
+</span></span><span style=display:flex><span><span style=color:#75715e># 注释掉 swap 分区的配置</span>
+</span></span></code></pre></div><p>配置系统：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>cat <span style=color:#e6db74>&lt;&lt;EOF | sudo tee /etc/modules-load.d/k8s.conf
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>overlay
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>br_netfilter
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>EOF</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sudo modprobe overlay
+</span></span><span style=display:flex><span>sudo modprobe br_netfilter
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># sysctl params required by setup, params persist across reboots</span>
+</span></span><span style=display:flex><span>cat <span style=color:#e6db74>&lt;&lt;EOF | sudo tee /etc/sysctl.d/k8s.conf
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>net.bridge.bridge-nf-call-iptables  = 1
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>net.bridge.bridge-nf-call-ip6tables = 1
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>net.ipv4.ip_forward                 = 1
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>EOF</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Apply sysctl params without reboot</span>
+</span></span><span style=display:flex><span>sudo sysctl --system
+</span></span></code></pre></div><h2 id=安装-docker>安装 Docker
+<a class=anchor href=#%e5%ae%89%e8%a3%85-docker>#</a></h2><p>设置 Docker 的 APT 源：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># Add Docker&#39;s official GPG key:</span>
+</span></span><span style=display:flex><span>sudo apt-get update
+</span></span><span style=display:flex><span>sudo apt-get install ca-certificates curl gnupg
+</span></span><span style=display:flex><span>sudo install -m <span style=color:#ae81ff>0755</span> -d /etc/apt/keyrings
+</span></span><span style=display:flex><span>curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+</span></span><span style=display:flex><span>sudo chmod a+r /etc/apt/keyrings/docker.gpg
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Add the repository to Apt sources:</span>
+</span></span><span style=display:flex><span>echo <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  <span style=color:#e6db74>&#34;deb [arch=</span><span style=color:#66d9ef>$(</span>dpkg --print-architecture<span style=color:#66d9ef>)</span><span style=color:#e6db74> signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  </span><span style=color:#66d9ef>$(</span>. /etc/os-release <span style=color:#f92672>&amp;&amp;</span> echo <span style=color:#e6db74>&#34;</span>$VERSION_CODENAME<span style=color:#e6db74>&#34;</span><span style=color:#66d9ef>)</span><span style=color:#e6db74> stable&#34;</span> | <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
+</span></span><span style=display:flex><span>sudo apt-get update
+</span></span></code></pre></div><p>安装 Docker：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+</span></span></code></pre></div><blockquote><p>官方文档：
+<a href=https://docs.docker.com/engine/install/ubuntu/>Docker 安装</a>。</p></blockquote><h2 id=安装-cri-dockerd>安装 cri-dockerd
+<a class=anchor href=#%e5%ae%89%e8%a3%85-cri-dockerd>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>wget https://github.com/Mirantis/cri-dockerd/releases/download/v0.3.8/cri-dockerd-0.3.8.amd64.tgz
+</span></span><span style=display:flex><span>tar -xzvf cri-dockerd-0.3.8.amd64.tgz
+</span></span><span style=display:flex><span>sudo install -m <span style=color:#ae81ff>0755</span> -o root -g root -t /usr/local/bin cri-dockerd/cri-dockerd
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>wget https://raw.githubusercontent.com/Mirantis/cri-dockerd/master/packaging/systemd/cri-docker.service
+</span></span><span style=display:flex><span>wget https://raw.githubusercontent.com/Mirantis/cri-dockerd/master/packaging/systemd/cri-docker.socket
+</span></span><span style=display:flex><span>sudo install cri-docker.service /etc/systemd/system
+</span></span><span style=display:flex><span>sudo install cri-docker.socket /etc/systemd/system
+</span></span><span style=display:flex><span>sudo sed -i -e <span style=color:#e6db74>&#39;s,/usr/bin/cri-dockerd,/usr/local/bin/cri-dockerd,&#39;</span> /etc/systemd/system/cri-docker.service
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sudo systemctl daemon-reload
+</span></span><span style=display:flex><span>sudo systemctl enable --now cri-docker.socket
+</span></span><span style=display:flex><span>sudo systemctl start cri-docker.service
+</span></span></code></pre></div><blockquote><p>社区文档：
+<a href=https://github.com/Mirantis/cri-dockerd/blob/master/README.md#install>cri-dockerd 安装</a></p></blockquote><h2 id=安装-kubeadmkubelet-和-kubectl>安装 kubeadm、kubelet 和 kubectl
+<a class=anchor href=#%e5%ae%89%e8%a3%85-kubeadmkubelet-%e5%92%8c-kubectl>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>sudo apt-get update
+</span></span><span style=display:flex><span>sudo apt-get install -y apt-transport-https ca-certificates curl
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 国内网络使用下面命令替换</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># curl -fsSL https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add -</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /&#39;</span> | sudo tee /etc/apt/sources.list.d/kubernetes.list
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 国内网络使用下面命令替换</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># cat &lt;&lt; EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># EOF</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sudo apt-get update
+</span></span><span style=display:flex><span>sudo apt-get install -y kubelet kubeadm kubectl
+</span></span><span style=display:flex><span>sudo apt-mark hold kubelet kubeadm kubectl
+</span></span></code></pre></div><blockquote><p>早于 Debian 12 和 Ubuntu 22.04 的版本，/etc/apt/keyrings 目录默认不存在，需要手动创建：<code>sudo mkdir -m 755 /etc/apt/keyrings</code></p></blockquote><h2 id=配置-cgroup-driver>配置 cgroup-driver
+<a class=anchor href=#%e9%85%8d%e7%bd%ae-cgroup-driver>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 查看 cgroup-driver</span>
+</span></span><span style=display:flex><span>docker info | grep <span style=color:#e6db74>&#34;Cgroup Driver&#34;</span>
+</span></span></code></pre></div><p>配置使用 systemd 作为 cgroup-driver：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>vim /etc/docker/daemon.json
+</span></span></code></pre></div><p>添加或修改配置项：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#960050;background-color:#1e0010>...</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;exec-opts&#34;</span>: [
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;native.cgroupdriver=systemd&#34;</span>
+</span></span><span style=display:flex><span>  ]
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>配置 kubelet 使用 systemd 作为 cgroup-driver（首次创建集群时，该文件并未生成，如果首次集群创建失败，那么可能已经生成该文件了，此时可以修改这个文件的配置）：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>vim /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+</span></span></code></pre></div><p>添加或修改配置项：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#a6e22e>...</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Environment</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;KUBELET_EXTRA_ARGS=--cgroup-driver=systemd&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>...</span>
+</span></span></code></pre></div><h2 id=安装集群>安装集群
+<a class=anchor href=#%e5%ae%89%e8%a3%85%e9%9b%86%e7%be%a4>#</a></h2><p>国内网络提前拉取 <code>registry.k8s.io/pause:3.9</code> 镜像：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker pull registry.aliyuncs.com/google_containers/pause:3.9
+</span></span><span style=display:flex><span>docker tag registry.aliyuncs.com/google_containers/pause:3.9 registry.k8s.io/pause:3.9
+</span></span></code></pre></div><p>使用 <code>kubeadm init</code> 初始化集群：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>sudo kubeadm init <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --pod-network-cidr 10.244.0.0/16 <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --kubernetes-version 1.28.3 <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --control-plane-endpoint<span style=color:#f92672>=</span>&lt;EXTERNAL_IP&gt;:6443 <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --ignore-preflight-errors<span style=color:#f92672>=</span>Swap <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cri-socket<span style=color:#f92672>=</span>unix:///var/run/cri-dockerd.sock
+</span></span></code></pre></div><p>Notes:</p><ol><li>需要确保 <code>--control-plane-endpoint</code> 端点在执行环境是可以访问的，如果参数值为服务器的公网 IP，那么你可能需要对安全组开通 6443 端口;</li><li>国内网络拉取镜像使用代理添加命令参数：<code>--image-repository registry.aliyuncs.com/google_containers</code>。</li></ol><p>初始化完成后，执行以下命令，配置集群访问环境：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>mkdir -p ~/.kube
+</span></span><span style=display:flex><span>sudo cp -i /etc/kubernetes/admin.conf ~/.kube/config
+</span></span><span style=display:flex><span>sudo chown <span style=color:#66d9ef>$(</span>id -u<span style=color:#66d9ef>)</span>:<span style=color:#66d9ef>$(</span>id -g<span style=color:#66d9ef>)</span> $HOME/.kube/config
+</span></span></code></pre></div><p>查看集群节点状态：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl get nodes
+</span></span></code></pre></div><p>如果允许 Pod 调度到 Master 节点，那么需要去除 Master 节点的污点：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+</span></span></code></pre></div><h2 id=安装网络插件>安装网络插件
+<a class=anchor href=#%e5%ae%89%e8%a3%85%e7%bd%91%e7%bb%9c%e6%8f%92%e4%bb%b6>#</a></h2><p>安装 <code>flanenel</code> 网络插件：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+</span></span></code></pre></div><p>flannel 默认使用 CIDR 为 <code>10.244.0.0/16</code>，需要与 <code>kubeadm init</code> 时指定的 <code>--pod-network-cidr</code> 参数一致。</p><h2 id=安装-metrics-server>安装 metrics-server
+<a class=anchor href=#%e5%ae%89%e8%a3%85-metrics-server>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+</span></span></code></pre></div><p>在多数情况下，metrics-server 由于证书问题无法正常启动，需要修改 <code>metrics-server</code> 的 <code>Deployment</code> 配置，添加 <code>--kubelet-insecure-tls</code> 参数：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl edit deployment metrics-server -n kube-system
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>...
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#ae81ff>...</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
+</span></span><span style=display:flex><span>    <span style=color:#ae81ff>...</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>containers</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>args</span>:
+</span></span><span style=display:flex><span>        - --<span style=color:#ae81ff>cert-dir=/tmp</span>
+</span></span><span style=display:flex><span>        - --<span style=color:#ae81ff>secure-port=4443</span>
+</span></span><span style=display:flex><span>        - --<span style=color:#ae81ff>kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname</span>
+</span></span><span style=display:flex><span>        - --<span style=color:#ae81ff>kubelet-use-node-status-port</span>
+</span></span><span style=display:flex><span>        - --<span style=color:#ae81ff>metric-resolution=15s</span>
+</span></span><span style=display:flex><span>        - --<span style=color:#ae81ff>kubelet-insecure-tls</span>
+</span></span></code></pre></div><h2 id=部署应用>部署应用
+<a class=anchor href=#%e9%83%a8%e7%bd%b2%e5%ba%94%e7%94%a8>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl create deployment nginx --image<span style=color:#f92672>=</span>nginx
+</span></span><span style=display:flex><span>kubectl expose deployment nginx --name<span style=color:#f92672>=</span>nginx --port<span style=color:#f92672>=</span><span style=color:#ae81ff>80</span> --target-port<span style=color:#f92672>=</span><span style=color:#ae81ff>80</span> --type<span style=color:#f92672>=</span>NodePort
+</span></span></code></pre></div><h2 id=参考>参考
+<a class=anchor href=#%e5%8f%82%e8%80%83>#</a></h2><ul><li><a href=https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/>Bootstrapping clusters with kubeadm</a></li><li><a href=https://kubernetes.io/docs/setup/production-environment/container-runtimes/>Container Runtimes</a></li></ul><hr><p><a href=/kubernetes/k8s-get-started/>« 简单介绍 K8s</a></p><p><a href=/kubernetes/kubeadm-install-k8s/>» kubeadm 安装 k8s (containerd)</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/kubernetes/kubeadm-install-k8s-docker.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#要求>要求</a></li><li><a href=#准备工作>准备工作</a></li><li><a href=#安装-docker>安装 Docker</a></li><li><a href=#安装-cri-dockerd>安装 cri-dockerd</a></li><li><a href=#安装-kubeadmkubelet-和-kubectl>安装 kubeadm、kubelet 和 kubectl</a></li><li><a href=#配置-cgroup-driver>配置 cgroup-driver</a></li><li><a href=#安装集群>安装集群</a></li><li><a href=#安装网络插件>安装网络插件</a></li><li><a href=#安装-metrics-server>安装 metrics-server</a></li><li><a href=#部署应用>部署应用</a></li><li><a href=#参考>参考</a></li></ul></nav></div></aside></main></body></html>

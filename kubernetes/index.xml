@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>我的博客</title><link>https://blog.poneding.com/kubernetes/</link><description>Recent content on 我的博客</description><generator>Hugo</generator><language>cn</language><atom:link href="https://blog.poneding.com/kubernetes/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>https://blog.poneding.com/kubernetes/anti-affinity-improves-service-availability/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/anti-affinity-improves-service-availability/</guid><description>我的博客 / Kubernetes / 反亲和性提高服务可用性
+反亲和性提高服务可用性 # 在 Kubernetes 中部署服务时，我们通常会部署多副本来提高服务的可用性。但是当这些副本集中部署在一个节点，而且很不幸，该节点出现故障，那么服务很容易陷入不可用状态。
+下面介绍一种方法，将服务副本分散部署在不同的节点（把鸡蛋放在不同的篮子里），避免单个节点故障导致服务多副本毁坏，提高服务可用性。
+反亲和 # apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx spec: selector: matchLabels: app: nginx replicas: 5 template: metadata: labels: app: nginx spec: affinity: podAntiAffinity: requiredDuringSchedulingIgnoredDuringExecution: podAffinityTerm: labelSelector: matchExpressions: - key: app operator: In values: - nginx topologyKey: kubernetes.io/hostname containers: - name: nginx image: nginx ports: - name: tcp containerPort: 80 使用 kubernetes.io/hostname 作为拓扑域,查看匹配规则，即同一打有同样标签 app=nginx 的 pod 会调度到不同的节点。</description></item><item><title/><link>https://blog.poneding.com/kubernetes/apiserver-builder/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/apiserver-builder/</guid><description>我的博客 / Kubernetes / apiserver-builder
+apiserver-builder # 安装 # go install sigs.k8s.io/apiserver-builder-alpha/cmd/apiserver-boot@v1.23.0 搭建 # 初始化项目：
+⚠️ 注意：由于历史原因需要进入 $(go env GOPATH)/src/&amp;lt;package&amp;gt; 包目录下执行初始化命令。
+mkdir -p $(go env GOPATH)/src/github.com/poneding/apiserver-demo &amp;amp;&amp;amp; cd $(go env GOPATH)/src/github.com/poneding/apiserver-demo apiserver-boot init repo --domain k8sdev.poneding.com 创建 API：
+# apiserver-boot create &amp;lt;group&amp;gt; &amp;lt;version&amp;gt; &amp;lt;resource&amp;gt; apiserver-boot create demo v1alpha1 User apiserver-boot create group version resource --group demo --version v1alpha1 --kind User 参考 # https://github.com/kubernetes-sigs/apiserver-builder-alpha/blob/master/docs/tools_user_guide.md https://github.com/kubernetes-sigs/apiserver-builder-alpha/blob/master/README.md « 反亲和性提高服务可用性
+» apiserver</description></item><item><title/><link>https://blog.poneding.com/kubernetes/apiserver/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/apiserver/</guid><description>我的博客 / Kubernetes / apiserver
+apiserver # 每一个 api 版本均有一个 apiservice 与之对应
+k api-versions | wc -l 30 k get apiservices.apiregistration.k8s.io| wc -l 30 « apiserver-builder
+» 二进制搭建 K8s - 1 机器准备</description></item><item><title/><link>https://blog.poneding.com/kubernetes/binary-build-k8s-01-prepare-nodes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/binary-build-k8s-01-prepare-nodes/</guid><description>我的博客 / Kubernetes / 二进制搭建 K8s - 1 机器准备
+二进制搭建 K8s - 1 机器准备 # 写在前面 # 记录和分享使用二进制搭建 K8s 集群的详细过程，由于操作比较冗长，大概会分四篇写完：
+机器准备： 部署 etcd 集群： 部署 Master： 部署 Node： 整个目标是使用二进制的方式搭建一个小型 K8s 集群（1 个 Master，2 个 Node），供自己学习测试。
+至于为什么要自己去用二进制的方式去搭建 K8s，而不是选用 minikube 或者 kubeadm 去搭建？
+因为使用二进制搭建，K8s 的每个组件，每个工具都需要你手动的安装和配置，帮助你加深对 K8s 组织架构和工作原理的了解。
+准备工作 # 三台 centos7 虚拟机，自己学习使用的话 1 核 1G 应该就够了。
+虚拟机能够连网，相关的安装包文件下载和 Docker 下载镜像需要使用到外网。
+当前虚拟机：
+k8s-master01: 192.168.115.131 k8s-node01: 192.168.115.132 k8s-node02: 192.168.115.133 虚拟机初始化 # 不做特殊说明的话：
+以下操作需要在 Master 和 Node 的所有机器上执行</description></item><item><title/><link>https://blog.poneding.com/kubernetes/binary-build-k8s-02-deploy-etcd/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/binary-build-k8s-02-deploy-etcd/</guid><description>我的博客 / Kubernetes / 二进制搭建 K8s - 2 部署 etcd 集群
+二进制搭建 K8s - 2 部署 etcd 集群 # 写在前面 # 记录和分享使用二进制搭建 K8s 集群的详细过程，由于操作比较冗长，大概会分四篇写完：
+机器准备： 部署 etcd 集群： 部署 Master： 部署 Node： etcd 作为 K8s 的数据库，需要首先安装，为其他组件做服务基础。
+etcd 是一个分布式的数据库系统，为了模拟 etcd 的高可用，我们将 etcd 部署在三台虚拟机上，正好就部署在 K8s 集群所使用的三台机器上吧。
+etcd 集群，K8s 组件之间通信，为了安全可靠，我们最好启用 HTTPS 安全机制。K8s 提供了基于 CA 签名的双向数字证书认证方式和简单的基于 HTTP Base 或 Token 的认证方式，其中 CA 证书方式的安全性最高。我们使用 cfssl 为我们的 K8s 集群配置 CA 证书，此外也可以使用 openssl。
+安装 cfssl # 在 Master 机器执行：</description></item><item><title/><link>https://blog.poneding.com/kubernetes/binary-build-k8s-03-deploy-master/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/binary-build-k8s-03-deploy-master/</guid><description>我的博客 / Kubernetes / 二进制搭建 K8s - 3 部署 Master
+二进制搭建 K8s - 3 部署 Master # 写在前面 # 记录和分享使用二进制搭建 K8s 集群的详细过程，由于操作比较冗长，大概会分四篇写完：
+机器准备： 部署 etcd 集群： 部署 Master： 部署 Node： 我们已经知道在 K8s 的 Master 上存在着 kube-apiserver、kube-controller-manager、kube-scheduler 三大组件。本篇介绍在 Master 机器安装这些组件，除此之外，如果想在 Master 机器上操作集群，还需要安装 kubectl 工具。
+安装 kubectl # kubernetes 的安装包里已经将 kubectl 包含进去了，部署很简单：
+cd /root/kubernetes/resources/ tar -zxvf ./kubernetes-server-linux-amd64.tar.gz cp kubernetes/server/bin/kubectl /usr/bin kubectl api-versions 制作 kubernetes 证书 # mkdir /root/kubernetes/resources/cert/kubernetes /etc/kubernetes/{ssl,bin} -p cp kubernetes/server/bin/kube-apiserver kubernetes/server/bin/kube-controller-manager kubernetes/server/bin/kube-scheduler /etc/kubernetes/bin cd /root/kubernetes/resources/cert/kubernetes 接下来都在 Master 机器上执行，编辑 ca-config.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/binary-build-k8s-04-deploy-worker/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/binary-build-k8s-04-deploy-worker/</guid><description>我的博客 / Kubernetes / 二进制搭建 K8s - 4 部署 Node
+二进制搭建 K8s - 4 部署 Node # 写在前面 # 记录和分享使用二进制搭建 K8s 集群的详细过程，由于操作比较冗长，大概会分四篇写完：
+机器准备： 部署 etcd 集群： 部署 Master： 部署 Node： K8s 的 Node 上需要运行 kubelet 和 kube-proxy。本篇介绍在 Node 机器安装这两个组件，除此之外，安装通信需要的 cni 插件。
+本篇的执行命令需要在准备的两台Node机器上执行。
+安装 docker # 可以参照官网： https://docs.docker.com/engine/install/
+# 卸载老版本或重装 docker 时执行第一行 yum remove docker \ docker-client \ docker-client-latest \ docker-common \ docker-latest \ docker-latest-logrotate \ docker-logrotate \ docker-engine -y # 安装 docker yum install -y yum-utils yum-config-manager \ --add-repo \ https://download.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/cloud-native-understood/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/cloud-native-understood/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 尝试理解云原生
+Kubernetes 0-1 尝试理解云原生 # 最初的云原生定义：
+应用容器化 面向微服务架构 应用支持容器编排调度 重新定义云原生：
+云原生技术有利于各组织在公有云、私有云和混合云等新型动态环境中，构建和运行可弹性扩展的应用。云原生的代表技术包括容器、服务网格、微服务、不可变基础设施和声明式API。
+这些技术能够构建容错性好、易于管理和便于观察的松耦合系统。结合可靠的自动化手段，云原生技术使工程师能够轻松地对系统作出频繁和可预测的重大变更。
+云原生本身不能称为是一种架构，它首先是一种基础设施，运行在其上的应用称作云原生应用，只有符合云原生设计哲学的应用架构才叫云原生应用架构。
+« 二进制搭建 K8s - 4 部署 Node
+» 集群联邦</description></item><item><title/><link>https://blog.poneding.com/kubernetes/cluster-federation/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/cluster-federation/</guid><description>我的博客 / Kubernetes / 集群联邦
+集群联邦 # 云服务提供商的集群联邦是一种将多个独立的 Kubernetes 集群组合在一起的方法。这种方法允许用户在多个集群之间共享资源，例如 Pods、Services、Deployments 等。集群联邦的目标是在多个集群上引入新的控制面板，提供一个统一的视图，使用户可以在多个集群之间无缝地部署和管理应用程序。
+概念 # 数据中心：Region，是一个物理位置，包含多个可用性区域。 可用性区域：Availability Zone（AZ），是一个独立的数据中心，包含 N 多服务器节点。 管理集群：或者宿主集群，是一个集群联邦的核心，用于管理多个工作集群。 联邦集群：或者工作集群，是一个普通的 Kubernetes 集群，用于部署工作负载。 集群联邦需要解决的问题 # 跨集群服务发现：连通多个集群，使得服务可以在多个集群之间发现，让请求跨越集群边界。 跨集群调度：将负载调度到多个集群，保证服务的稳定性以及可用性。 集群联邦开源项目 # Kubefed # 项目地址
+之前由 Kubernetes 官方多集群兴趣小组开发，目前已经停止维护。
+架构原理：
+将联邦资源（FederationResource）从管理集群同步到工作集群。
+这其中通过三个概念来实现：
+Template：定义了联邦资源的模板，用于指定联邦资源的属性 Placement：定义了联邦集群资源的部署位置，用于指定联邦资源的部署位置。 Overrides：定义了联邦集群资源的覆盖规则，用于覆盖联邦资源的属性。 kubefed 为所有的 Kubernetes 原生资源提供了对应的联邦资源，例如 FederatedService、FederatedDeployment 等。
+联邦资源中定义了原生资源的 Template、又通过 Overrides 定义了资源同步到不同的工作集群时需要做的变更，例如：
+kind: FederatedDeployment ... spec: ... overrides: # Apply overrides to cluster1 - clusterName: cluster1 clusterOverrides: # Set the replicas field to 5 - path: &amp;#34;/spec/replicas&amp;#34; value: 5 # Set the image of the first container - path: &amp;#34;/spec/template/spec/containers/0/image&amp;#34; value: &amp;#34;nginx:1.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/configmap-understood/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/configmap-understood/</guid><description>我的博客 / Kubernetes / 了解 ConfigMap
+了解 ConfigMap # 几乎所有的应用都需要配置信息，在 K8s 部署应用，最佳实践是将应用的配置信息（环境变量或者配置文件）和程序本身分离，这样配置信息的更新和复用都可以更简单，也使得程序更加灵活。
+Kubernetes 允许将配置选项分离到单独的资源对象 ConfigMap 中，本质上是一个键值对映射，值可以是一个短 string 串，也可以是一个完整的配置文件。
+本篇主要介绍 ConfigMap 资源的创建和使用。
+ConfigMap 的创建 # 可以直接通过 kubectl create configmap 命令创建，也可以先编写 configmap 的 yaml 文件再使用kubectl apply -f &amp;lt;filename&amp;gt;创建，推荐使用后者。
+单行命令创建 ConfigMap # 创建一个键值对的 ConfigMap： kubectl create configmap first-config --from-literal=user=admin 创建完成之后，使用 kubectl describe configmap first-config 查看，可以看到这个 configmap 的键值内容。
+可以使用多组 --from-literal=&amp;lt;key&amp;gt;=&amp;lt;value&amp;gt; 参数，在 configmap 中定义多组键值对。
+创建一个文件内容的 ConfigMap 假如我当前有一个配置文件 app.json，文件内容如下：
+{ &amp;#34;App&amp;#34;: &amp;#34;MyApp&amp;#34;, &amp;#34;Version&amp;#34;: &amp;#34;v1.0&amp;#34; } 使用以下命令创建 ConfigMap：</description></item><item><title/><link>https://blog.poneding.com/kubernetes/delete-es-log-index-scheduler/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/delete-es-log-index-scheduler/</guid><description>我的博客 / Kubernetes / 定期删除 ElasticSearch 日志索引
+定期删除 ElasticSearch 日志索引 # 背景 # 当前在 K8s 集群中部署了一套 EFK 日志监控系统，日复一日，ElasticSearch收集的数据越来越多，内存以及存储占用越来越高，需要定期来删除老旧的日志数据，来解放内存和存储空间，考虑到 K8s 中 cronjob 的功能特性，打算使用它制定一个es日志索引清除脚本，定时清除日志数据。
+ConfigMap # 这个configMap用来存储一个shell脚本，该shell脚本执行日志索引清除操作：
+apiVersion: v1 kind: ConfigMap metadata: name: es-log-indices-clear-configmap namespace: efk data: clean-indices.sh: | #/bin/bash LAST_MONTH_DATE=`date -d &amp;#34;1 month ago&amp;#34; +&amp;#34;%Y.%m.%d&amp;#34;` echo Start clear es indices *-${LAST_MONTH_DATE} curl -XDELETE http://elasticsearch:9200/*-${LAST_MONTH_DATE} --- 说明：这里我配置的configmap所在命名空间和efk部署的命名空间一致，并且es的Service的名称是elasticsearch，所以可以使用 http://elasticsearch:9200访问到es服务，否则的话需要是无法访问到的，所以这里需要根据具体情况配置es的服务地址；
+CronJob # CronJob使用了 poneding/sparrow
+apiVersion: batch/v1beta1 kind: CronJob metadata: name: clean-indices namespace: efk spec: schedule: &amp;#34;0 0 1/1 * *&amp;#34; jobTemplate: spec: template: spec: containers: - name: auto-recycle-job image: poneding/sparrow args: [&amp;#34;/bin/sh&amp;#34;, &amp;#34;/job/clean-indices.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/delete-k8s-resource-force/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/delete-k8s-resource-force/</guid><description>我的博客 / Kubernetes / 强制删除 K8s 资源
+强制删除 K8s 资源 # 强制删除 Pod # kubectl delete po &amp;lt;pod&amp;gt; -n &amp;lt;namespace&amp;gt; --force --grace-period=0 强制删除 PVC # kubectl patch pv &amp;lt;pv&amp;gt; -n &amp;lt;namespace&amp;gt; -p &amp;#39;{&amp;#34;metadata&amp;#34;:{&amp;#34;finalizers&amp;#34;:null}}&amp;#39; 强制删除 PV # kubectl patch pvc &amp;lt;pvc&amp;gt; -n &amp;lt;namespace&amp;gt; -p &amp;#39;{&amp;#34;metadata&amp;#34;:{&amp;#34;finalizers&amp;#34;:null}}&amp;#39; 强制删除命名空间 # 在删除 kubesphere 的命名空间时遇到无法删除成功的现象，命名空间一直处于 Terminating 状态。
+$ kubectl get ns |grep kubesphere NAME STATUS AGE kubesphere-controls-system Terminating 22d kubesphere-monitoring-system Terminating 21d 在网上找到了一种解决方案。
+首先获取命名空间的 json 文件，</description></item><item><title/><link>https://blog.poneding.com/kubernetes/gateway-api-practice/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/gateway-api-practice/</guid><description>我的博客 / Kubernetes / Gateway API 实践
+Gateway API 实践 # Gateway API 还在积极开发中，目前已经发布了 v1.0.0 版本。可以通过 gateway-api 文档 获取最新进展。
+Gateway API 概述 # Gateway API 是一个 Kubernetes 的扩展 API，它定义了一套 API 来管理网关、路由、TLS 等资源对象，可以用来替代传统的 Ingress。
+和 Ingress 一样，Gateway API 也是一个抽象层，它定义了一套 API 接口，这些接口由社区中的不同厂商来实现，比如 nginx、envoy、traefik 等。
+API 清单 # GatewayClass Gateway HTTPRoute GRPCRoute BackendTLSPolicy ReferenceGrant 安装 Gateway API # # 安装最新版 gateway-api CRDs export LATEST=$(curl -s https://api.github.com/repos/kubernetes-sigs/gateway-api/releases/latest | jq -r .tag_name) kubectl apply -f https://github.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/helm-k8s-package-management-tool/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/helm-k8s-package-management-tool/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 Helm Kubernetes 的包管理工具
+Kubernetes 0-1 Helm Kubernetes 的包管理工具 # Helm is the best way to find, share, and use software built for Kubernetes.
+Helm是为Kubernetes寻找，共享和使用软件构建的最佳方式。
+简介 # Helm帮助管理Kubernetes应用程序，即使是面对复杂的K8s引用，Helm Charts也可以轻松实现定义，安装和升级。
+Helm是CNCF的毕业项目，由Helm社区维护。
+Charts：
+Charts可以看作是Helm的程序包，一个Chart是描述Kubernetes资源集的文件集合。
+Repository：
+存储和共享Charts，可以看作是Kubernetes程序包的存储中心。
+Release：
+由一个Chart运行起来的实例，这将在kubernetes集群中生成或更新一组资源，可以使用同一个chart运行成多个release。例如，如果你想运行多个redis服务，你可以通过多次安装redis的chart得到。
+看到以上三个概念，你可能会觉得似曾相识，没错，与docker三个概念——image，registry，container如出一辙，也许现在你会加深点理解了。
+安装 # 可以方便的使用脚本安装
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 chmod 700 ./get-helm.sh ./get-helm.sh 也可以下载指定版本手动安装
+下载地址： https://github.com/helm/helm/releases
+wget https://get.helm.sh/helm-v3.5.2-linux-amd64.tar.gz tar -zxvf ./helm-v3.5.2-linux-amd64.tar.gz sudo mv linux-amd64/helm /usr/local/bin/helm 第一个helm命令
+helm help 更多安装方式可查看： https://helm.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/hpa-usage/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/hpa-usage/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 实现Pod自动扩缩HPA
+Kubernetes 0-1 实现Pod自动扩缩HPA # https://blog.51cto.com/14143894/2458468?source=dra
+前言 # 在K8s集群中，我们可以通过部署Metrics Server来持续收集Pod的资源利用指标数据，我们可以根据收集到的指标数据来评估是否需要调整Pod的数量以贴合它的使用需求。例如，当我们观察到Pod的CPU利用率过高时，我们可以适当上调Deployment的Replicas字段值，来手动实现Pod的横向扩容。
+Metrics Server的指标数据可以通过Dashboard查看到； 安装Metrics Server # HPA介绍 # HPA（Horizontal Pod Autoscaler，Pod水平自动扩缩），根据Pod的资源利用率自动调整Pod管理器中副本数：Pod资源利用率低，降低Pod副本数，降低资源的使用，节约成本；Pod资源利用率高，增加Pod副本数，提高应用的负载能力。
+示例 # 以部署redis为例，现使用redis
+« Kubernetes 0-1 Helm Kubernetes 的包管理工具
+» HTTP 客户端调用 Kubernetes APIServer</description></item><item><title/><link>https://blog.poneding.com/kubernetes/http-call-k8s-apiserver/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/http-call-k8s-apiserver/</guid><description>我的博客 / Kubernetes / HTTP 客户端调用 Kubernetes APIServer
+HTTP 客户端调用 Kubernetes APIServer # 本篇介绍几种如何通过 HTTP 客户端调用 Kubernetes APIServer 的姿势。
+如何获取 Kubernetes api-server 地址 # 查看 api-server 的几种方式：
+# 1. 直接查看 kubeconfig 文件 $ cat ~/.kube/config apiVersion: v1 clusters: - cluster: server: https://192.168.58.2:8443 ... # 2. kubectl 查看集群信息 $ kubectl cluster-info Kubernetes control plane is running at https://192.168.58.2:8443 ... # 3. kubectl 查看集群配置 $ kubectl config view clusters: - cluster: .</description></item><item><title/><link>https://blog.poneding.com/kubernetes/informer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/informer/</guid><description>我的博客 / Kubernetes / Informer
+Informer # Informer是client-go中实现的一个工具包，目前已经被kubernetes中各个组件所使用，例如controller-manager。Informer本质是一个api资源的缓存。
+主要功能：
+将etcd数据同步至本地缓存，客户端通过本地缓存读取和监听资源
+注册资源Add，Update，Delete的触发事件
+目的：
+本地缓存，避免组件直接与api-server交互，减缓对api-server及etcd的访问压力。
+组件 # Reflector
+Delta FIFO Queue
+Indexer（local strorage）
+下面结合流程示意图简单介绍这些组件的角色。
+流程示意图 # 这张示意图展示了client-go类库中各个组件的工作机制，以及它们与咱们将要编写的自定义控制器的交互点（黄颜色标注的块是需要自行开发的部分）。
+Reflector：
+负责监听（Watch）特定Kubernetes资源对象，监听的资源对象可以是内置的资源例如Pod，Ingress等，也可以是定制的CR对象。
+Reflettor与ApiServer建立连接，第一次使用List&amp;amp;Watch机制从ApiServer中List特定资源的所有实例，这些实例附带的ResourceVersion字段可以用来区分实例是否更新。后续在使用List&amp;amp;Watch机制从ApiServer中Watch特定资源的新增，更新，删除等变化（增量Delta）。
+将监听到的资源的新增，更新，删除顺序写入到DeltaFIFO队列中。
+DeltaFIFO：
+一个增量的先进先出的队列，存储监听到的资源，以及资源事件类型，例如Added，Updated，Deleted，Replaced，Sync。
+Informer：
+Indexer：
+一个自带索引功能的本地存储，用于存储资源对象。Informer从DeltaFIFO中Pop出资源，存储到Indexer。Indexer中资源与k8s etcd数据保持一致。本地读取时直接查询本地存储，从而减少k8s apiserver和etcd的压力。
+使用示例 # 自定义控制器
+clientset, err := kubernetes.NewForConfig(config) stopCh := make(chan struct{}) defer close(stopch) sharedInformers := informers.NewSharedInformerFactory(clientset, time.Minute) informer := sharedInformer.Core().V1().Pods().Informer() informer.AddEventHandler(cache.ResourceEventHandlerFuncs{ AddFunc: func(obj interface{} { // ... }, UpdateFunc: func(obj interface{} { // .</description></item><item><title/><link>https://blog.poneding.com/kubernetes/ingress-gray-deploy/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/ingress-gray-deploy/</guid><description>我的博客 / Kubernetes / 通过 Ingress 进行灰度发布
+通过 Ingress 进行灰度发布 # https://start.aliyun.com/handson/Tn0HcdCZ/grap_publish_by_ingress
+Step 1 ：实验介绍 # 本实验，你将运行运行一个简单的应用，部署一个新的应用用于新的发布，并通过 Ingress 能力实现灰度发布。
+灰度及蓝绿发布是为新版本创建一个与老版本完全一致的生产环境，在不影响老版本的前提下，按照一定的规则把部分流量切换到新版本，当新版本试运行一段时间没有问题后，将用户的全量流量从老版本迁移至新版本。
+通过本实验，你将学习：
+通过 Ingress 按权重进行灰度发布 通过 Ingress 按 Header 进行灰度发布 容器服务 Kubernetes 版（简称 ACK） 本节课使用的 Kubernetes(k8s) 集群就是由 ACK 提供的，本实验涵盖的都是一些基本操作。更多高级用法，可以去 ACK 的产品页面了解哦。
+Step 2 ：部署 Deployment V1 应用 # 创建如下 YAML 文件(app-v1.yaml)
+apiVersion: v1 kind: Service metadata: name: my-app-v1 labels: app: my-app spec: ports: - name: http port: 80 targetPort: http selector: app: my-app version: v1.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/installation/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/installation/</guid><description>我的博客 / Kubernetes / 安装 Kubernetes
+安装 Kubernetes # « 通过 Ingress 进行灰度发布
+» K3s</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k3s/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k3s/</guid><description>我的博客 / Kubernetes / K3s
+K3s # k3s 是一款轻量级的 Kubernetes 发行版，专为物联网及边缘计算设计。
+要求 # K3s 有望在大多数现代 Linux 系统上运行。
+规格要求：
+CPU: 1 核 Memory：512M 端口要求：
+K3s Server 节点的入站规则如下：
+协议 端口 源 描述 TCP 6443 K3s agent 节点 Kubernetes API Server UDP 8472 K3s server 和 agent 节点 仅对 Flannel VXLAN 需要 UDP 51820 K3s server 和 agent 节点 只有 Flannel Wireguard 后端需要 UDP 51821 K3s server 和 agent 节点 只有使用 IPv6 的 Flannel Wireguard 后端才需要 TCP 10250 K3s server 和 agent 节点 Kubelet metrics TCP 2379-2380 K3s server 节点 只有嵌入式 etcd 高可用才需要 启动 # curl -sfL https://rancher-mirror.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k8s-deploy-coredns/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k8s-deploy-coredns/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 K8s部署coredns
+Kubernetes 0-1 K8s部署coredns # 在K8s集群未部署DNS之前，K8s中运行的Pod是无法访问外部网络的，因为无法完成域名解析。
+比如我们运行一个busybox的Pod，然后在Pod里面是无法ping通外部网络的：
+[root@k8s-master01 ~]# kubectl run -it --rm busybox --image=busybox sh If you don&amp;#39;t see a command prompt, try pressing enter. / # ping www.baidu.com ping: bad address &amp;#39;www.baidu.com&amp;#39; 我们可以通过在K8s中部署coredns解决这一问题。
+准备coredns.yaml文件，写入文件内容：
+apiVersion: v1 kind: ServiceAccount metadata: name: coredns namespace: kube-system labels: kubernetes.io/cluster-service: &amp;#34;true&amp;#34; addonmanager.kubernetes.io/mode: Reconcile --- apiVersion: rbac.authorization.k8s.io/v1 kind: ClusterRole metadata: labels: kubernetes.io/bootstrapping: rbac-defaults addonmanager.kubernetes.io/mode: Reconcile name: system:coredns rules: - apiGroups: - &amp;#34;&amp;#34; resources: - endpoints - services - pods - namespaces verbs: - list - watch - apiGroups: - &amp;#34;&amp;#34; resources: - nodes verbs: - get --- apiVersion: rbac.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k8s-deploy-dashboard/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k8s-deploy-dashboard/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 K8s部署Dashboard
+Kubernetes 0-1 K8s部署Dashboard # 首先下载部署的必要文件：
+wget https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended.yaml -O kube-dash.yaml --no-check-certificate 默认Dashboard的Service类型是ClusterIP，我们集群外面不方便访问，我们最好是将Service类型修改为NodePoart或LoadBalancer（前提是你的集群支持LoadBalancer），以LoadBalancer为例。
+修改文件kube-dash.yaml文件，将kubernetes-dashboard Service部分修改成如下：
+kind: Service apiVersion: v1 metadata: labels: k8s-app: kubernetes-dashboard name: kubernetes-dashboard namespace: kubernetes-dashboard spec: type: LoadBalancer ports: - port: 443 targetPort: 8443 selector: k8s-app: kubernetes-dashboard 创建kube-dash-admin-user.yaml文件:
+vim kube-dash-admin-user.yaml 写入如下内容：
+apiVersion: v1 kind: ServiceAccount metadata: name: admin-user namespace: kubernetes-dashboard --- apiVersion: rbac.authorization.k8s.io/v1 kind: ClusterRoleBinding metadata: name: admin-user roleRef: apiGroup: rbac.authorization.k8s.io kind: ClusterRole name: cluster-admin subjects: - kind: ServiceAccount name: admin-user namespace: kubernetes-dashboard 执行命令：</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k8s-deploy-efk/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k8s-deploy-efk/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 K8s部署EFK
+Kubernetes 0-1 K8s部署EFK # 写在前面 # 本篇目标是在K8s集群中搭建EFK。
+EFK是由ElasticSearch，Fluentd，Kibane组成的一套目前比较主流的日志监控系统，使用EFK监控应用日志，可以让开发人员在一个统一的入口查看日志然后分析应用运行情况。
+EFK简单的工作原理可以参考下图。通过fluentd的agent收集日志数据，写入es，kibana从es中读取日志数据展示到ui。
+部署ElasticSearch # 最好选择部署一个ES集群，这样你的ES可用性更高一点。
+采用StatefulSet部署ES。
+编写es-statefulSet.yaml文件如下：
+apiVersion: apps/v1 kind: StatefulSet metadata: name: es-cluster namespace: dev spec: serviceName: elasticsearch replicas: 3 selector: matchLabels: app: elasticsearch template: metadata: labels: app: elasticsearch spec: containers: - name: elasticsearch image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0 resources: limits: cpu: 1000m requests: cpu: 100m ports: - containerPort: 9200 name: rest protocol: TCP - containerPort: 9300 name: inter-node protocol: TCP volumeMounts: - name: data mountPath: /usr/share/elasticsearch/data env: - name: cluster.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k8s-deploy-prometheus-grafana/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k8s-deploy-prometheus-grafana/</guid><description>我的博客 / Kubernetes / 可能需要运行多次以下命令，确保k8s资源都创建
+Step # 下载相关k8s资源文件 git clone https://github.com/coreos/kube-prometheus.git 修改文件kube-prometheus/manifests/prometheus-prometheus.yaml，做这一步的目的是为prometheus的访问分配子路径，访问方式为http(s)://xxx/prometheus
+在prometheus.spec下添加
+externalUrl: prometheus routePrefix: prometheus 修改文件kube-prometheus/manifests/grafana-deployment.yaml，做这一步的目的是为grafana的访问分配子路径，访问方式为：http(s)://xxx/grafana
+在deployment.spec.template.spec.container[0]下添加
+env: - name: GF_SERVER_ROOT_URL value: &amp;#34;http://localhost:3000/grafana&amp;#34; - name: GF_SERVER_SERVE_FROM_SUB_PATH value: &amp;#34;true&amp;#34; Apply k8s资源 # 可能需要运行多次以下命令，确保k8s资源都创建 kubectl create -f manifests/setup -f manifests # !如果要删除以上创建的k8s资源，运行以下命令 kubectl delete --ignore-not-found=true -f manifests/ -f manifests/setup Ingress转发 apiVersion: extensions/v1beta1 kind: Ingress metadata: name: prometheus namespace: monitoring spec: rules: - host: dp.example.tech http: paths: - path: /prometheus backend: serviceName: prometheus-k8s servicePort: 9090 - path: /grafana backend: serviceName: grafana servicePort: 3000 - path: /alertmanager backend: serviceName: alertmanager-main servicePort: 9093 « Kubernetes 0-1 K8s部署EFK</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k8s-deploy-zookeeper-kafka/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k8s-deploy-zookeeper-kafka/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 K8s部署Zookeeper和Kafka
+Kubernetes 0-1 K8s部署Zookeeper和Kafka # 按照官方定义，Kafka是一个分布式的流处理平台。更多了解官方文档： http://kafka.apachecn.org/intro.html
+那么直接开始在K8s中部署kafka吧。
+部署kafka，首先要有一个可用的Zookeeper集群，所以我们还需要先部署一个Zookeeper集群。
+首先说明，我的K8s集群是使用的AWS的EKS服务，与自建的K8s集群的配置方面可能会有所差别。
+部署Zookeeper # 编写zookeeper-statefulSet.yaml文件：
+vim zookeeper-statefulSet.yaml 写入内容:
+kind: StatefulSet apiVersion: apps/v1beta1 metadata: name: zookeeper-1 namespace: dev spec: serviceName: zookeeper-1 replicas: 1 selector: matchLabels: app: zookeeper-1 template: metadata: labels: app: zookeeper-1 spec: containers: - name: zookeeper image: digitalwonderland/zookeeper ports: - containerPort: 2181 env: - name: ZOOKEEPER_ID value: &amp;#34;1&amp;#34; - name: ZOOKEEPER_SERVER_1 value: zookeeper-1 - name: ZOOKEEPER_SERVER_2 value: zookeeper-2 - name: ZOOKEEPER_SERVER_3 value: zookeeper-3 volumeMounts: - name: zookeeper-data mountPath: &amp;#34;/var/lib/zookeeper/data&amp;#34; subPath: zookeeper volumeClaimTemplates: - metadata: name: zookeeper-data labels: app: zookeeper-1 spec: accessModes: [&amp;#34;ReadWriteOnce&amp;#34;] storageClassName: gp2 resources: requests: storage: 30Gi --- kind: StatefulSet apiVersion: apps/v1beta1 metadata: name: zookeeper-2 namespace: dev spec: serviceName: zookeeper-2 replicas: 1 selector: matchLabels: app: zookeeper-2 template: metadata: labels: app: zookeeper-2 spec: containers: - name: zookeeper image: digitalwonderland/zookeeper ports: - containerPort: 2181 env: - name: ZOOKEEPER_ID value: &amp;#34;2&amp;#34; - name: ZOOKEEPER_SERVER_1 value: zookeeper-1 - name: ZOOKEEPER_SERVER_2 value: zookeeper-2 - name: ZOOKEEPER_SERVER_3 value: zookeeper-3 volumeMounts: - name: zookeeper-data mountPath: &amp;#34;/var/lib/zookeeper/data&amp;#34; subPath: zookeeper-data volumeClaimTemplates: - metadata: name: zookeeper-data labels: app: zookeeper-2 spec: accessModes: [&amp;#34;ReadWriteOnce&amp;#34;] storageClassName: gp2 resources: requests: storage: 30Gi --- kind: StatefulSet apiVersion: apps/v1beta1 metadata: name: zookeeper-3 namespace: dev spec: serviceName: zookeeper-3 replicas: 1 selector: matchLabels: app: zookeeper-3 template: metadata: labels: app: zookeeper-3 spec: containers: - name: zookeeper image: digitalwonderland/zookeeper ports: - containerPort: 2181 env: - name: ZOOKEEPER_ID value: &amp;#34;3&amp;#34; - name: ZOOKEEPER_SERVER_1 value: zookeeper-1 - name: ZOOKEEPER_SERVER_2 value: zookeeper-2 - name: ZOOKEEPER_SERVER_3 value: zookeeper-3 volumeMounts: - name: zookeeper-data mountPath: &amp;#34;/var/lib/zookeeper/data&amp;#34; subPath: zookeeper volumeClaimTemplates: - metadata: name: zookeeper-data labels: app: zookeeper-3 spec: accessModes: [&amp;#34;ReadWriteOnce&amp;#34;] storageClassName: gp2 resources: requests: storage: 30Gi 编写zookeeper-service.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k8s-dev-01-api-concept/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k8s-dev-01-api-concept/</guid><description>我的博客 / Kubernetes / Kubernetes 定制开发 01：K8s API 概念
+Kubernetes 定制开发 01：K8s API 概念 # 在 K8s 集群中，API 是一切的基础，K8s 的所有资源对象都是通过 API 来管理的，所以我们在定制开发的时候，首先要了解 K8s 的 API 概念。
+基本概念 # Group（G）：
+API 组，例如：apps、networking.k8s.io 等
+Version（V）：
+API 版本，例如：v1alpha1、v1、v2 等
+Resource（R）：
+API 资源，例如：pods，configmaps 等
+Kind（K）：
+API 类型，例如：Deployment，Service 等 通过 kubectl api-versions 获取集群中所有 API 的版本列表：
+$ kubectl api-versions acme.cert-manager.io/v1 admissionregistration.k8s.io/v1 apiextensions.k8s.io/v1 apiregistration.k8s.io/v1 apps/v1 authentication.k8s.io/v1 通过 kubectl api-resources 命令获取集群所有 API 的资源列表，并且可以看到资源的简写名称，版本以及类型：
+$ kubectl api-resources NAME SHORTNAMES APIVERSION NAMESPACED KIND bindings v1 true Binding componentstatuses cs v1 false ComponentStatus configmaps cm v1 true ConfigMap endpoints ep v1 true Endpoints events ev v1 true Event limitranges limits v1 true LimitRange namespaces ns v1 false Namespace nodes no v1 false Node API 资源端点 # GVR 端点：</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k8s-dev-02-crd/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k8s-dev-02-crd/</guid><description>我的博客 / Kubernetes / Kubernetes 定制开发 02：CRD
+Kubernetes 定制开发 02：CRD # « Kubernetes 定制开发 01：K8s API 概念
+» Kubernetes 定制开发 50：扩展调度器</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k8s-dev-50-extend-kube-scheduler/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k8s-dev-50-extend-kube-scheduler/</guid><description>我的博客 / Kubernetes / Kubernetes 定制开发 50：扩展调度器
+Kubernetes 定制开发 50：扩展调度器 # 简介 # Kubernetes Scheduler（调度器）是一个控制面进程，负责将 Pods 指派到节点上。调度器基于约束和可用资源为调度队列中每个 Pod 确定其可合法放置的节点。调度器之后对所有合法的节点进行排序，将 Pod 绑定到一个合适的节点。
+kube-scheduler 是 Kubernetes 自带的一个默认调度器，它会根据 Pod 的资源需求和节点的资源容量，将 Pod 调度到合适的节点上。
+如果默认调度器不符合你的需求，你可以实现自己的调度器，并且你的调度器可以和默认调度器或其他调度器一起运行在集群中。你可以通过声明 Pod 的 spec.schedulerName 字段来指定要使用的调度器。
+扩展调度器 # 有三种方式可以实现自定义调度器：
+修改 kube-scheduler 源码调度逻辑，然后编译成定制的调度器镜像，然后使用这个镜像部署调度进程 自定义 Pod 控制器，监听 Pod 的 spec.schedulerName 字段，在 Pod 被创建时，为其绑定节点 使用 Scheduler Extender 的方式，这种方式不需要修改默认调度器的配置文件 编译定制调度器镜像 # 克隆 kubernetes 源码，然后修改 kube-scheduler 源码，然后编译成定制的调度器镜像。
+git clone https://github.com/kubernetes/kubernetes.git cd kubernetes # 修改源码 make 编写 Dockerfile：</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k8s-get-started/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k8s-get-started/</guid><description>我的博客 / Kubernetes / 简单介绍 K8s
+简单介绍 K8s # 简介 # 我们的应用部署趋势由大型单体应用向微服务演变，微服务应用之间解耦，形成可被独立开发、部署、升级、伸缩的软件单元。
+另一方面容器技术由于它的轻量级，资源隔离，可移植、部署高效等特性得到了迅速的发展和普及。越来越多的应用选择使用容器来部署，微服务更不例外。
+这时，便有了管理微服务+容器的需求，Kubernetes 开始大放异彩。
+Kubernetes 是基于容器技术的服务器集群管理系统，通过它，可以托管数量庞大的应用集，并且内置完备的集群管理能力，它有能力帮你做到这些：
+应用的容器化部署、健康检查、自我修复、自动伸缩、滚动更新、资源分配等 服务的注册、发现、均衡负载等 Kubernetes 对于运维团队来说，是一个强大的帮手，更自动化的部署和管理应用，更高效的利用硬件资源。
+基本概念 # Kubernetes 集群，后面简称为K8s，主要是由控制节点（Master）和工作节点（Node）组成。
+在 Master 节点中运行着三大组件：kube-api-server、kube-controller-manager、kube-scheduler，通常也会将 etcd 数据库部署在 Master 节点。
+在 Node 节点中，也是需要部署三个主要组件，容器引擎（基本默认 docker 了）、kubelet、kube-proxy。
+K8s 的组成结构大致如下图：
+Master 节点 # 负责 K8s 资源的调度管理，由 Master 向 Node 下达控制命令，并且一般运维人员使用 Master 操作和执行命令。
+Master 节点扮演的角色相当于 K8s 的大脑，其重要性可想而知，因此建议部署 3 台 Master 节点保证 K8s 的高可用性。
+kube-api-server：http rest 接口服务，与 K8s 其他组件通信，负责 K8s 资源的 CURD 的操作入口；</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubeadm-install-k8s-docker/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubeadm-install-k8s-docker/</guid><description>我的博客 / Kubernetes / kubeadm 安装 Kubernetes (Docker)
+kubeadm 安装 Kubernetes (Docker) # 使用 kubeadm 安装 k8s 集群，是社区推荐的安装方式，本文档将介绍使用 kubeadm 安装 k8s 集群（使用 Docker 作为容器运行时）的详细过程。
+Notes:
+随着 kubeadm &amp;amp; k8s 版本的更新，安装过程可能会有所不同，截至目前，本文档使用的是 kubeadm v1.28.3 &amp;amp; k8s v1.28.3 版本； 本文档使用的操作系统是 Ubuntu 22.04，其他操作系统可能会有所不同。 要求 # 至少一台物理机或虚拟机（例如：Ubuntu 22.04）作为集群节点，最少 2 核 2G 内存； 多节点之前网络互通，且节点主机名不冲突； Master 节点需要开放以下端口：6443、2379-2380、10250、10251、10252； 准备工作 # 禁用交换分区：
+# 临时禁用交换分区 sudo swapoff -a vim /etc/fstab # 注释掉 swap 分区的配置 配置系统：
+cat &amp;lt;&amp;lt;EOF | sudo tee /etc/modules-load.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubeadm-install-k8s/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubeadm-install-k8s/</guid><description>我的博客 / Kubernetes / kubeadm 安装 k8s (containerd)
+kubeadm 安装 k8s (containerd) # 使用 kubeadm 安装 k8s 集群，是社区推荐的安装方式，本文档将介绍使用 kubeadm 安装 k8s 集群的详细过程。
+Notes:
+随着 kubeadm &amp;amp; k8s 版本的更新，安装过程可能会有所不同，截至目前，本文档使用的是 kubeadm v1.28.3 &amp;amp; k8s v1.28.3 版本； 本文档使用的操作系统是 Ubuntu 22.04，其他操作系统可能会有所不同。 要求 # 至少一台物理机或虚拟机（例如：Ubuntu 22.04）作为集群节点，最少 2 核 2G 内存； 多节点之前网络互通，且节点主机名不冲突； Master 节点需要开放以下端口：6443、2379-2380、10250、10251、10252； 准备工作 # 禁用交换分区：
+# 临时禁用交换分区 sudo swapoff -a vim /etc/fstab # 注释掉 swap 分区的配置 配置系统：
+cat &amp;lt;&amp;lt;EOF | sudo tee /etc/modules-load.d/k8s.conf overlay br_netfilter EOF sudo modprobe overlay sudo modprobe br_netfilter # sysctl params required by setup, params persist across reboots cat &amp;lt;&amp;lt;EOF | sudo tee /etc/sysctl.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubeadm-upgrade/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubeadm-upgrade/</guid><description>我的博客 / Kubernetes / Kubeadm 升级 K8s
+Kubeadm 升级 K8s # 本篇以升级 1.29.0（旧版本：1.28.x ） 版本为例，介绍如何通过 kubeadm 工具来升级 K8s 集群。
+注意：
+不支持跨主版本升级，如 1.27.x 升级到 1.29.x，中间必须先升级到 1.28.x 主版本更新必须先升级到最新的次版本，如 1.28.3 升级到 1.28.4，然后再升级到 1.29.x 升级步骤 # 控制节点（control plane node）升级 工作节点（worker node）升级 升级过程 # 1、升级至当前主版本的最新次版本 # sudo apt update sudo apt-cache madison kubeadm 以上命令后，将可以得到类似如下输出：
+$ sudo apt-cache madison kubeadm kubeadm | 1.28.4-1.1 | https://pkgs.k8s.io/core:/stable:/v1.28/deb Packages kubeadm | 1.28.3-1.1 | https://pkgs.k8s.io/core:/stable:/v1.28/deb Packages kubeadm | 1.28.2-1.1 | https://pkgs.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubebuilder-inaction/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubebuilder-inaction/</guid><description>我的博客 / Kubernetes / kubebuilder 实战
+kubebuilder 实战 # 简介 # kubebuilder 是一个构建 Operator（CRD + Controller）的框架的工具，它可以帮助我们快速的构建一个 Operator 项目，并提供了一些常用的命令，例如：创建 API、创建 Controller、Webhook 等。
+安装 # 条件 # kustomize curl -s &amp;#34;https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh&amp;#34; | bash controller-gen go install sigs.k8s.io/controller-tools/cmd/controller-gen@latest ⚠️ 注意：以上命令都是直接下载了对应命令工具最新的版本，在使用 kubebuilder 创建项目之后，在 Makefile 文件中会指定 kustomize 和 controller-gen 的版本，为了避免不兼容，推荐下载对应指定的版本。
+使用以下命令安装 kubebuilder：
+# download kubebuilder and install locally. GOOS=$(go env GOOS) GOARCH=$(go env GOARCH) curl -L -o kubebuilder https://go.kubebuilder.io/dl/latest/$GOOS/$GOARCH chmod +x kubebuilder &amp;amp;&amp;amp; mv kubebuilder /usr/local/bin/ 代码自动补全：</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubectl/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubectl/</guid><description>我的博客 / Kubernetes / kubectl
+kubectl # 安装 # 参考文档： kubectl 安装文档
+常用命令 # 自动补全 # source &amp;lt;(kubectl completion bash) 可以将上面的命令写入 ~/.bashrc 或 /etc/bash.bashrc 中，这样每次登录都会自动补全。
+$ vim ~/.bashrc ... source &amp;lt;(kubectl completion bash) 命令别名 # alias k=kubectl complete -F __start_kubectl k Troubleshooting # Q1. _get_comp_words_by_ref: command not found # 解决方法：
+apt install bash-completion -y source /usr/share/bash-completion/bash_completion source &amp;lt;(kubectl completion bash) « kubebuilder 实战
+» Kubernetes 0-1 Kubernetes最佳实践</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubernetes-best-practice/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubernetes-best-practice/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 Kubernetes最佳实践
+Kubernetes 0-1 Kubernetes最佳实践 # https://github.com/learnk8s/kubernetes-production-best-practices
+« kubectl
+» Kubernetes Dashboard</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubernetes-dashboard/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubernetes-dashboard/</guid><description>我的博客 / Kubernetes / Kubernetes Dashboard
+Kubernetes Dashboard # Installation # Steps # 登入Kubernetes Master机器。
+Copy最新的recommended.yaml文件内容，写入本地kubernetes-dashboard.yaml文件。recommended.yaml文件地址： kubernetes dashboard github
+![image-20191223173827866](
+C:\Users\dp\AppData\Roaming\Typora\typora-user-images\image-20191223173827866.png)
+# Copyright 2017 The Kubernetes Authors. # # Licensed under the Apache License, Version 2.0 (the &amp;#34;License&amp;#34;); # you may not use this file except in compliance with the License. # You may obtain a copy of the License at # # http://www.apache.org/licenses/LICENSE-2.0 # # Unless required by applicable law or agreed to in writing, software # distributed under the License is distributed on an &amp;#34;AS IS&amp;#34; BASIS, # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubernetes-naming-constraints/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubernetes-naming-constraints/</guid><description>我的博客 / Kubernetes / Kubernetes 中资源名称规范
+Kubernetes 中资源名称规范 # 在Kubernetes中，同一种资源（GVR）在同一个命名空间下名称是唯一。但是名称也需要遵循命名规则。本篇主要介绍 Kubernetes 中三种资源名称的命名规范。
+DNS1123Subdomain # 不能超过 253 个字符 只能包含小写字母、数字，以及 &amp;lsquo;-&amp;rsquo; 和 &amp;lsquo;.&amp;rsquo; 必须以字母数字开头 必须以字母数字结尾 以此规范约束的资源有：
+Ingress Pod ConfigMap NetworkPolicy DNS1123Label # 最多 63 个字符 只能包含小写字母、数字，以及 &amp;lsquo;-&amp;rsquo; 必须以字母数字开头 必须以字母数字结尾 以此规范约束的资源有：
+Namespace Service DNS1035Label # 最多 63 个字符 只能包含小写字母、数字，以及 &amp;lsquo;-&amp;rsquo; 必须以字母开头 必须以字母数字结尾 以此规范约束的资源有：
+Deployment StatefulSet 建议 # 如果资源命名符合 DNS1035Label 规范，那么一定符合 Kubernetes 资源命名规范。假如在容器平台开发过程中，为了命名约束更加统一，建议使用 DNS1035Label 规范来约束资源命名。
+可以使用下面的代码（Go）来检查资源名称是否符合规范：
+引入包：
+go get k8s.io/apimachinery/pkg/util/validation 示例代码：
+package main import ( &amp;#34;k8s.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubernetes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubernetes/</guid><description>我的博客 / Kubernetes / Kuberentes
+Kuberentes # « Kubernetes 中资源名称规范
+» KubeVirt 创建 Windows 虚拟机</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubevirt-create-windows-vm/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubevirt-create-windows-vm/</guid><description>我的博客 / Kubernetes / KubeVirt 创建 Windows 虚拟机
+KubeVirt 创建 Windows 虚拟机 # virtctl image-upload --image-path windows-10.iso --pvc-name=windows-10-iso --size 10G --uploadproxy-url https://&amp;lt;cdi-uploadproxy.cdi.svc&amp;gt; --insecure --wait-secs 240 apiVersion: v1 kind: PersistentVolumeClaim metadata: name: windows-10-data spec: accessModes: - ReadWriteOnce resources: requests: storage: 40G storageClassName: longhorn volumeMode: Filesystem --- apiVersion: kubevirt.io/v1 kind: VirtualMachine metadata: name: windows-10 spec: running: true template: metadata: labels: kubevirt.io/domain: windows-10 spec: domain: cpu: cores: 4 devices: networkInterfaceMultiqueue: true #开启网卡多队列模式 blockMultiQueue: true #开启磁盘多队列模式 disks: - cdrom: bus: sata name: virtiocontainerdisk - cdrom: bus: sata name: cdromiso bootOrder: 1 - disk: bus: virtio name: harddrive bootOrder: 2 interfaces: - masquerade: {} model: virtio name: default resources: requests: memory: 8G networks: - name: default pod: {} volumes: - name: cdromiso persistentVolumeClaim: claimName: windows-10-iso - name: harddrive persistentVolumeClaim: claimName: windows-10-data - containerDisk: image: kubevirt/virtio-container-disk name: virtiocontainerdisk « Kuberentes</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubevirt-practice/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubevirt-practice/</guid><description>我的博客 / Kubernetes / Kubevirt 实践
+Kubevirt 实践 # 简介 # Kubevirt 是 Redhat 开源的以容器方式运行虚拟机的项目，以 k8s add-on 方式，利用 k8s CRD 为增加资源类型 VirtualMachineInstance（VMI）， 使用容器的 image registry 去创建虚拟机并提供 VM 生命周期管理。 CRD 的方式使得 kubevirt 对虚拟机的管理不局限于 pod 管理接口，但是也无法使用 pod 的 RS DS Deployment 等管理能力，也意味着 kubevirt 如果想要利用 pod 管理能力，要自主去实现，目前 kubevirt 实现了类似 RS 的功能。 kubevirt 目前支持的 runtime 是 docker 和 runc。
+安装 # 部署 K8s 资源 # 最新版本 export KUBEVIRT_VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq -r .</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kustomize/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kustomize/</guid><description>我的博客 / Kubernetes / Kustomize
+Kustomize # Kustomize 是一个通过 kustomization 文件 定制 Kubernetes 对象的工具。它提供以下功能特性来管理应用配置文件：
+从其他来源生成资源 为资源设置贯穿性（Cross-Cutting）字段 组织和定制资源集合 从 1.14 版本开始，kubectl 也开始支持使用 kustomization 文件来管理 Kubernetes 对象。 要查看包含 kustomization 文件的目录中的资源，执行下面的命令：
+kubectl kustomize &amp;lt;kustomization_directory&amp;gt; 要应用这些资源，使用 --kustomize 或 -k 参数来执行 kubectl apply：
+kubectl apply -k &amp;lt;kustomization_directory&amp;gt; 生成资源 # ConfigMap 和 Secret 包含其他 Kubernetes 对象（如 Pod）所需要的配置或敏感数据。 ConfigMap 或 Secret 中数据的来源往往是集群外部，例如某个 .properties 文件或者 SSH 密钥文件。 Kustomize 提供 secretGenerator 和 configMapGenerator，可以基于文件或字面值来生成 Secret 和 ConfigMap。
+configMapGenerator # 要基于文件来生成 ConfigMap，可以在 configMapGenerator 的 files 列表中添加表项。 下面是一个根据 .</description></item><item><title/><link>https://blog.poneding.com/kubernetes/liveness-readiness-probe/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/liveness-readiness-probe/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 Pod中的livenessProbe和readinessProbe解读
+Kubernetes 0-1 Pod中的livenessProbe和readinessProbe解读 # 写在前面 # K8s对Pod的健康状态可以通过两类探针来检查：livenessProbe和readinessProbe，kubelet通过定期执行这两类探针来诊断容器的健康状况。
+livenessProbe简介 # 存活指针，判断Pod（中的应用容器）是否健康，可以理解为健康检查。我们使用livenessProbe来定期的去探测，如果探测成功，则Pod状态可以判定为Running；如果探测失败，可kubectl会根据Pod的重启策略来重启容器。
+如果未给Pod设置livenessProbe，则默认探针永远返回Success。
+当我们执行kubectl get pods命令，输出信息中STATUS一列我们可以看到Pod是否处于Running状态。
+readinessProbe简介 # 就绪指针，就绪的意思是已经准备好了，Pod的就绪我们可以理解为这个Pod可以接受请求和访问。我们使用readinessProbe来定期的去探测，如果探测成功，则Pod 的Ready状态判定为True；如果探测失败，Pod的Ready状态判定为False。
+与livenessProbe不同的是，kubelet不会对readinessProbe的探测情况有重启操作。
+当我们执行kubectl get pods命令，输出信息中READY一列我们可以看到Pod的READY状态是否为True。
+定义参数 # livenessProbe和readinessProbe的定义参数是一致的，可以通过kubectl explain pods.spec.containers.readinessProbe或kubectl explain pods.spec.containers.livenessProbe命令了解：
+就绪探针的几种类型：
+httpGet：
+向容器发送Http Get请求，调用成功（通过Http状态码判断）则确定Pod就绪；
+使用方式：
+livenessProbe: httpGet: path: /app/healthz port: 80 exec：
+在容器内执行某命令，命令执行成功（通过命令退出状态码为0判断）则确定Pod就绪；
+使用方式：
+livenessProbe: exec: command: - cat - /app/healthz tcpSocket：
+打开一个TCP连接到容器的指定端口，连接成功建立则确定Pod就绪。
+使用方式：
+livenessProbe: tcpSocket: port: 80 一般就绪探针会在启动容器一段时间后才开始第一次的就绪探测，之后做周期性探测。所以在定义就绪指针时，会给以下几个参数：
+initialDelaySeconds：在初始化容器多少秒后开始第一次就绪探测； timeoutSeconds：如果该次就绪探测超过多少秒后还未成功，判定为超时，该次探测失败，Pod不就绪。默认值1，最小值1； periodSeconds：如果Pod未就绪，则每隔多少秒周期性的做就绪探测。默认值10，最小值1； failureThreshold：如果容器之前探测成功，后续连续几次探测失败，则确定容器未就绪。默认值3，最小值1； successThreshold：如果容器之前探测失败，后续连续几次探测成功，则确定容器就绪。默认值1，最小值1。 使用示例 # 目前我在docker hub有一个测试镜像：poneding/helloweb:v1，容器启动后，有一个健康检查路由/healthz/return200，访问该路由状态码返回200；有一个检查路由/health/return404，访问该路由状态码返回404。</description></item><item><title/><link>https://blog.poneding.com/kubernetes/local-storageclass/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/local-storageclass/</guid><description>我的博客 / Kubernetes / local 存储卷实践
+local 存储卷实践 # 在 Kubernetes 中有一种存储卷类型为 local。
+local 卷所代表的是某个被挂载的本地存储设备，例如磁盘、分区或者目录。
+local 卷只能用作静态创建的持久卷。不支持动态配置。
+与 hostPath 卷相比，local 卷能够以持久和可移植的方式使用，而无需手动将 Pod 调度到节点。系统通过查看 PersistentVolume 的节点亲和性配置，就能了解卷的节点约束。
+然而，local 卷仍然取决于底层节点的可用性，并不适合所有应用程序。 如果节点变得不健康，那么 local 卷也将变得不可被 Pod 访问。使用它的 Pod 将不能运行。 使用 local 卷的应用程序必须能够容忍这种可用性的降低，以及因底层磁盘的耐用性特征而带来的潜在的数据丢失风险。
+创建 local-storage 存储类 # apiVersion: storage.k8s.io/v1 kind: StorageClass metadata: name: local-storage provisioner: kubernetes.io/no-provisioner volumeBindingMode: WaitForFirstConsumer 手动创建 PV/PVC # 1、使用 local 卷时，你需要设置 PersistentVolume 对象的 nodeAffinity 字段。 Kubernetes 调度器使用 PersistentVolume 的 nodeAffinity 信息来将使用 local 卷的 Pod 调度到正确的节点；</description></item><item><title/><link>https://blog.poneding.com/kubernetes/metallb/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/metallb/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 K8s自建LoadBalancer
+Kubernetes 0-1 K8s自建LoadBalancer # Metallb介绍 # 一般只有云平台支持LoadBalancer，如果脱离云平台，自己搭建的K8s集群，Service的类型使用LoadBalancer是没有任何效果的。为了让私有网络中的K8s集群也能体验到LoadBalabcer，Metallb成为了解决方案。
+Metallb运行在K8s集群中，监视集群内LoadBalancer类型的服务，然后从配置的IP池中为其分配一个可用IP，以ARP/NDP或BGP的方式将其广播出去，这个可用IP成为了LoadBalancer的Url，可供集群外访问。
+Metallb搭建过程 # 创建命名空间 metallb-system：
+vim metallb-namespace.yaml 写入文件内容：
+apiVersion: v1 kind: Namespace metadata: name: metallb-system 下载metallb.yaml文件
+wget https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/metallb.yaml -O metallb.yaml --no-check-certificate 定义LoadBalancer的IP池，先创建configmap
+vim metallb-configMap.yaml 写入文件内容：
+apiVersion: v1 kind: ConfigMap metadata: namespace: metallb-system name: config data: config: | address-pools: - name: default protocol: layer2 addresses: - 192.168.115.140-192.168.115.199 注意：IP池的网络需要和K8s集群的IP处于同一网段，我的K8s集群网络是192.168.115.13x，这里IP池则是给到192.168.115.140-192.168.115.199的范围。
+执行命令：
+kubectl apply -f metallb-namespace.yaml kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey=&amp;#34;$(openssl rand -base64 128)&amp;#34; kubectl apply -f metallb.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/nfs-as-pvc/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/nfs-as-pvc/</guid><description>我的博客 / Kubernetes / 使用 nfs 持久化存储
+使用 nfs 持久化存储 # 一般云平台都会提供云存储服务，如 AWS EBS 服务，K8s 可以直接使用云存储服务创建 PV 和 PVC 作为 Volume 的存储后端。假设你没有使用到云存储，那么 NFS 可能会适合你。
+NFS（Network File System），网络文件系统，允许计算机之间共享存储资源，这里也就不具体介绍了。
+部署 nfs # 以下命令需要root权限，示例中机器IP为192.168.115.137。
+安装 nfs： # Ubuntu &amp;amp; Debian apt install nfs-kernel-server -y # CentOS yum install nfs-util -y 创建共享目录： mkdir /nfs/data -p 修改 nfs 的默认配置，在文末添加配置： vim /etc/exports /nfs/data *(rw,sync,no_root_squash) 其中：
+/nfs/data：共享目录 *：对所有开放访问，可以配置成网段，IP，域名等 rw：读写权限 sync：文件同时写入磁盘和内存 no_root_squash：当登录 NFS 主机使用共享目录的使用者是 root 时，其权限将被转换成为匿名使用者，通常它的 UID 与 GID，都会变成 nobody 身份 重启 rpc，nfs 需要向 rpc 注册： systemctl restart rpcbind.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/pod-understood/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/pod-understood/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 了解 Pod
+Kubernetes 0-1 了解 Pod # Pod 介绍 # Pod，是 K8s 对象模型中的最小单元，Pod 里面包含着一组容器（单个容器或多个紧密耦合的容器），这时候 Pod 可以理解为一个机器，而 Pod 里面的容器则理解为该机器里面的进程。
+Pod 的容器运行时由容器引擎提供，默认的容器引擎是 Docker；并且 K8s 管理的是 Pod，而不是容器。
+一个 Pod 内部的容器共享：
+存储：一个 Pod 可以指定一组共享存储卷。 网络：每个 Pod 分配一个唯一 IP（集群内 IP），共享网络命名空间，包括 IP 地址和网络端口。Pod 内的容器可以使用 localhost 互相通信，集群内 Pod 与 Pod通信可以使用 Pod 分配的 IP，但是由于 Pod 的 IP 是随机分配的，这种互通信的方式不太适合使用。 尽管一个 Pod 内可以包含多个 Pod，但我们在部署应用容器时的最佳实践是一个 Pod 里面只包含一个应用容器作为主容器，其他容器为主容器服务，称之为辅助容器。例如主容器崩溃了，会有一个辅助容器去重启主容器。辅助容器可以有也可以没有，因为 Pod 里面容器的生命周期可以被 Pod 的生命周期取代，而 Pod 的生命周期可以通过 Pod 管理器来管理维护。</description></item><item><title/><link>https://blog.poneding.com/kubernetes/prgramming-kubernetes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/prgramming-kubernetes/</guid><description>我的博客 / Kubernetes / Kubernetes 编程
+Kubernetes 编程 # 开始 Kuberntes 编程之旅～
+mkdir programming-kubernetes &amp;amp;&amp;amp; cd programming-kubernetes git mod init programming-kubernetes 常用包：
+kubeconfig 对应的结构 clientcmdapi &amp;#34;k8s.io/client-go/tools/clientcmd/api&amp;#34; clientcmdapi.Config 编写自定义 API # 随机生成字符 &amp;#34;k8s.io/apimachinery/pkg/util/rand&amp;#34; rand.String(5) 参考：
+kubernetes/code-generator: Generators for kube-like API types (github.com)
+code-generator 使用
+B站 code-generator 介绍
+mkdir hack vim hack/boilerplate.go.txt /* Copyright 2022 programming-kubernetes. Licensed under the Apache License, Version 2.0 (the &amp;#34;License&amp;#34;); you may not use this file except in compliance with the License.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/prometheus-collect-kong-metrics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/prometheus-collect-kong-metrics/</guid><description>我的博客 / Kubernetes / Prometheus-监控Kong完整操作
+Prometheus-监控Kong完整操作 # 本篇记录使用Prometheus收集Kong暴露的/metrics接口，收集指标数据，从而实现对Kong的监控。
+先决条件 # Prometheus部署完成； Kong（Kong 服务，端口8000）部署完成； Kong 的Admin Api（端口8001）部署完成 Konga（Kong的WebUI，端口1337）部署完成。 Kong添加Prometheus插件 # 登录进入Konga； 点击右边菜单栏”PLUGINS“，进入Plugins管理，点击“Analytics &amp;amp; Monitoring”，选择添加Promethus插件 Kong添加metrics接口 # 我们知道Prometheus主要通过读取 http://host/metrics接口, 来收集相关服务的性能数据，但是Kong的metrics接口服务默认是没有开启的，所以需要先为Kong添加/metrics。
+登录进入Konga； 点击右边菜单栏”SERVICES“，进入Services管理，点击“ADD NEW SERVICE” 添加页面输入“Name”和“Url”参数即可，例如“Name”=“prometheusService”，“Url”=“ http://localhost:8001/metrics” 添加完Prometheus Service之后，Service列表选中并点击进入prometheusService，选择”Routes“菜单，点击“ADD ROUTE” 添加页面输入“Paths”参数即可，例如“Paths”=[“/metrics”]（Path必须以“/”为首） 这时候访问“ http://localhost:8000/metrics”，看到页面如下显示，说明已经成功的添加了metrics接口 Prometheus添加Kong指标收集 # 修改Prometheus配置文件，prometheus.yml
+scrape_configs配置项下添加如下配置
+- job_name: &amp;#39;kong&amp;#39; scrape_interval: 5s static_configs: - targets: [&amp;#39;localhost:8000&amp;#39;] 配置完之后重启Prometheus，访问“ http://localhost:9090/graph”
+可以看到一已经生成了很多kong的指标项，如http访问，nginx当前访问量等指标
+« Kubernetes 编程
+» Prometheus</description></item><item><title/><link>https://blog.poneding.com/kubernetes/prometheus/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/prometheus/</guid><description>我的博客 / Kubernetes / Prometheus
+Prometheus # Intro # 是一个面向云原生应用程序的开源的监控&amp;amp;报警工具。
+开源：继Kubernetes之后的第二个CNCF开源项目，Go语言开发 监控：通过HTTP服务定时从配置的目标收集指标数据，识别数据展示规则，展示监控系统和服务指标数据 报警：监控到的指标数据达到某一设定好的条件时，触发报警机制 时间序列数据库： 时间序列是由唯一的指标名称（Metrics）和一组标签（key=value）的形式组成 PromeQL：基于Prometheus时间序列数据库的一个灵活的查询语言 Prometheus的监控对象 # 资源监控：
+服务器的资源使用情况，在Kubernetes集群中，则可以做到对Kubernetes Node、 Deployment 、Pod的资源利用以及apiserver，controller-manager，etcd等组件的监控。
+应用监控：
+业务应用暴露端口供Prometheus调用实现监测，比如实时的用户在线人数，数据库的当前连接数等。
+Prometheus优势 # 支持机器资源和动态配置的应用监控； 多维数据收集和查询； 服务独立，少依赖。 Prometheus组件 # Prometheus Server：采集监控数据，存储时序指标，提供数据查询； Prometheus Client SDK：对接开发工具包，提供自定义的指标数据等； Push Gateway：推送指标数据的网关组件； Third-part Exporter：外部指标采集系统，暴露接口供Prometheus采集； AlertManager：指标数据的分析告警管理器； Architecture overview # 上图来源于官网：
+处理流程： 配置资源目标或应用抓取； 抓取资源或应用指标数据； 制定报警规则，推送报警； 灵活查询语言，结合Grafana展示 Installation &amp;amp; Start Up # 1. 以服务进程运行Prometheus # ​ 在ubuntu系统上安装Prometheus，一般有两种方式
+第一种，安装命令如下：
+wget https://github.com/prometheus/prometheus/releases/download/v2.13.1/prometheus-2.13.1.linux-amd64.tar.gz tar xvfz prometheus-2.13.1.linux-amd64.tar.gz # 启动Prometheus cd prometheus-2.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/pvc-expansion/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/pvc-expansion/</guid><description>我的博客 / Kubernetes / PVC 扩容
+PVC 扩容 # K8s 部署的 Kafka 程序突然挂了，查看相关日志发现原来是挂日志的磁盘空间不足，那么现在需要对磁盘进行扩容。
+使用以下命令执行 PVC 扩容的操作：
+kubectl edit pvc &amp;lt;pvc-name&amp;gt; -n &amp;lt;namespace&amp;gt; 执行过程中发现，无法对该 PVC 进行动态扩容，需要分配 PVC 存储的 StorageClass 支持动态扩容。
+那么怎么是的 StorageClass 支持动态扩容呢，很简单，更新 StorageClass 即可。
+kubectl edit storageclass &amp;lt;storageclass-name&amp;gt; 添加属性：
+allowVolumeExpansion: true # 允许卷扩充 之后再次执行 PVC 扩容的操作即可。
+« Prometheus
+» 了解 Secret</description></item><item><title/><link>https://blog.poneding.com/kubernetes/secret-understood/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/secret-understood/</guid><description>我的博客 / Kubernetes / 了解 Secret
+了解 Secret # 通常我们的应用程序的配置都会包含一些敏感信息，例如数据库连接字符串，证书，私钥等，为了保证其安全性，K8s 提供了 Secret 资源对象来保存敏感数据，它和 CongfigMap 类似，也是键值对的映射，并且使用方式也几乎一样。
+介绍 Secret # Secret 中存储着键值对数据，可以
+作为环境变量传递给容器 作为文件挂载到容器的 Volume Secret 会存储在 Pod 所调度的节点的内存中，而不是写入磁盘。
+Pod 默认生成的 Secret # 每个 Pod 都会被自动挂载一个 Secret 卷，只需要使用 kubectl desribe pod 命令就能看到一个名称类似 default-token-n4q6m 的 Secret，Secret 也是一种 K8s 资源，所以，可以使用 kubectl get secret 或 kubectl describe secret 获取查看。
+从上面图例可以看出，Pod 默认生成的 Secret 会包含三个配置项：ca.crt、namespace、token。其实这三个配置项是 Pod 内部安全访问Kubernetes API 服务的所有信息，而在 kubectl describe pod 的时候，你可以看到 Secret 所挂载的具体目录在 /var/run/secrets/kubernetes.io/serviceaccount.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/service-understood/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/service-understood/</guid><description>我的博客 / Kubernetes / 了解 Service
+了解 Service # Service 介绍 # 按照官方文档的说法，在 K8s 中，Service 是将运行在集群中的一组 Pod 的应用公开为网络服务的抽象方法，是 K8s 的核心概念之一，Service 的主要作用是使客户端发现 Pod 并与之通信。
+简单理解起来就是，由 Service 提供统一的入口地址，然后将请求负载分发到后端 Pod 的容器应用。
+为什么有 Service # 集群中部署了 Pod，应用是成功的部署起来了，但是只是至此的话，Pod 提供服务访问存在以下一些问题。
+Pod 是短暂的，可能会被销毁或重新调度，这使得 Pod 的 IP 是随时变动和更新的； 部署多个 Pod 的伸缩问题，流量分配问题； 集群外部客户端无法直接访问 Pod。 这时候就需要 Service，Pod 作为 Service 的后端提供服务。所以我们可以想象，Service 需要完成的事情：
+服务发现，通过 Pod 的 lable 查找目标 Pod，将查找的 Pod 的注册到自己的后端列表，Pod 的 IP 信息发生更改，后端列表也同步更新； 负载均衡，请求到达 Service 之后，将请求均衡转发的后端列表； 服务暴露：对外提供统一的请求地址。 创建 Service # 在创建 Sercvice 之前我们首先创建 service 代理的 Pod，nginx-pod.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/telepresence/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/telepresence/</guid><description>我的博客 / Kubernetes / Telepresence
+Telepresence # Telepresence是一款
+« 了解 Service
+» Kubernetes 0-1 使用preStop优雅终止Pod</description></item><item><title/><link>https://blog.poneding.com/kubernetes/terminate-pod-gracefully/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/terminate-pod-gracefully/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 使用preStop优雅终止Pod
+Kubernetes 0-1 使用preStop优雅终止Pod # Kubernetes允许Pod终止之前，执行自定义逻辑。
+字段定义 # 字段定义：pod.spec.containers.lifecycle.preStop
+$ kubectl explain pod.spec.containers.lifecycle.preStop KIND: Pod VERSION: v1 RESOURCE: preStop &amp;lt;Object&amp;gt; DESCRIPTION: PreStop is called immediately before a container is terminated due to an API request or management event such as liveness/startup probe failure, preemption, resource contention, etc. The handler is not called if the container crashes or exits. The reason for termination is passed to the handler.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/terraform/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/terraform/</guid><description>我的博客 / Kubernetes / Terraform
+Terraform # 创建ec2同时安装应用的三种方式 # Mode 1: userdata # 需要shell脚本文件install_nginx.sh resource &amp;#34;aws_instance&amp;#34; &amp;#34;demo&amp;#34; { # ... # Mode 1: userdata user_data = &amp;#34;${file(&amp;#34;../templates/install_nginx.sh&amp;#34;)}&amp;#34; # ... } Mode 2: remote-exec # 需要连接主机，connection; 密钥文件xxx.pem resource &amp;#34;aws_instance&amp;#34; &amp;#34;demo&amp;#34; { # ... # Mode 2: remote-exec connection { host = &amp;#34;${self.private_ip}&amp;#34; private_key = &amp;#34;${file(&amp;#34;xxx.pem&amp;#34;)}&amp;#34; user = &amp;#34;${var.ansible_user}&amp;#34; } provisioner &amp;#34;remote-exec&amp;#34; { inline = [ &amp;#34;sudo apt-get update&amp;#34;, &amp;#34;sudo apt-get install -y nginx&amp;#34;, &amp;#34;sudo service nginx start&amp;#34; ] } # .</description></item><item><title/><link>https://blog.poneding.com/kubernetes/velero-minio-backup-restore-volume/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/velero-minio-backup-restore-volume/</guid><description>我的博客 / Kubernetes / Velero + Minio 备份与恢复
+Velero + Minio 备份与恢复 # 安装 Minio # docker run -d --name minio \\ -p 9000:9000 \\ -p 9001:9001 \\ -e MINIO_ROOT_USER=minio \\ -e MINIO_ROOT_PASSWORD=minio \\ -v /minio-data:/data \\ quay.io/minio/minio:latest server /data --console-address &amp;#34;:9001&amp;#34; 创建 Bucket # 设置 Region # 点击保存后，会出现一个横幅，点击横幅上的 Restart 即可。
+创建 AccessKey # 保存 AccessKey 和 SecretKey 到文件 credentials-velero：
+[default] aws_access_key_id = &amp;lt;access_key&amp;gt; aws_secret_access_key = &amp;lt;secret_key&amp;gt; 安装 Velero CLI # # linux wget &amp;lt;https://github.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/volume-understood/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/volume-understood/</guid><description>我的博客 / Kubernetes / 了解 Volume
+了解 Volume # 我们知道容器与容器之间是隔离的，有独立的文件系统。并且存储的文件性质时临时的，当容器被销毁时，容器内的文件一并被清除。
+在 Pod 内可能运行着多个容器，这可能需要容器共享文件。在 K8s 中，抽象除了 Volume 的概念来满足这种需求。
+Volume 介绍 # 在 Docker 中，也有 Volume 的概念，它是将容器内某文件目录挂载到宿主机的目录。
+在 K8s 中，Volume 供 Pod 内的容器使用，一个容器可以使用多个 Volume，同一 Pod 内的多个容器可以同时使用一个 Volume，实现文件共享，或数据持久存储。
+容器与 Volume 的简单关系：
+Volume 定义 # 定义在 pod.spec.container 属性下：
+kind: Pod ... spec: container: ... volumeMounts: - mountPath: &amp;lt;path&amp;gt; name: &amp;lt;volume-name&amp;gt; subPath: &amp;lt;volume-path&amp;gt; volumes: - name: &amp;lt;volume-name&amp;gt; &amp;lt;volume-type&amp;gt;: ... mountPath： 容器内的目录，如果不存在则创建该目录 subPath：默认会将 mountPath 直接映射到 volume 的根目录，使用 subpath 映射到 volume 特定的目录。 Volume 类型 # Volume 有多种类型，有的可以直接在集群中使用，有的则需要第三方服务或云平台的支持。简单罗列几种常见类型，更多了类型参考： https://kubernetes.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/vpa/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/vpa/</guid><description>我的博客 / Kubernetes / VPA
+VPA # 安装 # git clone https://github.com/kubernetes/autoscaler.git cd ./autoscaler/vertical-pod-autoscaler ./hack/vpa-up.sh 卸载：
+./hack/vpa-down.sh VPA运行模式 # Auto（默认模式）：VPA在pod创建时分配资源请求，并使用首选的更新机制在现有的pod上更新它们。目前，这相当于“重建”(见下文)。一旦pod请求的免费重启(“原位”)更新可用，它就可以被“Auto”模式用作首选的更新机制。注意:VPA的这个特性是实验性的，可能会导致您的应用程序停机。
+Recreate：VPA在pod创建时分配资源请求，并在现有pod上更新它们，当请求的资源与新建议有显著差异时(如果定义了pod中断预算，则考虑到它们)，将它们赶出现有pod。这种模式应该很少使用，只有当您需要确保在资源请求更改时重新启动pods时才会使用。否则更喜欢“自动”模式，这可能会利用重新启动免费更新，一旦他们可用。注意:VPA的这个特性是实验性的，可能会导致您的应用程序停机。
+Initial：VPA只在pod创建时分配资源请求，以后不会更改它们。
+Off：VPA不会自动更改pods的资源需求。计算并可以在VPA对象中检查建议。
+示例 # « 了解 Volume</description></item></channel></rss>

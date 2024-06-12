@@ -1,0 +1,89 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / Git / 使用 GitHub 托管 helm-chart 仓库
+使用 GitHub 托管 helm-chart 仓库 # helm 官方文档：
+Helm | Chart Releaser Action to Automate GitHub Page Charts 创建 GitHub 仓库，例如：helm-charts，克隆到本地。 git clone git@github.com:[gh_id]/helm-charts.git cd helm-charts 创建干净的 gh-pages 分支。 git checkout --orphan gh-pages git rm -rf . vim README.md # helm-charts ## Usage [Helm](https://helm.sh) must be installed to use the charts. Please refer to Helm's [documentation](https://helm.sh/docs) to get started. Once Helm has been set up correctly, add the repo as follows: ```bash helm repo add mycharts https://[gh_id]."><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/git/github-host-helm-chart/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / Git / 使用 GitHub 托管 helm-chart 仓库
+使用 GitHub 托管 helm-chart 仓库 # helm 官方文档：
+Helm | Chart Releaser Action to Automate GitHub Page Charts 创建 GitHub 仓库，例如：helm-charts，克隆到本地。 git clone git@github.com:[gh_id]/helm-charts.git cd helm-charts 创建干净的 gh-pages 分支。 git checkout --orphan gh-pages git rm -rf . vim README.md # helm-charts ## Usage [Helm](https://helm.sh) must be installed to use the charts. Please refer to Helm's [documentation](https://helm.sh/docs) to get started. Once Helm has been set up correctly, add the repo as follows: ```bash helm repo add mycharts https://[gh_id]."><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="git"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Github Host Helm Chart | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/git/github-host-helm-chart/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Github Host Helm Chart</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#参考>参考</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/git/>Git</a> / 使用 GitHub 托管 helm-chart 仓库</p><h1 id=使用-github-托管-helm-chart-仓库>使用 GitHub 托管 helm-chart 仓库
+<a class=anchor href=#%e4%bd%bf%e7%94%a8-github-%e6%89%98%e7%ae%a1-helm-chart-%e4%bb%93%e5%ba%93>#</a></h1><p>helm 官方文档：</p><ul><li><a href=https://helm.sh/docs/howto/chart_releaser_action/>Helm | Chart Releaser Action to Automate GitHub Page Charts</a></li></ul><ol><li>创建 GitHub 仓库，例如：<code>helm-charts</code>，克隆到本地。</li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>git clone git@github.com:<span style=color:#f92672>[</span>gh_id<span style=color:#f92672>]</span>/helm-charts.git
+</span></span><span style=display:flex><span>cd helm-charts
+</span></span></code></pre></div><ol start=2><li>创建干净的 <code>gh-pages</code> 分支。</li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>git checkout --orphan gh-pages
+</span></span><span style=display:flex><span>git rm -rf .
+</span></span><span style=display:flex><span>vim README.md
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-markdown data-lang=markdown><span style=display:flex><span># helm-charts
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>## Usage
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>[<span style=color:#f92672>Helm</span>](<span style=color:#a6e22e>https://helm.sh</span>) must be installed to use the charts.  Please refer to
+</span></span><span style=display:flex><span>Helm&#39;s [<span style=color:#f92672>documentation</span>](<span style=color:#a6e22e>https://helm.sh/docs</span>) to get started.
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Once Helm has been set up correctly, add the repo as follows:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>```bash
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>helm repo add mycharts https://<span style=color:#f92672>[</span>gh_id<span style=color:#f92672>]</span>.github.io/helm-charts
+</span></span><span style=display:flex><span><span style=color:#e6db74>```</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>If you had already added this repo earlier, run <span style=color:#e6db74>`helm repo update`</span> to retrieve
+</span></span><span style=display:flex><span>the latest versions of the packages.  You can then run`helm search repo
+</span></span><span style=display:flex><span>mycharts` to see the charts.
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>To install the mycharts chart:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>```bash
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>helm install myapp mycharts/myapp
+</span></span><span style=display:flex><span><span style=color:#e6db74>```</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>To uninstall the chart:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>```bash
+</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>helm uninstall myapp
+</span></span><span style=display:flex><span><span style=color:#e6db74>```</span>
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>git add .
+</span></span><span style=display:flex><span>git commit -am <span style=color:#e6db74>&#34;add README.md&#34;</span>
+</span></span><span style=display:flex><span>git push -u origin gh-pages
+</span></span></code></pre></div><ol start=3><li><p>仓库启用 GitHub Pages 功能，选择 <code>gh-pages</code> 分支。</p></li><li><p>charts 开发。</p></li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>git checkout master
+</span></span><span style=display:flex><span>mkdir charts
+</span></span><span style=display:flex><span>cd charts
+</span></span><span style=display:flex><span>helm create myapp
+</span></span><span style=display:flex><span>cd ..
+</span></span></code></pre></div><ol start=5><li>使用 GitHub Action 搭配 chart-releaser 功能，为我们自动发布 charts 版本。</li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>mkdir -p .github/workflows
+</span></span><span style=display:flex><span>vim .github/workflows/release-chart.yaml
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>name: Release Charts
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>on:
+</span></span><span style=display:flex><span>  push:
+</span></span><span style=display:flex><span>    branches:
+</span></span><span style=display:flex><span>      - main
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>jobs:
+</span></span><span style=display:flex><span>  release:
+</span></span><span style=display:flex><span>    <span style=color:#75715e># depending on default permission settings for your org (contents being read-only or read-write for workloads), you will have to add permissions</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># see: https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-github_token</span>
+</span></span><span style=display:flex><span>    permissions:
+</span></span><span style=display:flex><span>      contents: write
+</span></span><span style=display:flex><span>    runs-on: ubuntu-latest
+</span></span><span style=display:flex><span>    steps:
+</span></span><span style=display:flex><span>      - name: Checkout
+</span></span><span style=display:flex><span>        uses: actions/checkout@v3
+</span></span><span style=display:flex><span>        with:
+</span></span><span style=display:flex><span>          fetch-depth: <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - name: Configure Git
+</span></span><span style=display:flex><span>        run: |
+</span></span><span style=display:flex><span>          git config user.name <span style=color:#e6db74>&#34;</span>$GITHUB_ACTOR<span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>          git config user.email <span style=color:#e6db74>&#34;</span>$GITHUB_ACTOR<span style=color:#e6db74>@users.noreply.github.com&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - name: Install Helm
+</span></span><span style=display:flex><span>        uses: azure/setup-helm@v3
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      - name: Run chart-releaser
+</span></span><span style=display:flex><span>        uses: helm/chart-releaser-action@v1.5.0
+</span></span><span style=display:flex><span>        env:
+</span></span><span style=display:flex><span>          CR_TOKEN: <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>{ secrets.GITHUB_TOKEN <span style=color:#e6db74>}</span><span style=color:#e6db74>}&#34;</span>
+</span></span></code></pre></div><blockquote><p>需要提前将 GitHub Token 生成出来，并配置到仓库的 Secrets 中。</p></blockquote><ol><li><p>提交代码即可第一次发版。</p></li><li><p>之后对 charts 改动后，修改 <code>Chart.yaml</code> 中的 <code>version</code> 字段，helm-releaser 会检测版本改动，并自动发版。</p></li></ol><h2 id=参考>参考
+<a class=anchor href=#%e5%8f%82%e8%80%83>#</a></h2><ul><li><a href=https://github.com/helm/chart-releaser-action>chart-releaser-action</a></li></ul><hr><p><a href=/git/github-action-best-practice/>« Github Action 使用最佳实践</a></p><p><a href=/git/github-hosting-helm-reop/>» GitHub 托管 helm-chart 仓库</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/git/github-host-helm-chart.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#参考>参考</a></li></ul></nav></div></aside></main></body></html>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>我的博客</title><link>https://blog.poneding.com/git/</link><description>Recent content on 我的博客</description><generator>Hugo</generator><language>cn</language><atom:link href="https://blog.poneding.com/git/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>https://blog.poneding.com/git/common-usage/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/common-usage/</guid><description>我的博客 / Git / Git 常用
+Git 常用 # 本篇主要介绍 Git 的常用命令，包括 Git 的基本配置、创建仓库、添加文件、提交文件、查看状态、查看提交历史、撤销修改、删除文件、分支管理、远程仓库等。
+Git 基本配置 # 配置 SSH 密钥 # 提交代码到远程仓库时，需要使用 SSH 密钥进行身份验证，因此需要先配置 SSH 密钥。
+# 生成 SSH 密钥 ssh-keygen -t rsa -C poneding@gmail.com # 查看 SSH 密钥，复制到 GitHub/GitLab 等 SSH Keys 中 cat ~/.ssh/id_rsa.pub 添加 .ssh/config 文件，配置 SSH 密钥的别名，方便管理多个 SSH 密钥。
+vim ~/.ssh/config 以 GitHub 为例，配置如下：
+# GitHub Host github.com HostName github.com IdentityFile ~/.ssh/id_rsa 配置用户名和邮箱 # 提交代码时，需要配置用户名和邮箱。</description></item><item><title/><link>https://blog.poneding.com/git/git-secret/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/git-secret/</guid><description>我的博客 / Git / 使用 git-secret 保护仓库敏感数据
+使用 git-secret 保护仓库敏感数据 # 如何保护 git 仓库中的敏感数据，例如数据库连接字符串，账号密码等？
+首先，最好先将仓库设置成私有仓库！然后，
+第一种方式：带有敏感数据的文件加入到. gitignore，不提交到仓库中； 第二种方式：敏感数据库文件加密后再提交到仓库中，这个就是今天要说的 git-secret。 这两种方式都有优缺点：
+第一种方式，较为靠谱，敏感文件在 git 仓库之外，根本上避免仓库敏感数据的泄露，但是敏感文件不受版本控制了，开发人员需要在其他频道同步敏感文件的更新，而且使用到自动部署时需要另外去拉取敏感数据，最好是有自己的敏感数据配置中心统一管理；
+第二种方式，使用 git-secret 加密敏感文件，这样敏感文件被仓库 ignore 掉，转而提交加密后的文件，但是敏感文件如果更新了开发人员要记得再次加密。
+git-secret 简介 # git-secret 是一个在 git 仓库中加密文件的工具，将敏感文件加密，得到加密文件，将文件保存到仓库中，这样敏感文件也是版本控制，你可以获取到该文件的所有提交记录。
+使用 gpg 和所有信任用户的公钥加密文件，每个信任用户可以使用个人密钥解密文件，如果用户离开团队，将删除用户的公钥即可，他也就不能再解密文件了。
+git-secret 使用 # 假设我现在有一个仓库 git-secret-demo，仓库下有一个包含敏感信息的文件 secret.json：
+我现在想做的是使用 git-secret 将 secret.json 文件加密。
+首先得安装 gpg 工具 # Debian &amp;amp; Ubuntu sudo apt install gnupg -y ​ # Macos brew install gnupg 本地创建 gpg RSA 密钥对 gpg --gen-key 在创建时需要输入自己的用户名和邮箱，并且需要输入你的加密密码。</description></item><item><title/><link>https://blog.poneding.com/git/github-action-best-practice/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/github-action-best-practice/</guid><description>我的博客 / Git / Github Action 使用最佳实践
+Github Action 使用最佳实践 # Commit 构建 beta 版本镜像 # 仓库根目录下创建 .github/workflows/commit-cicd.yml 文件，用于提交代码触发 github action。
+beta 版本的镜像 tag 命名规则：{vx.x.x}-beta-{COMMIT_ID}，例如：v1.0.0-beta-f37cfa2
+name: commit-cicd ​ env: BASE_VERSION: v1.0.0 ​ on: push: branches: [main] workflow_dispatch: ​ jobs: build: runs-on: ubuntu-latest steps: - uses: actions/checkout@v3 ​ - name: Set ENV run: | echo &amp;#34;VERSION=${BASE_VERSION}-beta-${GITHUB_SHA::7}&amp;#34; &amp;gt;&amp;gt; $GITHUB_ENV ​ - name: Set up QEMU uses: docker/setup-qemu-action@v2 - name: Set up Docker Buildx uses: docker/setup-buildx-action@v2 ​ - name: Login to docker hub uses: docker/login-action@v2 with: username: poneding password: ${{ secrets.</description></item><item><title/><link>https://blog.poneding.com/git/github-host-helm-chart/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/github-host-helm-chart/</guid><description>我的博客 / Git / 使用 GitHub 托管 helm-chart 仓库
+使用 GitHub 托管 helm-chart 仓库 # helm 官方文档：
+Helm | Chart Releaser Action to Automate GitHub Page Charts 创建 GitHub 仓库，例如：helm-charts，克隆到本地。 git clone git@github.com:[gh_id]/helm-charts.git cd helm-charts 创建干净的 gh-pages 分支。 git checkout --orphan gh-pages git rm -rf . vim README.md # helm-charts ## Usage [Helm](https://helm.sh) must be installed to use the charts. Please refer to Helm&amp;#39;s [documentation](https://helm.sh/docs) to get started. Once Helm has been set up correctly, add the repo as follows: ```bash helm repo add mycharts https://[gh_id].</description></item><item><title/><link>https://blog.poneding.com/git/github-hosting-helm-reop/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/github-hosting-helm-reop/</guid><description>我的博客 / Git / GitHub 托管 helm-chart 仓库
+GitHub 托管 helm-chart 仓库 # 创建 GitHub 仓库 # 创建 GitHub helm charts 仓库，例如：helm-charts，克隆到本地。
+git clone git@github.com:poneding/helm-charts.git cd helm-charts 创建 gh-pages 孤立分支 # git checkout --orphan gh-pages git rm -rf . vim README.md 编写 README.md 文件，例如：
+# helm-charts ## Usage [Helm](https://helm.sh) must be installed to use the charts. Please refer to Helm&amp;#39;s [documentation](https://helm.sh/docs) to get started. Once Helm has been set up correctly, add the repo as follows: ```bash helm repo add poneding https://poneding.</description></item><item><title/><link>https://blog.poneding.com/git/github/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/github/</guid><description>我的博客 / Git / GitHub
+GitHub # GitHub 托管 helm chart 仓库 # GitHub 托管 helm chart 仓库
+获取仓库最新 Release 的版本 # 方法一：
+curl -s https://api.github.com/repos/ketches/registry-proxy/releases/latest | jq -r .tag_name 方法二：
+basename $(curl -s -w %{redirect_url} https://github.com/ketches/registry-proxy/releases/latest) « GitHub 托管 helm-chart 仓库
+» Gitlab 添加 K8s 集群</description></item><item><title/><link>https://blog.poneding.com/git/gitlab-intergrate-k8s/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/gitlab-intergrate-k8s/</guid><description>我的博客 / Git / Gitlab 添加 K8s 集群
+Gitlab 添加 K8s 集群 # 本文介绍如何在 Gitlab 项目中添加 K8s 集群，以便使用 K8s 集群部署 gitlab-runner 帮我们运行 gitlab 的 CI/CD。
+参考官方文档： https://docs.gitlab.com/ee/user/project/clusters/add_remove_clusters.html#add-existing-cluster
+操作步骤 # 找到添加位置：
+登入 gitlab 后，进入自己的项目主页，菜单栏 Operations =&amp;gt; Kubernetes =&amp;gt; Add Kubernetes cluster，选择页签 Add existing cluster。
+我们只需要获取响应的值填录到该表单即可。Kubernetes cluster name 集群名称随意填，Project namespace 可不填。
+获取 API URL：
+运行以下命令得到输出值：
+kubectl cluster-info | grep &amp;#39;Kubernetes master&amp;#39; | awk &amp;#39;/http/ {print $NF}&amp;#39; 获取 CA Certificate：
+运行以下命令得到输出值：
+kubectl get secret $(kubectl get secret | grep default-token | awk &amp;#39;{print $1}&amp;#39;) -o jsonpath=&amp;#34;{[&amp;#39;data&amp;#39;][&amp;#39;ca\.</description></item><item><title/><link>https://blog.poneding.com/git/gitlab-upgrade-cross-version/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/gitlab-upgrade-cross-version/</guid><description>我的博客 / Git / Gitlab 跨版本升级
+Gitlab 跨版本升级 # 本文记录 Gitlab 跨版本升级的具体操作过程。
+按照官方的说法，gitlab 允许小版本直接升级，大版本需要阶段升级。
+跨版本升级示例：11.0.x -&amp;gt; 11.11.x -&amp;gt; 12.0.x -&amp;gt; 12.10.x -&amp;gt; 13.0.x。
+官方推荐的升级路线文档： https://docs.gitlab.com/ee/policy/maintenance.html#upgrade-recommendations
+目的 # 实现 gitlab 版本：11.2.3 到 13.0.0 版本的升级，我选择的升级路线是：11.2.3 =&amp;gt; 11.11.8 =&amp;gt; 12.0.12 =&amp;gt; 12.10.6 =&amp;gt; 13.0.0 =&amp;gt; 13.1.2
+我当前创建 gitlab 容器的脚本如下：
+sudo docker run --detach \ --hostname gitlab.example.com \ --publish 8443:443 --publish 8080:80 --publish 8022:22 \ --name gitlab \ --restart always \ --volume /home/ubuntu/Apps/gitlab/etc/gitlab:/etc/gitlab \ --volume /home/ubuntu/Apps/gitlab/var/log/gitlab/logs:/var/log/gitlab \ --volume /home/ubuntu/Apps/gitlab/var/opt/gitlab:/var/opt/gitlab \ gitlab/gitlab-ce:11.</description></item><item><title/><link>https://blog.poneding.com/git/multi-github-account-management/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/multi-github-account-management/</guid><description>我的博客 / Git / 多 GitHub 账号管理
+多 GitHub 账号管理 # 实际开发工作中，你有可能多个 GitHub 账号：个人开发账号，工作开发账号。
+在仓库代码管理的过程中你需要重复的使用 git config user.* 来切换代码提交账号，很是麻烦。以下方案可以帮你解决你的烦恼。
+请确保你的 git 版本最低为 2.13
+~/.gitconfig
+[user] name = poneding email = poneding@gmail.com [includeIf &amp;#34;gitdir:~/src/workspace/&amp;#34;] path = ~/src/workspace/.gitconfig [url &amp;#34;git@github-workspace&amp;#34;] insteadOf = git@github.com [pull] rebase = false [init] defaultBranch = master [core] excludesfile = ~/.gitignore_global ~/src/workspace/.gitconfig
+[user] name = dingpeng24001 email = dingpeng24001@talkweb.com.cn [url &amp;#34;git@github-workspace&amp;#34;] insteadOf = git@github.com [pull] rebase = false [init] defaultBranch = master [core] excludesfile = ~/.</description></item><item><title/><link>https://blog.poneding.com/git/simplest-git-server/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/simplest-git-server/</guid><description>我的博客 / Git / 搭建最简单的 git 仓库服务
+搭建最简单的 git 仓库服务 # 远端 # 创建仓库服务目录：
+git init --bare git-server-demo.git 其实也可以直接在终端创建，但是你首先要可以能够通过 ssh 的方式连接远端，例如远端 IP 是 192.168.10.24
+ssh root@192.168.10.24 git init --bare git-server-demo.git 执行完命令之后，将在远端目标目录下生成 git-server-demo 目录，子目录结构如下：
+tree git-server-demo.git git-server-demo.git ├── branches ├── config ├── description ├── HEAD ├── hooks │ ├── applypatch-msg.sample │ ├── commit-msg.sample │ ├── fsmonitor-watchman.sample │ ├── post-update.sample │ ├── pre-applypatch.sample │ ├── pre-commit.sample │ ├── pre-merge-commit.sample │ ├── prepare-commit-msg.</description></item></channel></rss>

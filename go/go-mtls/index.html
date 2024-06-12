@@ -1,0 +1,196 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / Golang 编程 / Golang 实现双向认证
+Golang 实现双向认证 # TLS # 传输层安全协议（TLS），在互联网上，通常是由服务器单向的向客户端提供证书，以证明其身份。
+mTLS # 双向 TLS 认证，是指在客户端和服务器之间使用双行加密通道，mTLS 是云原生应用中常用的通信安全协议。
+使用双向TLS连接的主要目的是当服务器应该只接受来自有限的允许的客户端的 TLS 连接时。例如，一个组织希望将服务器的 TLS 连接限制为只来自该组织的合法合作伙伴或客户。显然，为客户端添加IP白名单不是一个好的安全实践，因为IP可能被欺骗。
+为了简化 mTLS 握手的过程，我们这样简单梳理：
+客户端发送访问服务器上受保护信息的请求； 服务器向客户端提供公钥证书； 客户端通过使用 CA 的公钥来验证服务器公钥证书的数字签名，以验证服务器的证书； 如果步骤 3 成功，客户机将其客户端公钥证书发送到服务器； 服务器使用步骤 3 中相同的方法验证客户机的证书； 如果成功，服务器将对受保护信息的访问权授予客户机。 代码实现 # 需要实现客户端验证服务端的公钥证书，服务端验证客户端的公钥证书。
+生成证书 # echo '清理并生成目录' OUT=./certs DAYS=365 RSALEN=2048 CN=poneding rm -rf ${OUT}/* mkdir ${OUT} >> /dev/null 2>&amp;1 cd ${OUT} echo '生成CA的私钥' openssl genrsa -out ca.key ${RSALEN} >> /dev/null 2>&amp;1 echo '生成CA的签名证书' openssl req -new \ -x509 \ -key ca."><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/go/go-mtls/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / Golang 编程 / Golang 实现双向认证
+Golang 实现双向认证 # TLS # 传输层安全协议（TLS），在互联网上，通常是由服务器单向的向客户端提供证书，以证明其身份。
+mTLS # 双向 TLS 认证，是指在客户端和服务器之间使用双行加密通道，mTLS 是云原生应用中常用的通信安全协议。
+使用双向TLS连接的主要目的是当服务器应该只接受来自有限的允许的客户端的 TLS 连接时。例如，一个组织希望将服务器的 TLS 连接限制为只来自该组织的合法合作伙伴或客户。显然，为客户端添加IP白名单不是一个好的安全实践，因为IP可能被欺骗。
+为了简化 mTLS 握手的过程，我们这样简单梳理：
+客户端发送访问服务器上受保护信息的请求； 服务器向客户端提供公钥证书； 客户端通过使用 CA 的公钥来验证服务器公钥证书的数字签名，以验证服务器的证书； 如果步骤 3 成功，客户机将其客户端公钥证书发送到服务器； 服务器使用步骤 3 中相同的方法验证客户机的证书； 如果成功，服务器将对受保护信息的访问权授予客户机。 代码实现 # 需要实现客户端验证服务端的公钥证书，服务端验证客户端的公钥证书。
+生成证书 # echo '清理并生成目录' OUT=./certs DAYS=365 RSALEN=2048 CN=poneding rm -rf ${OUT}/* mkdir ${OUT} >> /dev/null 2>&amp;1 cd ${OUT} echo '生成CA的私钥' openssl genrsa -out ca.key ${RSALEN} >> /dev/null 2>&amp;1 echo '生成CA的签名证书' openssl req -new \ -x509 \ -key ca."><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="go"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Go Mtls | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/go/go-mtls/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Go Mtls</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#tls>TLS</a></li><li><a href=#mtls>mTLS</a></li><li><a href=#代码实现>代码实现</a><ul><li><a href=#生成证书>生成证书</a></li><li><a href=#服务端>服务端</a></li><li><a href=#客户端>客户端</a></li></ul></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/go/>Golang 编程</a> / Golang 实现双向认证</p><h1 id=golang-实现双向认证>Golang 实现双向认证
+<a class=anchor href=#golang-%e5%ae%9e%e7%8e%b0%e5%8f%8c%e5%90%91%e8%ae%a4%e8%af%81>#</a></h1><h2 id=tls>TLS
+<a class=anchor href=#tls>#</a></h2><p>传输层安全协议（TLS），在互联网上，通常是由服务器单向的向客户端提供证书，以证明其身份。</p><h2 id=mtls>mTLS
+<a class=anchor href=#mtls>#</a></h2><p>双向 TLS 认证，是指在客户端和服务器之间使用双行加密通道，mTLS 是云原生应用中常用的通信安全协议。</p><p>使用双向TLS连接的主要目的是当服务器应该只接受来自有限的允许的客户端的 TLS 连接时。例如，一个组织希望将服务器的 TLS 连接限制为只来自该组织的合法合作伙伴或客户。显然，为客户端添加IP白名单不是一个好的安全实践，因为IP可能被欺骗。</p><p>为了简化 mTLS 握手的过程，我们这样简单梳理：</p><ol><li>客户端发送访问服务器上受保护信息的请求；</li><li>服务器向客户端提供公钥证书；</li><li>客户端通过使用 CA 的公钥来验证服务器公钥证书的数字签名，以验证服务器的证书；</li><li>如果步骤 3 成功，客户机将其客户端公钥证书发送到服务器；</li><li>服务器使用步骤 3 中相同的方法验证客户机的证书；</li><li>如果成功，服务器将对受保护信息的访问权授予客户机。</li></ol><h2 id=代码实现>代码实现
+<a class=anchor href=#%e4%bb%a3%e7%a0%81%e5%ae%9e%e7%8e%b0>#</a></h2><p>需要实现客户端验证服务端的公钥证书，服务端验证客户端的公钥证书。</p><h3 id=生成证书>生成证书
+<a class=anchor href=#%e7%94%9f%e6%88%90%e8%af%81%e4%b9%a6>#</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>echo <span style=color:#e6db74>&#39;清理并生成目录&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>OUT<span style=color:#f92672>=</span>./certs
+</span></span><span style=display:flex><span>DAYS<span style=color:#f92672>=</span><span style=color:#ae81ff>365</span>
+</span></span><span style=display:flex><span>RSALEN<span style=color:#f92672>=</span><span style=color:#ae81ff>2048</span>
+</span></span><span style=display:flex><span>CN<span style=color:#f92672>=</span>poneding
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>rm -rf <span style=color:#e6db74>${</span>OUT<span style=color:#e6db74>}</span>/*
+</span></span><span style=display:flex><span>mkdir <span style=color:#e6db74>${</span>OUT<span style=color:#e6db74>}</span>  &gt;&gt; /dev/null 2&gt;&amp;<span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>cd <span style=color:#e6db74>${</span>OUT<span style=color:#e6db74>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;生成CA的私钥&#39;</span>
+</span></span><span style=display:flex><span>openssl genrsa -out ca.key <span style=color:#e6db74>${</span>RSALEN<span style=color:#e6db74>}</span> &gt;&gt; /dev/null 2&gt;&amp;<span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;生成CA的签名证书&#39;</span>
+</span></span><span style=display:flex><span>openssl req -new <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>-x509 <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>-key ca.key <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>-subj <span style=color:#e6db74>&#34;/CN=</span><span style=color:#e6db74>${</span>CN<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>-out ca.crt
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;&#39;</span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;生成server端私钥&#39;</span>
+</span></span><span style=display:flex><span>openssl genrsa -out server.key <span style=color:#e6db74>${</span>RSALEN<span style=color:#e6db74>}</span> &gt;&gt; /dev/null 2&gt;&amp;<span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;生成server端自签名&#39;</span>
+</span></span><span style=display:flex><span>openssl req -new <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>-key server.key <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>-subj <span style=color:#e6db74>&#34;/CN=</span><span style=color:#e6db74>${</span>CN<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>-out server.csr
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;签发server端证书&#39;</span>
+</span></span><span style=display:flex><span>openssl x509 -req  -sha256 <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>-in server.csr <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>-CA ca.crt -CAkey ca.key -CAcreateserial <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>-out server.crt -text &gt;&gt; /dev/null 2&gt;&amp;<span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;删除server端自签名证书&#39;</span>
+</span></span><span style=display:flex><span>rm server.csr
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;&#39;</span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;生成client私钥&#39;</span>
+</span></span><span style=display:flex><span>openssl genrsa -out client.key <span style=color:#e6db74>${</span>RSALEN<span style=color:#e6db74>}</span>  &gt;&gt; /dev/null 2&gt;&amp;<span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;生成client自签名&#39;</span>
+</span></span><span style=display:flex><span>openssl req -new <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>    -subj <span style=color:#e6db74>&#34;/CN=</span><span style=color:#e6db74>${</span>CN<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>    -key client.key <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>    -out client.csr
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;签发client证书&#39;</span>
+</span></span><span style=display:flex><span>openssl x509 -req -sha256<span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span> -CA ca.crt -CAkey ca.key -CAcreateserial<span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span> -days  <span style=color:#e6db74>${</span>DAYS<span style=color:#e6db74>}</span><span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span> -in client.csr<span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span> -out client.crt<span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span> -text &gt;&gt; /dev/null 2&gt;&amp;<span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;删除client端自签名&#39;</span>
+</span></span><span style=display:flex><span>rm client.csr
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;&#39;</span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;删除临时文件&#39;</span>
+</span></span><span style=display:flex><span>rm ca.srl
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;&#39;</span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;完成&#39;</span>
+</span></span></code></pre></div><h3 id=服务端>服务端
+<a class=anchor href=#%e6%9c%8d%e5%8a%a1%e7%ab%af>#</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;crypto/tls&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;crypto/x509&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;fmt&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;log&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;net/http&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;os&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;time&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>var</span> (
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>caCert</span>     = <span style=color:#e6db74>&#34;../../certs/ca.crt&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>serverCert</span> = <span style=color:#e6db74>&#34;../../certs/server.crt&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>serverKey</span>  = <span style=color:#e6db74>&#34;../../certs/server.key&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>mtlsHandler</span> <span style=color:#66d9ef>struct</span> {
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>m</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>mtlsHandler</span>) <span style=color:#a6e22e>ServeHTTP</span>(<span style=color:#a6e22e>w</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>ResponseWriter</span>, <span style=color:#a6e22e>r</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Request</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Fprintln</span>(<span style=color:#a6e22e>w</span>, <span style=color:#e6db74>&#34;Hello World! &#34;</span>, <span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Now</span>())
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>pool</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>NewCertPool</span>()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>caCertBytes</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>os</span>.<span style=color:#a6e22e>ReadFile</span>(<span style=color:#a6e22e>caCert</span>)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>        panic(<span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>pool</span>.<span style=color:#a6e22e>AppendCertsFromPEM</span>(<span style=color:#a6e22e>caCertBytes</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>server</span> <span style=color:#f92672>:=</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Server</span>{
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>Addr</span>:    <span style=color:#e6db74>&#34;:8443&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>Handler</span>: <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>mtlsHandler</span>{},
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>TLSConfig</span>: <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>tls</span>.<span style=color:#a6e22e>Config</span>{
+</span></span><span style=display:flex><span>            <span style=color:#a6e22e>ClientCAs</span>:  <span style=color:#a6e22e>pool</span>,
+</span></span><span style=display:flex><span>            <span style=color:#a6e22e>ClientAuth</span>: <span style=color:#a6e22e>tls</span>.<span style=color:#a6e22e>RequireAndVerifyClientCert</span>, <span style=color:#75715e>// 需要客户端证书
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        },
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;server started...&#34;</span>)
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatalln</span>(<span style=color:#a6e22e>server</span>.<span style=color:#a6e22e>ListenAndServeTLS</span>(<span style=color:#a6e22e>serverCert</span>, <span style=color:#a6e22e>serverKey</span>))
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=客户端>客户端
+<a class=anchor href=#%e5%ae%a2%e6%88%b7%e7%ab%af>#</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span>	<span style=color:#e6db74>&#34;crypto/tls&#34;</span>
+</span></span><span style=display:flex><span>	<span style=color:#e6db74>&#34;crypto/x509&#34;</span>
+</span></span><span style=display:flex><span>	<span style=color:#e6db74>&#34;fmt&#34;</span>
+</span></span><span style=display:flex><span>	<span style=color:#e6db74>&#34;io&#34;</span>
+</span></span><span style=display:flex><span>	<span style=color:#e6db74>&#34;net/http&#34;</span>
+</span></span><span style=display:flex><span>	<span style=color:#e6db74>&#34;os&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>var</span> (
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>caCert</span>     = <span style=color:#e6db74>&#34;../../certs/ca.crt&#34;</span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>clientCert</span> = <span style=color:#e6db74>&#34;../../certs/client.crt&#34;</span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>clientKey</span>  = <span style=color:#e6db74>&#34;../../certs/client.key&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>pool</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>NewCertPool</span>()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>caCertBytes</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>os</span>.<span style=color:#a6e22e>ReadFile</span>(<span style=color:#a6e22e>caCert</span>)
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>		panic(<span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>pool</span>.<span style=color:#a6e22e>AppendCertsFromPEM</span>(<span style=color:#a6e22e>caCertBytes</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>clientCertBytes</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>tls</span>.<span style=color:#a6e22e>LoadX509KeyPair</span>(<span style=color:#a6e22e>clientCert</span>, <span style=color:#a6e22e>clientKey</span>)
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>		panic(<span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>tr</span> <span style=color:#f92672>:=</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Transport</span>{
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>TLSClientConfig</span>: <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>tls</span>.<span style=color:#a6e22e>Config</span>{
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>RootCAs</span>:            <span style=color:#a6e22e>pool</span>,
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>Certificates</span>:       []<span style=color:#a6e22e>tls</span>.<span style=color:#a6e22e>Certificate</span>{<span style=color:#a6e22e>clientCertBytes</span>},
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>InsecureSkipVerify</span>: <span style=color:#66d9ef>true</span>,
+</span></span><span style=display:flex><span>		},
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>client</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Client</span>{
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>Transport</span>: <span style=color:#a6e22e>tr</span>,
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>r</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>client</span>.<span style=color:#a6e22e>Get</span>(<span style=color:#e6db74>&#34;https://127.0.0.1:8443&#34;</span>) <span style=color:#75715e>// server
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>		panic(<span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>defer</span> <span style=color:#a6e22e>r</span>.<span style=color:#a6e22e>Body</span>.<span style=color:#a6e22e>Close</span>()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>b</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>io</span>.<span style=color:#a6e22e>ReadAll</span>(<span style=color:#a6e22e>r</span>.<span style=color:#a6e22e>Body</span>)
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>		panic(<span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Println</span>(string(<span style=color:#a6e22e>b</span>))
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><hr><p><a href=/go/go-list-to-tree/>« Golang 列表转树</a></p><p><a href=/go/go-publish-package-01/>» Golang 发布类库 - 1</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/go/go-mtls.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#tls>TLS</a></li><li><a href=#mtls>mTLS</a></li><li><a href=#代码实现>代码实现</a><ul><li><a href=#生成证书>生成证书</a></li><li><a href=#服务端>服务端</a></li><li><a href=#客户端>客户端</a></li></ul></li></ul></nav></div></aside></main></body></html>

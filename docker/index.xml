@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>我的博客</title><link>https://blog.poneding.com/docker/</link><description>Recent content on 我的博客</description><generator>Hugo</generator><language>cn</language><atom:link href="https://blog.poneding.com/docker/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>https://blog.poneding.com/docker/container-diff/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/container-diff/</guid><description>我的博客 / Docker / container-diff 工具的使用
+container-diff 工具的使用 # 简介 # container-diff 是 google 开源的一款用于分析和比较 Docker 镜像的工具，它可以从多个维度分析一个或者比较两个容器镜像：
+镜像构建历史 镜像文件系统 镜像大小 软件包管理 项目地址： https://github.com/GoogleContainerTools/container-diff
+安装 # macOS # curl -LO https://storage.googleapis.com/container-diff/latest/container-diff-darwin-amd64 &amp;amp;&amp;amp; chmod +x container-diff-darwin-amd64 &amp;amp;&amp;amp; sudo mv container-diff-darwin-amd64 /usr/local/bin/container-diff Linux # curl -LO https://storage.googleapis.com/container-diff/latest/container-diff-linux-amd64 &amp;amp;&amp;amp; chmod +x container-diff-linux-amd64 &amp;amp;&amp;amp; sudo mv container-diff-linux-amd64 /usr/local/bin/container-diff # or curl -LO https://storage.googleapis.com/container-diff/latest/container-diff-linux-amd64 &amp;amp;&amp;amp; chmod +x container-diff-linux-amd64 &amp;amp;&amp;amp; mkdir -p $HOME/bin &amp;amp;&amp;amp; export PATH=$PATH:$HOME/bin &amp;amp;&amp;amp; mv container-diff-linux-amd64 $HOME/bin/container-diff Windows # 下载地址： https://storage.</description></item><item><title/><link>https://blog.poneding.com/docker/dind/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/dind/</guid><description>我的博客 / Docker / Docker in Docker
+Docker in Docker # Docker-in-Docker 的意思是在 Docker 容器中使用 docker，就像和在宿主机上使用 docker 一样，你可以理解为套娃。
+场景：
+如果你的 Jenkins 是使用 Docker 容器的方式运行的，如果你想使用 Jenkins 的 Docker 插件来为 Jenkins Job 提供运行容器，这时候你就需要用到 Docker-in-Docker；
+一般这个技术使用在应用的程序集成中 CI/CD。
+1. 挂载主机 /var/run/docker.sock # Docker 容器：
+docker run -v /var/run/docker.sock:/var/run/docker.sock --name docker-in-docker -it docker 在运行起来的容器中使用docker：
+$ docker run -v /var/run/docker.sock:/var/run/docker.sock --name docker-in-docker -it docker / # docker run hello-world Hello from Docker! This message shows that your installation appears to be working correctly.</description></item><item><title/><link>https://blog.poneding.com/docker/docker-buildx/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/docker-buildx/</guid><description>我的博客 / Docker / docker buildx
+docker buildx # $ docker buildx Usage: docker buildx [OPTIONS] COMMAND Extended build capabilities with BuildKit Options: --builder string Override the configured builder instance Management Commands: imagetools Commands to work on images in registry Commands: bake Build from a file build Start a build create Create a new builder instance du Disk usage inspect Inspect current builder instance ls List builder instances prune Remove build cache rm Remove a builder instance stop Stop builder instance use Set the current builder instance version Show buildx version information Run &amp;#39;docker buildx COMMAND --help&amp;#39; for more information on a command.</description></item><item><title/><link>https://blog.poneding.com/docker/docker-commands/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/docker-commands/</guid><description>我的博客 / Docker / Docker 常用命令
+Docker 常用命令 # 启动容器命令 # 默认需要sudo权限执行
+sudo docker run -d -p 80:80 --name nginx nginx &amp;ndash;name：容器命名
+-d：在后台启动
+-p：&amp;lt;host端口&amp;gt;：&amp;lt;容器端口&amp;gt;
+&amp;ndash;rm：容器退出即删除
+-it：i-与容器交互，t-终端
+以root权限进入容器 # sudo docker exec -it -u root nginx bash 让容器一直睡眠 # 使用 curlimages/curl 镜像，并让其一直睡眠。
+docker run -d --name sleep curlimages/curl sleep infinity 操作镜像命令 # 查看镜像 # sudo docker images 删除镜像 # sudo docker rmi &amp;lt;image&amp;gt; # or sudo docker image rm &amp;lt;image&amp;gt; 删除所有镜像 # sudo docker rmi $(docker images -q) 清除未使用镜像 # sudo docker image prune # or sudo docker rmi $(sudo docker images | grep &amp;#34;^&amp;lt;none&amp;gt;&amp;#34; | awk &amp;#34;{print $3}&amp;#34;) 模糊清除镜像 # docker rmi $(docker images | grep &amp;#39;query&amp;#39; | awk &amp;#39;{print $3}&amp;#39;) 操作容器命令 # 查看已经退出的容器 # sudo docker ps -a | grep Exited 清理已经退出的容器 # sudo docker rm $(sudo docker ps -qf status=exited) # or sudo docker rm `sudo docker ps -a | grep Exited | awk &amp;#39;{print $1}&amp;#39;` 清除所有容器 # 使用 -f 参数才能清除所有容器，不使用则只会清理已经退出的容器</description></item><item><title/><link>https://blog.poneding.com/docker/docker-compose-practice/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/docker-compose-practice/</guid><description>我的博客 / Docker / Docker Compose 实践
+Docker Compose 实践 # 安装 # 如果你安装了 Docker Desktop，那么它已经帮你自动安装了 Docker Compose 插件。否则，需要额外安装插件。
+使用一下命令安装或升级 Docker Compose（linux）：
+Ubuntu，Debian： sudo apt update sudo apt install docker-compose-plugin 基于 RPM 发行版: sudo yum update sudo yum install docker-compose-plugin 验证安装版本：
+docker-compose version 常用命令 # 运行
+docker-compose up 查看运行
+docker-compose ps 停止
+docker-compose stop 启动&amp;amp;重启
+docker-compose start docker-compose restart 退出
+docker-compose down 使用 docker-compose -h 查看更多命令及参数。
+实践 # 使用 Docker Compose 运行一个简单的 golang web 程序。</description></item><item><title/><link>https://blog.poneding.com/docker/docker-container-install-pfx-cert/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/docker-container-install-pfx-cert/</guid><description>我的博客 / Docker / Docker 容器中安装 PFX 证书
+Docker 容器中安装 PFX 证书 # 如果正在开发 .NetCore 项目，并且你的项目需要使用到 PFX 证书。此时你需要将你的项目发布到 Docker 容器中，那么你就需要在你的 Docker 容器中安装 PFX 证书了。
+代码中编写 # 使用 X509Store Api 编写你的程序
+using (var certificate = new X509Certificate2(pfxFileBytes, pfxPassword, X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet)) using (var store = new X509Store(storeName, storeLocation, OpenFlags.ReadWrite)) { store.Add(certificate); store.Close(); } Dockerfile 中编写 # 使用 dotnet-certificate-tool 工具安装 pfx 证书。
+首先获取到 Pfx 文件的 Thumbprint，这在 dotnet-certificate-tool 命令中作为参数被使用。
+使用 Powershell Get-PfxCertificate 函数获取 Thumbprint Get-PfxCertificate -FilePath C:\Pfx\Hello-to-World.</description></item><item><title/><link>https://blog.poneding.com/docker/docker-copy-between-host-container/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/docker-copy-between-host-container/</guid><description>我的博客 / Docker / Docker 主机容器互拷贝文件
+Docker 主机容器互拷贝文件 # 命令：docker cp
+1. 将 Docker 容器内文件拷贝到 Host # 获取 docker 容器的 Container ID 或Name
+sudo docker ps 使用以下命令从容器内拷出文件
+sudo docker cp [CONTAINER ID/NAME]:[CONTAINER_PATH] [HOST_PATH] 例如我需要将容器内 /app/appsettings.json 文件拷贝到宿主机的 ~/temp/ 目录 （该目录必须存在） 下
+sudo docker cp b3e608e28f21:/app/appsettings.json ~/temp/appsettings.json # 不指定文件名亦可，默认使用原文件名 sudo docker cp b3e608e28f21:/app/appsettings.json ~/temp/ 2. 将 Host 文件拷贝至 Docker 容器 # 同样，需要先获取容器的 Container ID 或 Name；
+使用以下命令将文件拷贝至容器内
+sudo docker cp [HOST_PATH] [CONTAINER ID/NAME]:[CONTAINER_PATH] 例如我需要将宿主机的 ~/temp/hello.</description></item><item><title/><link>https://blog.poneding.com/docker/docker-manifest-build-cross-arch-image/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/docker-manifest-build-cross-arch-image/</guid><description>我的博客 / Docker / 使用 docker manifest 命令构建多架构镜像
+使用 docker manifest 命令构建多架构镜像 # # 创建 docker manifest create poneding/myimage:v1 poneding/myimage-amd64:v1 poneding/myimage-arm64:v1 # 注解 docker manifest annotate poneding/myimage:v1 poneding/myimage-amd64:v1 --arch amd64 docker manifest annotate poneding/myimage:v1 poneding/asmyimageh-arm64:v1 --arch arm64 # 检查 docker manifest inspect poneding/myimage:v1 # 推送 docker manifest push poneding/myimage:v1 在 x86 机器上构建 arm64 镜像
+docker run --rm --privileged multiarch/qemu-user-static --reset --persistent yes « Docker 主机容器互拷贝文件
+» 理解 docker run &amp;ndash;link</description></item><item><title/><link>https://blog.poneding.com/docker/docker-run-link/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/docker-run-link/</guid><description>我的博客 / Docker / 理解 docker run &amp;ndash;link
+理解 docker run &amp;ndash;link # 使用方式 # # 前提已经存在一个 container2 在运行 docker run img1 --name container1 --link container2 作用 # container1 连接 container2，达到：
+与 container2 直接通信 获取 container2 的环境变量 « 使用 docker manifest 命令构建多架构镜像
+» Docker 可视化工具 Kitematic</description></item><item><title/><link>https://blog.poneding.com/docker/docker-visiable-tool-kitematic/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/docker-visiable-tool-kitematic/</guid><description>我的博客 / Docker / Docker 可视化工具 Kitematic
+Docker 可视化工具 Kitematic # 使用 Kitematic，以可视化的方式管理 docker 镜像，容器等。
+安装 Kitematic # 在 ubuntu（desktop）中安装 kitematic 作为示例，其他平台安装下载地址： https://github.com/docker/kitematic/releases
+# download wget https://github.com/docker/kitematic/releases/download/v0.17.11/Kitematic-0.17.11-Ubuntu.zip unzip Kitematic-0.17.11-Ubuntu.zip # install sudo dpkg -i Kitematic-0.17.11_amd64.deb 用户组管理 # ubuntu 已经安装了 docker 了，当我们安装完 Kitematic 之后，第一次打开会遇到
+将当前用户加入到 docker 组：
+sudo usermod -aG docker $USER # 重启 docker sudo systemctl restart docker sudo chmod a+rw /var/run/docker.sock 完成上面操作后，重启主机，应该就可以使用 Kitamatic 了。
+使用 Kitematic # 第一次启动 Kitematic，需要登录 docker 账号，登录完成后，界面如下。</description></item><item><title/><link>https://blog.poneding.com/docker/dockerfile/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/dockerfile/</guid><description>我的博客 / Docker / Dockerfile
+Dockerfile # 官方文档参考： https://docs.docker.com/engine/reference/builder/
+Dockerfile Linter： https://hadolint.github.io/hadolint/
+Usage # docker build [work-dir] -t [image-tag] -f [dockerfile-path] --build-arg [arg-key]=[arg-value] 指令 # Dockerfile reference | Docker Documentation
+FROM # ARG # 由docker build命令传的参数。
+ARG在multi-stage的作用范围 # 如果ARG放置在第一个FROM之前，那么作用范围是全局的；如果ARG放在FROM之后，那么只对FROM的stage作用。
+ARG USERNAME FROM alpine RUN echo hello, ${USERNAME} FROM alpine RUN echo hi, ${USERNAME} CMD # CMD 指令的目的是为一个可执行容器提供初始运行命令或运行参数。
+CMD 指令有三种形式：
+可执行命令 + 命令参数列表，推荐使用 CMD [&amp;#34;executable&amp;#34;,&amp;#34;param1&amp;#34;,&amp;#34;param2&amp;#34;] 命令参数列表，作为 ENTRYPOINT 的参数 CMD [&amp;#34;param1&amp;#34;,&amp;#34;param2&amp;#34;] Shell 形式，字符串形式的命令 CMD command param1 param2 单个 build stage 只允许存在一个 CMD 指令，如果存在多个 CMD 指令，只有最后一个 CMD 指令生效。</description></item><item><title/><link>https://blog.poneding.com/docker/linux-container/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/linux-container/</guid><description>我的博客 / Docker / Linux 容器
+Linux 容器 # 容器是轻量级的虚拟化技术。
+资源隔离和限制
+容器镜像 # 联合文件系统 # 允许文件存放在不同的层级上，但是最终可以通过统一的视图查看到这些层级的所有文件。
+cgroup # namespace # mount：文件系统隔离 uts：hostname domain pid：1号进程 network user ipc：进程间通信 cgroup « Dockerfile
+» 非 root 账号获取 docker 权限</description></item><item><title/><link>https://blog.poneding.com/docker/non-root-account-get-docker-permission/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/non-root-account-get-docker-permission/</guid><description>我的博客 / Docker / 非 root 账号获取 docker 权限
+非 root 账号获取 docker 权限 # 默认 docker 的命令是需要 sudo 权限的，如果你觉得麻烦，想直接在当前用户下执行 docker 权限，你可以尝试使用下面这个解决方案。
+拢共分两步：
+第一步，将当前用户添加到 docker 组
+sudo usermod -aG docker $USER 第二步，授权
+sudo chmod a+rw /var/run/docker.sock 快去试试吧。
+« Linux 容器
+» some-apps.md</description></item><item><title/><link>https://blog.poneding.com/docker/some-apps/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/some-apps/</guid><description>我的博客 / Docker / some-apps.md
+Docker 应用
+Cloudreve # 项目地址： https://github.com/cloudreve/Cloudreve
+docker run -d --name cloudreve \ -p 5212:5212 \ --mount type=bind,source=/root/apps/cloudreve/conf.ini,target=/cloudreve/conf.ini \ --mount type=bind,source=/root/apps/cloudreve/cloudreve.db,target=/cloudreve/cloudreve.db \ -v /root/apps/cloudreve/uploads:/cloudreve/uploads \ -v /root/apps/cloudreve/avatar:/cloudreve/avatar \ cloudreve/cloudreve:latest Etcd # docker run -d --name etcd \ -p 12379:2379 \ -p 12380:2380 \ -e ALLOW_NONE_AUTHENTICATION=yes \ -e ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379 \ -e ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379,http://0.0.0.0:2379 \ -v /root/apps/etcd/data:/var/run/etcd \ quay.io/coreos/etcd:v3.5.6 Minio # docker run -d --name minio \ -p 9000:9000 \ -p 9001:9001 \ -e MINIO_ROOT_USER=minio \ -e MINIO_ROOT_PASSWORD=&amp;#39;pd1n9@1024&amp;#39; \ -v /root/apps/minio/data:/data \ quay.</description></item></channel></rss>

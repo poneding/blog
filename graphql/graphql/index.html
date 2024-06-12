@@ -1,0 +1,76 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content='我的博客 / Graphql / Graphql
+Graphql # https://graphql.cn/learn/
+介绍 # 一种 API 查询语言，也是一种满足使用现有数据完成几乎所有数据查询的运行时。
+对 API 数据提供可理解的完整描述，赋予客户端准确获取所需数据，使得 API 的演进更加轻松，也可以使用它来构建强大的开发者工具（LowCode?）。
+特性 # 所得即所取：
+请求什么，返回什么，因为总是根据你请求的结构返回可预见的结果。
+单取多得：
+单次请求，返回多种结构的数据，不仅对资源属性查询，而且还会沿着资源的引用关系进一步查询。
+这也是对比 Restful API 的一种优势，Restful API 对多资源的查询时，往往需要多次访问不同的API，这无疑增加了网络连接的压力。
+类型系统描述所有：
+GraphQL API 基于类型和字段的方式进行组织，而非入口端点。你可以通过一个单一入口端点得到你的访问数据的所有能力。GraphQL 使用类型来保证应用只请求可能的数据，否则会提供了明确的有用的错误信息。应用也可以使用类型，而避免编写手动解析代码。
+API无版本：
+API 演进只需要往 Graphql 类型系统中添加字段和类型，而不影响现有查询。
+统一共享：
+GraphQL 让你的整个应用共享一套 API，而不用被限制于特定存储引擎。GraphQL 引擎已经有多种语言实现，通过 GraphQL API 能够更好利用你的现有数据和代码。你只需要为类型系统的字段编写函数，GraphQL 就能通过优化并发的方式来调用它们。
+资源定义，请求和响应 # 数据描述：
+type User { name: String phone: String Friends: [User] } 数据请求：
+{ user(name: "dp") { phone } } 请求结果：'><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/graphql/graphql/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content='我的博客 / Graphql / Graphql
+Graphql # https://graphql.cn/learn/
+介绍 # 一种 API 查询语言，也是一种满足使用现有数据完成几乎所有数据查询的运行时。
+对 API 数据提供可理解的完整描述，赋予客户端准确获取所需数据，使得 API 的演进更加轻松，也可以使用它来构建强大的开发者工具（LowCode?）。
+特性 # 所得即所取：
+请求什么，返回什么，因为总是根据你请求的结构返回可预见的结果。
+单取多得：
+单次请求，返回多种结构的数据，不仅对资源属性查询，而且还会沿着资源的引用关系进一步查询。
+这也是对比 Restful API 的一种优势，Restful API 对多资源的查询时，往往需要多次访问不同的API，这无疑增加了网络连接的压力。
+类型系统描述所有：
+GraphQL API 基于类型和字段的方式进行组织，而非入口端点。你可以通过一个单一入口端点得到你的访问数据的所有能力。GraphQL 使用类型来保证应用只请求可能的数据，否则会提供了明确的有用的错误信息。应用也可以使用类型，而避免编写手动解析代码。
+API无版本：
+API 演进只需要往 Graphql 类型系统中添加字段和类型，而不影响现有查询。
+统一共享：
+GraphQL 让你的整个应用共享一套 API，而不用被限制于特定存储引擎。GraphQL 引擎已经有多种语言实现，通过 GraphQL API 能够更好利用你的现有数据和代码。你只需要为类型系统的字段编写函数，GraphQL 就能通过优化并发的方式来调用它们。
+资源定义，请求和响应 # 数据描述：
+type User { name: String phone: String Friends: [User] } 数据请求：
+{ user(name: "dp") { phone } } 请求结果：'><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="graphql"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Graphql | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/graphql/graphql/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Graphql</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#介绍>介绍</a><ul><li><a href=#特性>特性</a></li><li><a href=#资源定义请求和响应>资源定义，请求和响应</a></li></ul></li><li><a href=#变量>变量</a></li><li><a href=#graphqlite>GraphQLite</a></li><li><a href=#schema>Schema</a></li><li><a href=#文档>文档</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/graphql/>Graphql</a> / Graphql</p><h1 id=graphql>Graphql
+<a class=anchor href=#graphql>#</a></h1><p><a href=https://graphql.cn/learn/>https://graphql.cn/learn/</a></p><h2 id=介绍>介绍
+<a class=anchor href=#%e4%bb%8b%e7%bb%8d>#</a></h2><p>一种 API 查询语言，也是一种满足使用现有数据完成几乎所有数据查询的运行时。</p><p>对 API 数据提供可理解的完整描述，赋予客户端准确获取所需数据，使得 API 的演进更加轻松，也可以使用它来构建强大的开发者工具（LowCode?）。</p><h3 id=特性>特性
+<a class=anchor href=#%e7%89%b9%e6%80%a7>#</a></h3><p><strong>所得即所取</strong>：</p><p>请求什么，返回什么，因为总是根据你请求的结构返回可预见的结果。</p><p><strong>单取多得</strong>：</p><p>单次请求，返回多种结构的数据，不仅对资源属性查询，而且还会沿着资源的引用关系进一步查询。</p><p>这也是对比 Restful API 的一种优势，Restful API 对多资源的查询时，往往需要多次访问不同的API，这无疑增加了网络连接的压力。</p><p><strong>类型系统描述所有</strong>：</p><p>GraphQL API 基于类型和字段的方式进行组织，而非入口端点。你可以通过一个单一入口端点得到你的访问数据的所有能力。GraphQL 使用类型来保证应用只请求可能的数据，否则会提供了明确的有用的错误信息。应用也可以使用类型，而避免编写手动解析代码。</p><p><strong>API无版本</strong>：</p><p>API 演进只需要往 Graphql 类型系统中添加字段和类型，而不影响现有查询。</p><p><strong>统一共享</strong>：</p><p>GraphQL 让你的整个应用共享一套 API，而不用被限制于特定存储引擎。GraphQL 引擎已经有多种语言实现，通过 GraphQL API 能够更好利用你的现有数据和代码。你只需要为类型系统的字段编写函数，GraphQL 就能通过优化并发的方式来调用它们。</p><h3 id=资源定义请求和响应>资源定义，请求和响应
+<a class=anchor href=#%e8%b5%84%e6%ba%90%e5%ae%9a%e4%b9%89%e8%af%b7%e6%b1%82%e5%92%8c%e5%93%8d%e5%ba%94>#</a></h3><p><strong>数据描述</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-graphql data-lang=graphql><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>User</span> {
+</span></span><span style=display:flex><span>  name: <span style=color:#a6e22e>String</span>
+</span></span><span style=display:flex><span>  phone: <span style=color:#a6e22e>String</span>
+</span></span><span style=display:flex><span>  Friends: [<span style=color:#a6e22e>User</span>]
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>数据请求</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-graphql data-lang=graphql><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  user(name: <span style=color:#e6db74>&#34;dp&#34;</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>phone</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>请求结果</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;user&#34;</span>: {
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;phone&#34;</span>: <span style=color:#e6db74>&#34;18800001111&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=变量>变量
+<a class=anchor href=#%e5%8f%98%e9%87%8f>#</a></h2><p>变量前缀必须为 <code>$</code>，后跟其类型，例如：<code>$user User</code></p><p>变量必须是标量，枚举型或输入对象类型。</p><p>如果类型后没有跟 <code>!</code>，说明变量是可选的，可以不传入参数，否则必须出传入。</p><p><strong>默认变量</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-graphql data-lang=graphql><span style=display:flex><span><span style=color:#66d9ef>query</span> <span style=color:#a6e22e>HeroNameAndFriends</span>($episode: <span style=color:#a6e22e>Episode</span> = <span style=color:#e6db74>&#34;JEDI&#34;</span>) {
+</span></span><span style=display:flex><span>  hero(episode: $episode) {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>name</span>
+</span></span><span style=display:flex><span>    friends {
+</span></span><span style=display:flex><span>      name
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=graphqlite>GraphQLite
+<a class=anchor href=#graphqlite>#</a></h2><p>是一个为 GraphQL schema 定义提供基于注释的语法的库。 它与框架无关，可用于 Symfony 和 Laravel。</p><h2 id=schema>Schema
+<a class=anchor href=#schema>#</a></h2><h2 id=文档>文档
+<a class=anchor href=#%e6%96%87%e6%a1%a3>#</a></h2><p>learn：
+<a href=https://graphql.cn/learn/>https://graphql.cn/learn/</a></p><p>code：
+<a href=https://graphql.org/code/>https://graphql.org/code/</a></p><p>awesome-graphql：
+<a href=https://github.com/chentsulin/awesome-graphql>https://github.com/chentsulin/awesome-graphql</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/graphql/graphql.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#介绍>介绍</a><ul><li><a href=#特性>特性</a></li><li><a href=#资源定义请求和响应>资源定义，请求和响应</a></li></ul></li><li><a href=#变量>变量</a></li><li><a href=#graphqlite>GraphQLite</a></li><li><a href=#schema>Schema</a></li><li><a href=#文档>文档</a></li></ul></nav></div></aside></main></body></html>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>我的博客</title><link>https://blog.poneding.com/dapr/</link><description>Recent content on 我的博客</description><generator>Hugo</generator><language>cn</language><atom:link href="https://blog.poneding.com/dapr/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>https://blog.poneding.com/dapr/dapr/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/dapr/dapr/</guid><description>我的博客 / Dapr / Dapr 0-1
+Dapr 0-1 # 介绍 # Dapr（Distributed Application Runtime）,提供分布式应用运行所需要的环境。
+Sidecar架构。
+目的：
+快速落地微服务，将业务和基础设施分离，专注于业务开发，降低微服务的复杂性。
+运行环境：
+服务发现 负载均衡 故障转移 熔断限流 缓存 异步通信 日志组件 链路监控 &amp;hellip; 核心功能：
+Service Invocation（服务调用） State Management（状态管理） Publish and Subscribe（消息发布订阅） Resource bingdings and triggers（资源绑定，事件触发） Actors（单线程模型）分布式锁 Observability（遥测）ELK，链路监控，告警 Secrets（安全）IdentityServer4 安装 # 依赖 # Docker： https://docs.docker.com/install/ 注意：windows平台，Docker必须运行Linux Containers模式
+安装cli # https://github.com/dapr/cli
+以在linux中安装dapr为例：
+wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O-|/bin/bash dapr init --runtime-version Service Invocation # 解决微服务之间通信的问题。</description></item></channel></rss>

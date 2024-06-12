@@ -1,0 +1,193 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content='我的博客 / AWS / EKS配置 ALB Ingress
+EKS配置 ALB Ingress # 官方文档： https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/controller/installation/
+部署Alb Ingress Controller # IAM中创建Policy，给集群的Node节点的Role添加该Policy。
+Policy的JSON配置如下：
+{ "Version": "2012-10-17", "Statement": [ { "Effect": "Allow", "Action": [ "acm:DescribeCertificate", "acm:ListCertificates", "acm:GetCertificate" ], "Resource": "*" }, { "Effect": "Allow", "Action": [ "ec2:AuthorizeSecurityGroupIngress", "ec2:CreateSecurityGroup", "ec2:CreateTags", "ec2:DeleteTags", "ec2:DeleteSecurityGroup", "ec2:DescribeAccountAttributes", "ec2:DescribeAddresses", "ec2:DescribeInstances", "ec2:DescribeInstanceStatus", "ec2:DescribeInternetGateways", "ec2:DescribeNetworkInterfaces", "ec2:DescribeSecurityGroups", "ec2:DescribeSubnets", "ec2:DescribeTags", "ec2:DescribeVpcs", "ec2:ModifyInstanceAttribute", "ec2:ModifyNetworkInterfaceAttribute", "ec2:RevokeSecurityGroupIngress" ], "Resource": "*" }, { "Effect": "Allow", "Action": [ "elasticloadbalancing:AddListenerCertificates", "elasticloadbalancing:AddTags", "elasticloadbalancing:CreateListener", "elasticloadbalancing:CreateLoadBalancer", "elasticloadbalancing:CreateRule", "elasticloadbalancing:CreateTargetGroup", "elasticloadbalancing:DeleteListener", "elasticloadbalancing:DeleteLoadBalancer", "elasticloadbalancing:DeleteRule", "elasticloadbalancing:DeleteTargetGroup", "elasticloadbalancing:DeregisterTargets", "elasticloadbalancing:DescribeListenerCertificates", "elasticloadbalancing:DescribeListeners", "elasticloadbalancing:DescribeLoadBalancers", "elasticloadbalancing:DescribeLoadBalancerAttributes", "elasticloadbalancing:DescribeRules", "elasticloadbalancing:DescribeSSLPolicies", "elasticloadbalancing:DescribeTags", "elasticloadbalancing:DescribeTargetGroups", "elasticloadbalancing:DescribeTargetGroupAttributes", "elasticloadbalancing:DescribeTargetHealth", "elasticloadbalancing:ModifyListener", "elasticloadbalancing:ModifyLoadBalancerAttributes", "elasticloadbalancing:ModifyRule", "elasticloadbalancing:ModifyTargetGroup", "elasticloadbalancing:ModifyTargetGroupAttributes", "elasticloadbalancing:RegisterTargets", "elasticloadbalancing:RemoveListenerCertificates", "elasticloadbalancing:RemoveTags", "elasticloadbalancing:SetIpAddressType", "elasticloadbalancing:SetSecurityGroups", "elasticloadbalancing:SetSubnets", "elasticloadbalancing:SetWebACL" ], "Resource": "*" }, { "Effect": "Allow", "Action": [ "iam:CreateServiceLinkedRole", "iam:GetServerCertificate", "iam:ListServerCertificates" ], "Resource": "*" }, { "Effect": "Allow", "Action": [ "cognito-idp:DescribeUserPoolClient" ], "Resource": "*" }, { "Effect": "Allow", "Action": [ "waf-regional:GetWebACLForResource", "waf-regional:GetWebACL", "waf-regional:AssociateWebACL", "waf-regional:DisassociateWebACL" ], "Resource": "*" }, { "Effect": "Allow", "Action": [ "tag:GetResources", "tag:TagResources" ], "Resource": "*" }, { "Effect": "Allow", "Action": [ "waf:GetWebACL" ], "Resource": "*" }, { "Effect": "Allow", "Action": [ "shield:DescribeProtection", "shield:GetSubscriptionState", "shield:DeleteProtection", "shield:CreateProtection", "shield:DescribeSubscription", "shield:ListProtections" ], "Resource": "*" } ] } 下载alb-ingress-controller.'><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/aws/eks-config-alb-ingress/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content='我的博客 / AWS / EKS配置 ALB Ingress
+EKS配置 ALB Ingress # 官方文档： https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/controller/installation/
+部署Alb Ingress Controller # IAM中创建Policy，给集群的Node节点的Role添加该Policy。
+Policy的JSON配置如下：
+{ "Version": "2012-10-17", "Statement": [ { "Effect": "Allow", "Action": [ "acm:DescribeCertificate", "acm:ListCertificates", "acm:GetCertificate" ], "Resource": "*" }, { "Effect": "Allow", "Action": [ "ec2:AuthorizeSecurityGroupIngress", "ec2:CreateSecurityGroup", "ec2:CreateTags", "ec2:DeleteTags", "ec2:DeleteSecurityGroup", "ec2:DescribeAccountAttributes", "ec2:DescribeAddresses", "ec2:DescribeInstances", "ec2:DescribeInstanceStatus", "ec2:DescribeInternetGateways", "ec2:DescribeNetworkInterfaces", "ec2:DescribeSecurityGroups", "ec2:DescribeSubnets", "ec2:DescribeTags", "ec2:DescribeVpcs", "ec2:ModifyInstanceAttribute", "ec2:ModifyNetworkInterfaceAttribute", "ec2:RevokeSecurityGroupIngress" ], "Resource": "*" }, { "Effect": "Allow", "Action": [ "elasticloadbalancing:AddListenerCertificates", "elasticloadbalancing:AddTags", "elasticloadbalancing:CreateListener", "elasticloadbalancing:CreateLoadBalancer", "elasticloadbalancing:CreateRule", "elasticloadbalancing:CreateTargetGroup", "elasticloadbalancing:DeleteListener", "elasticloadbalancing:DeleteLoadBalancer", "elasticloadbalancing:DeleteRule", "elasticloadbalancing:DeleteTargetGroup", "elasticloadbalancing:DeregisterTargets", "elasticloadbalancing:DescribeListenerCertificates", "elasticloadbalancing:DescribeListeners", "elasticloadbalancing:DescribeLoadBalancers", "elasticloadbalancing:DescribeLoadBalancerAttributes", "elasticloadbalancing:DescribeRules", "elasticloadbalancing:DescribeSSLPolicies", "elasticloadbalancing:DescribeTags", "elasticloadbalancing:DescribeTargetGroups", "elasticloadbalancing:DescribeTargetGroupAttributes", "elasticloadbalancing:DescribeTargetHealth", "elasticloadbalancing:ModifyListener", "elasticloadbalancing:ModifyLoadBalancerAttributes", "elasticloadbalancing:ModifyRule", "elasticloadbalancing:ModifyTargetGroup", "elasticloadbalancing:ModifyTargetGroupAttributes", "elasticloadbalancing:RegisterTargets", "elasticloadbalancing:RemoveListenerCertificates", "elasticloadbalancing:RemoveTags", "elasticloadbalancing:SetIpAddressType", "elasticloadbalancing:SetSecurityGroups", "elasticloadbalancing:SetSubnets", "elasticloadbalancing:SetWebACL" ], "Resource": "*" }, { "Effect": "Allow", "Action": [ "iam:CreateServiceLinkedRole", "iam:GetServerCertificate", "iam:ListServerCertificates" ], "Resource": "*" }, { "Effect": "Allow", "Action": [ "cognito-idp:DescribeUserPoolClient" ], "Resource": "*" }, { "Effect": "Allow", "Action": [ "waf-regional:GetWebACLForResource", "waf-regional:GetWebACL", "waf-regional:AssociateWebACL", "waf-regional:DisassociateWebACL" ], "Resource": "*" }, { "Effect": "Allow", "Action": [ "tag:GetResources", "tag:TagResources" ], "Resource": "*" }, { "Effect": "Allow", "Action": [ "waf:GetWebACL" ], "Resource": "*" }, { "Effect": "Allow", "Action": [ "shield:DescribeProtection", "shield:GetSubscriptionState", "shield:DeleteProtection", "shield:CreateProtection", "shield:DescribeSubscription", "shield:ListProtections" ], "Resource": "*" } ] } 下载alb-ingress-controller.'><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="aws"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Eks Config Alb Ingress | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/aws/eks-config-alb-ingress/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Eks Config Alb Ingress</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#部署alb-ingress-controller>部署Alb Ingress Controller</a></li><li><a href=#配置alb-ingress-controller>配置Alb Ingress Controller</a></li><li><a href=#设置external-dns>设置External DNS</a><ul><li><a href=#背景>背景</a></li><li><a href=#前提条件>前提条件</a></li><li><a href=#安装>安装</a></li><li><a href=#使用方式>使用方式</a></li></ul></li><li><a href=#实践记录>实践记录</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/aws/>AWS</a> / EKS配置 ALB Ingress</p><h1 id=eks配置-alb-ingress>EKS配置 ALB Ingress
+<a class=anchor href=#eks%e9%85%8d%e7%bd%ae-alb-ingress>#</a></h1><p>官方文档：
+<a href=https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/controller/installation/>https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/controller/installation/</a></p><h2 id=部署alb-ingress-controller>部署Alb Ingress Controller
+<a class=anchor href=#%e9%83%a8%e7%bd%b2alb-ingress-controller>#</a></h2><p>IAM中创建Policy，给集群的Node节点的Role添加该Policy。</p><p>Policy的JSON配置如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;Version&#34;</span>: <span style=color:#e6db74>&#34;2012-10-17&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;Statement&#34;</span>: [
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Effect&#34;</span>: <span style=color:#e6db74>&#34;Allow&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Action&#34;</span>: [
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;acm:DescribeCertificate&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;acm:ListCertificates&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;acm:GetCertificate&#34;</span>
+</span></span><span style=display:flex><span>      ],
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Resource&#34;</span>: <span style=color:#e6db74>&#34;*&#34;</span>
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Effect&#34;</span>: <span style=color:#e6db74>&#34;Allow&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Action&#34;</span>: [
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ec2:AuthorizeSecurityGroupIngress&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ec2:CreateSecurityGroup&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ec2:CreateTags&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ec2:DeleteTags&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ec2:DeleteSecurityGroup&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ec2:DescribeAccountAttributes&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ec2:DescribeAddresses&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ec2:DescribeInstances&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ec2:DescribeInstanceStatus&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ec2:DescribeInternetGateways&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ec2:DescribeNetworkInterfaces&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ec2:DescribeSecurityGroups&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ec2:DescribeSubnets&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ec2:DescribeTags&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ec2:DescribeVpcs&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ec2:ModifyInstanceAttribute&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ec2:ModifyNetworkInterfaceAttribute&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ec2:RevokeSecurityGroupIngress&#34;</span>
+</span></span><span style=display:flex><span>      ],
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Resource&#34;</span>: <span style=color:#e6db74>&#34;*&#34;</span>
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Effect&#34;</span>: <span style=color:#e6db74>&#34;Allow&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Action&#34;</span>: [
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:AddListenerCertificates&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:AddTags&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:CreateListener&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:CreateLoadBalancer&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:CreateRule&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:CreateTargetGroup&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:DeleteListener&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:DeleteLoadBalancer&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:DeleteRule&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:DeleteTargetGroup&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:DeregisterTargets&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:DescribeListenerCertificates&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:DescribeListeners&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:DescribeLoadBalancers&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:DescribeLoadBalancerAttributes&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:DescribeRules&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:DescribeSSLPolicies&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:DescribeTags&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:DescribeTargetGroups&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:DescribeTargetGroupAttributes&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:DescribeTargetHealth&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:ModifyListener&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:ModifyLoadBalancerAttributes&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:ModifyRule&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:ModifyTargetGroup&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:ModifyTargetGroupAttributes&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:RegisterTargets&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:RemoveListenerCertificates&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:RemoveTags&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:SetIpAddressType&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:SetSecurityGroups&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:SetSubnets&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;elasticloadbalancing:SetWebACL&#34;</span>
+</span></span><span style=display:flex><span>      ],
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Resource&#34;</span>: <span style=color:#e6db74>&#34;*&#34;</span>
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Effect&#34;</span>: <span style=color:#e6db74>&#34;Allow&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Action&#34;</span>: [
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;iam:CreateServiceLinkedRole&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;iam:GetServerCertificate&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;iam:ListServerCertificates&#34;</span>
+</span></span><span style=display:flex><span>      ],
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Resource&#34;</span>: <span style=color:#e6db74>&#34;*&#34;</span>
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Effect&#34;</span>: <span style=color:#e6db74>&#34;Allow&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Action&#34;</span>: [
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;cognito-idp:DescribeUserPoolClient&#34;</span>
+</span></span><span style=display:flex><span>      ],
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Resource&#34;</span>: <span style=color:#e6db74>&#34;*&#34;</span>
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Effect&#34;</span>: <span style=color:#e6db74>&#34;Allow&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Action&#34;</span>: [
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;waf-regional:GetWebACLForResource&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;waf-regional:GetWebACL&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;waf-regional:AssociateWebACL&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;waf-regional:DisassociateWebACL&#34;</span>
+</span></span><span style=display:flex><span>      ],
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Resource&#34;</span>: <span style=color:#e6db74>&#34;*&#34;</span>
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Effect&#34;</span>: <span style=color:#e6db74>&#34;Allow&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Action&#34;</span>: [
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;tag:GetResources&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;tag:TagResources&#34;</span>
+</span></span><span style=display:flex><span>      ],
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Resource&#34;</span>: <span style=color:#e6db74>&#34;*&#34;</span>
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Effect&#34;</span>: <span style=color:#e6db74>&#34;Allow&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Action&#34;</span>: [
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;waf:GetWebACL&#34;</span>
+</span></span><span style=display:flex><span>      ],
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Resource&#34;</span>: <span style=color:#e6db74>&#34;*&#34;</span>
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Effect&#34;</span>: <span style=color:#e6db74>&#34;Allow&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Action&#34;</span>: [
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;shield:DescribeProtection&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;shield:GetSubscriptionState&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;shield:DeleteProtection&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;shield:CreateProtection&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;shield:DescribeSubscription&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;shield:ListProtections&#34;</span>
+</span></span><span style=display:flex><span>      ],
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Resource&#34;</span>: <span style=color:#e6db74>&#34;*&#34;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  ]
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>下载alb-ingress-controller.yaml</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>wget https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.6/docs/examples/alb-ingress-controller.yaml
+</span></span></code></pre></div><p>修改alb-ingress-controller.yaml，修改以下三个配置项</p><ul><li><p><code>--cluster-name=dev-eks</code></p></li><li><p><code>--aws-vpc-id=vpc-xxxxxx</code></p></li><li><p><code>--aws-region=us-west-1</code></p></li></ul><p>部署：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.6/docs/examples/rbac-role.yaml
+</span></span><span style=display:flex><span>kubectl apply -f alb-ingress-controller.yaml
+</span></span></code></pre></div><p>验证部署情况：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl logs -n kube-system <span style=color:#66d9ef>$(</span>kubectl get po -n kube-system | egrep -o <span style=color:#e6db74>&#34;alb-ingress[a-zA-Z0-9-]+&#34;</span><span style=color:#66d9ef>)</span>
+</span></span></code></pre></div><h2 id=配置alb-ingress-controller>配置Alb Ingress Controller
+<a class=anchor href=#%e9%85%8d%e7%bd%aealb-ingress-controller>#</a></h2><h2 id=设置external-dns>设置External DNS
+<a class=anchor href=#%e8%ae%be%e7%bd%aeexternal-dns>#</a></h2><p>本篇内容来源：
+<a href=https://kubernetes-sigs.github.io/aws-load-balancer-controller/v1.1/guide/external-dns/setup/>https://kubernetes-sigs.github.io/aws-load-balancer-controller/v1.1/guide/external-dns/setup/</a></p><h3 id=背景>背景
+<a class=anchor href=#%e8%83%8c%e6%99%af>#</a></h3><p>在AWS中，如果我们希望以某个域名访问K8s集群的某个服务，我们可以通过维护Route 53中Record Set和LoadBalancer映射来实现，这无疑会增加一些手动操作的成本，本篇即介绍使用<strong>external-dns</strong>来自动维护它们之间的关系。</p><p><strong>external-dns</strong>项目地址：
+<a href=https://github.com/kubernetes-incubator/external-dns>https://github.com/kubernetes-incubator/external-dns</a></p><p>external-dns根据host的信息提供DNS记录，它将建立和管理Route 53中Record Set与LoadBalancer的映射关系。</p><h3 id=前提条件>前提条件
+<a class=anchor href=#%e5%89%8d%e6%8f%90%e6%9d%a1%e4%bb%b6>#</a></h3><h4 id=角色权限>角色权限
+<a class=anchor href=#%e8%a7%92%e8%89%b2%e6%9d%83%e9%99%90>#</a></h4><p>必须给K8s集群运行external-dns的Node配置角色和策略。</p><p>IAM中创建Policy，给集群的Node节点的Role添加该Policy。</p><p>Policy的JSON配置如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;Version&#34;</span>: <span style=color:#e6db74>&#34;2012-10-17&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;Statement&#34;</span>: [
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Effect&#34;</span>: <span style=color:#e6db74>&#34;Allow&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Action&#34;</span>: [
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;route53:ChangeResourceRecordSets&#34;</span>
+</span></span><span style=display:flex><span>      ],
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Resource&#34;</span>: [
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;arn:aws:route53:::hostedzone/*&#34;</span>
+</span></span><span style=display:flex><span>      ]
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Effect&#34;</span>: <span style=color:#e6db74>&#34;Allow&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Action&#34;</span>: [
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;route53:ListHostedZones&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;route53:ListResourceRecordSets&#34;</span>
+</span></span><span style=display:flex><span>      ],
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;Resource&#34;</span>: [
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;*&#34;</span>
+</span></span><span style=display:flex><span>      ]
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  ]
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=安装>安装
+<a class=anchor href=#%e5%ae%89%e8%a3%85>#</a></h3><ol><li>下载external-dns.yaml示例文件</li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>wget https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.6/docs/examples/external-dns.yaml
+</span></span></code></pre></div><ol start=2><li>修改external-dns.yaml文件，主要修改``&ndash;domain-filter`这个配置内容</li></ol><ul><li><code>--domain-filter=example.com</code></li></ul><ol start=3><li>部署external-dns</li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl apply -f external-dns.yaml
+</span></span></code></pre></div><ol start=4><li>验证部署是否成功和实时记录</li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl logs -f <span style=color:#66d9ef>$(</span>kubectl get po | egrep -o <span style=color:#e6db74>&#39;external-dns[A-Za-z0-9-]+&#39;</span><span style=color:#66d9ef>)</span>
+</span></span></code></pre></div><h3 id=使用方式>使用方式
+<a class=anchor href=#%e4%bd%bf%e7%94%a8%e6%96%b9%e5%bc%8f>#</a></h3><ol><li>为了在子域名中建立Record Set，需要在<code>Ingress</code>或者<code>Service</code>资源中添加如下注释：</li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>annotations</span>:
+</span></span><span style=display:flex><span>  <span style=color:#75715e># for creating record-set</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>external-dns.alpha.kubernetes.io/hostname</span>: <span style=color:#ae81ff>nginx.example.com</span> <span style=color:#75715e># give your domain name here</span>
+</span></span></code></pre></div><blockquote><p>如果是<code>service</code>，需要将<code>type</code>设置成<code>LoadBalancer</code></p></blockquote><ol><li>查看实时日志，2分钟后在Route 53中查看记录是否生成或更新。</li></ol><h2 id=实践记录>实践记录
+<a class=anchor href=#%e5%ae%9e%e8%b7%b5%e8%ae%b0%e5%bd%95>#</a></h2><ul><li>Pod内容器使用Secrets Manager，需要给Node的Role添加相应的权限；</li></ul><hr><p><a href=/aws/create-eks-cluster/>« 创建 EKS 集群</a></p><p><a href=/aws/eks-details/>» EKS小细节汇总</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/aws/eks-config-alb-ingress.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#部署alb-ingress-controller>部署Alb Ingress Controller</a></li><li><a href=#配置alb-ingress-controller>配置Alb Ingress Controller</a></li><li><a href=#设置external-dns>设置External DNS</a><ul><li><a href=#背景>背景</a></li><li><a href=#前提条件>前提条件</a></li><li><a href=#安装>安装</a></li><li><a href=#使用方式>使用方式</a></li></ul></li><li><a href=#实践记录>实践记录</a></li></ul></nav></div></aside></main></body></html>

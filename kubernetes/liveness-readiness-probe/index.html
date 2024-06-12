@@ -1,0 +1,180 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / Kubernetes / Kubernetes 0-1 Pod中的livenessProbe和readinessProbe解读
+Kubernetes 0-1 Pod中的livenessProbe和readinessProbe解读 # 写在前面 # K8s对Pod的健康状态可以通过两类探针来检查：livenessProbe和readinessProbe，kubelet通过定期执行这两类探针来诊断容器的健康状况。
+livenessProbe简介 # 存活指针，判断Pod（中的应用容器）是否健康，可以理解为健康检查。我们使用livenessProbe来定期的去探测，如果探测成功，则Pod状态可以判定为Running；如果探测失败，可kubectl会根据Pod的重启策略来重启容器。
+如果未给Pod设置livenessProbe，则默认探针永远返回Success。
+当我们执行kubectl get pods命令，输出信息中STATUS一列我们可以看到Pod是否处于Running状态。
+readinessProbe简介 # 就绪指针，就绪的意思是已经准备好了，Pod的就绪我们可以理解为这个Pod可以接受请求和访问。我们使用readinessProbe来定期的去探测，如果探测成功，则Pod 的Ready状态判定为True；如果探测失败，Pod的Ready状态判定为False。
+与livenessProbe不同的是，kubelet不会对readinessProbe的探测情况有重启操作。
+当我们执行kubectl get pods命令，输出信息中READY一列我们可以看到Pod的READY状态是否为True。
+定义参数 # livenessProbe和readinessProbe的定义参数是一致的，可以通过kubectl explain pods.spec.containers.readinessProbe或kubectl explain pods.spec.containers.livenessProbe命令了解：
+就绪探针的几种类型：
+httpGet：
+向容器发送Http Get请求，调用成功（通过Http状态码判断）则确定Pod就绪；
+使用方式：
+livenessProbe: httpGet: path: /app/healthz port: 80 exec：
+在容器内执行某命令，命令执行成功（通过命令退出状态码为0判断）则确定Pod就绪；
+使用方式：
+livenessProbe: exec: command: - cat - /app/healthz tcpSocket：
+打开一个TCP连接到容器的指定端口，连接成功建立则确定Pod就绪。
+使用方式：
+livenessProbe: tcpSocket: port: 80 一般就绪探针会在启动容器一段时间后才开始第一次的就绪探测，之后做周期性探测。所以在定义就绪指针时，会给以下几个参数：
+initialDelaySeconds：在初始化容器多少秒后开始第一次就绪探测； timeoutSeconds：如果该次就绪探测超过多少秒后还未成功，判定为超时，该次探测失败，Pod不就绪。默认值1，最小值1； periodSeconds：如果Pod未就绪，则每隔多少秒周期性的做就绪探测。默认值10，最小值1； failureThreshold：如果容器之前探测成功，后续连续几次探测失败，则确定容器未就绪。默认值3，最小值1； successThreshold：如果容器之前探测失败，后续连续几次探测成功，则确定容器就绪。默认值1，最小值1。 使用示例 # 目前我在docker hub有一个测试镜像：poneding/helloweb:v1，容器启动后，有一个健康检查路由/healthz/return200，访问该路由状态码返回200；有一个检查路由/health/return404，访问该路由状态码返回404。"><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/kubernetes/liveness-readiness-probe/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / Kubernetes / Kubernetes 0-1 Pod中的livenessProbe和readinessProbe解读
+Kubernetes 0-1 Pod中的livenessProbe和readinessProbe解读 # 写在前面 # K8s对Pod的健康状态可以通过两类探针来检查：livenessProbe和readinessProbe，kubelet通过定期执行这两类探针来诊断容器的健康状况。
+livenessProbe简介 # 存活指针，判断Pod（中的应用容器）是否健康，可以理解为健康检查。我们使用livenessProbe来定期的去探测，如果探测成功，则Pod状态可以判定为Running；如果探测失败，可kubectl会根据Pod的重启策略来重启容器。
+如果未给Pod设置livenessProbe，则默认探针永远返回Success。
+当我们执行kubectl get pods命令，输出信息中STATUS一列我们可以看到Pod是否处于Running状态。
+readinessProbe简介 # 就绪指针，就绪的意思是已经准备好了，Pod的就绪我们可以理解为这个Pod可以接受请求和访问。我们使用readinessProbe来定期的去探测，如果探测成功，则Pod 的Ready状态判定为True；如果探测失败，Pod的Ready状态判定为False。
+与livenessProbe不同的是，kubelet不会对readinessProbe的探测情况有重启操作。
+当我们执行kubectl get pods命令，输出信息中READY一列我们可以看到Pod的READY状态是否为True。
+定义参数 # livenessProbe和readinessProbe的定义参数是一致的，可以通过kubectl explain pods.spec.containers.readinessProbe或kubectl explain pods.spec.containers.livenessProbe命令了解：
+就绪探针的几种类型：
+httpGet：
+向容器发送Http Get请求，调用成功（通过Http状态码判断）则确定Pod就绪；
+使用方式：
+livenessProbe: httpGet: path: /app/healthz port: 80 exec：
+在容器内执行某命令，命令执行成功（通过命令退出状态码为0判断）则确定Pod就绪；
+使用方式：
+livenessProbe: exec: command: - cat - /app/healthz tcpSocket：
+打开一个TCP连接到容器的指定端口，连接成功建立则确定Pod就绪。
+使用方式：
+livenessProbe: tcpSocket: port: 80 一般就绪探针会在启动容器一段时间后才开始第一次的就绪探测，之后做周期性探测。所以在定义就绪指针时，会给以下几个参数：
+initialDelaySeconds：在初始化容器多少秒后开始第一次就绪探测； timeoutSeconds：如果该次就绪探测超过多少秒后还未成功，判定为超时，该次探测失败，Pod不就绪。默认值1，最小值1； periodSeconds：如果Pod未就绪，则每隔多少秒周期性的做就绪探测。默认值10，最小值1； failureThreshold：如果容器之前探测成功，后续连续几次探测失败，则确定容器未就绪。默认值3，最小值1； successThreshold：如果容器之前探测失败，后续连续几次探测成功，则确定容器就绪。默认值1，最小值1。 使用示例 # 目前我在docker hub有一个测试镜像：poneding/helloweb:v1，容器启动后，有一个健康检查路由/healthz/return200，访问该路由状态码返回200；有一个检查路由/health/return404，访问该路由状态码返回404。"><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="kubernetes"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Liveness Readiness Probe | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/liveness-readiness-probe/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Liveness Readiness Probe</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#写在前面>写在前面</a></li><li><a href=#livenessprobe简介>livenessProbe简介</a></li><li><a href=#readinessprobe简介>readinessProbe简介</a></li><li><a href=#定义参数>定义参数</a></li><li><a href=#使用示例>使用示例</a><ul><li><a href=#readinessprobe示例>readinessProbe示例</a></li><li><a href=#livenessprobe示例>livenessProbe示例</a></li></ul></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/kubernetes/>Kubernetes</a> / Kubernetes 0-1 Pod中的livenessProbe和readinessProbe解读</p><h1 id=kubernetes-0-1-pod中的livenessprobe和readinessprobe解读>Kubernetes 0-1 Pod中的livenessProbe和readinessProbe解读
+<a class=anchor href=#kubernetes-0-1-pod%e4%b8%ad%e7%9a%84livenessprobe%e5%92%8creadinessprobe%e8%a7%a3%e8%af%bb>#</a></h1><p><img src=https://fs.poneding.com/images/1*UnrkdMdY3XBHOUSx9H-sJw.png alt=kubernetes></p><h2 id=写在前面>写在前面
+<a class=anchor href=#%e5%86%99%e5%9c%a8%e5%89%8d%e9%9d%a2>#</a></h2><p>K8s对Pod的健康状态可以通过两类探针来检查：livenessProbe和readinessProbe，kubelet通过定期执行这两类探针来诊断容器的健康状况。</p><h2 id=livenessprobe简介>livenessProbe简介
+<a class=anchor href=#livenessprobe%e7%ae%80%e4%bb%8b>#</a></h2><p>存活指针，判断Pod（中的应用容器）是否健康，可以理解为健康检查。我们使用livenessProbe来定期的去探测，如果探测成功，则Pod状态可以判定为Running；如果探测失败，可kubectl会根据Pod的重启策略来重启容器。</p><p>如果未给Pod设置livenessProbe，则默认探针永远返回Success。</p><p>当我们执行<code>kubectl get pods</code>命令，输出信息中<code>STATUS</code>一列我们可以看到Pod是否处于<code>Running</code>状态。</p><h2 id=readinessprobe简介>readinessProbe简介
+<a class=anchor href=#readinessprobe%e7%ae%80%e4%bb%8b>#</a></h2><p>就绪指针，就绪的意思是已经准备好了，Pod的就绪我们可以理解为这个Pod可以接受请求和访问。我们使用readinessProbe来定期的去探测，如果探测成功，则Pod 的Ready状态判定为True；如果探测失败，Pod的Ready状态判定为False。</p><p>与livenessProbe不同的是，kubelet不会对readinessProbe的探测情况有重启操作。</p><p>当我们执行<code>kubectl get pods</code>命令，输出信息中<code>READY</code>一列我们可以看到Pod的<code>READY</code>状态是否为True。</p><h2 id=定义参数>定义参数
+<a class=anchor href=#%e5%ae%9a%e4%b9%89%e5%8f%82%e6%95%b0>#</a></h2><p>livenessProbe和readinessProbe的定义参数是一致的，可以通过<code>kubectl explain pods.spec.containers.readinessProbe</code>或<code>kubectl explain pods.spec.containers.livenessProbe</code>命令了解：</p><p><img src=https://fs.poneding.com/images/image-20200614162236210.png alt=image-20200614162236210></p><p>就绪探针的几种类型：</p><p><strong>httpGet</strong>：</p><p>向容器发送Http Get请求，调用成功（通过Http状态码判断）则确定Pod就绪；</p><p>使用方式：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>livenessProbe</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>httpGet</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/app/healthz</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>port</span>: <span style=color:#ae81ff>80</span>
+</span></span></code></pre></div><p><strong>exec</strong>：</p><p>在容器内执行某命令，命令执行成功（通过命令退出状态码为0判断）则确定Pod就绪；</p><p>使用方式：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>livenessProbe</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>exec</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>command</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>cat </span>
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>/app/healthz</span>
+</span></span></code></pre></div><p><strong>tcpSocket</strong>：</p><p>打开一个TCP连接到容器的指定端口，连接成功建立则确定Pod就绪。</p><p>使用方式：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>livenessProbe</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>tcpSocket</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>port</span>: <span style=color:#ae81ff>80</span>
+</span></span></code></pre></div><p>一般就绪探针会在启动容器一段时间后才开始第一次的就绪探测，之后做周期性探测。所以在定义就绪指针时，会给以下几个参数：</p><ul><li><strong>initialDelaySeconds</strong>：在初始化容器多少秒后开始第一次就绪探测；</li><li><strong>timeoutSeconds</strong>：如果该次就绪探测超过多少秒后还未成功，判定为超时，该次探测失败，Pod不就绪。默认值1，最小值1；</li><li><strong>periodSeconds</strong>：如果Pod未就绪，则每隔多少秒周期性的做就绪探测。默认值10，最小值1；</li><li><strong>failureThreshold</strong>：如果容器之前探测成功，后续连续几次探测失败，则确定容器未就绪。默认值3，最小值1；</li><li><strong>successThreshold</strong>：如果容器之前探测失败，后续连续几次探测成功，则确定容器就绪。默认值1，最小值1。</li></ul><h2 id=使用示例>使用示例
+<a class=anchor href=#%e4%bd%bf%e7%94%a8%e7%a4%ba%e4%be%8b>#</a></h2><p>目前我在docker hub有一个测试镜像：poneding/helloweb:v1，容器启动后，有一个健康检查路由/healthz/return200，访问该路由状态码返回200；有一个检查路由/health/return404，访问该路由状态码返回404。</p><p><img src=https://fs.poneding.com/images/image-20200614141140161.png alt=image-20200614141140161></p><p><img src=https://fs.poneding.com/images/image-20200614141106875.png alt=image-20200614141106875></p><h3 id=readinessprobe示例>readinessProbe示例
+<a class=anchor href=#readinessprobe%e7%a4%ba%e4%be%8b>#</a></h3><p>在实验之前先了解一下Pod和Service的负载均衡关系：在K8s中，Service作为Pod的负载均衡器，是通过Label Selector匹配Pod的。但是这句话没有说完整，因为还有一个必要条件：Pod当前已经就绪。也就是说，Service通过Label Selector匹配当前就绪的Pod，还未就绪的Pod就算labelSelector匹配上了，也不会出现在Service的endpoints中，请求是不会被转发过去的，如下图示例。</p><p><img src=https://fs.poneding.com/images/image-20200106164307228.png alt=image-20200106164307228></p><p>示例说明：我们使用<code>poneding/helloweb:v1</code>镜像启动三个Pod，三个Pod的Label都设置成一样，为了使Service匹配到；三个Pod其中两个readinessProbe使用httpGet探测/health/return200，模拟探测成功，一个readinessProbe使用httpGet探测/health/return404，模拟探测失败。</p><p>编写我们的helloweb-readinessProbe.yaml文件如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Pod</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>helloweb1</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>helloweb</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>containers</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>helloweb</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>image</span>: <span style=color:#ae81ff>poneding/helloweb:v1</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>readinessProbe</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>httpGet</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/healthz/return200</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>initialDelaySeconds</span>: <span style=color:#ae81ff>30</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>timeoutSeconds</span>: <span style=color:#ae81ff>10</span>     
+</span></span><span style=display:flex><span>      <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>containerPort</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Pod</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>helloweb2</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>helloweb</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>containers</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>helloweb</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>image</span>: <span style=color:#ae81ff>poneding/helloweb:v1</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>readinessProbe</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>httpGet</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/healthz/return200</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>initialDelaySeconds</span>: <span style=color:#ae81ff>30</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>timeoutSeconds</span>: <span style=color:#ae81ff>10</span>     
+</span></span><span style=display:flex><span>      <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>containerPort</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Pod</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>helloweb3</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>helloweb</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>containers</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>helloweb</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>image</span>: <span style=color:#ae81ff>poneding/helloweb:v1</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>readinessProbe</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>httpGet</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/healthz/return404</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>initialDelaySeconds</span>: <span style=color:#ae81ff>30</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>timeoutSeconds</span>: <span style=color:#ae81ff>10</span>     
+</span></span><span style=display:flex><span>      <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>containerPort</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Service</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>:  <span style=color:#ae81ff>helloweb</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>:  <span style=color:#ae81ff>helloweb</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>type</span>:  <span style=color:#ae81ff>ClusterIP</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>:  <span style=color:#ae81ff>http</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>port</span>:  <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>targetPort</span>:  <span style=color:#ae81ff>80</span>  
+</span></span></code></pre></div><p>运行命令部署Pod和Service：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl apply -f helloweb-readinessProbe.yaml
+</span></span></code></pre></div><p>之后，我们查看Pod的就绪情况：</p><p><img src=https://fs.poneding.com/images/image-20200614141813684.png alt=image-20200614141813684></p><p>可以看到Pod只有helloweb1和helloweb2当前使处于<code>READY</code>（就绪）的状态，helloweb3尚未Ready，我们接着查看helloweb service的endpoints：</p><p><img src=https://fs.poneding.com/images/image-20200614141750563.png alt=image-20200614141750563></p><p>可以看到Service的EndPoints只将helloweb1、helloweb2 pod的IP负载上了。</p><p>查看日志访问情况：</p><p><img src=https://fs.poneding.com/images/image-20200614145627312.png alt=image-20200614145627312></p><p>可以看到每隔10秒（readniessProbe.periodSeconds默认10s）就会做一次就绪探测。</p><h3 id=livenessprobe示例>livenessProbe示例
+<a class=anchor href=#livenessprobe%e7%a4%ba%e4%be%8b>#</a></h3><p>编写我们的helloweb-livenessProbe.yaml文件如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Pod</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>helloweb4</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>helloweb</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>containers</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>helloweb</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>image</span>: <span style=color:#ae81ff>poneding/helloweb:v1</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>livenessProbe</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>httpGet</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/healthz/return200</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>initialDelaySeconds</span>: <span style=color:#ae81ff>30</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>timeoutSeconds</span>: <span style=color:#ae81ff>10</span>     
+</span></span><span style=display:flex><span>      <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>containerPort</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Pod</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>helloweb5</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>helloweb</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>containers</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>helloweb</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>image</span>: <span style=color:#ae81ff>poneding/helloweb:v1</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>livenessProbe</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>httpGet</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/healthz/return404</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>initialDelaySeconds</span>: <span style=color:#ae81ff>30</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>timeoutSeconds</span>: <span style=color:#ae81ff>10</span>     
+</span></span><span style=display:flex><span>      <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>containerPort</span>: <span style=color:#ae81ff>80</span>
+</span></span></code></pre></div><p>运行命令部署Pod和Service：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl apply -f helloweb-livenessProbe.yaml
+</span></span></code></pre></div><p>之后，我们查看Pod的就绪情况：</p><p><img src=https://fs.poneding.com/images/image-20200614165017124.png alt=image-20200614165017124></p><p>可以看到helloweb4的STATUS状态为<code>Running</code>，而helloweb5的STATUS状态最终变为<code>CrashLoopBackOff</code>，并且一直在重启。</p><p>相信到这里，你已经对<code>readniessProbe</code>和<code>livenessProbe</code>有一个清晰的了解了。</p><p><img src=https://fs.poneding.com/images/gzh.png alt=gzh></p><hr><p><a href=/kubernetes/kustomize/>« Kustomize</a></p><p><a href=/kubernetes/local-storageclass/>» local 存储卷实践</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/kubernetes/liveness-readiness-probe.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#写在前面>写在前面</a></li><li><a href=#livenessprobe简介>livenessProbe简介</a></li><li><a href=#readinessprobe简介>readinessProbe简介</a></li><li><a href=#定义参数>定义参数</a></li><li><a href=#使用示例>使用示例</a><ul><li><a href=#readinessprobe示例>readinessProbe示例</a></li><li><a href=#livenessprobe示例>livenessProbe示例</a></li></ul></li></ul></nav></div></aside></main></body></html>

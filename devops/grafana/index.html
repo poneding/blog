@@ -1,0 +1,46 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / DevOps / Grafana
+Grafana # 官方文档： https://grafana.com/docs/grafana/latest/
+简介 # 特性 # 可视化：通过图表展示指标信息，直观，便于分析
+报警：指标数据超出阈值
+统一：多种数据源可以应用到同一个Dashboard中
+多平台支持：windows、linux、docker、mac
+丰富的插件扩展
+丰富的模板支持
+使用Grafana监控Jenkins # 监控指标包括:jenkins发布状态,jenkins的发布时长等.
+前提条件 # 已安装jenkins
+已安装prometheus
+已安装grafana
+Jenkins安装插件 # 登入Jenkins => Manage Jenkins => Manage Plugins => Available页签 搜索Prometheus插件,安装即可.
+此节可以参考: https://medium.com/@eng.mohamed.m.saeed/monitoring-jenkins-with-grafana-and-prometheus-a7e037cbb376
+« 使用Grafana监控service
+» Jaeger"><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/devops/grafana/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / DevOps / Grafana
+Grafana # 官方文档： https://grafana.com/docs/grafana/latest/
+简介 # 特性 # 可视化：通过图表展示指标信息，直观，便于分析
+报警：指标数据超出阈值
+统一：多种数据源可以应用到同一个Dashboard中
+多平台支持：windows、linux、docker、mac
+丰富的插件扩展
+丰富的模板支持
+使用Grafana监控Jenkins # 监控指标包括:jenkins发布状态,jenkins的发布时长等.
+前提条件 # 已安装jenkins
+已安装prometheus
+已安装grafana
+Jenkins安装插件 # 登入Jenkins => Manage Jenkins => Manage Plugins => Available页签 搜索Prometheus插件,安装即可.
+此节可以参考: https://medium.com/@eng.mohamed.m.saeed/monitoring-jenkins-with-grafana-and-prometheus-a7e037cbb376
+« 使用Grafana监控service
+» Jaeger"><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="devops"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Grafana | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/devops/grafana/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Grafana</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#简介>简介</a></li><li><a href=#特性>特性</a></li><li><a href=#使用grafana监控jenkins>使用Grafana监控Jenkins</a><ul><li><a href=#前提条件>前提条件</a></li><li><a href=#jenkins安装插件>Jenkins安装插件</a></li></ul></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/devops/>DevOps</a> / Grafana</p><h1 id=grafana>Grafana
+<a class=anchor href=#grafana>#</a></h1><p>官方文档：
+<a href=https://grafana.com/docs/grafana/latest/>https://grafana.com/docs/grafana/latest/</a></p><h2 id=简介>简介
+<a class=anchor href=#%e7%ae%80%e4%bb%8b>#</a></h2><h2 id=特性>特性
+<a class=anchor href=#%e7%89%b9%e6%80%a7>#</a></h2><ul><li><p>可视化：通过图表展示指标信息，直观，便于分析</p></li><li><p>报警：指标数据超出阈值</p></li><li><p>统一：多种数据源可以应用到同一个Dashboard中</p></li><li><p>多平台支持：windows、linux、docker、mac</p></li><li><p>丰富的插件扩展</p></li><li><p>丰富的模板支持</p></li></ul><h2 id=使用grafana监控jenkins>使用Grafana监控Jenkins
+<a class=anchor href=#%e4%bd%bf%e7%94%a8grafana%e7%9b%91%e6%8e%a7jenkins>#</a></h2><blockquote><p>监控指标包括:jenkins发布状态,jenkins的发布时长等.</p></blockquote><h3 id=前提条件>前提条件
+<a class=anchor href=#%e5%89%8d%e6%8f%90%e6%9d%a1%e4%bb%b6>#</a></h3><ol><li><p>已安装jenkins</p></li><li><p>已安装prometheus</p></li><li><p>已安装grafana</p></li></ol><h3 id=jenkins安装插件>Jenkins安装插件
+<a class=anchor href=#jenkins%e5%ae%89%e8%a3%85%e6%8f%92%e4%bb%b6>#</a></h3><p>登入Jenkins => Manage Jenkins => Manage Plugins => Available页签 搜索Prometheus插件,安装即可.</p><p>此节可以参考:
+<a href=https://medium.com/@eng.mohamed.m.saeed/monitoring-jenkins-with-grafana-and-prometheus-a7e037cbb376>https://medium.com/@eng.mohamed.m.saeed/monitoring-jenkins-with-grafana-and-prometheus-a7e037cbb376</a></p><hr><p><a href=/devops/grafana-monite-service/>« 使用Grafana监控service</a></p><p><a href=/devops/jeager/>» Jaeger</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/devops/grafana.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#简介>简介</a></li><li><a href=#特性>特性</a></li><li><a href=#使用grafana监控jenkins>使用Grafana监控Jenkins</a><ul><li><a href=#前提条件>前提条件</a></li><li><a href=#jenkins安装插件>Jenkins安装插件</a></li></ul></li></ul></nav></div></aside></main></body></html>

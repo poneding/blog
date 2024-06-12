@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>我的博客</title><link>https://blog.poneding.com/linux/</link><description>Recent content on 我的博客</description><generator>Hugo</generator><language>cn</language><atom:link href="https://blog.poneding.com/linux/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>https://blog.poneding.com/linux/certbot-auto-gen-cert/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/certbot-auto-gen-cert/</guid><description>我的博客 / Linux / certbot-auto 生成证书
+certbot-auto 生成证书 # 安装 # wget https://dl.eff.org/certbot-auto chmod a+x ./certbot-auto cp ./certbot-auto /usr/local/bin 生成证书 # 条件：
+提前已经将域名解析到本服务器； 本服务器端口 80、443 处于未被占用的状态，如果 web 服务占用了 80 端口，需要临时关闭。 certbot-auto certonly --standalone --email poneding@gmail.com -d test.poneding.com 以上命令执行完成后，将会在 /etc/letsencrypt/live 目录下生成域名证书文件。默认证书有效期为 3 个月。
+nginx 配置证书 # 参考示例：
+server { listen 80; server_name abc.com; rewrite ^(.*) https://test.poneding.com permanent; } server{ listen 443 ssl default_server; listen [::]:443 ssl default_server; ssl_certificate /etc/letsencrypt/live/test.poneding.com/fullchain.pem; ssl_certificate_key /etc/letsencrypt/live/test.</description></item><item><title/><link>https://blog.poneding.com/linux/history-with-date/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/history-with-date/</guid><description>我的博客 / Linux / Linux-history 输出附带日期
+Linux-history 输出附带日期 # 如果我们在 linux 系统中想看历史的命令记录，我们可以通过 command 命令来获取。
+history 输出大概会是下面这种样子，只有简单的 command 列表。
+1 ls 2 top 4 docker ps 5 df 6 ls 那么，如果想知道历史执行的 command 的时间该怎么做呢。
+按照如下步骤，一步一步来。
+首先设置 HISTTIMEFORMAT 变量 $ HISTTIMEFORMAT=&amp;#34;%d/%m/%y %T &amp;#34; # OR $ echo &amp;#39;export HISTTIMEFORMAT=&amp;#34;%d/%m/%y %T &amp;#34;&amp;#39; &amp;gt;&amp;gt; ~/.bash_profile 使用 source 命令加载 HISTTIMEFORMAT 变量到当前 shell 命令窗 $ . ~/.bash_profile # OR $ source ~/.bash_profile 再次运行 history 命令，已经可以输出附带执行时间的 history 了。 1 root 2020/02/18 11:28:19 ls 2 root 2020/02/18 11:28:21 top 4 root 2020/02/18 11:28:58 docker ps 5 root 2020/02/18 11:34:09 df 6 root 2020/02/18 11:34:15 ls « certbot-auto 生成证书</description></item><item><title/><link>https://blog.poneding.com/linux/linux-commands/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/linux-commands/</guid><description>我的博客 / Linux / Linux 命令
+Linux 命令 # Linux 命令大全
+cat # cat命令用于把档案串连接后传到基本输出（萤幕或加 &amp;gt; fileName 到另一个档案）
+使用权限 # 所有使用者
+语法格式 # cat [-AbeEnstTuv] [--help] [--version] fileName 参数说明 # -n 或 &amp;ndash;number 由 1 开始对所有输出的行数编号
+-b 或 &amp;ndash;number-nonblank 和 -n 相似，只不过对于空白行不编号
+-s 或 &amp;ndash;squeeze-blank 当遇到有连续两行以上的空白行，就代换为一行的空白行
+-v 或 &amp;ndash;show-nonprinting
+实例 # 把 textfile1 的档案内容加上行号后输入 textfile2 这个档案里
+cat -n textfile1 &amp;gt; textfile2 把 textfile1 和 textfile2 的档案内容加上行号（空白行不加）之后将内容附加到 textfile3 里。
+cat -b textfile1 textfile2 &amp;gt;&amp;gt; textfile3 清空/etc/test.</description></item><item><title/><link>https://blog.poneding.com/linux/linux-common-commands/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/linux-common-commands/</guid><description>我的博客 / Linux / Linux常用命令
+Linux常用命令 # 1.文件和目录相关 # cd .. 切换到上一级目录 cd ../.. 切换到上两级目录 cd [dir] 进入 dir 目录 cd 进入个人的主目录 cd ~[username] 进入个人的主目录 cd - 进入上次目录 pwd 查看目录路径 ls 查看当前目录下的目录和文件（不包含隐藏目录或文件） ls -a 查看当前目录下的所有目录和文件 ls -F 查看当前目录下的文件 （不包含目录和隐藏文件） ls -l 查看文件和目录的详细资料 ls *[0-9]* 查看包含字符的文件和目录 mkdir dir1 创建目录 mkdir dir1 dir2 mkdir -p dir1/dir1/dir1 创建一个目录树 rm -f file1 删除文件 rmdir dir1 删除空 rm -rf dir1 删除包含内容的目录 rm -rf dir1 dir2 删除多个目录 mv dir1 dir2 重命名或移动一个目录（看 dir2 是否存在） cp file1 file2 复制文件 cp dir/* .</description></item><item><title/><link>https://blog.poneding.com/linux/linux-enable-crontab-log/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/linux-enable-crontab-log/</guid><description>我的博客 / Linux / Linux 启用 crontab 日志
+Linux 启用 crontab 日志 # You can enable logging for cron jobs in order to track problems.
+You need to edit the /etc/rsyslog.conf or /etc/rsyslog.d/50-default.conf (on Ubuntu) file and make sure you have the following line uncommented or add it if it is missing:
+cron.* /var/log/cron.log Then restart rsyslog and cron:
+sudo service rsyslog restart sudo service cron restart Cron jobs will log to /var/log/cron.</description></item><item><title/><link>https://blog.poneding.com/linux/linux-secure-login/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/linux-secure-login/</guid><description>我的博客 / Linux / Linux-安全登录
+Linux-安全登录 # 我们都知道
+root 是 linux 系统默认的最高权限账号 linux 系统默认的 ssh 端口是 22 大多数人习惯使用 user/password 来登录 linux 系统 很遗憾，如果你的系统没有做特殊等登陆配置，那么其他人便可以利用 ssh ip:22 root/暴力密码 来破解登入你 的 linux 系统，一旦被他破解，你的系统就可以为他所用了。
+但是，我们可以通过以下三种方式来避免发生这类安全问题。
+1. 禁用 root 账号登录 # 禁用 root 账号，那么我们就必须创建其他登录账号，这里建议账号名不要为 admin 这类常见用户名。
+创建用户（以下都基于 ubuntu 系统操作） adduser dp 用户赋权 此时创建的用户不能使用 sudo 权限，考虑将用户加入 sudo 组
+usermod -a -G sudo dp 并且，为了避免使用 sudo 权限需要时不时的输入密码的麻烦，进行免密设置。在 /etc/sudoers 文件中新增行。
+dp ALL=(ALL) NOPASSWD: ALL 到了这一步，应该尝试使用新用户登录系统，如果成功登录再往下继续。 禁用 root 登录 打开 /etc/ssh/sshd_config 文件，找到 PermitRootLogin 项，修改该项成如下：</description></item><item><title/><link>https://blog.poneding.com/linux/shell-command-interval-character/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/shell-command-interval-character/</guid><description>我的博客 / Linux / shell 命令间隔符
+shell 命令间隔符 # 我们经常能看到Shell命令间有很多中间隔符：|，||，&amp;amp;&amp;amp; 等，它们到底有着什么样的作用呢？一一来看：
+1. |：
+间隔符 | 起着管道的作用，是将上一条命令的 stdout 作为下一条命令的 stdin：
+示例：
+echo hello world! | tee hello.txt 2. ||：
+命令被 || 分割，只有当前面的命令发生错误，才会执行后面的命令。
+示例：
+# 如果创业失败，那么就继续打工 sh chuangye.sh || sh dagong.sh 3. &amp;amp;&amp;amp;：
+命令被 &amp;amp;&amp;amp; 分割，命令会连续执行，但是如果前面的命令发生错误，会影响后面的命令继续执行。
+示例：
+# 洗了手才能吃饭 sh wash_hand.sh &amp;amp;&amp;amp; sh eat.sh 4. ;：
+命令被 ; 分割，命令会连续执行，即使前面的命令发生错误，也不影响后面的命令继续执行。
+示例：
+# 不管有没有赚到钱，都要回家过年 sh earn_money.sh; sh go_home.sh 5. &amp;gt;：
+输出到指定文件（文件不存在则创建文件，文件存在则会覆盖文件内容）
+echo &amp;#34;Hello World&amp;#34; &amp;gt; hello.</description></item><item><title/><link>https://blog.poneding.com/linux/shell/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/shell/</guid><description>我的博客 / Linux / shell 基础
+shell 基础 # shell 注释 # 单行注释：
+# 注释内容 多行注释：
+:&amp;lt;&amp;lt;EOF 注释内容 注释内容 注释内容 EOF 或
+:&amp;lt;&amp;lt;! 注释内容 注释内容 注释内容 ! 或
+:&amp;lt;&amp;lt;&amp;#39; 注释内容 注释内容 注释内容 &amp;#39; shell 变量 # 定义变量：
+my_name=&amp;#34;Ding Peng&amp;#34; 使用变量：
+$my_name ${my_name} 只读变量：
+my_name=&amp;#34;Ding Peng&amp;#34; readonly my_name 删除变量：
+unset my_name 变量类型：
+局部变量：在脚本或命令中定义，仅在当前shell实例有效 环境变量：所有shell实例有效 shell变量：shell程序设置的特殊变量 shell 字符串 # 单引号与双引号的区别：
+单引号里的任何字符都会原样输出，单引号字符串中的变量是无效的； 单引号字串中不能出现单独一个的单引号（对单引号使用转义符后也不行），但可成对出现，作为字符串拼接使用； 双引号里可以有变量； 双引号里可以出现转义字符 my_name=&amp;#34;Ding Peng&amp;#34; hello_string=&amp;#34;Hllo,\&amp;#34;$my_name\&amp;#34;!&amp;#34; echo $hello_string 获取字符串长度：
+my_name=&amp;#34;dp&amp;#34; echo ${#my_name} # 输出5 截取字符串：</description></item><item><title/><link>https://blog.poneding.com/linux/ssh-tunnel-connect-middleware/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/ssh-tunnel-connect-middleware/</guid><description>我的博客 / Linux / 使用 SSH Tunnel 连接中间件
+使用 SSH Tunnel 连接中间件 # 背景 # 一般线上的数据库是不允许本机直接访问的，只能通过跳板机访问。但是这么多的开发人员都要访问数据库的话，跳板机的数量就有压力了。
+本篇介绍如何使用 SSH Tunnel 的方式访问数据库，数据库不限于 Sql Server、MySql、Mongodb、Redis 等。
+前提条件 # 已经拥有数据库的登录信息，如数据库访问的 host、port、user、password； 拥有一台可以访问数据库的跳板机登录权限，如跳板机的 IP、user、password（或密钥文件）； 本机安装了有 SSH Tunnel 功能的数据库的可视化工具，如 DBeaver，Navicate，Robo 3T 等。 RDB # 使用 DBeaver 或 Navicate 等工具通过 SSH Tunnel 方式访问关系型数据库，以 Sql Server 为例。
+打开DBeaver，选择 Sql Server 连接。
+在连接配置页面 Main，输入 Sql Server 连接的基本信息，这里 host 直接使用原本的数据库 host 即可。
+切至 SSH，勾选 Use SSH Tunnel，输入跳板机的连接配置即可。
+配置完成，Ok连接即可。
+使用 SSMS + SSH Tunnel 连接 Sql Server # 本机需要安装 SSMS 和 Putty 工具。</description></item><item><title/><link>https://blog.poneding.com/linux/tee-keep-stderr/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/tee-keep-stderr/</guid><description>我的博客 / Linux / tee 保存 stderr 到文件
+tee 保存 stderr 到文件 # tee命令是将 stdout 写入到某文件当中，但是如何将 stderr 也写入到文件当中？
+示例如下：
+1.sh
+echo exec 1.sh start! &amp;amp;&amp;amp; \ cat hello.txt &amp;amp;&amp;amp; \ echo exec 1.sh end! 假如 hello.txt 文件不存在，执行 1.sh 文件中的 cat 命令将报错。如果我们想将执行 1.sh 文件的输出写入到一个 log 文件，例如：
+sh 1.sh | tee 1.log 执行以上命令，控制台的输出是：
+$ sh 1.sh | tee 1.log exec 1.sh start! cat: hello.txt: No such file or directory 但是写入到 1.log 日志文件中的内容是：</description></item><item><title/><link>https://blog.poneding.com/linux/vim-common-commands/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/vim-common-commands/</guid><description>我的博客 / Linux / vim 使用
+vim 使用 # 设置 # vim /etc/vim/vimrc 或者当前环境设置
+:set paste :set nopaste :set number :set nonumber :set hlsearch :set nohlsearch :set cursorline :set nocursorline vim删除所有行 # ggdG 撤销 # u ctrl+r 查找 # 大小写问题：
+默认大小写敏感。
+大小写不敏感：/hello\c
+大小写敏感：/hello\C
+设置大小写敏感：
+ecs+:set ignorecase：设置默认忽略大小写敏感
+ecs+:set smartcase：如果查找字符中存在大写则自动大小写敏感
+查找当前字符：
+光标移动 # h：向左 j：向下 k：向上 l：向右 替换 # :s/jay/dp/g 替换当前行中所有匹配 jay =&amp;gt; dp :1,$s/jay/dp/g 替换所有 :1,5s/jay/dp/g 替换 1 到 5 行 翻页 # ctrl+f：下一页 ctrl+d：下半页 ctrl+b：上一页 ctrl+u：上半页 行操作 # dG：删除当前行到尾行</description></item></channel></rss>

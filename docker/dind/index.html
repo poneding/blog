@@ -1,0 +1,77 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / Docker / Docker in Docker
+Docker in Docker # Docker-in-Docker 的意思是在 Docker 容器中使用 docker，就像和在宿主机上使用 docker 一样，你可以理解为套娃。
+场景：
+如果你的 Jenkins 是使用 Docker 容器的方式运行的，如果你想使用 Jenkins 的 Docker 插件来为 Jenkins Job 提供运行容器，这时候你就需要用到 Docker-in-Docker；
+一般这个技术使用在应用的程序集成中 CI/CD。
+1. 挂载主机 /var/run/docker.sock # Docker 容器：
+docker run -v /var/run/docker.sock:/var/run/docker.sock --name docker-in-docker -it docker 在运行起来的容器中使用docker：
+$ docker run -v /var/run/docker.sock:/var/run/docker.sock --name docker-in-docker -it docker / # docker run hello-world Hello from Docker! This message shows that your installation appears to be working correctly."><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/docker/dind/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / Docker / Docker in Docker
+Docker in Docker # Docker-in-Docker 的意思是在 Docker 容器中使用 docker，就像和在宿主机上使用 docker 一样，你可以理解为套娃。
+场景：
+如果你的 Jenkins 是使用 Docker 容器的方式运行的，如果你想使用 Jenkins 的 Docker 插件来为 Jenkins Job 提供运行容器，这时候你就需要用到 Docker-in-Docker；
+一般这个技术使用在应用的程序集成中 CI/CD。
+1. 挂载主机 /var/run/docker.sock # Docker 容器：
+docker run -v /var/run/docker.sock:/var/run/docker.sock --name docker-in-docker -it docker 在运行起来的容器中使用docker：
+$ docker run -v /var/run/docker.sock:/var/run/docker.sock --name docker-in-docker -it docker / # docker run hello-world Hello from Docker! This message shows that your installation appears to be working correctly."><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="docker"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Dind | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/docker/dind/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Dind</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#1-挂载主机-varrundockersock>1. 挂载主机 /var/run/docker.sock</a></li><li><a href=#2-使用-docker-dind>2. 使用 Docker-Dind</a></li><li><a href=#3-结束语>3. 结束语</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/docker/>Docker</a> / Docker in Docker</p><h1 id=docker-in-docker>Docker in Docker
+<a class=anchor href=#docker-in-docker>#</a></h1><p><img src=https://fs.poneding.com/images/docker.png alt=docker></p><p><code>Docker-in-Docker</code> 的意思是在 Docker 容器中使用 docker，就像和在宿主机上使用 docker 一样，你可以理解为<strong>套娃</strong>。</p><p>场景：</p><p>如果你的 Jenkins 是使用 Docker 容器的方式运行的，如果你想使用 Jenkins 的 Docker 插件来为 Jenkins Job 提供运行容器，这时候你就需要用到 Docker-in-Docker；</p><p>一般这个技术使用在应用的程序集成中 <strong>CI/CD</strong>。</p><h2 id=1-挂载主机-varrundockersock>1. 挂载主机 /var/run/docker.sock
+<a class=anchor href=#1-%e6%8c%82%e8%bd%bd%e4%b8%bb%e6%9c%ba-varrundockersock>#</a></h2><p><img src=https://fs.poneding.com/images/docker-in-docker-01.png alt=docker-in-docker-01></p><p><strong>Docker 容器</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker run -v /var/run/docker.sock:/var/run/docker.sock --name docker-in-docker -it docker
+</span></span></code></pre></div><p>在运行起来的容器中使用docker：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ docker run -v /var/run/docker.sock:/var/run/docker.sock --name docker-in-docker -it docker
+</span></span><span style=display:flex><span>/ <span style=color:#75715e># docker run hello-world</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Hello from Docker!
+</span></span><span style=display:flex><span>This message shows that your installation appears to be working correctly.
+</span></span><span style=display:flex><span>...
+</span></span></code></pre></div><p>可以看到，在该容器中可以像在宿主机一样运行 docker 容器。</p><p>但是，使用 <code>docker ps -a</code> 命令可以查看到宿主机的运行容器，这说明容器的权限是很大的，存在一定的安全隐患：</p><p><img src=https://fs.poneding.com/images/image-20201208143849939.png alt=image-20201208143849939></p><p><strong>Kubernetes Pod</strong>：</p><p>准备 docker-in-docker.yaml 文件如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Pod</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>docker-in-docker</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>containers</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>docker</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>image</span>: <span style=color:#ae81ff>docker</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>command</span>: [<span style=color:#e6db74>&#34;/bin/sh&#34;</span>, <span style=color:#e6db74>&#34;-c&#34;</span>]
+</span></span><span style=display:flex><span>      <span style=color:#f92672>args</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#ae81ff>sleep 300s;</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>volumeMounts</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>docker-sock</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>mountPath</span>: <span style=color:#ae81ff>/var/run/docker.sock</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>volumes</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>docker-sock</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>hostPath</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/var/run/docker.sock</span>
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl apply -f docker-in-docker.yaml
+</span></span><span style=display:flex><span>kubectl exec -it docker-in-docker -c docker /bin/sh
+</span></span></code></pre></div><p>同样，这种方式也能获取到宿主机的容器。</p><p><img src=https://fs.poneding.com/images/image-20210115093238930.png alt=image-20210115093238930></p><h2 id=2-使用-docker-dind>2. 使用 Docker-Dind
+<a class=anchor href=#2-%e4%bd%bf%e7%94%a8-docker-dind>#</a></h2><p><img src=https://fs.poneding.com/images/docker-in-docker-02.png alt=docker-in-docker-02></p><p><strong>Docker 容器</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker run --privileged -d --name docker-in-docker docker:dind
+</span></span><span style=display:flex><span>docker exec -it docker-in-docker /bin/sh
+</span></span></code></pre></div><p>与上面方式不同的是，这种方式运行起来的 docker-in-docker 无法看到宿主机上的容器。</p><p><img src=https://fs.poneding.com/images/image-20210115090727784.png alt=image-20210115090727784></p><p><strong>Kubernetes Pod</strong>：</p><p>准备 docker-in-docker.yaml 文件如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Pod</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>docker-in-docker</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>containers</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>docker</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>image</span>: <span style=color:#ae81ff>docker:18</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>imagePullPolicy</span>: <span style=color:#ae81ff>Always</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>env</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>DOCKER_HOST</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>value</span>: <span style=color:#ae81ff>tcp://localhost:2375</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>command</span>: [<span style=color:#e6db74>&#34;/bin/sh&#34;</span>, <span style=color:#e6db74>&#34;-c&#34;</span>]
+</span></span><span style=display:flex><span>      <span style=color:#f92672>args</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#ae81ff>sleep 300s;</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>docker-dind</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>image</span>: <span style=color:#ae81ff>docker:18-dind</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>securityContext</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>privileged</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>restartPolicy</span>: <span style=color:#ae81ff>OnFailure</span>
+</span></span></code></pre></div><blockquote><p>注意：</p><p>需要两个容器，第一容器由 docker 镜像运行，第二容器由 <code>docker:dind</code> 镜像运行；</p><p>第一容器需要设置环境变量：<code>DOCKER_HOST=tcp://localhost:2375</code>；</p><p>第二容器使用特权模式运行。</p></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl apply -f docker-in-docker.yaml
+</span></span><span style=display:flex><span>kubectl exec -it docker-in-docker -c docker /bin/sh
+</span></span></code></pre></div><h2 id=3-结束语>3. 结束语
+<a class=anchor href=#3-%e7%bb%93%e6%9d%9f%e8%af%ad>#</a></h2><p>前面提到了，由于第一种方式挂载主机 <code>/var/run/docker.sock</code>，在容器视角依然能获取到宿主机的容器，也能运行或删除容器，存在一定的安全隐患，更推荐使用第二种方式，Over!</p><hr><p><a href=/docker/container-diff/>« container-diff 工具的使用</a></p><p><a href=/docker/docker-buildx/>» docker buildx</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/docker/dind.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#1-挂载主机-varrundockersock>1. 挂载主机 /var/run/docker.sock</a></li><li><a href=#2-使用-docker-dind>2. 使用 Docker-Dind</a></li><li><a href=#3-结束语>3. 结束语</a></li></ul></nav></div></aside></main></body></html>

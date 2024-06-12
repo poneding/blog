@@ -1,0 +1,235 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content='我的博客 / Kubernetes / Kubernetes 0-1 K8s部署coredns
+Kubernetes 0-1 K8s部署coredns # 在K8s集群未部署DNS之前，K8s中运行的Pod是无法访问外部网络的，因为无法完成域名解析。
+比如我们运行一个busybox的Pod，然后在Pod里面是无法ping通外部网络的：
+[root@k8s-master01 ~]# kubectl run -it --rm busybox --image=busybox sh If you don&#39;t see a command prompt, try pressing enter. / # ping www.baidu.com ping: bad address &#39;www.baidu.com&#39; 我们可以通过在K8s中部署coredns解决这一问题。
+准备coredns.yaml文件，写入文件内容：
+apiVersion: v1 kind: ServiceAccount metadata: name: coredns namespace: kube-system labels: kubernetes.io/cluster-service: "true" addonmanager.kubernetes.io/mode: Reconcile --- apiVersion: rbac.authorization.k8s.io/v1 kind: ClusterRole metadata: labels: kubernetes.io/bootstrapping: rbac-defaults addonmanager.kubernetes.io/mode: Reconcile name: system:coredns rules: - apiGroups: - "" resources: - endpoints - services - pods - namespaces verbs: - list - watch - apiGroups: - "" resources: - nodes verbs: - get --- apiVersion: rbac.'><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/kubernetes/k8s-deploy-coredns/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content='我的博客 / Kubernetes / Kubernetes 0-1 K8s部署coredns
+Kubernetes 0-1 K8s部署coredns # 在K8s集群未部署DNS之前，K8s中运行的Pod是无法访问外部网络的，因为无法完成域名解析。
+比如我们运行一个busybox的Pod，然后在Pod里面是无法ping通外部网络的：
+[root@k8s-master01 ~]# kubectl run -it --rm busybox --image=busybox sh If you don&#39;t see a command prompt, try pressing enter. / # ping www.baidu.com ping: bad address &#39;www.baidu.com&#39; 我们可以通过在K8s中部署coredns解决这一问题。
+准备coredns.yaml文件，写入文件内容：
+apiVersion: v1 kind: ServiceAccount metadata: name: coredns namespace: kube-system labels: kubernetes.io/cluster-service: "true" addonmanager.kubernetes.io/mode: Reconcile --- apiVersion: rbac.authorization.k8s.io/v1 kind: ClusterRole metadata: labels: kubernetes.io/bootstrapping: rbac-defaults addonmanager.kubernetes.io/mode: Reconcile name: system:coredns rules: - apiGroups: - "" resources: - endpoints - services - pods - namespaces verbs: - list - watch - apiGroups: - "" resources: - nodes verbs: - get --- apiVersion: rbac.'><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="kubernetes"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>K8s Deploy Coredns | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/k8s-deploy-coredns/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>K8s Deploy Coredns</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/kubernetes/>Kubernetes</a> / Kubernetes 0-1 K8s部署coredns</p><h1 id=kubernetes-0-1-k8s部署coredns>Kubernetes 0-1 K8s部署coredns
+<a class=anchor href=#kubernetes-0-1-k8s%e9%83%a8%e7%bd%b2coredns>#</a></h1><p>在K8s集群未部署DNS之前，K8s中运行的Pod是无法访问外部网络的，因为无法完成域名解析。</p><p>比如我们运行一个busybox的Pod，然后在Pod里面是无法ping通外部网络的：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#f92672>[</span>root@k8s-master01 ~<span style=color:#f92672>]</span><span style=color:#75715e># kubectl run -it --rm busybox --image=busybox sh</span>
+</span></span><span style=display:flex><span>If you don<span style=color:#e6db74>&#39;t see a command prompt, try pressing enter.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>/ # ping www.baidu.com
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>ping: bad address &#39;</span>www.baidu.com<span style=color:#960050;background-color:#1e0010>&#39;</span>
+</span></span></code></pre></div><p>我们可以通过在K8s中部署coredns解决这一问题。</p><p>准备coredns.yaml文件，写入文件内容：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ServiceAccount</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>coredns</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>kubernetes.io/cluster-service</span>: <span style=color:#e6db74>&#34;true&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>addonmanager.kubernetes.io/mode</span>: <span style=color:#ae81ff>Reconcile</span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io/v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRole</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>kubernetes.io/bootstrapping</span>: <span style=color:#ae81ff>rbac-defaults</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>addonmanager.kubernetes.io/mode</span>: <span style=color:#ae81ff>Reconcile</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>system:coredns</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>rules</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>apiGroups</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#e6db74>&#34;&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>resources</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>endpoints</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>services</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>pods</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>namespaces</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>verbs</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>list</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>watch</span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>apiGroups</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#e6db74>&#34;&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>resources</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>nodes</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>verbs</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>get</span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io/v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRoleBinding</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>annotations</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>rbac.authorization.kubernetes.io/autoupdate</span>: <span style=color:#e6db74>&#34;true&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>kubernetes.io/bootstrapping</span>: <span style=color:#ae81ff>rbac-defaults</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>addonmanager.kubernetes.io/mode</span>: <span style=color:#ae81ff>EnsureExists</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>system:coredns</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>roleRef</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>apiGroup</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRole</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>system:coredns</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>subjects</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ServiceAccount</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>coredns</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ConfigMap</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>coredns</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>addonmanager.kubernetes.io/mode</span>: <span style=color:#ae81ff>EnsureExists</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>data</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>Corefile</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    .:53 {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        errors
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        health {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            lameduck 5s
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        }
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        ready
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        kubernetes cluster.local in-addr.arpa ip6.arpa {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            pods insecure
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            fallthrough in-addr.arpa ip6.arpa
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            ttl 30
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        }
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        prometheus :9153
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        forward . /etc/resolv.conf
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        cache 30
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        loop
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        reload
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        loadbalance
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    }</span>    
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>apps/v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Deployment</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>coredns</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>k8s-app</span>: <span style=color:#ae81ff>kube-dns</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>kubernetes.io/cluster-service</span>: <span style=color:#e6db74>&#34;true&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>addonmanager.kubernetes.io/mode</span>: <span style=color:#ae81ff>Reconcile</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>kubernetes.io/name</span>: <span style=color:#e6db74>&#34;CoreDNS&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#75715e># replicas: not specified here:</span>
+</span></span><span style=display:flex><span>  <span style=color:#75715e># 1. In order to make Addon Manager do not reconcile this replicas parameter.</span>
+</span></span><span style=display:flex><span>  <span style=color:#75715e># 2. Default is 1.</span>
+</span></span><span style=display:flex><span>  <span style=color:#75715e># 3. Will be tuned in real time if DNS horizontal auto-scaling is turned on.</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>strategy</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>type</span>: <span style=color:#ae81ff>RollingUpdate</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>rollingUpdate</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>maxUnavailable</span>: <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>matchLabels</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>k8s-app</span>: <span style=color:#ae81ff>kube-dns</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>k8s-app</span>: <span style=color:#ae81ff>kube-dns</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>annotations</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>seccomp.security.alpha.kubernetes.io/pod</span>: <span style=color:#e6db74>&#39;runtime/default&#39;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>priorityClassName</span>: <span style=color:#ae81ff>system-cluster-critical</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>serviceAccountName</span>: <span style=color:#ae81ff>coredns</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>tolerations</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>key</span>: <span style=color:#e6db74>&#34;CriticalAddonsOnly&#34;</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>operator</span>: <span style=color:#e6db74>&#34;Exists&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>nodeSelector</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>kubernetes.io/os</span>: <span style=color:#ae81ff>linux</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>containers</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>coredns</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>image</span>: <span style=color:#ae81ff>k8s.gcr.io/coredns:1.6.7</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>imagePullPolicy</span>: <span style=color:#ae81ff>IfNotPresent</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>resources</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>limits</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>memory</span>: <span style=color:#ae81ff>160Mi</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>requests</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>cpu</span>: <span style=color:#ae81ff>100m</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>memory</span>: <span style=color:#ae81ff>70Mi</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>args</span>: [ <span style=color:#e6db74>&#34;-conf&#34;</span>, <span style=color:#e6db74>&#34;/etc/coredns/Corefile&#34;</span> ]
+</span></span><span style=display:flex><span>        <span style=color:#f92672>volumeMounts</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>config-volume</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>mountPath</span>: <span style=color:#ae81ff>/etc/coredns</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>readOnly</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>containerPort</span>: <span style=color:#ae81ff>53</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>name</span>: <span style=color:#ae81ff>dns</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>protocol</span>: <span style=color:#ae81ff>UDP</span>
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>containerPort</span>: <span style=color:#ae81ff>53</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>name</span>: <span style=color:#ae81ff>dns-tcp</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>protocol</span>: <span style=color:#ae81ff>TCP</span>
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>containerPort</span>: <span style=color:#ae81ff>9153</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>name</span>: <span style=color:#ae81ff>metrics</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>protocol</span>: <span style=color:#ae81ff>TCP</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>livenessProbe</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>httpGet</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/health</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>: <span style=color:#ae81ff>8080</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>scheme</span>: <span style=color:#ae81ff>HTTP</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>initialDelaySeconds</span>: <span style=color:#ae81ff>60</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>timeoutSeconds</span>: <span style=color:#ae81ff>5</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>successThreshold</span>: <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>failureThreshold</span>: <span style=color:#ae81ff>5</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>readinessProbe</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>httpGet</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/ready</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>: <span style=color:#ae81ff>8181</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>scheme</span>: <span style=color:#ae81ff>HTTP</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>securityContext</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>allowPrivilegeEscalation</span>: <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>capabilities</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>add</span>:
+</span></span><span style=display:flex><span>            - <span style=color:#ae81ff>NET_BIND_SERVICE</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>drop</span>:
+</span></span><span style=display:flex><span>            - <span style=color:#ae81ff>all</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>readOnlyRootFilesystem</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>dnsPolicy</span>: <span style=color:#ae81ff>Default</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>volumes</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>config-volume</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>configMap</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>name</span>: <span style=color:#ae81ff>coredns</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>items</span>:
+</span></span><span style=display:flex><span>            - <span style=color:#f92672>key</span>: <span style=color:#ae81ff>Corefile</span>
+</span></span><span style=display:flex><span>              <span style=color:#f92672>path</span>: <span style=color:#ae81ff>Corefile</span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Service</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>kube-dns</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>annotations</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>prometheus.io/port</span>: <span style=color:#e6db74>&#34;9153&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>prometheus.io/scrape</span>: <span style=color:#e6db74>&#34;true&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>k8s-app</span>: <span style=color:#ae81ff>kube-dns</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>kubernetes.io/cluster-service</span>: <span style=color:#e6db74>&#34;true&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>addonmanager.kubernetes.io/mode</span>: <span style=color:#ae81ff>Reconcile</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>kubernetes.io/name</span>: <span style=color:#e6db74>&#34;CoreDNS&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>k8s-app</span>: <span style=color:#ae81ff>kube-dns</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>clusterIP</span>: <span style=color:#ae81ff>10.0.0.2</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>dns</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>port</span>: <span style=color:#ae81ff>53</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>protocol</span>: <span style=color:#ae81ff>UDP</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>dns-tcp</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>port</span>: <span style=color:#ae81ff>53</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>protocol</span>: <span style=color:#ae81ff>TCP</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>metrics</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>port</span>: <span style=color:#ae81ff>9153</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>protocol</span>: <span style=color:#ae81ff>TCP</span>
+</span></span></code></pre></div><p>运行命令：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl apply -f coredns.yaml
+</span></span></code></pre></div><p>查看coredns部署情况：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-tex data-lang=tex><span style=display:flex><span>[root@k8s-master01 ~]# kubectl get pod -A
+</span></span><span style=display:flex><span>NAMESPACE     NAME                          READY   STATUS    RESTARTS   AGE
+</span></span><span style=display:flex><span>kube-system   coredns-6879cc89dc-ngsld      1/1     Running   0          3m
+</span></span><span style=display:flex><span>kube-system   kube-flannel-ds-amd64-bgjt4   1/1     Running   1          6d14h
+</span></span><span style=display:flex><span>kube-system   kube-flannel-ds-amd64-dqlkc   1/1     Running   1          6d14h
+</span></span></code></pre></div><p>可以看到coredns的Pod已经启动，这是我们再次测试Pod内部的网络访问情况：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-tex data-lang=tex><span style=display:flex><span>[root@k8s-master01 ~]# kubectl run -it --rm busybox --image=busybox sh
+</span></span><span style=display:flex><span>If you don&#39;t see a command prompt, try pressing enter.
+</span></span><span style=display:flex><span>/ # ping www.baidu.com
+</span></span><span style=display:flex><span>PING www.baidu.com (14.215.177.39): 56 data bytes
+</span></span><span style=display:flex><span>64 bytes from 14.215.177.39: seq=0 ttl=127 time=14.441 ms
+</span></span><span style=display:flex><span>64 bytes from 14.215.177.39: seq=1 ttl=127 time=26.355 ms
+</span></span><span style=display:flex><span>...
+</span></span></code></pre></div><p>可以正常解析。</p><p><img src=https://fs.poneding.com/images/white.jpg alt=image></p><hr><p><a href=/kubernetes/k3s/>« K3s</a></p><p><a href=/kubernetes/k8s-deploy-dashboard/>» Kubernetes 0-1 K8s部署Dashboard</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/kubernetes/k8s-deploy-coredns.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents></nav></div></aside></main></body></html>

@@ -1,0 +1,204 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / Istio / 应用平台实现应用金丝雀发布
+应用平台实现应用金丝雀发布 # 实现思路 # 应用正常的 CI 流程添加请求参数：
+CanaryMode【bool，true | false，缺省值 false】 CanaryWeight 【int，缺省值 10】 使用 Istio 的 DetinationRule + VirtualService 实现流量按权重分配到不同版本应用。
+概念 # Iteration：发布迭代号，。是一个字段值，使用金丝雀发布时累加该值，从 0 累加。
+Retract：动作，弃用金丝雀版本。当金丝雀版本存在不可忽视的问题时撤回金丝雀执行该动作。
+Ratify：动作，确认使用金丝雀版本。当金丝雀版本确认可以全面投入使用执行该动作。
+前提 # 使用金丝雀发布的前提条件：
+应用处于发布状态，已经至少发布一次，当前存在稳定的运行版本； 应用已经开启 Istio Gateway，涉及到 VirtualService 的流量转发； 应用当前不是金丝雀状态，要不然乱套了。 发布细节 # CI 发布除了创建或更新 Deployment，Service 之外，默认创建或更新 istio 的 DestinationRule 资源；
+deployment：
+apiVersion: apps/v1 kind: Deployment metadata: name: myapp-pbd3n69-v{iteration} # 出于兼容历史发布，当iteration为0时，name不附带iteration，iteration大于0时，name将附带iteration labels: app: myapp-pbd3n69 version: v{iteration} spec: selector: matchLabels: app: myapp-pbd3n69 version: v{iteration} template: metadata: labels: app: myapp-pbd3n69 version: v{iteration} ."><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/istio/istio-canary-deploy/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / Istio / 应用平台实现应用金丝雀发布
+应用平台实现应用金丝雀发布 # 实现思路 # 应用正常的 CI 流程添加请求参数：
+CanaryMode【bool，true | false，缺省值 false】 CanaryWeight 【int，缺省值 10】 使用 Istio 的 DetinationRule + VirtualService 实现流量按权重分配到不同版本应用。
+概念 # Iteration：发布迭代号，。是一个字段值，使用金丝雀发布时累加该值，从 0 累加。
+Retract：动作，弃用金丝雀版本。当金丝雀版本存在不可忽视的问题时撤回金丝雀执行该动作。
+Ratify：动作，确认使用金丝雀版本。当金丝雀版本确认可以全面投入使用执行该动作。
+前提 # 使用金丝雀发布的前提条件：
+应用处于发布状态，已经至少发布一次，当前存在稳定的运行版本； 应用已经开启 Istio Gateway，涉及到 VirtualService 的流量转发； 应用当前不是金丝雀状态，要不然乱套了。 发布细节 # CI 发布除了创建或更新 Deployment，Service 之外，默认创建或更新 istio 的 DestinationRule 资源；
+deployment：
+apiVersion: apps/v1 kind: Deployment metadata: name: myapp-pbd3n69-v{iteration} # 出于兼容历史发布，当iteration为0时，name不附带iteration，iteration大于0时，name将附带iteration labels: app: myapp-pbd3n69 version: v{iteration} spec: selector: matchLabels: app: myapp-pbd3n69 version: v{iteration} template: metadata: labels: app: myapp-pbd3n69 version: v{iteration} ."><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="istio"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Istio Canary Deploy | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/istio/istio-canary-deploy/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Istio Canary Deploy</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#实现思路>实现思路</a></li><li><a href=#概念>概念</a></li><li><a href=#前提>前提</a></li><li><a href=#发布细节>发布细节</a></li><li><a href=#撤回retract>撤回（Retract）</a></li><li><a href=#批准ratify>批准（Ratify）</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/istio/>Istio</a> / 应用平台实现应用金丝雀发布</p><h1 id=应用平台实现应用金丝雀发布>应用平台实现应用金丝雀发布
+<a class=anchor href=#%e5%ba%94%e7%94%a8%e5%b9%b3%e5%8f%b0%e5%ae%9e%e7%8e%b0%e5%ba%94%e7%94%a8%e9%87%91%e4%b8%9d%e9%9b%80%e5%8f%91%e5%b8%83>#</a></h1><h2 id=实现思路>实现思路
+<a class=anchor href=#%e5%ae%9e%e7%8e%b0%e6%80%9d%e8%b7%af>#</a></h2><p>应用正常的 CI 流程添加请求参数：</p><ul><li>CanaryMode【bool，true | false，缺省值 false】</li><li>CanaryWeight 【int，缺省值 10】</li></ul><p>使用 Istio 的 <code>DetinationRule + VirtualService</code> 实现流量按权重分配到不同版本应用。</p><h2 id=概念>概念
+<a class=anchor href=#%e6%a6%82%e5%bf%b5>#</a></h2><p><strong>Iteration</strong>：发布迭代号，。是一个字段值，使用金丝雀发布时累加该值，从 0 累加。</p><p><strong>Retract</strong>：动作，弃用金丝雀版本。当金丝雀版本存在不可忽视的问题时撤回金丝雀执行该动作。</p><p><strong>Ratify</strong>：动作，确认使用金丝雀版本。当金丝雀版本确认可以全面投入使用执行该动作。</p><h2 id=前提>前提
+<a class=anchor href=#%e5%89%8d%e6%8f%90>#</a></h2><p>使用金丝雀发布的前提条件：</p><ul><li>应用处于发布状态，已经至少发布一次，当前存在稳定的运行版本；</li><li>应用已经开启 Istio Gateway，涉及到 VirtualService 的流量转发；</li><li>应用当前不是金丝雀状态，要不然乱套了。</li></ul><h2 id=发布细节>发布细节
+<a class=anchor href=#%e5%8f%91%e5%b8%83%e7%bb%86%e8%8a%82>#</a></h2><p>CI 发布除了创建或更新 Deployment，Service 之外，默认创建或更新 istio 的 DestinationRule 资源；</p><p><em>deployment</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>apps/v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Deployment</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>myapp-pbd3n69-v{iteration} </span> <span style=color:#75715e># 出于兼容历史发布，当iteration为0时，name不附带iteration，iteration大于0时，name将附带iteration  </span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>myapp-pbd3n69</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v{iteration}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>matchLabels</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>app</span>: <span style=color:#ae81ff>myapp-pbd3n69</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v{iteration}</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>app</span>: <span style=color:#ae81ff>myapp-pbd3n69</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v{iteration}</span>
+</span></span><span style=display:flex><span>...
+</span></span></code></pre></div><p><em>service</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Service</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>myapp-pbd3n69</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>myapp-pbd3n69</span>
+</span></span><span style=display:flex><span>...
+</span></span></code></pre></div><p><em>destination rule</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.istio.io/v1beta1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>DestinationRule</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>myapp-pbd3n69</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>host</span>: <span style=color:#ae81ff>myapp-pbd3n69 </span> <span style=color:#75715e># 注意：这里是 Service 的 name</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>subsets</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v{iteration}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>subset-v{iteration}</span>
+</span></span></code></pre></div><p><em>virtual service</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.istio.io/v1beta1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>VirtualService</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>virtual-service-example-com</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>example.com</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>http</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>match</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>uri</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>prefix</span>: <span style=color:#ae81ff>/xxx</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>myapp-pbd3n69</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>route</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>destination</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>host</span>: <span style=color:#ae81ff>myapp-pbd3n69 </span> <span style=color:#75715e># 注意：这里是 Service 的 name</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>:
+</span></span><span style=display:flex><span>              <span style=color:#f92672>number</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>subset</span>: <span style=color:#ae81ff>subset-v{iteration}</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>weight</span>: <span style=color:#ae81ff>100</span>
+</span></span></code></pre></div><p>使用金丝雀发布，涉及到金丝雀版本 Deployment 的创建，DestinationRule 和 VirtualService 的更新：</p><p><em>deployment</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>apps/v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Deployment</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>myapp-pbd3n69-v{iteration+1}  </span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>myapp-pbd3n69</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v{iteration+1}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>matchLabels</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>app</span>: <span style=color:#ae81ff>myapp-pbd3n69</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v{iteration+1}</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>app</span>: <span style=color:#ae81ff>myapp-pbd3n69</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v{iteration+1}</span>
+</span></span></code></pre></div><p><em>destination rule</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.istio.io/v1beta1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>DestinationRule</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>ash-pbd3n69</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>test</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>host</span>: <span style=color:#ae81ff>ash-pbd3n69 </span> <span style=color:#75715e># 注意：这里是 Service 的 name</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>subsets</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v{iteration}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>subset-v{iteration}</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v{iteration+1}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>subset-v{iteration+1}</span>
+</span></span></code></pre></div><p><em>virtual service</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.istio.io/v1beta1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>VirtualService</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>virtual-service-example-com</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>example.com</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>http</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>match</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>uri</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>prefix</span>: <span style=color:#ae81ff>/xxx</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>myapp-pbd3n69</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>route</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>destination</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>host</span>: <span style=color:#ae81ff>myapp-pbd3n69 </span> <span style=color:#75715e># 注意：这里是 Service 的 name</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>:
+</span></span><span style=display:flex><span>              <span style=color:#f92672>number</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>subset</span>: <span style=color:#ae81ff>subset-v{iteration}</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>weight</span>: {<span style=color:#ae81ff>canaryWeight}</span>
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>destination</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>host</span>: <span style=color:#ae81ff>myapp-pbd3n69 </span> <span style=color:#75715e># 注意：这里是 Service 的 name</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>:
+</span></span><span style=display:flex><span>              <span style=color:#f92672>number</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>subset</span>: <span style=color:#ae81ff>subset-v{iteration+1}</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>weight</span>: {<span style=color:#ae81ff>100</span>-<span style=color:#ae81ff>canaryWeight}</span>
+</span></span></code></pre></div><p>发布完成后，Iteration+1，应用状态更新为 Canary。在 Canary 状态下，由于存在两个版本的 Deployment，将无法手动应用垂直或水平扩容。</p><h2 id=撤回retract>撤回（Retract）
+<a class=anchor href=#%e6%92%a4%e5%9b%9eretract>#</a></h2><p>删除金丝雀版本的 Deployment，</p><p>DestinationRule 更新</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.istio.io/v1beta1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>DestinationRule</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>ash-pbd3n69</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>test</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>host</span>: <span style=color:#ae81ff>ash-pbd3n69 </span> <span style=color:#75715e># 注意：这里是 Service 的 name</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>subsets</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v{iteration-1}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>subset-v{iteration-1}</span>
+</span></span></code></pre></div><p>VirtualService 更新</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.istio.io/v1beta1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>VirtualService</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>virtual-service-example-com</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>example.com</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>http</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>match</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>uri</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>prefix</span>: <span style=color:#ae81ff>/xxx</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>myapp-pbd3n69</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>route</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>destination</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>host</span>: <span style=color:#ae81ff>myapp-pbd3n69 </span> <span style=color:#75715e># 注意：这里是 Service 的 name</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>:
+</span></span><span style=display:flex><span>              <span style=color:#f92672>number</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>subset</span>: <span style=color:#ae81ff>subset-v{iteration-1}</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>weight</span>: <span style=color:#ae81ff>100</span>
+</span></span></code></pre></div><p>Iteration-1</p><h2 id=批准ratify>批准（Ratify）
+<a class=anchor href=#%e6%89%b9%e5%87%86ratify>#</a></h2><p>删除之前稳定版本的 Deployment，</p><p>DestinationRule 更新</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.istio.io/v1beta1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>DestinationRule</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>ash-pbd3n69</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>test</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>host</span>: <span style=color:#ae81ff>ash-pbd3n69 </span> <span style=color:#75715e># 注意：这里是 Service 的 name</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>subsets</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v{iteration}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>subset-v{iteration}</span>
+</span></span></code></pre></div><p>VirtualService 更新</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.istio.io/v1beta1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>VirtualService</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>virtual-service-example-com</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>example.com</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>http</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>match</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>uri</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>prefix</span>: <span style=color:#ae81ff>/xxx</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>myapp-pbd3n69</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>route</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>destination</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>host</span>: <span style=color:#ae81ff>myapp-pbd3n69 </span> <span style=color:#75715e># 注意：这里是 Service 的 name</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>:
+</span></span><span style=display:flex><span>              <span style=color:#f92672>number</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>subset</span>: <span style=color:#ae81ff>subset-v{iteration}</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>weight</span>: <span style=color:#ae81ff>100</span>
+</span></span></code></pre></div><hr><p><a href=/istio/istio-auth-policy/>« 授权策略 Authorization Policy</a></p><p><a href=/istio/istio-cors/>» Istio 0-1 使用Istio实现Cors</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/istio/istio-canary-deploy.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#实现思路>实现思路</a></li><li><a href=#概念>概念</a></li><li><a href=#前提>前提</a></li><li><a href=#发布细节>发布细节</a></li><li><a href=#撤回retract>撤回（Retract）</a></li><li><a href=#批准ratify>批准（Ratify）</a></li></ul></nav></div></aside></main></body></html>

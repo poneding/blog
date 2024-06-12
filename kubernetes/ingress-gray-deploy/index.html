@@ -1,0 +1,221 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / Kubernetes / 通过 Ingress 进行灰度发布
+通过 Ingress 进行灰度发布 # https://start.aliyun.com/handson/Tn0HcdCZ/grap_publish_by_ingress
+Step 1 ：实验介绍 # 本实验，你将运行运行一个简单的应用，部署一个新的应用用于新的发布，并通过 Ingress 能力实现灰度发布。
+灰度及蓝绿发布是为新版本创建一个与老版本完全一致的生产环境，在不影响老版本的前提下，按照一定的规则把部分流量切换到新版本，当新版本试运行一段时间没有问题后，将用户的全量流量从老版本迁移至新版本。
+通过本实验，你将学习：
+通过 Ingress 按权重进行灰度发布 通过 Ingress 按 Header 进行灰度发布 容器服务 Kubernetes 版（简称 ACK） 本节课使用的 Kubernetes(k8s) 集群就是由 ACK 提供的，本实验涵盖的都是一些基本操作。更多高级用法，可以去 ACK 的产品页面了解哦。
+Step 2 ：部署 Deployment V1 应用 # 创建如下 YAML 文件(app-v1.yaml)
+apiVersion: v1 kind: Service metadata: name: my-app-v1 labels: app: my-app spec: ports: - name: http port: 80 targetPort: http selector: app: my-app version: v1."><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/kubernetes/ingress-gray-deploy/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / Kubernetes / 通过 Ingress 进行灰度发布
+通过 Ingress 进行灰度发布 # https://start.aliyun.com/handson/Tn0HcdCZ/grap_publish_by_ingress
+Step 1 ：实验介绍 # 本实验，你将运行运行一个简单的应用，部署一个新的应用用于新的发布，并通过 Ingress 能力实现灰度发布。
+灰度及蓝绿发布是为新版本创建一个与老版本完全一致的生产环境，在不影响老版本的前提下，按照一定的规则把部分流量切换到新版本，当新版本试运行一段时间没有问题后，将用户的全量流量从老版本迁移至新版本。
+通过本实验，你将学习：
+通过 Ingress 按权重进行灰度发布 通过 Ingress 按 Header 进行灰度发布 容器服务 Kubernetes 版（简称 ACK） 本节课使用的 Kubernetes(k8s) 集群就是由 ACK 提供的，本实验涵盖的都是一些基本操作。更多高级用法，可以去 ACK 的产品页面了解哦。
+Step 2 ：部署 Deployment V1 应用 # 创建如下 YAML 文件(app-v1.yaml)
+apiVersion: v1 kind: Service metadata: name: my-app-v1 labels: app: my-app spec: ports: - name: http port: 80 targetPort: http selector: app: my-app version: v1."><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="kubernetes"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Ingress Gray Deploy | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/ingress-gray-deploy/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Ingress Gray Deploy</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#step-1-实验介绍>Step 1 ：实验介绍</a></li><li><a href=#step-2-部署-deployment-v1-应用>Step 2 ：部署 Deployment V1 应用</a></li><li><a href=#step-3-部署-deployment-v2-应用>Step 3 ：部署 Deployment V2 应用</a></li><li><a href=#step-4-按照权重策略灰度到-deployment-v2-应用>Step 4 ：按照权重策略灰度到 Deployment V2 应用</a></li><li><a href=#step-5-按照-header-策略灰度到-deployment-v2-应用>Step 5 ：按照 Header 策略灰度到 Deployment V2 应用</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/kubernetes/>Kubernetes</a> / 通过 Ingress 进行灰度发布</p><h1 id=通过-ingress-进行灰度发布>通过 Ingress 进行灰度发布
+<a class=anchor href=#%e9%80%9a%e8%bf%87-ingress-%e8%bf%9b%e8%a1%8c%e7%81%b0%e5%ba%a6%e5%8f%91%e5%b8%83>#</a></h1><p><a href=https://start.aliyun.com/handson/Tn0HcdCZ/grap_publish_by_ingress>https://start.aliyun.com/handson/Tn0HcdCZ/grap_publish_by_ingress</a></p><h2 id=step-1-实验介绍>Step 1 ：实验介绍
+<a class=anchor href=#step-1-%e5%ae%9e%e9%aa%8c%e4%bb%8b%e7%bb%8d>#</a></h2><p>本实验，你将运行运行一个简单的应用，部署一个新的应用用于新的发布，并通过 Ingress 能力实现灰度发布。</p><p>灰度及蓝绿发布是为新版本创建一个与老版本完全一致的生产环境，在不影响老版本的前提下，按照一定的规则把部分流量切换到新版本，当新版本试运行一段时间没有问题后，将用户的全量流量从老版本迁移至新版本。</p><p>通过本实验，你将学习：</p><ul><li>通过 Ingress 按权重进行灰度发布</li><li>通过 Ingress 按 Header 进行灰度发布</li></ul><blockquote><p><strong>容器服务 Kubernetes 版（简称 ACK）</strong> 本节课使用的 Kubernetes(k8s) 集群就是由 ACK 提供的，本实验涵盖的都是一些基本操作。更多高级用法，可以去
+<a href=https://www.aliyun.com/product/kubernetes>ACK 的产品页面</a>了解哦。</p></blockquote><h2 id=step-2-部署-deployment-v1-应用>Step 2 ：部署 Deployment V1 应用
+<a class=anchor href=#step-2-%e9%83%a8%e7%bd%b2-deployment-v1-%e5%ba%94%e7%94%a8>#</a></h2><p>创建如下 YAML 文件(app-v1.yaml)</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Service</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-app-v1</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>my-app</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>http</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>port</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>targetPort</span>: <span style=color:#ae81ff>http</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>my-app</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v1.0.0</span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>apps/v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Deployment</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-app-v1</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>my-app</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>replicas</span>: <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>matchLabels</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>app</span>: <span style=color:#ae81ff>my-app</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v1.0.0</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>app</span>: <span style=color:#ae81ff>my-app</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v1.0.0</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>annotations</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>prometheus.io/scrape</span>: <span style=color:#e6db74>&#34;true&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>prometheus.io/port</span>: <span style=color:#e6db74>&#34;9101&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>containers</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-app</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>image</span>: <span style=color:#ae81ff>registry.cn-hangzhou.aliyuncs.com/containerdemo/containersol-k8s-deployment-strategies</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>http</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>containerPort</span>: <span style=color:#ae81ff>8080</span>
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>probe</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>containerPort</span>: <span style=color:#ae81ff>8086</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>env</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>VERSION</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>value</span>: <span style=color:#ae81ff>v1.0.0</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>livenessProbe</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>httpGet</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/live</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>: <span style=color:#ae81ff>probe</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>initialDelaySeconds</span>: <span style=color:#ae81ff>5</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>periodSeconds</span>: <span style=color:#ae81ff>5</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>readinessProbe</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>httpGet</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/ready</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>: <span style=color:#ae81ff>probe</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>periodSeconds</span>: <span style=color:#ae81ff>5</span>
+</span></span></code></pre></div><p>执行如下命令部署 Deployement V1 应用：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl apply -f app-v1.yaml
+</span></span></code></pre></div><p>创建如下 Ingress YAML文件(ingress-v1.yaml)</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>extensions/v1beta1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Ingress</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-app</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>my-app</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>rules</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>host</span>: <span style=color:#ae81ff>my-app-898e6352eda2ac9c5cfc5d51c155455b.ca2ef983cc3a64042a32c1a423d32021e.cn-shanghai.alicontainer.com</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>http</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>paths</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>backend</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>serviceName</span>: <span style=color:#ae81ff>my-app-v1</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>servicePort</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/</span>
+</span></span></code></pre></div><p>执行如下命令部署 Ingress 资源</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl apply -f ingress-v1.yaml
+</span></span></code></pre></div><p>部署完成后通过 <code>curl</code> 命令进行测试：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>curl my-app-898e6352eda2ac9c5cfc5d51c155455b.ca2ef983cc3a64042a32c1a423d32021e.cn-shanghai.alicontainer.com
+</span></span></code></pre></div><p>会看到如下返回：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-console data-lang=console><span style=display:flex><span>Host: my-app-v1-68bfcbb7cf-w4rpg, Version: v1.0.0
+</span></span></code></pre></div><h2 id=step-3-部署-deployment-v2-应用>Step 3 ：部署 Deployment V2 应用
+<a class=anchor href=#step-3-%e9%83%a8%e7%bd%b2-deployment-v2-%e5%ba%94%e7%94%a8>#</a></h2><p>创建如下 YAML 文件(app-v2.yaml)</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Service</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-app-v2</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>my-app</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>http</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>port</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>targetPort</span>: <span style=color:#ae81ff>http</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>my-app</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v2.0.0</span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>apps/v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Deployment</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-app-v2</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>my-app</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>replicas</span>: <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>matchLabels</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>app</span>: <span style=color:#ae81ff>my-app</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v2.0.0</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>app</span>: <span style=color:#ae81ff>my-app</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v2.0.0</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>annotations</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>prometheus.io/scrape</span>: <span style=color:#e6db74>&#34;true&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>prometheus.io/port</span>: <span style=color:#e6db74>&#34;9101&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>containers</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-app</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>image</span>: <span style=color:#ae81ff>registry.cn-hangzhou.aliyuncs.com/containerdemo/containersol-k8s-deployment-strategies</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>http</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>containerPort</span>: <span style=color:#ae81ff>8080</span>
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>probe</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>containerPort</span>: <span style=color:#ae81ff>8086</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>env</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>VERSION</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>value</span>: <span style=color:#ae81ff>v2.0.0</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>livenessProbe</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>httpGet</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/live</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>: <span style=color:#ae81ff>probe</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>initialDelaySeconds</span>: <span style=color:#ae81ff>5</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>periodSeconds</span>: <span style=color:#ae81ff>5</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>readinessProbe</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>httpGet</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/ready</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>: <span style=color:#ae81ff>probe</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>periodSeconds</span>: <span style=color:#ae81ff>5</span>
+</span></span></code></pre></div><p>执行如下命令部署 Deployement V2 应用：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl apply -f app-v2.yaml
+</span></span></code></pre></div><h2 id=step-4-按照权重策略灰度到-deployment-v2-应用>Step 4 ：按照权重策略灰度到 Deployment V2 应用
+<a class=anchor href=#step-4-%e6%8c%89%e7%85%a7%e6%9d%83%e9%87%8d%e7%ad%96%e7%95%a5%e7%81%b0%e5%ba%a6%e5%88%b0-deployment-v2-%e5%ba%94%e7%94%a8>#</a></h2><p>创建如下 Ingress YAML文件(ingress-v2-canary-weigth.yaml)</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>extensions/v1beta1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Ingress</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-app-canary</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>my-app</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>annotations</span>:
+</span></span><span style=display:flex><span>    <span style=color:#75715e># Enable canary and send 10% of traffic to version 2</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>nginx.ingress.kubernetes.io/canary</span>: <span style=color:#e6db74>&#34;true&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>nginx.ingress.kubernetes.io/canary-weight</span>: <span style=color:#e6db74>&#34;10&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>rules</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>host</span>: <span style=color:#ae81ff>my-app-898e6352eda2ac9c5cfc5d51c155455b.ca2ef983cc3a64042a32c1a423d32021e.cn-shanghai.alicontainer.com</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>http</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>paths</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>backend</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>serviceName</span>: <span style=color:#ae81ff>my-app-v2</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>servicePort</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/</span>
+</span></span></code></pre></div><p>执行如下命令部署 Ingress 资源</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl apply -f ingress-v2-canary-weigth.yaml
+</span></span></code></pre></div><p>执行如下命令进行测试：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#66d9ef>while</span> sleep 0.1;<span style=color:#66d9ef>do</span> curl my-app-898e6352eda2ac9c5cfc5d51c155455b.ca2ef983cc3a64042a32c1a423d32021e.cn-shanghai.alicontainer.com; <span style=color:#66d9ef>done</span>
+</span></span></code></pre></div><p>测试结果如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-console data-lang=console><span style=display:flex><span>Host: my-app-v1-68bfcbb7cf-w4rpg, Version: v1.0.0
+</span></span><span style=display:flex><span>Host: my-app-v1-68bfcbb7cf-w4rpg, Version: v1.0.0
+</span></span><span style=display:flex><span>Host: my-app-v1-68bfcbb7cf-w4rpg, Version: v1.0.0
+</span></span><span style=display:flex><span>Host: my-app-v1-68bfcbb7cf-w4rpg, Version: v1.0.0
+</span></span><span style=display:flex><span>Host: my-app-v1-68bfcbb7cf-w4rpg, Version: v1.0.0
+</span></span><span style=display:flex><span>Host: my-app-v1-68bfcbb7cf-w4rpg, Version: v1.0.0
+</span></span><span style=display:flex><span>Host: my-app-v1-68bfcbb7cf-w4rpg, Version: v1.0.0
+</span></span><span style=display:flex><span>Host: my-app-v1-68bfcbb7cf-w4rpg, Version: v1.0.0
+</span></span><span style=display:flex><span>Host: my-app-v1-68bfcbb7cf-w4rpg, Version: v1.0.0
+</span></span><span style=display:flex><span>Host: my-app-v2-67c69b8857-g82gr, Version: v2.0.0
+</span></span><span style=display:flex><span>Host: my-app-v1-68bfcbb7cf-w4rpg, Version: v1.0.0
+</span></span></code></pre></div><h2 id=step-5-按照-header-策略灰度到-deployment-v2-应用>Step 5 ：按照 Header 策略灰度到 Deployment V2 应用
+<a class=anchor href=#step-5-%e6%8c%89%e7%85%a7-header-%e7%ad%96%e7%95%a5%e7%81%b0%e5%ba%a6%e5%88%b0-deployment-v2-%e5%ba%94%e7%94%a8>#</a></h2><p>创建如下 Ingress YAML文件(ingress-v2-canary-header.yaml)</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>extensions/v1beta1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Ingress</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-app-canary</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>my-app</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>annotations</span>:
+</span></span><span style=display:flex><span>    <span style=color:#75715e># Enable canary and send traffic with headder x-app-canary to version 2</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>nginx.ingress.kubernetes.io/canary</span>: <span style=color:#e6db74>&#34;true&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>nginx.ingress.kubernetes.io/canary-by-header</span>: <span style=color:#e6db74>&#34;x-app-canary&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>nginx.ingress.kubernetes.io/canary-by-header-value</span>: <span style=color:#e6db74>&#34;true&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>rules</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>host</span>: <span style=color:#ae81ff>my-app-898e6352eda2ac9c5cfc5d51c155455b.ca2ef983cc3a64042a32c1a423d32021e.cn-shanghai.alicontainer.com</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>http</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>paths</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>backend</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>serviceName</span>: <span style=color:#ae81ff>my-app-v2</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>servicePort</span>: <span style=color:#ae81ff>80</span>
+</span></span></code></pre></div><p>执行如下命令部署 Ingress 资源</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl apply -f ingress-v2-canary-header.yaml
+</span></span></code></pre></div><p>通过 <code>curl</code> 命令对应用进行测试：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>curl my-app-898e6352eda2ac9c5cfc5d51c155455b.ca2ef983cc3a64042a32c1a423d32021e.cn-shanghai.alicontainer.com
+</span></span></code></pre></div><p>结果如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-console data-lang=console><span style=display:flex><span>Host: my-app-v1-68bfcbb7cf-w4rpg, Version: v1.0.0
+</span></span><span style=display:flex><span>curl my-app-898e6352eda2ac9c5cfc5d51c155455b.ca2ef983cc3a64042a32c1a423d32021e.cn-shanghai.alicontainer.com -H &#34;x-app-canary: true&#34;
+</span></span></code></pre></div><p>结果如下</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-console data-lang=console><span style=display:flex><span>Host: my-app-v2-67c69b8857-g82gr, Version: v2.0.0
+</span></span></code></pre></div><hr><p><a href=/kubernetes/informer/>« Informer</a></p><p><a href=/kubernetes/installation/>» 安装 Kubernetes</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/kubernetes/ingress-gray-deploy.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#step-1-实验介绍>Step 1 ：实验介绍</a></li><li><a href=#step-2-部署-deployment-v1-应用>Step 2 ：部署 Deployment V1 应用</a></li><li><a href=#step-3-部署-deployment-v2-应用>Step 3 ：部署 Deployment V2 应用</a></li><li><a href=#step-4-按照权重策略灰度到-deployment-v2-应用>Step 4 ：按照权重策略灰度到 Deployment V2 应用</a></li><li><a href=#step-5-按照-header-策略灰度到-deployment-v2-应用>Step 5 ：按照 Header 策略灰度到 Deployment V2 应用</a></li></ul></nav></div></aside></main></body></html>

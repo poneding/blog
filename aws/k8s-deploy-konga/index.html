@@ -1,0 +1,133 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / AWS / K8s 部署 konga
+K8s 部署 konga # 本篇只涉及 konga 的部署操作，不涉及概念知识。
+提前准备 # K8s 集群，本文使用的是 AWS EKS 集群服务 一台可以连接 K8s 集群的服务器，已经安装 kubectl 和 docker 等基础应用，之后称之为操作机器 Postgres数据库 ！注意：该数据库使用 9.5 版本，其他最新版本的数据库在初始化 konga 数据库时会报如下错：
+error: Failed to prepare database: error: column r.consrc does not exist 这是部署 konga 踩过的坑之一。
+确保 K8s 集群中已经创建了 nginx-ingress，nginx-ingress 用于根据定制的 Rule（如后文 kong-ingress 的配置）将流量转发至 K8s 集群的 Service 中去。 创建 nginx-ingress 指令（可参照 https://kubernetes.github.io/ingress-nginx/deploy/）步骤如下：
+Step 1. 执行以下强制命令
+kubectl apply -f https://raw."><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/aws/k8s-deploy-konga/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / AWS / K8s 部署 konga
+K8s 部署 konga # 本篇只涉及 konga 的部署操作，不涉及概念知识。
+提前准备 # K8s 集群，本文使用的是 AWS EKS 集群服务 一台可以连接 K8s 集群的服务器，已经安装 kubectl 和 docker 等基础应用，之后称之为操作机器 Postgres数据库 ！注意：该数据库使用 9.5 版本，其他最新版本的数据库在初始化 konga 数据库时会报如下错：
+error: Failed to prepare database: error: column r.consrc does not exist 这是部署 konga 踩过的坑之一。
+确保 K8s 集群中已经创建了 nginx-ingress，nginx-ingress 用于根据定制的 Rule（如后文 kong-ingress 的配置）将流量转发至 K8s 集群的 Service 中去。 创建 nginx-ingress 指令（可参照 https://kubernetes.github.io/ingress-nginx/deploy/）步骤如下：
+Step 1. 执行以下强制命令
+kubectl apply -f https://raw."><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="aws"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>K8s Deploy Konga | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/aws/k8s-deploy-konga/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>K8s Deploy Konga</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#提前准备>提前准备</a></li><li><a href=#初始化数据库>初始化数据库</a></li><li><a href=#k8s-资源文件>K8s 资源文件</a></li><li><a href=#创建konga>创建Konga</a></li><li><a href=#验证konga>验证konga</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/aws/>AWS</a> / K8s 部署 konga</p><h1 id=k8s-部署-konga>K8s 部署 konga
+<a class=anchor href=#k8s-%e9%83%a8%e7%bd%b2-konga>#</a></h1><p><img src=https://fs.poneding.com/images/konga-logo.png alt=image></p><p>本篇只涉及 konga 的部署操作，不涉及概念知识。</p><h2 id=提前准备>提前准备
+<a class=anchor href=#%e6%8f%90%e5%89%8d%e5%87%86%e5%a4%87>#</a></h2><ul><li>K8s 集群，本文使用的是 AWS EKS 集群服务</li><li>一台可以连接 K8s 集群的服务器，已经安装 kubectl 和 docker 等基础应用，之后称之为操作机器</li><li>Postgres数据库</li></ul><p><strong>！注意</strong>：该数据库使用 9.5 版本，其他最新版本的数据库在初始化 konga 数据库时会报如下错：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-tex data-lang=tex><span style=display:flex><span>error: Failed to prepare database: error: column r.consrc does not exist
+</span></span></code></pre></div><p>这是部署 konga 踩过的坑之一。</p><ul><li>确保 K8s 集群中已经创建了 nginx-ingress，nginx-ingress 用于根据定制的 Rule（如后文 kong-ingress 的配置）将流量转发至 K8s 集群的 Service 中去。</li></ul><p>创建 nginx-ingress 指令（可参照
+<a href=https://kubernetes.github.io/ingress-nginx/deploy/%ef%bc%89%e6%ad%a5%e9%aa%a4%e5%a6%82%e4%b8%8b%ef%bc%9a>https://kubernetes.github.io/ingress-nginx/deploy/）步骤如下：</a></p><p>Step 1. 执行以下强制命令</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.30.0/deploy/static/mandatory.yaml
+</span></span></code></pre></div><p>Step 2. 针对我们使用的 AWS 服务，并且根据你想配置的 ELB 类型选择层（L4或L7），执行以下命令</p><p>​ # Layer 4: use TCP as the listener protocol for ports 80 and 443.</p><p>​ # Layer 7: use HTTP as the listener protocol for port 80 and terminate TLS in the ELB</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span><span style=color:#75715e># FOR Layer 4</span>
+</span></span><span style=display:flex><span>kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.30.0/deploy/static/provider/aws/service-l4.yaml
+</span></span><span style=display:flex><span>kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.30.0/deploy/static/provider/aws/patch-configmap-l4.yaml
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># FOR Layer 7</span>
+</span></span><span style=display:flex><span>kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.30.0/deploy/static/provider/aws/service-l7.yaml
+</span></span><span style=display:flex><span>kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.30.0/deploy/static/provider/aws/patch-configmap-l7.yaml
+</span></span></code></pre></div><h2 id=初始化数据库>初始化数据库
+<a class=anchor href=#%e5%88%9d%e5%a7%8b%e5%8c%96%e6%95%b0%e6%8d%ae%e5%ba%93>#</a></h2><p>在操作机器上执行如下指令</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>docker run --rm pantsel/konga:latest -c prepare -a <span style=color:#f92672>{{</span>adapter<span style=color:#f92672>}}</span> -u <span style=color:#f92672>{{</span>connection-uri<span style=color:#f92672>}}</span>
+</span></span></code></pre></div><blockquote><p>adapter：数据库类型，可选，&lsquo;mongo&rsquo;,&lsquo;postgres&rsquo;,&lsquo;sqlserver&rsquo; or &lsquo;mysql&rsquo;</p><p>connection-uri：数据库的连接字符串</p></blockquote><p>使用 postgres 数据库作为 konga 的存储，指令大概长这个样子：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>docker run --rm pantsel/konga:latest -c prepare -a postgres -u postgresql://&lt;user&gt;:&lt;password&gt;@&lt;host&gt;:&lt;port&gt;/&lt;database&gt;
+</span></span></code></pre></div><p>运行指令，输出如下，可以说明数据库初始化成功。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>debug: Preparing database...
+</span></span><span style=display:flex><span>Using postgres DB Adapter.
+</span></span><span style=display:flex><span>Database exists. Continue...
+</span></span><span style=display:flex><span>debug: Hook:api_health_checks:process<span style=color:#f92672>()</span> called
+</span></span><span style=display:flex><span>debug: Hook:health_checks:process<span style=color:#f92672>()</span> called
+</span></span><span style=display:flex><span>debug: Hook:start-scheduled-snapshots:process<span style=color:#f92672>()</span> called
+</span></span><span style=display:flex><span>debug: Hook:upstream_health_checks:process<span style=color:#f92672>()</span> called
+</span></span><span style=display:flex><span>debug: Hook:user_events_hook:process<span style=color:#f92672>()</span> called
+</span></span><span style=display:flex><span>debug: Seeding User...
+</span></span><span style=display:flex><span>debug: User seed planted
+</span></span><span style=display:flex><span>debug: Seeding Kongnode...
+</span></span><span style=display:flex><span>debug: Kongnode seed planted
+</span></span><span style=display:flex><span>debug: Seeding Emailtransport...
+</span></span><span style=display:flex><span>debug: Emailtransport seed planted
+</span></span><span style=display:flex><span>debug: Database migrations completed!
+</span></span></code></pre></div><p>可以连接postgres发现你的数据库中多出了下面这些表</p><p><img src=https://fs.poneding.com/images/image-20200316134405073.png alt=image-20200316134405073></p><h2 id=k8s-资源文件>K8s 资源文件
+<a class=anchor href=#k8s-%e8%b5%84%e6%ba%90%e6%96%87%e4%bb%b6>#</a></h2><p><strong>kanga-namespace.yaml</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Namespace</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>konga</span>
+</span></span></code></pre></div><p><strong>konga-deployment.yaml</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>extensions/v1beta1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Deployment</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>konga</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>konga</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>replicas</span>: <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>labels</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>name</span>: <span style=color:#ae81ff>konga</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>app</span>: <span style=color:#ae81ff>konga</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>containers</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>env</span>:
+</span></span><span style=display:flex><span>            - <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;DB_ADAPTER&#34;</span>
+</span></span><span style=display:flex><span>              <span style=color:#f92672>value</span>: <span style=color:#e6db74>&#34;postgres&#34;</span>
+</span></span><span style=display:flex><span>            - <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;DB_HOST&#34;</span>
+</span></span><span style=display:flex><span>              <span style=color:#f92672>value</span>: <span style=color:#e6db74>&#34;postgres/postgres&#34;</span>
+</span></span><span style=display:flex><span>            - <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;DB_PORT&#34;</span>
+</span></span><span style=display:flex><span>              <span style=color:#f92672>value</span>: <span style=color:#e6db74>&#34;5432&#34;</span>
+</span></span><span style=display:flex><span>            - <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;DB_USER&#34;</span>
+</span></span><span style=display:flex><span>              <span style=color:#f92672>value</span>: <span style=color:#ae81ff>konga</span>
+</span></span><span style=display:flex><span>            - <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;DB_PASSWORD&#34;</span>
+</span></span><span style=display:flex><span>              <span style=color:#f92672>value</span>: <span style=color:#ae81ff>konga</span>
+</span></span><span style=display:flex><span>   - <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;DB_DATABASE&#34;</span>
+</span></span><span style=display:flex><span>              <span style=color:#f92672>value</span>: <span style=color:#ae81ff>konga</span>
+</span></span><span style=display:flex><span>            - <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;DB_PG_SCHEMA&#34;</span>
+</span></span><span style=display:flex><span>              <span style=color:#f92672>value</span>: <span style=color:#e6db74>&#34;public&#34;</span>
+</span></span><span style=display:flex><span>          <span style=color:#75715e># - name: BASE_URL</span>
+</span></span><span style=display:flex><span>          <span style=color:#75715e>#   value: /konga/</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>name</span>: <span style=color:#ae81ff>konga</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>image</span>: <span style=color:#ae81ff>pantsel/konga</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>            - <span style=color:#f92672>containerPort</span>: <span style=color:#ae81ff>1337</span>
+</span></span></code></pre></div><blockquote><p>该文件需要设置 postgres 的数据库配置，需要自行替换；</p><p>可以注意到 yaml 文件中的 BASE_URL 环境变量被我注释掉了，这个参数的作用本来是设置成我们可以通过
+<a href=http://www.example.com/konga/%e6%9d%a5%e8%ae%bf%e9%97%aekonga%e7%a8%8b%e5%ba%8f%e7%9a%84%ef%bc%8c%e4%bd%86%e6%98%af%e9%95%9c%e5%83%8f%e7%9a%84%e4%bd%9c%e8%80%85%e7%9b%ae%e5%89%8d%e8%bf%98%e6%b2%a1%e6%9c%89%e5%a4%84%e7%90%86%e5%a5%bd%e7%9b%b8%e5%85%b3%e7%9a%84%e8%b7%af%e7%94%b1%e9%97%ae%e9%a2%98%e3%80%82%e6%89%80%e4%bb%a5%e7%9b%ae%e5%89%8d%e8%bf%98%e5%8f%aa%e8%83%bd%e9%80%9a%e8%bf%87http://konga.example.com%e4%bd%bf%e7%94%a8%e3%80%82>http://www.example.com/konga/来访问konga程序的，但是镜像的作者目前还没有处理好相关的路由问题。所以目前还只能通过http://konga.example.com使用。</a></p></blockquote><p><strong>konga-service.yaml</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Service</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>konga</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>konga</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>tcp</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>port</span>: <span style=color:#ae81ff>1337</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>targetPort</span>: <span style=color:#ae81ff>1337</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>protocol</span>: <span style=color:#ae81ff>TCP</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>konga</span>
+</span></span></code></pre></div><p><strong>kong-ingress.yaml</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>extensions/v1beta1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Ingress</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>konga-ingress</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>konga</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>annotations</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>nginx.ingress.kubernetes.io/ssl-redirect</span>: <span style=color:#e6db74>&#34;false&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>nginx.ingress.kubernetes.io/force-ssl-redirect</span>: <span style=color:#e6db74>&#34;false&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>nginx.ingress.kubernetes.io/rewrite-target</span>: <span style=color:#ae81ff>/</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>tls</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>hosts</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#ae81ff>konga.example.com</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>secretName</span>: <span style=color:#ae81ff>tls-secret</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>rules</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>host</span>: <span style=color:#ae81ff>konga.example.com</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>http</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>paths</span>:
+</span></span><span style=display:flex><span>          - <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>backend</span>:
+</span></span><span style=display:flex><span>              <span style=color:#f92672>serviceName</span>: <span style=color:#ae81ff>konga</span>
+</span></span><span style=display:flex><span>              <span style=color:#f92672>servicePort</span>: <span style=color:#ae81ff>1337</span>
+</span></span></code></pre></div><blockquote><p>这里host(s)需要替换成真正的域名。</p></blockquote><h2 id=创建konga>创建Konga
+<a class=anchor href=#%e5%88%9b%e5%bb%bakonga>#</a></h2><p>先创建konga命令空间</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl apply -f konga-namespace.yaml
+</span></span></code></pre></div><p>再创建其他资源即可</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl apply -f konga-deployment.yaml
+</span></span><span style=display:flex><span>kubectl apply -f konga-service.yaml
+</span></span><span style=display:flex><span>kubectl apply -f konga-ingress.yaml
+</span></span></code></pre></div><h2 id=验证konga>验证konga
+<a class=anchor href=#%e9%aa%8c%e8%af%81konga>#</a></h2><p>在以上创建命令执行后大概1-2分钟，浏览器访问
+<a href=http://konga.example.com%ef%bc%8c%e5%87%ba%e7%8e%b0konga%e6%b3%a8%e5%86%8c%e9%a1%b5%e9%9d%a2%e8%af%b4%e6%98%8e%e5%b7%b2%e7%bb%8f%e9%83%a8%e7%bd%b2%e6%88%90%e5%8a%9f%e3%80%82>http://konga.example.com，出现konga注册页面说明已经部署成功。</a></p><p><img src=https://fs.poneding.com/images/image-20200316171055384.png alt=image-20200316171055384></p><p><img src=https://fs.poneding.com/images/image-20200316124621295.png alt=image-20200316124621295></p><hr><p><a href=/aws/k8s-deploy-kong/>« K8s 部署 Kong 服务</a></p><p><a href=/aws/k8s-deploy-postgres/>» K8s 部署 Postgres</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/aws/k8s-deploy-konga.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#提前准备>提前准备</a></li><li><a href=#初始化数据库>初始化数据库</a></li><li><a href=#k8s-资源文件>K8s 资源文件</a></li><li><a href=#创建konga>创建Konga</a></li><li><a href=#验证konga>验证konga</a></li></ul></nav></div></aside></main></body></html>

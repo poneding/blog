@@ -1,0 +1,298 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / Kubernetes / 二进制搭建 K8s - 4 部署 Node
+二进制搭建 K8s - 4 部署 Node # 写在前面 # 记录和分享使用二进制搭建 K8s 集群的详细过程，由于操作比较冗长，大概会分四篇写完：
+机器准备： 部署 etcd 集群： 部署 Master： 部署 Node： K8s 的 Node 上需要运行 kubelet 和 kube-proxy。本篇介绍在 Node 机器安装这两个组件，除此之外，安装通信需要的 cni 插件。
+本篇的执行命令需要在准备的两台Node机器上执行。
+安装 docker # 可以参照官网： https://docs.docker.com/engine/install/
+# 卸载老版本或重装 docker 时执行第一行 yum remove docker \ docker-client \ docker-client-latest \ docker-common \ docker-latest \ docker-latest-logrotate \ docker-logrotate \ docker-engine -y # 安装 docker yum install -y yum-utils yum-config-manager \ --add-repo \ https://download."><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/kubernetes/binary-build-k8s-04-deploy-worker/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / Kubernetes / 二进制搭建 K8s - 4 部署 Node
+二进制搭建 K8s - 4 部署 Node # 写在前面 # 记录和分享使用二进制搭建 K8s 集群的详细过程，由于操作比较冗长，大概会分四篇写完：
+机器准备： 部署 etcd 集群： 部署 Master： 部署 Node： K8s 的 Node 上需要运行 kubelet 和 kube-proxy。本篇介绍在 Node 机器安装这两个组件，除此之外，安装通信需要的 cni 插件。
+本篇的执行命令需要在准备的两台Node机器上执行。
+安装 docker # 可以参照官网： https://docs.docker.com/engine/install/
+# 卸载老版本或重装 docker 时执行第一行 yum remove docker \ docker-client \ docker-client-latest \ docker-common \ docker-latest \ docker-latest-logrotate \ docker-logrotate \ docker-engine -y # 安装 docker yum install -y yum-utils yum-config-manager \ --add-repo \ https://download."><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="kubernetes"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Binary Build K8s 04 Deploy Worker | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/binary-build-k8s-04-deploy-worker/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Binary Build K8s 04 Deploy Worker</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#写在前面>写在前面</a></li><li><a href=#安装-docker>安装 docker</a></li><li><a href=#安装-kubelet>安装 kubelet</a></li><li><a href=#安装-kube-proxy>安装 kube-proxy</a></li><li><a href=#部署-cni-网络插件>部署 cni 网络插件</a></li><li><a href=#部署-flannel-集群网络>部署 Flannel 集群网络</a></li><li><a href=#k8s-集群测试>K8s 集群测试</a></li><li><a href=#结束语>结束语</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/kubernetes/>Kubernetes</a> / 二进制搭建 K8s - 4 部署 Node</p><h1 id=二进制搭建-k8s---4-部署-node>二进制搭建 K8s - 4 部署 Node
+<a class=anchor href=#%e4%ba%8c%e8%bf%9b%e5%88%b6%e6%90%ad%e5%bb%ba-k8s---4-%e9%83%a8%e7%bd%b2-node>#</a></h1><h2 id=写在前面>写在前面
+<a class=anchor href=#%e5%86%99%e5%9c%a8%e5%89%8d%e9%9d%a2>#</a></h2><p>记录和分享使用二进制搭建 K8s 集群的详细过程，由于操作比较冗长，大概会分四篇写完：</p><ol><li><strong><a href=/kubernetes/binary-build-k8s-01-prepare-nodes/>机器准备</a></strong>：</li><li><strong><a href=/kubernetes/binary-build-k8s-02-deploy-etcd/>部署 etcd 集群</a></strong>：</li><li><strong><a href=/kubernetes/binary-build-k8s-03-deploy-master/>部署 Master</a></strong>：</li><li><strong><a href=/kubernetes/binary-build-k8s-04-deploy-worker/>部署 Node</a></strong>：</li></ol><p>K8s 的 Node 上需要运行 kubelet 和 kube-proxy。本篇介绍在 Node 机器安装这两个组件，除此之外，安装通信需要的 cni 插件。</p><p>本篇的执行命令需要在准备的两台Node机器上执行。</p><h2 id=安装-docker>安装 docker
+<a class=anchor href=#%e5%ae%89%e8%a3%85-docker>#</a></h2><p>可以参照官网：
+<a href=https://docs.docker.com/engine/install/>https://docs.docker.com/engine/install/</a></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span><span style=color:#75715e># 卸载老版本或重装 docker 时执行第一行</span>
+</span></span><span style=display:flex><span>yum remove docker <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>                  docker-client <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>                  docker-client-latest <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>                  docker-common <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>                  docker-latest <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>                  docker-latest-logrotate <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>                  docker-logrotate <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>                  docker-engine -y
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 安装 docker</span>
+</span></span><span style=display:flex><span>yum install -y yum-utils
+</span></span><span style=display:flex><span>yum-config-manager <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>    --add-repo <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>    https://download.docker.com/linux/centos/docker-ce.repo
+</span></span><span style=display:flex><span>yum install docker-ce docker-ce-cli containerd.io -y
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 查看 Docker 版本</span>
+</span></span><span style=display:flex><span>docker version
+</span></span></code></pre></div><p>启动 Docker</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>systemctl enable docker
+</span></span><span style=display:flex><span>systemctl start docker
+</span></span></code></pre></div><h2 id=安装-kubelet>安装 kubelet
+<a class=anchor href=#%e5%ae%89%e8%a3%85-kubelet>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>cd /root/kubernetes/resources
+</span></span><span style=display:flex><span>tar -zxvf ./kubernetes-node-linux-amd64.tar.gz
+</span></span><span style=display:flex><span>mkdir /etc/kubernetes/<span style=color:#f92672>{</span>ssl,bin<span style=color:#f92672>}</span> -p
+</span></span><span style=display:flex><span>cp kubernetes/node/bin/kubelet ./kubernetes/node/bin/kube-proxy /etc/kubernetes/bin
+</span></span><span style=display:flex><span>cd /etc/kubernetes
+</span></span></code></pre></div><p>准备 kubelet 配置文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim kubelet
+</span></span></code></pre></div><p>执行上行命令，在 k8s-node01 写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>KUBELET_ARGS<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;--logtostderr=false \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>--v=2 \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>--log-dir=/var/log/kubernetes  \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>--enable-server=true \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>--kubeconfig=/etc/kubernetes/kubelet.kubeconfig \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>--hostname-override=k8s-node01 \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>--network-plugin=cni \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>--bootstrap-kubeconfig=/etc/kubernetes/bootstrap.kubeconfig \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>--config=/etc/kubernetes/kubelet-config.yml \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>--cert-dir=/etc/kubernetes/ssl&#34;</span>
+</span></span></code></pre></div><p>在 k8s-node02 写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>KUBELET_ARGS<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;--logtostderr=false \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>--v=2 \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>--log-dir=/var/log/kubernetes  \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>--enable-server=true \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>--kubeconfig=/etc/kubernetes/kubelet.kubeconfig \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>--hostname-override=k8s-node02 \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>--network-plugin=cni \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>--bootstrap-kubeconfig=/etc/kubernetes/bootstrap.kubeconfig \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>--config=/etc/kubernetes/kubelet-config.yml \
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>--cert-dir=/etc/kubernetes/ssl&#34;</span>
+</span></span></code></pre></div><p>准备 bootstrap.kubeconfig 文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>vim /etc/kubernetes/bootstrap.kubeconfig
+</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>clusters</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>cluster</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>certificate-authority</span>: <span style=color:#ae81ff>/etc/kubernetes/ssl/ca.pem</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>server</span>: <span style=color:#ae81ff>https://192.168.115.131:6443</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>kubernetes</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>contexts</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>context</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>cluster</span>: <span style=color:#ae81ff>kubernetes</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>user</span>: <span style=color:#ae81ff>kubelet-bootstrap</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>default</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>current-context</span>: <span style=color:#ae81ff>default</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Config</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>preferences</span>: {}
+</span></span><span style=display:flex><span><span style=color:#f92672>users</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>kubelet-bootstrap</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>user</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>token</span>: <span style=color:#ae81ff>d5c5d767b64db39db132b433e9c45fbc</span>
+</span></span></code></pre></div><blockquote><p>注意：token 的值需要替换为 master 生成的 token.csv 中所用的 token。</p></blockquote><p>准备 kubelet-config.yml 文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>vim kubelet-config.yml
+</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kind: KubeletConfiguration
+</span></span><span style=display:flex><span>apiVersion: kubelet.config.k8s.io/v1beta1
+</span></span><span style=display:flex><span>address: 0.0.0.0
+</span></span><span style=display:flex><span>port: <span style=color:#ae81ff>10250</span>
+</span></span><span style=display:flex><span>readOnlyPort: <span style=color:#ae81ff>10255</span>
+</span></span><span style=display:flex><span>cgroupDriver: cgroupfs
+</span></span><span style=display:flex><span>clusterDNS:
+</span></span><span style=display:flex><span>- 10.0.0.2
+</span></span><span style=display:flex><span>clusterDomain: cluster.local 
+</span></span><span style=display:flex><span>failSwapOn: false
+</span></span><span style=display:flex><span>authentication:
+</span></span><span style=display:flex><span>  anonymous:
+</span></span><span style=display:flex><span>    enabled: false
+</span></span><span style=display:flex><span>  webhook:
+</span></span><span style=display:flex><span>    cacheTTL: 2m0s
+</span></span><span style=display:flex><span>    enabled: true
+</span></span><span style=display:flex><span>  x509:
+</span></span><span style=display:flex><span>    clientCAFile: /etc/kubernetes/ssl/ca.pem 
+</span></span><span style=display:flex><span>authorization:
+</span></span><span style=display:flex><span>  mode: Webhook
+</span></span><span style=display:flex><span>  webhook:
+</span></span><span style=display:flex><span>    cacheAuthorizedTTL: 5m0s
+</span></span><span style=display:flex><span>    cacheUnauthorizedTTL: 30s
+</span></span><span style=display:flex><span>evictionHard:
+</span></span><span style=display:flex><span>  imagefs.available: 15%
+</span></span><span style=display:flex><span>  memory.available: 100Mi
+</span></span><span style=display:flex><span>  nodefs.available: 10%
+</span></span><span style=display:flex><span>  nodefs.inodesFree: 5%
+</span></span><span style=display:flex><span>maxOpenFiles: <span style=color:#ae81ff>1000000</span>
+</span></span><span style=display:flex><span>maxPods: <span style=color:#ae81ff>110</span>
+</span></span></code></pre></div><p>准备 kubelet.kubeconfig 文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>vim kubelet.kubeconfig
+</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#ae81ff>kubelet.kubeconfig</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>clusters</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>cluster</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>certificate-authority</span>: <span style=color:#ae81ff>/etc/kubernetes/ssl/ca.pem</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>server</span>: <span style=color:#ae81ff>https://192.168.115.131:6443</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>kubernetes</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>contexts</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>context</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>cluster</span>: <span style=color:#ae81ff>kubernetes</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>default</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>user</span>: <span style=color:#ae81ff>default-auth</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>default-context</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>current-context</span>: <span style=color:#ae81ff>default-context</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Config</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>preferences</span>: {}
+</span></span><span style=display:flex><span><span style=color:#f92672>users</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>default-auth</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>user</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>client-certificate</span>: <span style=color:#ae81ff>/etc/kubernetes/ssl/kubelet-client-current.pem</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>client-key</span>: <span style=color:#ae81ff>/etc/kubernetes/ssl/kubelet-client-current.pem</span>
+</span></span></code></pre></div><p>准备kubelet服务配置文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim /usr/lib/systemd/system/kubelet.service
+</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#66d9ef>[Unit]</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Description</span><span style=color:#f92672>=</span><span style=color:#e6db74>Kubelet</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Documentation</span><span style=color:#f92672>=</span><span style=color:#e6db74>https://github.com/GoogleCloudPlatform/kubernetes</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>After</span><span style=color:#f92672>=</span><span style=color:#e6db74>docker.service</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Requires</span><span style=color:#f92672>=</span><span style=color:#e6db74>docker.service</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>[Service]</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>EnvironmentFile</span><span style=color:#f92672>=</span><span style=color:#e6db74>/etc/kubernetes/kubelet</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>ExecStart</span><span style=color:#f92672>=</span><span style=color:#e6db74>/etc/kubernetes/bin/kubelet $KUBELET_ARGS</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Restart</span><span style=color:#f92672>=</span><span style=color:#e6db74>on-failure</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>[Install]</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>WantedBy</span><span style=color:#f92672>=</span><span style=color:#e6db74>multi-user.target</span>
+</span></span></code></pre></div><p>启动 kubelet：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>systemctl daemon-reload
+</span></span><span style=display:flex><span>systemctl start kubelet
+</span></span><span style=display:flex><span>systemctl enable kubelet
+</span></span><span style=display:flex><span>systemctl status kubelet
+</span></span></code></pre></div><p>给 Node 颁发证书，在 Master 上执行：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl get csr
+</span></span><span style=display:flex><span><span style=color:#75715e># 输出如下</span>
+</span></span><span style=display:flex><span>NAME                                                   AGE   SIGNERNAME                                    REQUESTOR           CONDITION
+</span></span><span style=display:flex><span>node-csr-a-BmW9xMglOXlUdwBjD2QQphXLdu4iwtamEIIbhJKcY   10m   kubernetes.io/kube-apiserver-client-kubelet   kubelet-bootstrap   Pending
+</span></span><span style=display:flex><span>node-csr-zDDrVyKH7ug8fTUcDjdvDgh-f9rVCyoHuLMGaWbykAQ   10m   kubernetes.io/kube-apiserver-client-kubelet   kubelet-bootstrap   Pending
+</span></span></code></pre></div><p>得到证书的 NAME，给其 Approve：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl certificate approve node-csr-a-BmW9xMglOXlUdwBjD2QQphXLdu4iwtamEIIbhJKcY
+</span></span><span style=display:flex><span>kubectl certificate approve node-csr-zDDrVyKH7ug8fTUcDjdvDgh-f9rVCyoHuLMGaWbykAQ 
+</span></span></code></pre></div><p>再次查看证书，证书的 CONDITION 就会更新了</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl get csr
+</span></span><span style=display:flex><span><span style=color:#75715e># 输出如下</span>
+</span></span><span style=display:flex><span>NAME                                                   AGE     SIGNERNAME                                    REQUESTOR           CONDITION
+</span></span><span style=display:flex><span>node-csr-a-BmW9xMglOXlUdwBjD2QQphXLdu4iwtamEIIbhJKcY   10m   kubernetes.io/kube-apiserver-client-kubelet   kubelet-bootstrap   Approved,Issued
+</span></span><span style=display:flex><span>node-csr-zDDrVyKH7ug8fTUcDjdvDgh-f9rVCyoHuLMGaWbykAQ   10m   kubernetes.io/kube-apiserver-client-kubelet   kubelet-bootstrap   Approved,Issued
+</span></span></code></pre></div><p>接下来使用查看 Node 的命令，应该可以获取到 Node 信息：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl get node
+</span></span><span style=display:flex><span><span style=color:#75715e># 输出如下</span>
+</span></span><span style=display:flex><span>NAME         STATUS     ROLES    AGE     VERSION
+</span></span><span style=display:flex><span>k8s-node01   NotReady   &lt;none&gt;   50s   v1.18.3
+</span></span><span style=display:flex><span>k8s-node02   NotReady   &lt;none&gt;   56s   v1.18.3
+</span></span></code></pre></div><h2 id=安装-kube-proxy>安装 kube-proxy
+<a class=anchor href=#%e5%ae%89%e8%a3%85-kube-proxy>#</a></h2><p>准备 kube-proxy 配置文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim kube-proxy
+</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-tex data-lang=tex><span style=display:flex><span>KUBE_PROXY_ARGS=&#34;--logtostderr=false <span style=color:#66d9ef>\</span>
+</span></span><span style=display:flex><span>--v=2 <span style=color:#66d9ef>\</span>
+</span></span><span style=display:flex><span>--log-dir=/var/log/kubernetes <span style=color:#66d9ef>\</span>
+</span></span><span style=display:flex><span>--config=/etc/kubernetes/kube-proxy-config.yml&#34;
+</span></span></code></pre></div><p>准备 kube-proxy-config.yml 文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>vim /etc/kubernetes/kube-proxy-config.yml
+</span></span></code></pre></div><p>执行上行命令，在 k8s-node01 写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kind: KubeProxyConfiguration
+</span></span><span style=display:flex><span>apiVersion: kubeproxy.config.k8s.io/v1alpha1
+</span></span><span style=display:flex><span>address: 0.0.0.0
+</span></span><span style=display:flex><span>metricsBindAddress: 0.0.0.0:10249
+</span></span><span style=display:flex><span>iclientConnection:
+</span></span><span style=display:flex><span>  kubeconfig: /etc/kubernetes/kube-proxy.kubeconfig
+</span></span><span style=display:flex><span>hostnameOverride: k8s-node01
+</span></span><span style=display:flex><span>clusterCIDR: 10.0.0.0/24
+</span></span><span style=display:flex><span>mode: ipvs
+</span></span><span style=display:flex><span>ipvs:
+</span></span><span style=display:flex><span>  scheduler: <span style=color:#e6db74>&#34;rr&#34;</span>
+</span></span><span style=display:flex><span>iptables:
+</span></span><span style=display:flex><span>  masqueradeAll: true
+</span></span></code></pre></div><p>在 k8s-node02 写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>KubeProxyConfiguration</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>kubeproxy.config.k8s.io/v1alpha1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>address</span>: <span style=color:#ae81ff>0.0.0.0</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metricsBindAddress</span>: <span style=color:#ae81ff>0.0.0.0</span>:<span style=color:#ae81ff>10249</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>clientConnection</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>kubeconfig</span>: <span style=color:#ae81ff>/etc/kubernetes/kube-proxy.kubeconfig</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>hostnameOverride</span>: <span style=color:#ae81ff>k8s-node02</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>clusterCIDR</span>: <span style=color:#ae81ff>10.0.0.0</span><span style=color:#ae81ff>/24</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>mode</span>: <span style=color:#ae81ff>ipvs</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>ipvs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>scheduler</span>: <span style=color:#e6db74>&#34;rr&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>iptables</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>masqueradeAll</span>: <span style=color:#66d9ef>true</span>
+</span></span></code></pre></div><p>准备 kube-proxy.kubeconfig 文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>vim /etc/kubernetes/kube-proxy.kubeconfig
+</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>clusters</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>cluster</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>certificate-authority</span>: <span style=color:#ae81ff>/etc/kubernetes/ssl/ca.pem</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>server</span>: <span style=color:#ae81ff>https://192.168.115.131:6443</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>kubernetes</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>contexts</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>context</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>cluster</span>: <span style=color:#ae81ff>kubernetes</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>user</span>: <span style=color:#ae81ff>kube-proxy</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>default</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>current-context</span>: <span style=color:#ae81ff>default</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Config</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>preferences</span>: {}
+</span></span><span style=display:flex><span><span style=color:#f92672>users</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>kube-proxy</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>user</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>client-certificate</span>: <span style=color:#ae81ff>/etc/kubernetes/ssl/kube-proxy.pem</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>client-key</span>: <span style=color:#ae81ff>/etc/kubernetes/ssl/kube-proxy-key.pem</span>
+</span></span></code></pre></div><p>准备 kube-proxy 服务配置文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim /usr/lib/systemd/system/kube-proxy.service
+</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#66d9ef>[Unit]</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Description</span><span style=color:#f92672>=</span><span style=color:#e6db74>Kube-Proxy</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Documentation</span><span style=color:#f92672>=</span><span style=color:#e6db74>https://github.com/GoogleCloudPlatform/kubernetes</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>After</span><span style=color:#f92672>=</span><span style=color:#e6db74>network.target</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Requires</span><span style=color:#f92672>=</span><span style=color:#e6db74>network.target</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>[Service]</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>EnvironmentFile</span><span style=color:#f92672>=</span><span style=color:#e6db74>/etc/kubernetes/kube-proxy</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>ExecStart</span><span style=color:#f92672>=</span><span style=color:#e6db74>/etc/kubernetes/bin/kube-proxy $KUBE_PROXY_ARGS</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>Restart</span><span style=color:#f92672>=</span><span style=color:#e6db74>on-failure</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>[Install]</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>WantedBy</span><span style=color:#f92672>=</span><span style=color:#e6db74>multi-user.target</span>
+</span></span></code></pre></div><p>启动 kubelet：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>systemctl daemon-reload
+</span></span><span style=display:flex><span>systemctl start kube-proxy
+</span></span><span style=display:flex><span>systemctl enable kube-proxy
+</span></span><span style=display:flex><span>systemctl status kube-proxy
+</span></span></code></pre></div><h2 id=部署-cni-网络插件>部署 cni 网络插件
+<a class=anchor href=#%e9%83%a8%e7%bd%b2-cni-%e7%bd%91%e7%bb%9c%e6%8f%92%e4%bb%b6>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>cd /root/kubernetes/resources
+</span></span><span style=display:flex><span>mkdir -p /opt/cni/bin /etc/cni/net.d
+</span></span><span style=display:flex><span>tar -zxvf cni-plugins-linux-amd64-v0.8.6.tgz -C /opt/cni/bin
+</span></span></code></pre></div><h2 id=部署-flannel-集群网络>部署 Flannel 集群网络
+<a class=anchor href=#%e9%83%a8%e7%bd%b2-flannel-%e9%9b%86%e7%be%a4%e7%bd%91%e7%bb%9c>#</a></h2><p>需要在 Master 机器上执行</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>cd /root/kubernetes/resources
+</span></span><span style=display:flex><span>kubectl apply -f kube-flannel.yml
+</span></span></code></pre></div><p>创建角色绑定</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl create clusterrolebinding kube-apiserver:kubelet-apis --clusterrole<span style=color:#f92672>=</span>system:kubelet-api-admin --user kubernetes
+</span></span></code></pre></div><h2 id=k8s-集群测试>K8s 集群测试
+<a class=anchor href=#k8s-%e9%9b%86%e7%be%a4%e6%b5%8b%e8%af%95>#</a></h2><p>部署一个 nginx 的 deployment：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl create deployment nginx --image<span style=color:#f92672>=</span>nginx
+</span></span><span style=display:flex><span><span style=color:#75715e># 在等待几秒后，获取 deployment</span>
+</span></span><span style=display:flex><span>kubectl get deployment
+</span></span><span style=display:flex><span>ifconfig cni0
+</span></span><span style=display:flex><span>kubectl expose deployment nginx --port<span style=color:#f92672>=</span><span style=color:#ae81ff>80</span> --type<span style=color:#f92672>=</span>NodePort
+</span></span><span style=display:flex><span>kubectl get svc
+</span></span></code></pre></div><p>可以看到 nginx 已经启动成功。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>NAME    READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span style=display:flex><span>nginx   1/1     <span style=color:#ae81ff>1</span>            <span style=color:#ae81ff>1</span>           7m7s
+</span></span></code></pre></div><blockquote><p>注意：如果启动失败，可能是由于网络原因拉取镜像失败导致。可以通过 <code>kubectl describe pod &lt;pod-name></code> 查看。</p></blockquote><p>使用 service 暴露 K8s 集群内部 Pod 服务：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl expose deployment nginx --port<span style=color:#f92672>=</span><span style=color:#ae81ff>80</span> --type<span style=color:#f92672>=</span>NodePort
+</span></span><span style=display:flex><span><span style=color:#75715e># 获取 service</span>
+</span></span><span style=display:flex><span>kubectl get svc
+</span></span></code></pre></div><p>可以看到，service 将 nginx 的服务转发到了 31839 端口</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT<span style=color:#f92672>(</span>S<span style=color:#f92672>)</span>        AGE
+</span></span><span style=display:flex><span>kubernetes   ClusterIP   10.0.0.1     &lt;none&gt;        443/TCP        10h
+</span></span><span style=display:flex><span>nginx        NodePort    10.0.0.101   &lt;none&gt;        80:31839/TCP   10s
+</span></span></code></pre></div><p>此时，我们在 Node 机器上使用该端口访问 nginx，可以看到成功访问。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-tex data-lang=tex><span style=display:flex><span>[root@k8s-node01]# curl 192.168.115.132:31839
+</span></span><span style=display:flex><span>&lt;!DOCTYPE html&gt;
+</span></span><span style=display:flex><span>&lt;html&gt;
+</span></span><span style=display:flex><span>&lt;head&gt;
+</span></span><span style=display:flex><span>&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+</span></span><span style=display:flex><span>&lt;style&gt;
+</span></span><span style=display:flex><span>    body {
+</span></span><span style=display:flex><span>        width: 35em;
+</span></span><span style=display:flex><span>        margin: 0 auto;
+</span></span><span style=display:flex><span>        font-family: Tahoma, Verdana, Arial, sans-serif;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>&lt;/style&gt;
+</span></span><span style=display:flex><span>&lt;/head&gt;
+</span></span><span style=display:flex><span>&lt;body&gt;
+</span></span><span style=display:flex><span>&lt;h1&gt;Welcome to nginx!&lt;/h1&gt;
+</span></span><span style=display:flex><span>&lt;p&gt;If you see this page, the nginx web server is successfully installed and
+</span></span><span style=display:flex><span>working. Further configuration is required.&lt;/p&gt;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>&lt;p&gt;For online documentation and support please refer to
+</span></span><span style=display:flex><span>&lt;a href=&#34;http://nginx.org/&#34;&gt;nginx.org&lt;/a&gt;.&lt;br/&gt;
+</span></span><span style=display:flex><span>Commercial support is available at
+</span></span><span style=display:flex><span>&lt;a href=&#34;http://nginx.com/&#34;&gt;nginx.com&lt;/a&gt;.&lt;/p&gt;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>&lt;p&gt;&lt;em&gt;Thank you for using nginx.&lt;/em&gt;&lt;/p&gt;
+</span></span><span style=display:flex><span>&lt;/body&gt;
+</span></span><span style=display:flex><span>&lt;/html&gt;
+</span></span></code></pre></div><p>好了，至此第四段落<strong>部署 Node</strong>也顺利结束。</p><h2 id=结束语>结束语
+<a class=anchor href=#%e7%bb%93%e6%9d%9f%e8%af%ad>#</a></h2><p>在使用二进制搭建 K8s 集群的过程中，搭建的过程参考了很多园友的博客。由于我是使用最新的 K8s、etcd 版本搭建的，遇到了很多的问题，但没有关系，好事多磨。</p><p>在遇到问题的时候，几乎都是通过查看 K8s 中组件的运行状态和日志来寻找问题根源和解决方案的。</p><p>大部分问题都是出在配置方面，或是文件路径配置问题，或是新版本的配置不兼容问题。</p><hr><p><a href=/kubernetes/binary-build-k8s-03-deploy-master/>« 二进制搭建 K8s - 3 部署 Master</a></p><p><a href=/kubernetes/cloud-native-understood/>» Kubernetes 0-1 尝试理解云原生</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/kubernetes/binary-build-k8s-04-deploy-worker.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#写在前面>写在前面</a></li><li><a href=#安装-docker>安装 docker</a></li><li><a href=#安装-kubelet>安装 kubelet</a></li><li><a href=#安装-kube-proxy>安装 kube-proxy</a></li><li><a href=#部署-cni-网络插件>部署 cni 网络插件</a></li><li><a href=#部署-flannel-集群网络>部署 Flannel 集群网络</a></li><li><a href=#k8s-集群测试>K8s 集群测试</a></li><li><a href=#结束语>结束语</a></li></ul></nav></div></aside></main></body></html>

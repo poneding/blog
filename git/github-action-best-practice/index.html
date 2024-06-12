@@ -1,0 +1,117 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content='我的博客 / Git / Github Action 使用最佳实践
+Github Action 使用最佳实践 # Commit 构建 beta 版本镜像 # 仓库根目录下创建 .github/workflows/commit-cicd.yml 文件，用于提交代码触发 github action。
+beta 版本的镜像 tag 命名规则：{vx.x.x}-beta-{COMMIT_ID}，例如：v1.0.0-beta-f37cfa2
+name: commit-cicd ​ env: BASE_VERSION: v1.0.0 ​ on: push: branches: [main] workflow_dispatch: ​ jobs: build: runs-on: ubuntu-latest steps: - uses: actions/checkout@v3 ​ - name: Set ENV run: | echo "VERSION=${BASE_VERSION}-beta-${GITHUB_SHA::7}" >> $GITHUB_ENV ​ - name: Set up QEMU uses: docker/setup-qemu-action@v2 - name: Set up Docker Buildx uses: docker/setup-buildx-action@v2 ​ - name: Login to docker hub uses: docker/login-action@v2 with: username: poneding password: ${{ secrets.'><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/git/github-action-best-practice/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content='我的博客 / Git / Github Action 使用最佳实践
+Github Action 使用最佳实践 # Commit 构建 beta 版本镜像 # 仓库根目录下创建 .github/workflows/commit-cicd.yml 文件，用于提交代码触发 github action。
+beta 版本的镜像 tag 命名规则：{vx.x.x}-beta-{COMMIT_ID}，例如：v1.0.0-beta-f37cfa2
+name: commit-cicd ​ env: BASE_VERSION: v1.0.0 ​ on: push: branches: [main] workflow_dispatch: ​ jobs: build: runs-on: ubuntu-latest steps: - uses: actions/checkout@v3 ​ - name: Set ENV run: | echo "VERSION=${BASE_VERSION}-beta-${GITHUB_SHA::7}" >> $GITHUB_ENV ​ - name: Set up QEMU uses: docker/setup-qemu-action@v2 - name: Set up Docker Buildx uses: docker/setup-buildx-action@v2 ​ - name: Login to docker hub uses: docker/login-action@v2 with: username: poneding password: ${{ secrets.'><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="git"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Github Action Best Practice | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/git/github-action-best-practice/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Github Action Best Practice</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#commit-构建-beta-版本镜像>Commit 构建 beta 版本镜像</a></li><li><a href=#release-构建-stable-版本镜像>Release 构建 stable 版本镜像</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/git/>Git</a> / Github Action 使用最佳实践</p><h1 id=github-action-使用最佳实践>Github Action 使用最佳实践
+<a class=anchor href=#github-action-%e4%bd%bf%e7%94%a8%e6%9c%80%e4%bd%b3%e5%ae%9e%e8%b7%b5>#</a></h1><h2 id=commit-构建-beta-版本镜像>Commit 构建 beta 版本镜像
+<a class=anchor href=#commit-%e6%9e%84%e5%bb%ba-beta-%e7%89%88%e6%9c%ac%e9%95%9c%e5%83%8f>#</a></h2><p>仓库根目录下创建 <code>.github/workflows/commit-cicd.yml</code> 文件，用于提交代码触发 <code>github action</code>。</p><p>beta 版本的镜像 tag 命名规则：<code>{vx.x.x}-beta-{COMMIT_ID}</code>，例如：<code>v1.0.0-beta-f37cfa2</code></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>name</span>: <span style=color:#ae81ff>commit-cicd</span>
+</span></span><span style=display:flex><span><span style=color:#ae81ff>​</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>env</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>BASE_VERSION</span>: <span style=color:#ae81ff>v1.0.0</span>
+</span></span><span style=display:flex><span><span style=color:#ae81ff>​</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>on</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>push</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>branches</span>: [<span style=color:#ae81ff>main]</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>workflow_dispatch</span>:
+</span></span><span style=display:flex><span><span style=color:#ae81ff>​</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>build</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@v3</span>
+</span></span><span style=display:flex><span><span style=color:#ae81ff>​</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Set ENV</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          echo &#34;VERSION=${BASE_VERSION}-beta-${GITHUB_SHA::7}&#34; &gt;&gt; $GITHUB_ENV</span> 
+</span></span><span style=display:flex><span><span style=color:#ae81ff>​</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Set up QEMU</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>docker/setup-qemu-action@v2</span>
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Set up Docker Buildx</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>docker/setup-buildx-action@v2</span>
+</span></span><span style=display:flex><span><span style=color:#ae81ff>​</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Login to docker hub</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>docker/login-action@v2</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>username</span>: <span style=color:#ae81ff>poneding</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>password</span>: <span style=color:#ae81ff>${{ secrets.DOCKER_PASSWORD }}</span>
+</span></span><span style=display:flex><span><span style=color:#ae81ff>​</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Build and push</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>id</span>: <span style=color:#ae81ff>docker_build</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>docker/build-push-action@v3</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>platforms</span>: <span style=color:#ae81ff>linux/amd64,linux/arm64</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>file</span>: <span style=color:#ae81ff>Dockerfile.multiarch</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>push</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>tags</span>: <span style=color:#ae81ff>poneding/demo:${VERSION}</span>
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Image digest</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>echo ${{ steps.docker_build.outputs.digest }}</span>
+</span></span><span style=display:flex><span><span style=color:#ae81ff>​</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Deploy demo</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>id</span>: <span style=color:#ae81ff>deploy</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions-hub/kubectl@master</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>env</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>KUBE_CONFIG</span>: <span style=color:#ae81ff>${{ secrets.KUBE_CONFIG }}</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:    
+</span></span><span style=display:flex><span>          <span style=color:#f92672>args</span>: <span style=color:#ae81ff>set image deployment/demo demo=poneding/demo:${VERSION}</span>
+</span></span></code></pre></div><h2 id=release-构建-stable-版本镜像>Release 构建 stable 版本镜像
+<a class=anchor href=#release-%e6%9e%84%e5%bb%ba-stable-%e7%89%88%e6%9c%ac%e9%95%9c%e5%83%8f>#</a></h2><p>仓库根目录下创建 <code>.github/workflows/release-cicd.yml</code>文件，用于 Release 发布触发 <code>github action</code>。</p><p>stable 版本镜像 tag 命名规则：<code>vx.x.x</code>-stable，例如：<code>v1.0.0-stable</code></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>name</span>: <span style=color:#ae81ff>release-cicd</span>
+</span></span><span style=display:flex><span><span style=color:#ae81ff>​</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>on</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>release</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>types</span>: [<span style=color:#ae81ff>created]</span>
+</span></span><span style=display:flex><span><span style=color:#ae81ff>​</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>build</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@v3</span>
+</span></span><span style=display:flex><span><span style=color:#ae81ff>​</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Set ENV</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          echo &#34;VERSION=${GITHUB_REF#refs/*/}&#34; &gt;&gt; $GITHUB_ENV</span> 
+</span></span><span style=display:flex><span><span style=color:#ae81ff>​</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Set up QEMU</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>docker/setup-qemu-action@v2</span>
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Set up Docker Buildx</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>docker/setup-buildx-action@v2</span>
+</span></span><span style=display:flex><span> 
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Login to docker hub</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>docker/login-action@v2</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>username</span>: <span style=color:#ae81ff>poneding</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>password</span>: <span style=color:#ae81ff>${{ secrets.DOCKER_PASSWORD }}</span>
+</span></span><span style=display:flex><span><span style=color:#ae81ff>​</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Build and push</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>id</span>: <span style=color:#ae81ff>docker_build</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>docker/build-push-action@v3</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>env</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>VERSION</span>: <span style=color:#ae81ff>${GITHUB_REF#refs/*/}</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>platforms</span>: <span style=color:#ae81ff>linux/amd64,linux/arm64</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>file</span>: <span style=color:#ae81ff>Dockerfile.multiarch</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>push</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>tags</span>: <span style=color:#ae81ff>poneding/demo:latest,poneding/demo:${VERSION}</span>
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Image digest</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>echo ${{ steps.docker_build.outputs.digest }}</span>
+</span></span><span style=display:flex><span><span style=color:#ae81ff>​</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Deploy demo</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>id</span>: <span style=color:#ae81ff>deploy</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions-hub/kubectl@master</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>env</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>KUBE_CONFIG</span>: <span style=color:#ae81ff>${{ secrets.KUBE_CONFIG }}</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>with</span>:     
+</span></span><span style=display:flex><span>          <span style=color:#f92672>args</span>: <span style=color:#ae81ff>set image deployment/demo demo=poneding/demo:${VERSION}</span>
+</span></span></code></pre></div><blockquote><p>镜像 tag 版本号来自于 git 中创建的 tag，所以如果要发布稳定版本，需要打一个命名为 <code>vx.x.x-stable</code> 的 tag，然后 Release 时，选择该 tag 即可。</p></blockquote><hr><p><a href=/git/git-secret/>« 使用 git-secret 保护仓库敏感数据</a></p><p><a href=/git/github-host-helm-chart/>» 使用 GitHub 托管 helm-chart 仓库</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/git/github-action-best-practice.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#commit-构建-beta-版本镜像>Commit 构建 beta 版本镜像</a></li><li><a href=#release-构建-stable-版本镜像>Release 构建 stable 版本镜像</a></li></ul></nav></div></aside></main></body></html>

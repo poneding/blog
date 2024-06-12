@@ -1,0 +1,238 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content='我的博客 / Kubernetes / Kubernetes 编程
+Kubernetes 编程 # 开始 Kuberntes 编程之旅～
+mkdir programming-kubernetes && cd programming-kubernetes git mod init programming-kubernetes 常用包：
+kubeconfig 对应的结构 clientcmdapi "k8s.io/client-go/tools/clientcmd/api" clientcmdapi.Config 编写自定义 API # 随机生成字符 "k8s.io/apimachinery/pkg/util/rand" rand.String(5) 参考：
+kubernetes/code-generator: Generators for kube-like API types (github.com)
+code-generator 使用
+B站 code-generator 介绍
+mkdir hack vim hack/boilerplate.go.txt /* Copyright 2022 programming-kubernetes. Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.'><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/kubernetes/prgramming-kubernetes/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content='我的博客 / Kubernetes / Kubernetes 编程
+Kubernetes 编程 # 开始 Kuberntes 编程之旅～
+mkdir programming-kubernetes && cd programming-kubernetes git mod init programming-kubernetes 常用包：
+kubeconfig 对应的结构 clientcmdapi "k8s.io/client-go/tools/clientcmd/api" clientcmdapi.Config 编写自定义 API # 随机生成字符 "k8s.io/apimachinery/pkg/util/rand" rand.String(5) 参考：
+kubernetes/code-generator: Generators for kube-like API types (github.com)
+code-generator 使用
+B站 code-generator 介绍
+mkdir hack vim hack/boilerplate.go.txt /* Copyright 2022 programming-kubernetes. Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.'><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="kubernetes"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Prgramming Kubernetes | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/prgramming-kubernetes/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Prgramming Kubernetes</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#编写自定义-api>编写自定义 API</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/kubernetes/>Kubernetes</a> / Kubernetes 编程</p><h1 id=kubernetes-编程>Kubernetes 编程
+<a class=anchor href=#kubernetes-%e7%bc%96%e7%a8%8b>#</a></h1><p>开始 Kuberntes 编程之旅～</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>mkdir programming-kubernetes <span style=color:#f92672>&amp;&amp;</span> cd programming-kubernetes
+</span></span><span style=display:flex><span>git mod init programming-kubernetes
+</span></span></code></pre></div><p><strong>常用包</strong>：</p><ul><li>kubeconfig 对应的结构</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#a6e22e>clientcmdapi</span> <span style=color:#e6db74>&#34;k8s.io/client-go/tools/clientcmd/api&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>clientcmdapi</span>.<span style=color:#a6e22e>Config</span>
+</span></span></code></pre></div><h2 id=编写自定义-api>编写自定义 API
+<a class=anchor href=#%e7%bc%96%e5%86%99%e8%87%aa%e5%ae%9a%e4%b9%89-api>#</a></h2><ul><li>随机生成字符</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#e6db74>&#34;k8s.io/apimachinery/pkg/util/rand&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>rand</span>.<span style=color:#a6e22e>String</span>(<span style=color:#ae81ff>5</span>)
+</span></span></code></pre></div><p><strong>参考</strong>：</p><ul><li><p><a href=https://github.com/kubernetes/code-generator>kubernetes/code-generator: Generators for kube-like API types (github.com)</a></p></li><li><p><a href=https://tangxusc.github.io/blog/2019/05/code-generator%e4%bd%bf%e7%94%a8/>code-generator 使用</a></p></li><li><p><a href="https://www.bilibili.com/video/BV1Pa411q78H?spm_id_from=333.337.search-card.all.click">B站 code-generator 介绍</a></p></li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>mkdir hack
+</span></span><span style=display:flex><span>vim hack/boilerplate.go.txt
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-tex data-lang=tex><span style=display:flex><span>/*
+</span></span><span style=display:flex><span>Copyright 2022 programming-kubernetes.
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
+</span></span><span style=display:flex><span>you may not use this file except in compliance with the License.
+</span></span><span style=display:flex><span>You may obtain a copy of the License at
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    http://www.apache.org/licenses/LICENSE-2.0
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Unless required by applicable law or agreed to in writing, software
+</span></span><span style=display:flex><span>distributed under the License is distributed on an &#34;AS IS&#34; BASIS,
+</span></span><span style=display:flex><span>WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+</span></span><span style=display:flex><span>See the License for the specific language governing permissions and
+</span></span><span style=display:flex><span>limitations under the License.
+</span></span><span style=display:flex><span>*/
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>mkdir -p pkg/apis/demo/v1alpha
+</span></span><span style=display:flex><span>vim pkg/apis/demo/v1alpha/doc.go
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#75715e>/*
+</span></span></span><span style=display:flex><span><span style=color:#75715e>Copyright 2022 programming-kubernetes.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
+</span></span></span><span style=display:flex><span><span style=color:#75715e>you may not use this file except in compliance with the License.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>You may obtain a copy of the License at
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    http://www.apache.org/licenses/LICENSE-2.0
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>Unless required by applicable law or agreed to in writing, software
+</span></span></span><span style=display:flex><span><span style=color:#75715e>distributed under the License is distributed on an &#34;AS IS&#34; BASIS,
+</span></span></span><span style=display:flex><span><span style=color:#75715e>WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>See the License for the specific language governing permissions and
+</span></span></span><span style=display:flex><span><span style=color:#75715e>limitations under the License.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>*/</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// +k8s:deepcopy-gen=package
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// +groupName=demo.pk.io
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>v1alpha1</span>
+</span></span></code></pre></div><blockquote><p>文件名称一定要是 <code>doc.go</code>，要不然无法成功生成 <code>deepcopy</code> 代码；</p><p>// +groupName=demo.pk.io，将根据该注释在 client 中生成对应的组</p></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>vim pkg/apis/demo/v1alpha/types.go
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#75715e>/*
+</span></span></span><span style=display:flex><span><span style=color:#75715e>Copyright 2022 programming-kubernetes.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
+</span></span></span><span style=display:flex><span><span style=color:#75715e>you may not use this file except in compliance with the License.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>You may obtain a copy of the License at
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    http://www.apache.org/licenses/LICENSE-2.0
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>Unless required by applicable law or agreed to in writing, software
+</span></span></span><span style=display:flex><span><span style=color:#75715e>distributed under the License is distributed on an &#34;AS IS&#34; BASIS,
+</span></span></span><span style=display:flex><span><span style=color:#75715e>WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>See the License for the specific language governing permissions and
+</span></span></span><span style=display:flex><span><span style=color:#75715e>limitations under the License.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>*/</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>v1alpha1</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>corev1</span> <span style=color:#e6db74>&#34;k8s.io/api/core/v1&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>metav1</span> <span style=color:#e6db74>&#34;k8s.io/apimachinery/pkg/apis/meta/v1&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// +genclient
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Foo -
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Foo</span> <span style=color:#66d9ef>struct</span> {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>metav1</span>.<span style=color:#a6e22e>TypeMeta</span>   <span style=color:#e6db74>`json:&#34;,inline&#34;`</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>metav1</span>.<span style=color:#a6e22e>ObjectMeta</span> <span style=color:#e6db74>`json:&#34;metadata,omitempty&#34; protobuf:&#34;bytes,1,opt,name=metadata&#34;`</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>Spec</span>              <span style=color:#a6e22e>FooSpec</span>   <span style=color:#e6db74>`json:&#34;spec,omitempty&#34; protobuf:&#34;bytes,2,opt,name=spec&#34;`</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>Status</span>            <span style=color:#a6e22e>FooStatus</span> <span style=color:#e6db74>`json:&#34;status,omitempty&#34; protobuf:&#34;bytes,3,opt,name=status&#34;`</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>FooList</span> <span style=color:#66d9ef>struct</span> {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>metav1</span>.<span style=color:#a6e22e>TypeMeta</span> <span style=color:#e6db74>`json:&#34;,inline&#34;`</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>metav1</span>.<span style=color:#a6e22e>ListMeta</span> <span style=color:#e6db74>`json:&#34;metadata,omitempty&#34; protobuf:&#34;bytes,1,opt,name=metadata&#34;`</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>Items</span>           []<span style=color:#a6e22e>Foo</span> <span style=color:#e6db74>`json:&#34;items&#34; protobuf:&#34;bytes,2,rep,name=items&#34;`</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>FooSpec</span> <span style=color:#66d9ef>struct</span> {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>Name</span> <span style=color:#66d9ef>string</span> <span style=color:#e6db74>`json:&#34;name&#34; protobuf:&#34;bytes,1,opt,name=name&#34;`</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>Desc</span> <span style=color:#66d9ef>string</span> <span style=color:#e6db74>`json:&#34;desc&#34; protobuf:&#34;bytes,2,opt,name=desc&#34;`</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>FooStatus</span> <span style=color:#66d9ef>struct</span> {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>Conditions</span> []<span style=color:#a6e22e>FooCondition</span> <span style=color:#e6db74>`json:&#34;conditions,omitempty&#34; protobuf:&#34;bytes,1,rep,name=conditions&#34;`</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>FooCondition</span> <span style=color:#66d9ef>struct</span> {
+</span></span><span style=display:flex><span> <span style=color:#75715e>// Type of team condition.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#a6e22e>Type</span> <span style=color:#a6e22e>FooConditionType</span> <span style=color:#e6db74>`json:&#34;type&#34; protobuf:&#34;bytes,1,opt,name=type,casttype=TeamConditionType&#34;`</span>
+</span></span><span style=display:flex><span> <span style=color:#75715e>// Status of the condition, one of True, False, Unknown.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#a6e22e>Status</span> <span style=color:#a6e22e>corev1</span>.<span style=color:#a6e22e>ConditionStatus</span> <span style=color:#e6db74>`json:&#34;status&#34; protobuf:&#34;bytes,2,opt,name=status,casttype=k8s.io/api/core/v1.ConditionStatus&#34;`</span>
+</span></span><span style=display:flex><span> <span style=color:#75715e>// Last time the condition transitioned from one status to another.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// +optional
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#a6e22e>LastTransitionTime</span> <span style=color:#a6e22e>metav1</span>.<span style=color:#a6e22e>Time</span> <span style=color:#e6db74>`json:&#34;lastTransitionTime,omitempty&#34; protobuf:&#34;bytes,3,opt,name=lastTransitionTime&#34;`</span>
+</span></span><span style=display:flex><span> <span style=color:#75715e>// The reason for the condition&#39;s last transition.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// +optional
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#a6e22e>Reason</span> <span style=color:#66d9ef>string</span> <span style=color:#e6db74>`json:&#34;reason,omitempty&#34; protobuf:&#34;bytes,4,opt,name=reason&#34;`</span>
+</span></span><span style=display:flex><span> <span style=color:#75715e>// A human readable message indicating details about the transition.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// +optional
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#a6e22e>Message</span> <span style=color:#66d9ef>string</span> <span style=color:#e6db74>`json:&#34;message,omitempty&#34; protobuf:&#34;bytes,5,opt,name=message&#34;`</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>FooConditionType</span> <span style=color:#66d9ef>string</span>
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>vim pkg/apis/demo/v1alpha/register.go
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#75715e>/*
+</span></span></span><span style=display:flex><span><span style=color:#75715e>Copyright 2022 Ketches.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
+</span></span></span><span style=display:flex><span><span style=color:#75715e>you may not use this file except in compliance with the License.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>You may obtain a copy of the License at
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    http://www.apache.org/licenses/LICENSE-2.0
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>Unless required by applicable law or agreed to in writing, software
+</span></span></span><span style=display:flex><span><span style=color:#75715e>distributed under the License is distributed on an &#34;AS IS&#34; BASIS,
+</span></span></span><span style=display:flex><span><span style=color:#75715e>WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>See the License for the specific language governing permissions and
+</span></span></span><span style=display:flex><span><span style=color:#75715e>limitations under the License.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>*/</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>v1alpha1</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>metav1</span> <span style=color:#e6db74>&#34;k8s.io/apimachinery/pkg/apis/meta/v1&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;k8s.io/apimachinery/pkg/runtime&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;k8s.io/apimachinery/pkg/runtime/schema&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>var</span> <span style=color:#a6e22e>SchemeGroupVersion</span> = <span style=color:#a6e22e>schema</span>.<span style=color:#a6e22e>GroupVersion</span>{<span style=color:#a6e22e>Group</span>: <span style=color:#e6db74>&#34;demo.pk.io&#34;</span>, <span style=color:#a6e22e>Version</span>: <span style=color:#e6db74>&#34;v1alpha1&#34;</span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>var</span> (
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>SchemeBuilder</span>      <span style=color:#a6e22e>runtime</span>.<span style=color:#a6e22e>SchemeBuilder</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>localSchemeBuilder</span> = <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>SchemeBuilder</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>AddToScheme</span>        = <span style=color:#a6e22e>localSchemeBuilder</span>.<span style=color:#a6e22e>AddToScheme</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>init</span>() {
+</span></span><span style=display:flex><span> <span style=color:#75715e>// We only register manually written functions here. The registration of the
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// generated functions takes place in the generated files. The separation
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// makes the code compile even when the generated files are missing.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#a6e22e>localSchemeBuilder</span>.<span style=color:#a6e22e>Register</span>(<span style=color:#a6e22e>addKnownTypes</span>)
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Resource takes an unqualified resource and returns a Group qualified GroupResource
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>Resource</span>(<span style=color:#a6e22e>resource</span> <span style=color:#66d9ef>string</span>) <span style=color:#a6e22e>schema</span>.<span style=color:#a6e22e>GroupResource</span> {
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>SchemeGroupVersion</span>.<span style=color:#a6e22e>WithResource</span>(<span style=color:#a6e22e>resource</span>).<span style=color:#a6e22e>GroupResource</span>()
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Adds the list of known types to the given scheme.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>addKnownTypes</span>(<span style=color:#a6e22e>scheme</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>runtime</span>.<span style=color:#a6e22e>Scheme</span>) <span style=color:#66d9ef>error</span> {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>scheme</span>.<span style=color:#a6e22e>AddKnownTypes</span>(<span style=color:#a6e22e>SchemeGroupVersion</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>Foo</span>{},
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>FooList</span>{},
+</span></span><span style=display:flex><span> )
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>scheme</span>.<span style=color:#a6e22e>AddKnownTypes</span>(<span style=color:#a6e22e>SchemeGroupVersion</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>metav1</span>.<span style=color:#a6e22e>Status</span>{},
+</span></span><span style=display:flex><span> )
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>metav1</span>.<span style=color:#a6e22e>AddToGroupVersion</span>(<span style=color:#a6e22e>scheme</span>, <span style=color:#a6e22e>SchemeGroupVersion</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>需要在机器上克隆下 <code>k8s.io/code-generator</code> 仓库：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>mkdir -p $GOPATH/src/k8s.io <span style=color:#f92672>&amp;&amp;</span> cd $GOPATH/src/k8s.io
+</span></span><span style=display:flex><span>git clone https://github.com/kubernetes/code-generator.git
+</span></span></code></pre></div><p>回到 <code>programming-kubernetes/hack</code> 项目目录：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>mkdir hack <span style=color:#f92672>&amp;&amp;</span> cd hack
+</span></span><span style=display:flex><span>vim update-codegen.sh
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Copyright 2022 Ketches.</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># you may not use this file except in compliance with the License.</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># You may obtain a copy of the License at</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#     http://www.apache.org/licenses/LICENSE-2.0</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Unless required by applicable law or agreed to in writing, software</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># distributed under the License is distributed on an &#34;AS IS&#34; BASIS,</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># See the License for the specific language governing permissions and</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># limitations under the License.</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>set -o errexit
+</span></span><span style=display:flex><span>set -o nounset
+</span></span><span style=display:flex><span>set -o pipefail
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>SCRIPT_ROOT<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>dirname <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>BASH_SOURCE[0]<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span><span style=color:#66d9ef>)</span>/..
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># generate the code with:</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># - --output-base because this script should also be able to run inside the vendor dir of</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#   k8s.io/kubernetes. The output-base is needed for the generators to output into the vendor dir</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#   instead of the $GOPATH directly. For normal projects this can be dropped.</span>
+</span></span><span style=display:flex><span>~/go/src/k8s.io/code-generator/generate-groups.sh <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>    all <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>    programming-kubernetes/pkg/client <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>    programming-kubernetes/pkg/apis <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>    <span style=color:#e6db74>&#34;demo.dev:v1alpha1&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>    --output-base <span style=color:#e6db74>${</span>SCRIPT_ROOT<span style=color:#e6db74>}</span>/.. <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>    --go-header-file <span style=color:#e6db74>${</span>SCRIPT_ROOT<span style=color:#e6db74>}</span>/hack/boilerplate.go.txt
+</span></span></code></pre></div><blockquote><p>&ldquo;demo:v1alpha1&rdquo; 需要保持 api 的目录一致，而不是 groupname</p><p>如果项目 <code>mod</code> 名称中包含 “/”，那么项目也需要放在完整的目录下，例如 <code>mod</code> 名称为 <code>github.com/poneding/programming-kubernetes</code>，那么项目一定要放在 <code>[..]/github.com/poneding/programming-kubernetes</code> 下，此时 <code>--output-base</code> 也需要调整，需要增加目录查找长度 <code>${SCRIPT_ROOT}/../../..</code>。</p></blockquote><p>测试使用自定义 API 的 client，infromer，lister 等：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># programming-kubernets 项目目录</span>
+</span></span><span style=display:flex><span>mkdir -p manifests/crd
+</span></span><span style=display:flex><span>vim manitests/crd/demo-foo.yaml
+</span></span></code></pre></div><p>安装 <code>controller-gen</code> 工具</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#ae81ff>go install sigs.k8s.io/controller-tools/cmd/controller-gen@latest</span>
+</span></span></code></pre></div><p>生成 crd yaml 文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#a6e22e>controller</span><span style=color:#f92672>-</span><span style=color:#a6e22e>gen</span> 
+</span></span></code></pre></div><hr><p><a href=/kubernetes/pod-understood/>« Kubernetes 0-1 了解 Pod</a></p><p><a href=/kubernetes/prometheus-collect-kong-metrics/>» Prometheus-监控Kong完整操作</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/kubernetes/prgramming-kubernetes.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#编写自定义-api>编写自定义 API</a></li></ul></nav></div></aside></main></body></html>

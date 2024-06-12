@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>我的博客</title><link>https://blog.poneding.com/istio/</link><description>Recent content on 我的博客</description><generator>Hugo</generator><language>cn</language><atom:link href="https://blog.poneding.com/istio/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>https://blog.poneding.com/istio/aws-acm-tls-management/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/aws-acm-tls-management/</guid><description>我的博客 / Istio / 使用 aws-acm 管理 tls 密钥和证书
+使用 aws-acm 管理 tls 密钥和证书 # 参考： https://medium.com/faun/managing-tls-keys-and-certs-in-istio-using-amazons-acm-8ff9a0b99033
+在Ingressgateway service的annotation中添加:
+kind: Service apiVersion: v1 metadata: name: my-ingressgateway namespace: istio-system labels: app: my-ingressgateway annotations: # external-dns.alpha.kubernetes.io/hostname: example.com service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: &amp;#39;3600&amp;#39; service.beta.kubernetes.io/aws-load-balancer-ssl-cert: &amp;gt;- arn:aws:acm:ap-southeast-1:xxxxxxxxxxxx:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx service.beta.kubernetes.io/aws-load-balancer-ssl-ports: https .... service.yaml:
+apiVersion: v1 kind: Service metadata: name: demo-api labels: app: demop-api spec: ports: - name: http port: 80 targetPort: 80 selector: app: demo-api pod 所在的 namespace 需要开启 istio-injection，例如：kubectl label namespace default istio-injection=enabled</description></item><item><title/><link>https://blog.poneding.com/istio/installation/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/installation/</guid><description>我的博客 / Istio / 安装 Istio
+安装 Istio # 安装istioctl # Step 1 下载：
+以下操作步骤默认会安装最新版 istioctl。
+curl -L https://istio.io/downloadIstio | sh - 以上命令默认会安装最新版 istioctl，如果需要安装指定版本例如 1.6.8，使用以下命令。
+curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.6.8 TARGET_ARCH=x86_64 sh - Step 2 配置：
+step 1会下载istio包，目录istio-{ISTIO_VERSION}，进入目录
+cd istio-{ISTIO_VERSION} 拷贝bin目录下的istioctl二进制文件到PATH目录下：
+cp bin/istio /usr/local/bin « 使用 aws-acm 管理 tls 密钥和证书
+» 授权策略 Authorization Policy</description></item><item><title/><link>https://blog.poneding.com/istio/istio-auth-policy/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/istio-auth-policy/</guid><description>我的博客 / Istio / 授权策略 Authorization Policy
+授权策略 Authorization Policy # 授权架构 # 由于服务网格的 Sidecar 设计模式，每个工作负载都会有一个 Envoy 代理，而每个代理都运行着授权引擎，以此给请求授权。授权引擎依靠授权策略来鉴定请求权限，返回 ALLOW 或 DENY 鉴权结果。
+授权启用 # 将授权策略应用到工作负载即生效访问控制。对于没有应用授权策略的工作负载，则不会对请求做访问控制。
+授权策略 # 资源定义 # selector：
+标签选择器，通过标签选择器选择同命名空间下的目标工作负载，对目标工作负载启用访问控制。
+action：
+当满足rules条件时，控制ALLOW或DENY请求。
+rules：
+访问控制的请求条件：
+from：请求来源 to：请求目标 when：应用规则所需的提交 示例 # 以下授权策略允许两个源（服务帐号 cluster.local/ns/default/sa/sleep 和命名空间 dev），在使用有效的 JWT 令牌发送请求时，可以访问命名空间 foo 中的带有标签 app: httpbin 和 version: v1 的工作负载。
+apiVersion: security.istio.io/v1beta1 kind: AuthorizationPolicy metadata: name: httpbin namespace: foo spec: selector: matchLabels: app: httpbin version: v1 action: ALLOW rules: - from: - source: principals: [&amp;#34;cluster.</description></item><item><title/><link>https://blog.poneding.com/istio/istio-canary-deploy/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/istio-canary-deploy/</guid><description>我的博客 / Istio / 应用平台实现应用金丝雀发布
+应用平台实现应用金丝雀发布 # 实现思路 # 应用正常的 CI 流程添加请求参数：
+CanaryMode【bool，true | false，缺省值 false】 CanaryWeight 【int，缺省值 10】 使用 Istio 的 DetinationRule + VirtualService 实现流量按权重分配到不同版本应用。
+概念 # Iteration：发布迭代号，。是一个字段值，使用金丝雀发布时累加该值，从 0 累加。
+Retract：动作，弃用金丝雀版本。当金丝雀版本存在不可忽视的问题时撤回金丝雀执行该动作。
+Ratify：动作，确认使用金丝雀版本。当金丝雀版本确认可以全面投入使用执行该动作。
+前提 # 使用金丝雀发布的前提条件：
+应用处于发布状态，已经至少发布一次，当前存在稳定的运行版本； 应用已经开启 Istio Gateway，涉及到 VirtualService 的流量转发； 应用当前不是金丝雀状态，要不然乱套了。 发布细节 # CI 发布除了创建或更新 Deployment，Service 之外，默认创建或更新 istio 的 DestinationRule 资源；
+deployment：
+apiVersion: apps/v1 kind: Deployment metadata: name: myapp-pbd3n69-v{iteration} # 出于兼容历史发布，当iteration为0时，name不附带iteration，iteration大于0时，name将附带iteration labels: app: myapp-pbd3n69 version: v{iteration} spec: selector: matchLabels: app: myapp-pbd3n69 version: v{iteration} template: metadata: labels: app: myapp-pbd3n69 version: v{iteration} .</description></item><item><title/><link>https://blog.poneding.com/istio/istio-cors/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/istio-cors/</guid><description>我的博客 / Istio / Istio 0-1 使用Istio实现Cors
+Istio 0-1 使用Istio实现Cors # Cors # Cors（Cross-Origin Resource Sharing）：跨域资源共享，是一种基于 HTTP Header 的机制，该机制通过允许服务器标示除了它自己以外的其它 origin（域，协议和端口），这样浏览器可以访问加载这些资源。跨源资源共享还通过一种机制来检查服务器是否会允许要发送的真实请求，该机制通过浏览器发起一个到服务器托管的跨源资源的&amp;quot;预检&amp;quot;请求。在预检中，浏览器发送的头中标示有 HTTP 方法和真实请求中会用到的头。
+跨源HTTP请求的一个例子：运行在 https://a.com 的JavaScript代码使用 XMLHttpRequest来发起一个到 https://b.com/data.js 的请求。
+出于安全性，浏览器限制脚本内发起的跨域 HTTP 请求。 例如，XMLHttpRequest 和 Fetch API 遵循同源策略。 这意味着使用这些 API 的 Web 应用程序只能从加载应用程序的同一个域请求 HTTP 资源，除非响应报文包含了正确 CORS 响应头。
+更多 Cors 知识： 跨域资源共享（CORS）
+Istio 实现 # 基于 Istio VirtualService 的配置实现。
+官方文档： Istio / Virtual Service#CorsPolicy
+在目标服务上设置允许的请求域 Hello：
+apiVersion: networking.istio.io/v1beta1 kind: VirtualService metadata: name: b spec: http: - route: - destination: host: b.</description></item><item><title/><link>https://blog.poneding.com/istio/istio-timeout/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/istio-timeout/</guid><description>我的博客 / Istio / 使用 Istio 实现服务超时
+使用 Istio 实现服务超时 # 参考 # https://www.servicemesher.com/blog/circuit-breaking-and-outlier-detection-in-istio/ 超时 # 为了防止无限期的等待服务，一般都会给服务设置超时时间，AWS 的 LoadBalancer 默认的超时时间是 60s。但是不同的服务，可能需要不同的超时设置，例如 DocumentApi 超时时间可能需要设置的长一点。
+LoadBalancer 的超时是全局的，我们基于 Istio 服务网格集成了针对单个服务的超时功能。
+重试 # 重试也是一个服务很常用的功能，例如某次请求分配到了一个问题节点，请求失败，则自动重试特定次数。
+熔断/限流 # 为了防止大量涌入请求使得服务崩溃，引入熔断功能。熔断，可以限制当前请求连接数在一个特定范围内。
+配置服务 VirtualService 既可实现：
+apiVersion: networking.istio.io/v1beta1 kind: VirtualService metadata: name: myapp spec: hosts: - myapp http: - route: - destination: host: myapp subset: v1 timeout: 1s timeout：请求超过设定的超时时间，响应返回 504 请求超时。
+« Istio 0-1 使用Istio实现Cors
+» 应用层级设置访问白名单</description></item><item><title/><link>https://blog.poneding.com/istio/istio-white-manifest/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/istio-white-manifest/</guid><description>我的博客 / Istio / 应用层级设置访问白名单
+应用层级设置访问白名单 # 需求 # 两个应用，foo 和 bar，应用 foo 只允许 IP 地址为 1.2.3.4 访问，应用 bar 只允许 IP 地址为 5.6.7.8 访问。
+实现 # 基于 istio 的 AuthorizationPolicy 实现。
+假设，现在 K8s 集群中已经安装 istio，并且有一个正在运行着的 istio-ingressgateway 转发应用 foo 和 bar：
+通过： https://www.example.com/foo 访问 foo;
+通过： https://www.example.com/bar 访问 bar;
+插曲 # 按照 istio 官方文档，使用 AuthorizationPolicy 即可实现基于应用层级的访问白名单设置：
+apiVersion: security.istio.io/v1beta1 kind: AuthorizationPolicy metadata: name: foo spec: selector: matchLabels: app: foo action: ALLOW rules: - from: - source: ipBlocks: [&amp;#34;1.</description></item><item><title/><link>https://blog.poneding.com/istio/Istio/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/Istio/</guid><description>我的博客 / Istio / Istio
+Istio # 简介 # Istio，是一种服务网格的平台。在微服务系统中起着连接，保护，控制和观察服务的作用。它可以降低微服务部署的复杂程度，减轻开发团队压力，无缝接入现有分布式应用程序，可以集成日志，遥测，和策略系统的 API 接口。
+服务网格：
+Service Mesh 是一个基础设施层，用于处理服务间通信。云原生应用有着复杂的服务拓扑，Service Mesh 保证请求可以在这些拓扑中可靠地穿梭。在实际应用当中，Service Mesh 通常是由一系列轻量级的网络代理组成的，它们与应用程序部署在一起，但应用程序不需要知道它们的存在。
+用来描述组成应用程序的微服务网络以及它们之间的交互。
+实现需求包括：
+服务发现 负载均衡 故障恢复 指标和监控 A/B 测试 金丝雀发布 速率控制 访问控制 端到端认证 istioctl # 管理 istio 的命令行工具。
+安装 # curl -L https://istio.io/downloadIstio | sh - cp istio-x.x.x /usr/local cd istio-x.x.x export PATH=$PWD/bin:$PATH Istio 的绝大多数治理能力都是在 Sidecar 而非应用程序中实现，因此是非侵入的； Istio 的调用链埋点逻辑也是在 Sidecar 代理中完成，对应用程序非侵入，但应用程序需做适当的修改，即配合在请求头上传递生成的 Trace 相关信息。 关键功能：
+流量管理 可观察性 策略执行 服务身份和安全 平台支持 集成和定制 架构 # 数据面板 # Envoy # Envoy 是用 C++ 开发的高性能代理，用于协调服务网格中所有服务的入站和出站流量。Envoy 代理是唯一与数据平面流量交互的 Istio 组件。</description></item><item><title/><link>https://blog.poneding.com/istio/tls-transform/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/tls-transform/</guid><description>我的博客 / Istio / 实现 Https 协议的转发
+实现 Https 协议的转发 # apiVersion: networking.istio.io/v1beta1 kind: VirtualService metadata: name: demo spec: http: - headers: request: set: X-Forwarded-Proto: https match: - uri: prefix: / name: demo.default « 应用层级设置访问白名单
+» Istio 0-1 流量管理方案</description></item><item><title/><link>https://blog.poneding.com/istio/traffic-management/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/traffic-management/</guid><description>我的博客 / Istio / Istio 0-1 流量管理方案
+Istio 0-1 流量管理方案 # 设置 istio-system 命名空间下 istiod Deployment 的环境变量：
+PILOT_ENABLE_VIRTUAL_SERVICE_DELEGATE =true：
+« 实现 Https 协议的转发</description></item></channel></rss>

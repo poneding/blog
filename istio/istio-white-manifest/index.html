@@ -1,0 +1,110 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content='我的博客 / Istio / 应用层级设置访问白名单
+应用层级设置访问白名单 # 需求 # 两个应用，foo 和 bar，应用 foo 只允许 IP 地址为 1.2.3.4 访问，应用 bar 只允许 IP 地址为 5.6.7.8 访问。
+实现 # 基于 istio 的 AuthorizationPolicy 实现。
+假设，现在 K8s 集群中已经安装 istio，并且有一个正在运行着的 istio-ingressgateway 转发应用 foo 和 bar：
+通过： https://www.example.com/foo 访问 foo;
+通过： https://www.example.com/bar 访问 bar;
+插曲 # 按照 istio 官方文档，使用 AuthorizationPolicy 即可实现基于应用层级的访问白名单设置：
+apiVersion: security.istio.io/v1beta1 kind: AuthorizationPolicy metadata: name: foo spec: selector: matchLabels: app: foo action: ALLOW rules: - from: - source: ipBlocks: ["1.'><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/istio/istio-white-manifest/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content='我的博客 / Istio / 应用层级设置访问白名单
+应用层级设置访问白名单 # 需求 # 两个应用，foo 和 bar，应用 foo 只允许 IP 地址为 1.2.3.4 访问，应用 bar 只允许 IP 地址为 5.6.7.8 访问。
+实现 # 基于 istio 的 AuthorizationPolicy 实现。
+假设，现在 K8s 集群中已经安装 istio，并且有一个正在运行着的 istio-ingressgateway 转发应用 foo 和 bar：
+通过： https://www.example.com/foo 访问 foo;
+通过： https://www.example.com/bar 访问 bar;
+插曲 # 按照 istio 官方文档，使用 AuthorizationPolicy 即可实现基于应用层级的访问白名单设置：
+apiVersion: security.istio.io/v1beta1 kind: AuthorizationPolicy metadata: name: foo spec: selector: matchLabels: app: foo action: ALLOW rules: - from: - source: ipBlocks: ["1.'><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="istio"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Istio White Manifest | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/istio/istio-white-manifest/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Istio White Manifest</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#需求>需求</a></li><li><a href=#实现>实现</a><ul><li><a href=#插曲>插曲</a></li><li><a href=#最终方案>最终方案</a></li></ul></li><li><a href=#附录>附录</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/istio/>Istio</a> / 应用层级设置访问白名单</p><h1 id=应用层级设置访问白名单>应用层级设置访问白名单
+<a class=anchor href=#%e5%ba%94%e7%94%a8%e5%b1%82%e7%ba%a7%e8%ae%be%e7%bd%ae%e8%ae%bf%e9%97%ae%e7%99%bd%e5%90%8d%e5%8d%95>#</a></h1><h2 id=需求>需求
+<a class=anchor href=#%e9%9c%80%e6%b1%82>#</a></h2><p>两个应用，<code>foo</code> 和 <code>bar</code>，应用 <code>foo</code> 只允许 <code>IP</code> 地址为 <code>1.2.3.4</code> 访问，应用 <code>bar</code> 只允许 <code>IP</code> 地址为 <code>5.6.7.8</code> 访问。</p><h2 id=实现>实现
+<a class=anchor href=#%e5%ae%9e%e7%8e%b0>#</a></h2><p>基于 <code>istio</code> 的 <code>AuthorizationPolicy</code> 实现。</p><p>假设，现在 <code>K8s</code> 集群中已经安装 <code>istio</code>，并且有一个正在运行着的 <code>istio-ingressgateway</code> 转发应用 <code>foo</code> 和 <code>bar</code>：</p><blockquote><p>通过：
+<a href=https://www.example.com/foo>https://www.example.com/foo</a> 访问 <code>foo</code>;</p><p>通过：
+<a href=https://www.example.com/bar>https://www.example.com/bar</a> 访问 <code>bar</code>;</p></blockquote><h3 id=插曲>插曲
+<a class=anchor href=#%e6%8f%92%e6%9b%b2>#</a></h3><p>按照 <code>istio</code> 官方文档，使用 <code>AuthorizationPolicy</code> 即可实现基于应用层级的访问白名单设置：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>security.istio.io/v1beta1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>AuthorizationPolicy</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>foo</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>matchLabels</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>app</span>: <span style=color:#ae81ff>foo</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>action</span>: <span style=color:#ae81ff>ALLOW</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>rules</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>from</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>source</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>ipBlocks</span>: [<span style=color:#e6db74>&#34;1.2.3.4&#34;</span>]
+</span></span></code></pre></div><blockquote><p>想让以上AuthorizationPolicy生效，需要在 <code>foo</code> 工作负载所在的命名空间注入 <code>istio-proxy</code>，通过给命名空间添加 label，添加 lable 后，工作负载启动新的 Pod 会自动注入 <code>istio-proxy</code> 容器：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl label namespace default istio-injection<span style=color:#f92672>=</span>enabled
+</span></span></code></pre></div></blockquote><p>但是，你会发现你使用 <code>https://www.example.com/foo</code> 一直返回的信息都是 <code>RBAC: access denied</code>。为什么会这样呢？</p><p>如果你在 <code>ipBlocks</code> 中加入 <code>istio-ingressgateway</code>（是一个 Deployment）Pod 的 IP，你会发现这时候是可以成功访问的。</p><p>分析流量的转发路径应该就能知道，实际上到达目标应用 <code>foo</code> 的请求，都由<code>istio-ingressgateway</code>转发了，所以源 IP 都会是 <code>istio-ingressgateway</code> Pod 的 IP，从而导致外部访问 IP 的白名单设置无法生效。</p><p>那么如果获取外部IP呢。</p><h3 id=最终方案>最终方案
+<a class=anchor href=#%e6%9c%80%e7%bb%88%e6%96%b9%e6%a1%88>#</a></h3><p><strong>Step 0: 获取客户端源IP</strong>：</p><blockquote><p>如果使用 AWS-EKS 创建 <code>istio-ingressgateway</code> 服务时默认创建的 <code>classic</code> 类型的 LoadBalancer，需要修改成 <code>network</code>类型：</p><p>通过向 istio-ingressgateway Service 添加 annotation：<code>service.beta.kubernetes.io/aws-load-balancer-type: nlb</code></p></blockquote><p>更新 <code>istio-gateway</code> Service：<code>spec.externalTrafficPolicy: Local</code>，现在访问工作负载可以获取到源 IP，这就为我们设置 IP 白名单造就了条件。</p><p>现在只需要为这个 <code>istio-ingressgateway</code> 应用上 <code>AuthorizationPolicy</code> 即可：</p><p><strong>Step 1: 默认允许所有 <code>IP</code> 访问 <code>istio-ingressgateway</code></strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>security.istio.io/v1beta1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>AuthorizationPolicy</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>allow-all-for-istio-ingressgateway</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>istio-system</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>matchLabels</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>istio</span>: <span style=color:#ae81ff>ingressgateway</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>action</span>: <span style=color:#ae81ff>ALLOW</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>rules</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>from</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>source</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>ipBlocks</span>: [<span style=color:#e6db74>&#34;0.0.0.0/0&#34;</span>]
+</span></span></code></pre></div><blockquote><p>默认是允许所有 <code>IP</code> 都可以访问 <code>istio-ingressgateway</code> 下转发的服务的，如果有服务例如 <code>foo</code> 和 <code>bar</code> 需要单独添加 <code>IP</code> 访问百名单则继续参考下面的步骤。</p></blockquote><p><strong>Step 2: 只允许 IP <code>1.2.3.4</code> 访问 <code>foo</code></strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>security.istio.io/v1beta1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>AuthorizationPolicy</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>foo</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>istio-system</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>matchLabels</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>istio</span>: <span style=color:#ae81ff>ingressgateway</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>action</span>: <span style=color:#ae81ff>DENY</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>rules</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>from</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>source</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>notIpBlocks</span>: [<span style=color:#e6db74>&#34;1.2.3.4&#34;</span>]
+</span></span><span style=display:flex><span>      <span style=color:#f92672>to</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>operation</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>hosts</span>:
+</span></span><span style=display:flex><span>              - <span style=color:#ae81ff>www.example.com</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>paths</span>:
+</span></span><span style=display:flex><span>              - <span style=color:#ae81ff>/foo</span>
+</span></span><span style=display:flex><span>              - <span style=color:#ae81ff>/foo/*</span>
+</span></span></code></pre></div><blockquote><p>由于默认是允许所有 <code>IP</code> 都可以访问 <code>istio-ingressgateway</code> 下转发的服务，所以为单独应用设置访问百名的时候使用 <code>DENY</code> + <code>notIpBlocks</code> 来完成。</p><p><code>ipBlocks</code> 和 <code>notIpBlocks</code> 允许配置IP和IP的CIDR，例如：<code>1.2.3.4</code> 或 <code>1.2.3.4/24</code>。</p></blockquote><p><strong>Step 3: 只允许 IP <code>5.6.7.8</code> 访问 <code>bar</code></strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>security.istio.io/v1beta1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>AuthorizationPolicy</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>bar</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>istio-system</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>matchLabels</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>istio</span>: <span style=color:#ae81ff>ingressgateway</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>action</span>: <span style=color:#ae81ff>DENY</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>rules</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>from</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>source</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>notIpBlocks</span>: [<span style=color:#e6db74>&#34;5.6.7.8&#34;</span>]
+</span></span><span style=display:flex><span>      <span style=color:#f92672>to</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>operation</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>hosts</span>:
+</span></span><span style=display:flex><span>              - <span style=color:#ae81ff>www.example.com</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>paths</span>:
+</span></span><span style=display:flex><span>              - <span style=color:#ae81ff>/bar</span>
+</span></span><span style=display:flex><span>              - <span style=color:#ae81ff>/bar/*</span>
+</span></span></code></pre></div><h2 id=附录>附录
+<a class=anchor href=#%e9%99%84%e5%bd%95>#</a></h2><p>如果相同的 LoadBalancer 下的服务都是用同一白名单设置的话，则没必要这么麻烦的设置 <code>AuthorizationPolicy</code> 了，只需要为 Service 设置参数即可：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Service</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>istio-gateway</span>
+</span></span><span style=display:flex><span>...
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>LoadBalancer</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>loadBalancerSourceRanges</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#e6db74>&#34;1.2.3.4/24&#34;</span>
+</span></span><span style=display:flex><span>...
+</span></span></code></pre></div><hr><p><a href=/istio/istio-timeout/>« 使用 Istio 实现服务超时</a></p><p><a href=/istio/tls-transform/>» 实现 Https 协议的转发</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/istio/istio-white-manifest.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#需求>需求</a></li><li><a href=#实现>实现</a><ul><li><a href=#插曲>插曲</a></li><li><a href=#最终方案>最终方案</a></li></ul></li><li><a href=#附录>附录</a></li></ul></nav></div></aside></main></body></html>

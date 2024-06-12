@@ -1,0 +1,217 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / Kubernetes / Gateway API 实践
+Gateway API 实践 # Gateway API 还在积极开发中，目前已经发布了 v1.0.0 版本。可以通过 gateway-api 文档 获取最新进展。
+Gateway API 概述 # Gateway API 是一个 Kubernetes 的扩展 API，它定义了一套 API 来管理网关、路由、TLS 等资源对象，可以用来替代传统的 Ingress。
+和 Ingress 一样，Gateway API 也是一个抽象层，它定义了一套 API 接口，这些接口由社区中的不同厂商来实现，比如 nginx、envoy、traefik 等。
+API 清单 # GatewayClass Gateway HTTPRoute GRPCRoute BackendTLSPolicy ReferenceGrant 安装 Gateway API # # 安装最新版 gateway-api CRDs export LATEST=$(curl -s https://api.github.com/repos/kubernetes-sigs/gateway-api/releases/latest | jq -r .tag_name) kubectl apply -f https://github."><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/kubernetes/gateway-api-practice/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / Kubernetes / Gateway API 实践
+Gateway API 实践 # Gateway API 还在积极开发中，目前已经发布了 v1.0.0 版本。可以通过 gateway-api 文档 获取最新进展。
+Gateway API 概述 # Gateway API 是一个 Kubernetes 的扩展 API，它定义了一套 API 来管理网关、路由、TLS 等资源对象，可以用来替代传统的 Ingress。
+和 Ingress 一样，Gateway API 也是一个抽象层，它定义了一套 API 接口，这些接口由社区中的不同厂商来实现，比如 nginx、envoy、traefik 等。
+API 清单 # GatewayClass Gateway HTTPRoute GRPCRoute BackendTLSPolicy ReferenceGrant 安装 Gateway API # # 安装最新版 gateway-api CRDs export LATEST=$(curl -s https://api.github.com/repos/kubernetes-sigs/gateway-api/releases/latest | jq -r .tag_name) kubectl apply -f https://github."><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="kubernetes"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Gateway API Practice | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/gateway-api-practice/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Gateway API Practice</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#gateway-api-概述>Gateway API 概述</a></li><li><a href=#api-清单>API 清单</a></li><li><a href=#安装-gateway-api>安装 Gateway API</a></li><li><a href=#安装-gateway-controller>安装 Gateway Controller</a></li><li><a href=#实践>实践</a><ul><li><a href=#简单网关路由>简单网关路由</a></li><li><a href=#tls-网关路由certmanager--lets-encrypt>TLS 网关路由：CertManager + Let&rsquo;s Encrypt</a></li></ul></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/kubernetes/>Kubernetes</a> / Gateway API 实践</p><h1 id=gateway-api-实践>Gateway API 实践
+<a class=anchor href=#gateway-api-%e5%ae%9e%e8%b7%b5>#</a></h1><p>Gateway API 还在积极开发中，目前已经发布了 v1.0.0 版本。可以通过
+<a href=https://gateway-api.sigs.k8s.io/>gateway-api 文档</a> 获取最新进展。</p><h2 id=gateway-api-概述>Gateway API 概述
+<a class=anchor href=#gateway-api-%e6%a6%82%e8%bf%b0>#</a></h2><p>Gateway API 是一个 Kubernetes 的扩展 API，它定义了一套 API 来管理网关、路由、TLS 等资源对象，可以用来替代传统的 Ingress。</p><p>和 Ingress 一样，Gateway API 也是一个抽象层，它定义了一套 API 接口，这些接口由社区中的不同厂商来实现，比如 <code>nginx</code>、<code>envoy</code>、<code>traefik</code> 等。</p><h2 id=api-清单>API 清单
+<a class=anchor href=#api-%e6%b8%85%e5%8d%95>#</a></h2><ul><li><a href=https://gateway-api.sigs.k8s.io/api-types/gatewayclass/>GatewayClass</a></li><li><a href=https://gateway-api.sigs.k8s.io/api-types/gateway/>Gateway</a></li><li><a href=https://gateway-api.sigs.k8s.io/api-types/httproute/>HTTPRoute</a></li><li><a href=https://gateway-api.sigs.k8s.io/api-types/grpcroute/>GRPCRoute</a></li><li><a href=https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/>BackendTLSPolicy</a></li><li><a href=https://gateway-api.sigs.k8s.io/api-types/referencegrant/>ReferenceGrant</a></li></ul><p><img src=https://images.poneding.com/2023/11/202311161115426.png alt=202311161115426.png></p><h2 id=安装-gateway-api>安装 Gateway API
+<a class=anchor href=#%e5%ae%89%e8%a3%85-gateway-api>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 安装最新版 gateway-api CRDs</span>
+</span></span><span style=display:flex><span>export LATEST<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>curl -s https://api.github.com/repos/kubernetes-sigs/gateway-api/releases/latest | jq -r .tag_name<span style=color:#66d9ef>)</span>
+</span></span><span style=display:flex><span>kubectl apply -f https://github.com/nginxinc/nginx-gateway-fabric/releases/download/$LATEST/crds.yaml
+</span></span></code></pre></div><h2 id=安装-gateway-controller>安装 Gateway Controller
+<a class=anchor href=#%e5%ae%89%e8%a3%85-gateway-controller>#</a></h2><p><code>gateway-api</code> 只是定义了一套 API，需要 <code>gateway-controller</code> 来实现这些 API。目前已经有许多厂商实现了 <code>gateway-controller</code>，比如 <code>nginx</code>、<code>envoy</code>、<code>traefik</code> 等。</p><p>下面介绍如何安装
+<a href=https://github.com/nginxinc/nginx-gateway-fabric><code>nginx-gateway-fabric</code></a>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 安装最新版 gateway-controller</span>
+</span></span><span style=display:flex><span>export LATEST<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>curl -s https://api.github.com/repos/nginxinc/nginx-gateway-fabric/releases/latest | jq -r .tag_name<span style=color:#66d9ef>)</span>
+</span></span><span style=display:flex><span>kubectl apply -f https://github.com/nginxinc/nginx-gateway-fabric/releases/download/$LATEST/nginx-gateway.yaml
+</span></span></code></pre></div><p>配置 nginx-gateway 使用主机网络：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl patch deployment nginx-gateway -n nginx-gateway --type<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;json&#39;</span> -p<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;[{&#34;op&#34;: &#34;add&#34;, &#34;path&#34;: &#34;/spec/template/spec/hostNetwork&#34;, &#34;value&#34;: true}]&#39;</span>
+</span></span></code></pre></div><blockquote><p>注意：配置使用主机网络之后，宿主机的 80 端口将被占用，因此一个节点只允许调度一个 nginx-gateway Pod，当更新 nginx-gateway 时，您可能需要先停止旧的 Pod，再启动新的 Pod。</p></blockquote><p>在使用过程中，发现有可能由于宿主机的差异导致 <code>nginx-gateway</code> 健康检查无法通过，Pod 不能正常启动。可以通过修改配置 <code>allowPrivilegeEscalation</code> 字段来解决：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 使用主机网络，端口被占用，需要先停止 nginx-gateway</span>
+</span></span><span style=display:flex><span>kubectl scale deployment nginx-gateway -n nginx-gateway --replicas<span style=color:#f92672>=</span><span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>kubectl patch deployment nginx-gateway -n nginx-gateway --type<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;json&#39;</span> -p<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;[{&#34;op&#34;: &#34;replace&#34;, &#34;path&#34;: &#34;/spec/template/spec/containers/0/securityContext/allowPrivilegeEscalation&#34;, &#34;value&#34;: true}]&#39;</span>
+</span></span><span style=display:flex><span>kubectl scale deployment nginx-gateway -n nginx-gateway --replicas<span style=color:#f92672>=</span><span style=color:#ae81ff>1</span>
+</span></span></code></pre></div><h2 id=实践>实践
+<a class=anchor href=#%e5%ae%9e%e8%b7%b5>#</a></h2><h3 id=简单网关路由>简单网关路由
+<a class=anchor href=#%e7%ae%80%e5%8d%95%e7%bd%91%e5%85%b3%e8%b7%af%e7%94%b1>#</a></h3><p>部署 nginx deployment，并且暴露服务：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl create deployment nginx --image<span style=color:#f92672>=</span>nginx
+</span></span><span style=display:flex><span>kubectl expose deployment nginx --name<span style=color:#f92672>=</span>nginx --port<span style=color:#f92672>=</span><span style=color:#ae81ff>80</span> --target-port<span style=color:#f92672>=</span><span style=color:#ae81ff>80</span>
+</span></span></code></pre></div><p>部署 nginx gateway & httpRoute：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>```</span>bash
+</span></span><span style=display:flex><span>kubectl apply -f - &lt;&lt;EOF
+</span></span><span style=display:flex><span>apiVersion: gateway.networking.k8s.io/v1
+</span></span><span style=display:flex><span>kind: Gateway
+</span></span><span style=display:flex><span>metadata:
+</span></span><span style=display:flex><span>  name: gateway
+</span></span><span style=display:flex><span>spec:
+</span></span><span style=display:flex><span>  gatewayClassName: nginx
+</span></span><span style=display:flex><span>  listeners:
+</span></span><span style=display:flex><span>  - name: http
+</span></span><span style=display:flex><span>    port: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>    protocol: HTTP
+</span></span><span style=display:flex><span>    hostname: <span style=color:#e6db74>&#34;*.mydomain.com&#34;</span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span>apiVersion: gateway.networking.k8s.io/v1
+</span></span><span style=display:flex><span>kind: HTTPRoute
+</span></span><span style=display:flex><span>metadata:
+</span></span><span style=display:flex><span>  name: nginx
+</span></span><span style=display:flex><span>spec:
+</span></span><span style=display:flex><span>  parentRefs:
+</span></span><span style=display:flex><span>  - name: gateway
+</span></span><span style=display:flex><span>    sectionName: http
+</span></span><span style=display:flex><span>  hostnames:
+</span></span><span style=display:flex><span>  - <span style=color:#e6db74>&#34;nginx.mydomain.com&#34;</span>
+</span></span><span style=display:flex><span>  rules:
+</span></span><span style=display:flex><span>  - matches:
+</span></span><span style=display:flex><span>    - path:
+</span></span><span style=display:flex><span>        type: PathPrefix
+</span></span><span style=display:flex><span>        value: /
+</span></span><span style=display:flex><span>    backendRefs:
+</span></span><span style=display:flex><span>    - name: nginx
+</span></span><span style=display:flex><span>      port: <span style=color:#ae81ff>80</span>
+</span></span></code></pre></div><h3 id=tls-网关路由certmanager--lets-encrypt>TLS 网关路由：CertManager + Let&rsquo;s Encrypt
+<a class=anchor href=#tls-%e7%bd%91%e5%85%b3%e8%b7%af%e7%94%b1certmanager--lets-encrypt>#</a></h3><p>特定域名网关：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>apiVersion: cert-manager.io/v1
+</span></span><span style=display:flex><span>kind: ClusterIssuer
+</span></span><span style=display:flex><span>metadata:
+</span></span><span style=display:flex><span>  name: mydomain-cert-issuer
+</span></span><span style=display:flex><span>spec:
+</span></span><span style=display:flex><span>  acme:
+</span></span><span style=display:flex><span>    email: poneding@gmail.com
+</span></span><span style=display:flex><span>    server: https://acme-v02.api.letsencrypt.org/directory
+</span></span><span style=display:flex><span>    privateKeySecretRef:
+</span></span><span style=display:flex><span>      name: mydomain-cert-issuer-account-key
+</span></span><span style=display:flex><span>    solvers:
+</span></span><span style=display:flex><span>    - http01:
+</span></span><span style=display:flex><span>        gatewayHTTPRoute:
+</span></span><span style=display:flex><span>          parentRefs: 
+</span></span><span style=display:flex><span>          - name: nginx-gateway
+</span></span><span style=display:flex><span>            namespace: nginx-gateway
+</span></span><span style=display:flex><span>            kind: Gateway
+</span></span><span style=display:flex><span>      selector:
+</span></span><span style=display:flex><span>        dnsNames:
+</span></span><span style=display:flex><span>        - <span style=color:#e6db74>&#34;nginx.mydomain.com&#34;</span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span>apiVersion: gateway.networking.k8s.io/v1
+</span></span><span style=display:flex><span>kind: Gateway
+</span></span><span style=display:flex><span>metadata:
+</span></span><span style=display:flex><span>  name: nginx-gateway
+</span></span><span style=display:flex><span>  namespace: nginx-gateway
+</span></span><span style=display:flex><span>  annotations:
+</span></span><span style=display:flex><span>    cert-manager.io/cluster-issuer: mydomain-cert-issuer
+</span></span><span style=display:flex><span>spec:
+</span></span><span style=display:flex><span>  gatewayClassName: nginx
+</span></span><span style=display:flex><span>  listeners:
+</span></span><span style=display:flex><span>  - name: nginx-mydomain-https
+</span></span><span style=display:flex><span>    hostname: <span style=color:#e6db74>&#39;nginx.mydomain.com&#39;</span>
+</span></span><span style=display:flex><span>    protocol: HTTPS
+</span></span><span style=display:flex><span>    port: <span style=color:#ae81ff>443</span>
+</span></span><span style=display:flex><span>    allowedRoutes:
+</span></span><span style=display:flex><span>      namespaces:
+</span></span><span style=display:flex><span>        from: All
+</span></span><span style=display:flex><span>    tls:
+</span></span><span style=display:flex><span>      certificateRefs:
+</span></span><span style=display:flex><span>      - group: <span style=color:#e6db74>&#34;&#34;</span>
+</span></span><span style=display:flex><span>        kind: Secret
+</span></span><span style=display:flex><span>        name: nginx-mydomain-https-cert
+</span></span><span style=display:flex><span>      mode: Terminate
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span>apiVersion: gateway.networking.k8s.io/v1
+</span></span><span style=display:flex><span>kind: HTTPRoute
+</span></span><span style=display:flex><span>metadata:
+</span></span><span style=display:flex><span>  name: nginx
+</span></span><span style=display:flex><span>spec:
+</span></span><span style=display:flex><span>  parentRefs:
+</span></span><span style=display:flex><span>  - name: nginx-gateway
+</span></span><span style=display:flex><span>    namespace: nginx-gateway
+</span></span><span style=display:flex><span>    sectionName: nginx-mydomain-https
+</span></span><span style=display:flex><span>  hostnames:
+</span></span><span style=display:flex><span>  - <span style=color:#e6db74>&#34;nginx.mydomain.com&#34;</span>
+</span></span><span style=display:flex><span>  rules:
+</span></span><span style=display:flex><span>  - matches:
+</span></span><span style=display:flex><span>    backendRefs:
+</span></span><span style=display:flex><span>    - name: nginx
+</span></span><span style=display:flex><span>      port: <span style=color:#ae81ff>80</span>
+</span></span></code></pre></div><p>通配符域名（泛域名）网关：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>apiVersion: v1
+</span></span><span style=display:flex><span>kind: Secret
+</span></span><span style=display:flex><span>metadata:
+</span></span><span style=display:flex><span>  name: cloudflare-api-token
+</span></span><span style=display:flex><span>  namespace: cert-manager
+</span></span><span style=display:flex><span>type: Opaque
+</span></span><span style=display:flex><span>stringData:
+</span></span><span style=display:flex><span>  api-token: <span style=color:#f92672>[</span>your_cloudflare_api_token<span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span>apiVersion: cert-manager.io/v1
+</span></span><span style=display:flex><span>kind: ClusterIssuer
+</span></span><span style=display:flex><span>metadata:
+</span></span><span style=display:flex><span>  name: mydomain-cert-issuer
+</span></span><span style=display:flex><span>spec:
+</span></span><span style=display:flex><span>  acme:
+</span></span><span style=display:flex><span>    email: poneding@gmail.com
+</span></span><span style=display:flex><span>    server: https://acme-v02.api.letsencrypt.org/directory
+</span></span><span style=display:flex><span>    privateKeySecretRef:
+</span></span><span style=display:flex><span>      name: mydomain-cert-issuer-account-key
+</span></span><span style=display:flex><span>    solvers:
+</span></span><span style=display:flex><span>    - dns01:
+</span></span><span style=display:flex><span>        cloudflare:
+</span></span><span style=display:flex><span>          apiTokenSecretRef:
+</span></span><span style=display:flex><span>            name: cloudflare-api-token
+</span></span><span style=display:flex><span>            key: api-token
+</span></span><span style=display:flex><span>      selector:
+</span></span><span style=display:flex><span>        dnsNames:
+</span></span><span style=display:flex><span>        - <span style=color:#e6db74>&#34;*.gateway.mydomain.com&#34;</span>
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span>apiVersion: gateway.networking.k8s.io/v1
+</span></span><span style=display:flex><span>kind: Gateway
+</span></span><span style=display:flex><span>metadata:
+</span></span><span style=display:flex><span>  name: nginx-gateway
+</span></span><span style=display:flex><span>  namespace: nginx-gateway
+</span></span><span style=display:flex><span>  annotations:
+</span></span><span style=display:flex><span>    cert-manager.io/cluster-issuer: mydomain-cert-issuer
+</span></span><span style=display:flex><span>spec:
+</span></span><span style=display:flex><span>  gatewayClassName: nginx
+</span></span><span style=display:flex><span>  listeners:
+</span></span><span style=display:flex><span>  <span style=color:#75715e># encrypted by cloudflare</span>
+</span></span><span style=display:flex><span>  - name: wildcard-mydomain-http
+</span></span><span style=display:flex><span>    hostname: <span style=color:#e6db74>&#39;*.mydomain.com&#39;</span>
+</span></span><span style=display:flex><span>    protocol: HTTP
+</span></span><span style=display:flex><span>    port: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>    allowedRoutes:
+</span></span><span style=display:flex><span>      namespaces:
+</span></span><span style=display:flex><span>        from: All
+</span></span><span style=display:flex><span>  - name: wildcard-gateway-mydomain-http
+</span></span><span style=display:flex><span>    hostname: <span style=color:#e6db74>&#39;*.gateway.mydomain.com&#39;</span>
+</span></span><span style=display:flex><span>    protocol: HTTP
+</span></span><span style=display:flex><span>    port: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>    allowedRoutes:
+</span></span><span style=display:flex><span>      namespaces:
+</span></span><span style=display:flex><span>        from: All
+</span></span><span style=display:flex><span>  - name: wildcard-gateway-mydomain-https
+</span></span><span style=display:flex><span>    hostname: <span style=color:#e6db74>&#39;*.gateway.mydomain.com&#39;</span>
+</span></span><span style=display:flex><span>    protocol: HTTPS
+</span></span><span style=display:flex><span>    port: <span style=color:#ae81ff>443</span>
+</span></span><span style=display:flex><span>    allowedRoutes:
+</span></span><span style=display:flex><span>      namespaces:
+</span></span><span style=display:flex><span>        from: All
+</span></span><span style=display:flex><span>    tls:
+</span></span><span style=display:flex><span>      certificateRefs:
+</span></span><span style=display:flex><span>      - group: <span style=color:#e6db74>&#34;&#34;</span>
+</span></span><span style=display:flex><span>        kind: Secret
+</span></span><span style=display:flex><span>        name: wildcard-gateway-mydomain-cert
+</span></span><span style=display:flex><span>      mode: Terminate
+</span></span><span style=display:flex><span>---
+</span></span><span style=display:flex><span>apiVersion: gateway.networking.k8s.io/v1
+</span></span><span style=display:flex><span>kind: HTTPRoute
+</span></span><span style=display:flex><span>metadata:
+</span></span><span style=display:flex><span>  name: nginx
+</span></span><span style=display:flex><span>spec:
+</span></span><span style=display:flex><span>  parentRefs:
+</span></span><span style=display:flex><span>  - name: nginx-gateway
+</span></span><span style=display:flex><span>    namespace: nginx-gateway
+</span></span><span style=display:flex><span>    sectionName: wildcard-gateway-mydomain-https
+</span></span><span style=display:flex><span>  hostnames:
+</span></span><span style=display:flex><span>  - <span style=color:#e6db74>&#34;nginx.gateway.mydomain.com&#34;</span>
+</span></span><span style=display:flex><span>  rules:
+</span></span><span style=display:flex><span>  - matches:
+</span></span><span style=display:flex><span>    backendRefs:
+</span></span><span style=display:flex><span>    - name: nginx
+</span></span><span style=display:flex><span>      port: <span style=color:#ae81ff>80</span>
+</span></span></code></pre></div><hr><p><a href=/kubernetes/delete-k8s-resource-force/>« 强制删除 K8s 资源</a></p><p><a href=/kubernetes/helm-k8s-package-management-tool/>» Kubernetes 0-1 Helm Kubernetes 的包管理工具</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/kubernetes/gateway-api-practice.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#gateway-api-概述>Gateway API 概述</a></li><li><a href=#api-清单>API 清单</a></li><li><a href=#安装-gateway-api>安装 Gateway API</a></li><li><a href=#安装-gateway-controller>安装 Gateway Controller</a></li><li><a href=#实践>实践</a><ul><li><a href=#简单网关路由>简单网关路由</a></li><li><a href=#tls-网关路由certmanager--lets-encrypt>TLS 网关路由：CertManager + Let&rsquo;s Encrypt</a></li></ul></li></ul></nav></div></aside></main></body></html>

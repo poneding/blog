@@ -1,0 +1,79 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / Docker / Docker Compose 实践
+Docker Compose 实践 # 安装 # 如果你安装了 Docker Desktop，那么它已经帮你自动安装了 Docker Compose 插件。否则，需要额外安装插件。
+使用一下命令安装或升级 Docker Compose（linux）：
+Ubuntu，Debian： sudo apt update sudo apt install docker-compose-plugin 基于 RPM 发行版: sudo yum update sudo yum install docker-compose-plugin 验证安装版本：
+docker-compose version 常用命令 # 运行
+docker-compose up 查看运行
+docker-compose ps 停止
+docker-compose stop 启动&重启
+docker-compose start docker-compose restart 退出
+docker-compose down 使用 docker-compose -h 查看更多命令及参数。
+实践 # 使用 Docker Compose 运行一个简单的 golang web 程序。"><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/docker/docker-compose-practice/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / Docker / Docker Compose 实践
+Docker Compose 实践 # 安装 # 如果你安装了 Docker Desktop，那么它已经帮你自动安装了 Docker Compose 插件。否则，需要额外安装插件。
+使用一下命令安装或升级 Docker Compose（linux）：
+Ubuntu，Debian： sudo apt update sudo apt install docker-compose-plugin 基于 RPM 发行版: sudo yum update sudo yum install docker-compose-plugin 验证安装版本：
+docker-compose version 常用命令 # 运行
+docker-compose up 查看运行
+docker-compose ps 停止
+docker-compose stop 启动&重启
+docker-compose start docker-compose restart 退出
+docker-compose down 使用 docker-compose -h 查看更多命令及参数。
+实践 # 使用 Docker Compose 运行一个简单的 golang web 程序。"><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="docker"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Docker Compose Practice | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/docker/docker-compose-practice/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Docker Compose Practice</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#安装>安装</a></li><li><a href=#常用命令>常用命令</a></li><li><a href=#实践>实践</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/docker/>Docker</a> / Docker Compose 实践</p><h1 id=docker-compose-实践>Docker Compose 实践
+<a class=anchor href=#docker-compose-%e5%ae%9e%e8%b7%b5>#</a></h1><h2 id=安装>安装
+<a class=anchor href=#%e5%ae%89%e8%a3%85>#</a></h2><p>如果你安装了 <code>Docker Desktop</code>，那么它已经帮你自动安装了 <code>Docker Compose</code> 插件。否则，需要额外安装插件。</p><p>使用一下命令安装或升级 <code>Docker Compose</code>（linux）：</p><ul><li>Ubuntu，Debian：</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>sudo apt update
+</span></span><span style=display:flex><span>sudo apt install docker-compose-plugin
+</span></span></code></pre></div><ul><li>基于 RPM 发行版:</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>sudo yum update
+</span></span><span style=display:flex><span>sudo yum install docker-compose-plugin
+</span></span></code></pre></div><p>验证安装版本：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker-compose version
+</span></span></code></pre></div><h2 id=常用命令>常用命令
+<a class=anchor href=#%e5%b8%b8%e7%94%a8%e5%91%bd%e4%bb%a4>#</a></h2><p>运行</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker-compose up
+</span></span></code></pre></div><p>查看运行</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker-compose ps
+</span></span></code></pre></div><p>停止</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker-compose stop
+</span></span></code></pre></div><p>启动&重启</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker-compose start
+</span></span><span style=display:flex><span>docker-compose restart
+</span></span></code></pre></div><p>退出</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker-compose down
+</span></span></code></pre></div><p>使用 <code>docker-compose -h</code> 查看更多命令及参数。</p><h2 id=实践>实践
+<a class=anchor href=#%e5%ae%9e%e8%b7%b5>#</a></h2><p>使用 <code>Docker Compose</code> 运行一个简单的 golang web 程序。</p><ol><li>程序初始化</li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>mkdir docker-compose-go-demo
+</span></span><span style=display:flex><span>cd docker-compose-go-demo
+</span></span><span style=display:flex><span>go mod init docker-compose-go-demo
+</span></span></code></pre></div><ol start=2><li>创建 <code>main.go</code> 文件，并写入程序代码</li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-golang data-lang=golang><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;fmt&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;net/http&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;time&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>greet</span>(<span style=color:#a6e22e>w</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>ResponseWriter</span>, <span style=color:#a6e22e>r</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Request</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Fprintf</span>(<span style=color:#a6e22e>w</span>, <span style=color:#e6db74>&#34;Hello Docker Compose! %s&#34;</span>, <span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Now</span>())
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>HandleFunc</span>(<span style=color:#e6db74>&#34;/&#34;</span>, <span style=color:#a6e22e>greet</span>)
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>ListenAndServe</span>(<span style=color:#e6db74>&#34;:8080&#34;</span>, <span style=color:#66d9ef>nil</span>)
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><ol start=3><li>创建 <code>Dockerfile</code> 文件，并编写内容</li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-dockerfile data-lang=dockerfile><span style=display:flex><span><span style=color:#66d9ef>FROM</span><span style=color:#e6db74> golang:alpine</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span><span style=color:#66d9ef>WORKDIR</span><span style=color:#e6db74> /app</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span><span style=color:#66d9ef>COPY</span> . .<span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span><span style=color:#66d9ef>EXPOSE</span><span style=color:#e6db74> 8080</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span><span style=color:#66d9ef>ENTRYPOINT</span> [ <span style=color:#e6db74>&#34;go&#34;</span>,<span style=color:#e6db74>&#34;run&#34;</span>,<span style=color:#e6db74>&#34;main.go&#34;</span> ]<span style=color:#960050;background-color:#1e0010>
+</span></span></span></code></pre></div><ol start=4><li>创建 <code>docker-comppose.yml</code> 文件，并编写内容</li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>version</span>: <span style=color:#e6db74>&#34;3.9&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>services</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>web</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>build</span>: <span style=color:#ae81ff>.</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># image: docker-compose-go-demo_web:v1</span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># image: docker-compose-go-demo_web:v2</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#e6db74>&#34;8080:8080&#34;</span>
+</span></span></code></pre></div><ol start=5><li>启动服务</li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker-compose up -d
+</span></span></code></pre></div><p>场景：</p><ul><li>web 服务业务代码修改了，希望不停机更新服务：</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker-compose up -d --build
+</span></span></code></pre></div><ul><li>包含多个服务，例如中间件，但只想重新编译其中业务服务，如 web：</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker-compose up -d --no-deps --build web
+</span></span></code></pre></div><blockquote><p>如果 <code>docker-compose.yml</code> 直接使用的镜像，那么直接更新，再次 <code>docker-compose up -d</code> 即可。</p></blockquote><hr><p><a href=/docker/docker-commands/>« Docker 常用命令</a></p><p><a href=/docker/docker-container-install-pfx-cert/>» Docker 容器中安装 PFX 证书</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/docker/docker-compose-practice.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#安装>安装</a></li><li><a href=#常用命令>常用命令</a></li><li><a href=#实践>实践</a></li></ul></nav></div></aside></main></body></html>

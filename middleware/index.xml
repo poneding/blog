@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>我的博客</title><link>https://blog.poneding.com/middleware/</link><description>Recent content on 我的博客</description><generator>Hugo</generator><language>cn</language><atom:link href="https://blog.poneding.com/middleware/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>https://blog.poneding.com/middleware/elasticsearch/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/middleware/elasticsearch/</guid><description>我的博客 / 数据中间件 / Elasticsearch
+Elasticsearch # 全文搜索
+API # 题外话：
+幂等性：多次执行同样的请求，资源只能创建或修改一次
+POST 请求不是幂等性的，同样的数据请求，会造成不同的影响
+PUT 是幂等性的，同样的请求造成的影响是一样的
+创建索引 # PUT /users 查询索引 # 获取单个索引
+GET /users 获取所有索引
+GET /_cat/indices?v 删除索引 # DELETE /users 创建文档 # 这个操作是在单个索引下的
+POST /users/_doc # 一定需要body，否则报错 body: { &amp;#34;name&amp;#34;: &amp;#34;dp&amp;#34;, &amp;#34;age&amp;#34;: 18 } 上面这个文档创建时会生成随机 ID（返回结果中的 _id），不便维护，使用下面的方法自定义文档 ID，此时由于 ID 自定义了，就要求幂等，所以可以使用 PUT 方法
+POST | PUT /users/_doc/1002 PUT /users/_create/1003 # 一定需要body，否则报错 body: { &amp;#34;name&amp;#34;: &amp;#34;dp&amp;#34;, &amp;#34;age&amp;#34;: 18 } 查询文档 # 获取单个文档</description></item><item><title/><link>https://blog.poneding.com/middleware/mongodb/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/middleware/mongodb/</guid><description>我的博客 / 数据中间件 / MongoDB
+MongoDB # 资料 # http://cw.hubwiz.com/card/c/543b2f3cf86387171814c026/1/1/1/ http://cw.hubwiz.com/card/c/5438c259032c7817c40298b5/1/1/1/ 安装 # 按照官网给出的指南在 ubuntu 系统安装 mongod，参考 https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+验证 mongo 是否安装成功：进入 ubuntu shell 窗口，直接输入
+mongo --version 窗口正常输出 mongo 版本就说明 mongo 安装成功
+启动 mongo 服务
+sudo systemctl statt mongod #/stop/restart 创建 dba 用户并添加权限验证
+mongodb 没有开启权限验证之前，使用 mongo 命令可以直接连接本地 mongodb；
+sudo mongo 使用 db.createUser 命令创建 dba 用户,为 dba 用户添加所有 database 的管理员权限；
+&amp;gt; db.createUser({user:&amp;#34;dba&amp;#34;,pwd:&amp;#34;[your pass]&amp;#34;,roles:[ {role:&amp;#34;readWriteAnyDatabase&amp;#34;,db:&amp;#34;admin&amp;#34;},{role:&amp;#34;dbAdminAnyDatabase&amp;#34;,db:&amp;#34;admin&amp;#34;},{role:&amp;#34;userAdminAnyDatabase&amp;#34;,db:&amp;#34;admin&amp;#34;},{role:&amp;#34;clusterAdmin&amp;#34;,db:&amp;#34;admin&amp;#34;},{role:&amp;#34;restore&amp;#34;,db:&amp;#34;admin&amp;#34;},{role:&amp;#34;backup&amp;#34;,db:&amp;#34;admin&amp;#34;} ]}) Successfully added user: { &amp;#34;user&amp;#34; : &amp;#34;dba&amp;#34;, &amp;#34;roles&amp;#34; : [ // .</description></item><item><title/><link>https://blog.poneding.com/middleware/mysql/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/middleware/mysql/</guid><description>我的博客 / 数据中间件 / MySQL
+MySQL # 安装 # Windows 安装 MySQL # 下载 Mysql 安装包： https://dev.mysql.com/downloads/installer/
+下载完成后，双击 msi 文件安装。
+Ubuntu 安装 MySQL # sudo apt update sudo apt install mysql-server -y # 只安装 mysql 客户端 sudo apt install mysql-client -y Docker 安装 MySQL # docker run -d --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql:5.7 Troubleshooting # Q1. root 用户本地登录 # 使用命令 mysql -u root -p，输入密码后登录失败，提示如下：
+Access denied for user &amp;#39;root&amp;#39;@&amp;#39;localhost&amp;#39; 解决方案：：</description></item><item><title/><link>https://blog.poneding.com/middleware/postgres/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/middleware/postgres/</guid><description>我的博客 / 数据中间件 / Postgres
+Postgres # 自增 Id 数据插入权限
+GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO &amp;lt;user_name&amp;gt;; 修改用户密码
+alter user postgres with password &amp;#39;admin123&amp;#39;; « MySQL
+» Redis</description></item><item><title/><link>https://blog.poneding.com/middleware/redis/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/middleware/redis/</guid><description>我的博客 / 数据中间件 / Redis
+Redis # 安装 # Docker 安装 redis # sudo docker run --name redis-01 \ -p 2501:6379 \ -v /home/dp/apps/redis/redis-01/conf/redis.conf:/etc/redis/redis.conf \ -v /home/dp/apps/redis/redis-01/data:/data \ -d \ redis:6.0 redis-server /etc/redis/redis.conf --appendonly yes redis.conf 是配置文件 redis-server /etc/redis/redis.conf，启用配置，如果没有 redis-server 则 redis 默认是无配置启动 &amp;ndash;appendonly yes 启用数据持久化 redis.conf 参照：
+bind 127.0.0.1 # 注释掉这部分，使 redis 可以外部访问 daemonize no # 用守护线程的方式启动 requirepass your_pwd # 给 redis 设置密码 appendonly yes # redis 持久化　默认是 no tcp-keepalive 300 # 防止出现远程主机强迫关闭了一个现有的连接的错误 默认是 300 « Postgres</description></item></channel></rss>

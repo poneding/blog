@@ -1,0 +1,154 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / 前端技术 / VitePress
+VitePress # 搭建项目 # mkdir vitepress-demo npm add -D vitepress npx vitepress init 运行 # npm run docs:dev # 或者直接调用 VitePress npx vitepress dev docs 打包 # npm run docs:build GitHub Action # .github/workflows/deploy.yaml
+# 构建 VitePress 站点并将其部署到 GitHub Pages 的示例工作流程 # name: Deploy VitePress site to Pages on: # 在针对 `main` 分支的推送上运行。如果你 # 使用 `master` 分支作为默认分支，请将其更改为 `master` push: branches: [master] # 允许你从 Actions 选项卡手动运行此工作流程 workflow_dispatch: # 设置 GITHUB_TOKEN 的权限，以允许部署到 GitHub Pages permissions: contents: read pages: write id-token: write # 只允许同时进行一次部署，跳过正在运行和最新队列之间的运行队列 # 但是，不要取消正在进行的运行，因为我们希望允许这些生产部署完成 concurrency: group: pages cancel-in-progress: false jobs: # 构建工作 build: runs-on: ubuntu-latest steps: - name: Checkout uses: actions/checkout@v4 with: fetch-depth: 0 # 如果未启用 lastUpdated，则不需要 # - uses: pnpm/action-setup@v3 # 如果使用 pnpm，请取消注释 # - uses: oven-sh/setup-bun@v1 # 如果使用 Bun，请取消注释 - name: Setup Node uses: actions/setup-node@v4 with: node-version: 20 cache: npm # 或 pnpm / yarn - name: Setup Pages uses: actions/configure-pages@v4 - name: Install dependencies run: npm ci # 或 pnpm install / yarn install / bun install - name: Build with VitePress run: npm run docs:build # 或 pnpm docs:build / yarn docs:build / bun run docs:build - name: Upload artifact uses: actions/upload-pages-artifact@v3 with: path: ."><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/front-end/vitepress/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / 前端技术 / VitePress
+VitePress # 搭建项目 # mkdir vitepress-demo npm add -D vitepress npx vitepress init 运行 # npm run docs:dev # 或者直接调用 VitePress npx vitepress dev docs 打包 # npm run docs:build GitHub Action # .github/workflows/deploy.yaml
+# 构建 VitePress 站点并将其部署到 GitHub Pages 的示例工作流程 # name: Deploy VitePress site to Pages on: # 在针对 `main` 分支的推送上运行。如果你 # 使用 `master` 分支作为默认分支，请将其更改为 `master` push: branches: [master] # 允许你从 Actions 选项卡手动运行此工作流程 workflow_dispatch: # 设置 GITHUB_TOKEN 的权限，以允许部署到 GitHub Pages permissions: contents: read pages: write id-token: write # 只允许同时进行一次部署，跳过正在运行和最新队列之间的运行队列 # 但是，不要取消正在进行的运行，因为我们希望允许这些生产部署完成 concurrency: group: pages cancel-in-progress: false jobs: # 构建工作 build: runs-on: ubuntu-latest steps: - name: Checkout uses: actions/checkout@v4 with: fetch-depth: 0 # 如果未启用 lastUpdated，则不需要 # - uses: pnpm/action-setup@v3 # 如果使用 pnpm，请取消注释 # - uses: oven-sh/setup-bun@v1 # 如果使用 Bun，请取消注释 - name: Setup Node uses: actions/setup-node@v4 with: node-version: 20 cache: npm # 或 pnpm / yarn - name: Setup Pages uses: actions/configure-pages@v4 - name: Install dependencies run: npm ci # 或 pnpm install / yarn install / bun install - name: Build with VitePress run: npm run docs:build # 或 pnpm docs:build / yarn docs:build / bun run docs:build - name: Upload artifact uses: actions/upload-pages-artifact@v3 with: path: ."><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="front-end"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Vitepress | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/front-end/vitepress/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Vitepress</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#搭建项目>搭建项目</a></li><li><a href=#运行>运行</a></li><li><a href=#打包>打包</a></li><li><a href=#github-action>GitHub Action</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/front-end/>前端技术</a> / VitePress</p><h1 id=vitepress>VitePress
+<a class=anchor href=#vitepress>#</a></h1><h2 id=搭建项目>搭建项目
+<a class=anchor href=#%e6%90%ad%e5%bb%ba%e9%a1%b9%e7%9b%ae>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>mkdir vitepress-demo
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>npm add -D vitepress
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>npx vitepress init
+</span></span></code></pre></div><h2 id=运行>运行
+<a class=anchor href=#%e8%bf%90%e8%a1%8c>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>npm run docs:dev
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 或者直接调用 VitePress</span>
+</span></span><span style=display:flex><span>npx vitepress dev docs
+</span></span></code></pre></div><h2 id=打包>打包
+<a class=anchor href=#%e6%89%93%e5%8c%85>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>npm run docs:build
+</span></span></code></pre></div><h2 id=github-action>GitHub Action
+<a class=anchor href=#github-action>#</a></h2><p><em>.github/workflows/deploy.yaml</em></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 构建 VitePress 站点并将其部署到 GitHub Pages 的示例工作流程</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>name: Deploy VitePress site to Pages
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>on:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 在针对 `main` 分支的推送上运行。如果你</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 使用 `master` 分支作为默认分支，请将其更改为 `master`</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>push:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>branches: <span style=color:#f92672>[</span>master<span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 允许你从 Actions 选项卡手动运行此工作流程</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>workflow_dispatch:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 设置 GITHUB_TOKEN 的权限，以允许部署到 GitHub Pages</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>permissions:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>contents: read
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>pages: write
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>id-token: write
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 只允许同时进行一次部署，跳过正在运行和最新队列之间的运行队列</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 但是，不要取消正在进行的运行，因为我们希望允许这些生产部署完成</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>concurrency:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>group: pages
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>cancel-in-progress: false
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>jobs:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 构建工作</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>build:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>runs-on: ubuntu-latest
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>steps:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- name: Checkout
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>uses: actions/checkout@v4
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>with:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>fetch-depth: <span style=color:#ae81ff>0</span> <span style=color:#75715e># 如果未启用 lastUpdated，则不需要</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># - uses: pnpm/action-setup@v3 # 如果使用 pnpm，请取消注释</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># - uses: oven-sh/setup-bun@v1 # 如果使用 Bun，请取消注释</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- name: Setup Node
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>uses: actions/setup-node@v4
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>with:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>node-version: <span style=color:#ae81ff>20</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>cache: npm <span style=color:#75715e># 或 pnpm / yarn</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- name: Setup Pages
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>uses: actions/configure-pages@v4
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- name: Install dependencies
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>run: npm ci <span style=color:#75715e># 或 pnpm install / yarn install / bun install</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- name: Build with VitePress
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>run: npm run docs:build <span style=color:#75715e># 或 pnpm docs:build / yarn docs:build / bun run docs:build</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- name: Upload artifact
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>uses: actions/upload-pages-artifact@v3
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>with:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>path: .vitepress/dist
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 部署工作</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>deploy:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>environment:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>name: github-pages
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>url: <span style=color:#e6db74>${</span>{ steps.deployment.outputs.page_url <span style=color:#e6db74>}</span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>needs: build
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>runs-on: ubuntu-latest
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>name: Deploy
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>steps:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- name: Deploy to GitHub Pages
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>id: deployment
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>uses: actions/deploy-pages@v4
+</span></span></code></pre></div><blockquote><p>需要该 GitHub 仓库开启 Action 并且配置 GITHUB_TOKEN。</p></blockquote><hr><p><a href=/front-end/pinia/>« Pinia 入门</a></p><p><a href=/front-end/vue3/>» 认识Vue3</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/front-end/vitepress.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#搭建项目>搭建项目</a></li><li><a href=#运行>运行</a></li><li><a href=#打包>打包</a></li><li><a href=#github-action>GitHub Action</a></li></ul></nav></div></aside></main></body></html>

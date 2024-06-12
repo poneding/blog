@@ -1,0 +1,1145 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>我的博客</title><link>https://blog.poneding.com/</link><description>Recent content on 我的博客</description><generator>Hugo</generator><language>cn</language><atom:link href="https://blog.poneding.com/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>https://blog.poneding.com/algo/%E5%A0%86%E6%8E%92%E5%BA%8F/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/algo/%E5%A0%86%E6%8E%92%E5%BA%8F/</guid><description>我的博客 / 数据结构与算法 / 堆排序
+堆排序 # 堆排序是利用堆这种数据结构而设计的一种排序算法，堆排序是一种**选择排序，**它的最坏，最好，平均时间复杂度均为 O(nlogn)，它也是不稳定排序。首先简单了解下堆结构。
+堆 # 堆是具有以下性质的完全二叉树：每个结点的值都大于或等于其左右孩子结点的值，称为大顶堆；或者每个结点的值都小于或等于其左右孩子结点的值，称为小顶堆。：
+算法实现（golang） # package main import &amp;#34;fmt&amp;#34; type BinaryTreeNode struct { Value int Left, Right *BinaryTreeNode } func main() { tree := &amp;amp;BinaryTreeNode{ Left: &amp;amp;BinaryTreeNode{ Left: &amp;amp;BinaryTreeNode{ Value: 1, }, Right: &amp;amp;BinaryTreeNode{ Value: 2, }, Value: 3, }, Right: &amp;amp;BinaryTreeNode{ Value: 4, }, Value: 5, } res := HeapSort(tree) fmt.Println(res) } func HeapSort(tree *BinaryTreeNode) []int { var res []int if tree == nil { return []int{} } res = heapSortHelper(tree, res) return res } func heapSortHelper(tree *BinaryTreeNode, res []int) []int { if tree.</description></item><item><title/><link>https://blog.poneding.com/algo/%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/algo/%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F/</guid><description>我的博客 / 数据结构与算法 / 快速排序
+快速排序 # 步骤如下：
+先从数列中取出一个数作为基准数。一般取第一个数。 分区过程，将比这个数大的数全放到它的右边，小于或等于它的数全放到它的左边。 再对左右区间重复第二步，直到各区间只有一个数。 举一个例子：5 9 1 6 8 14 6 49 25 4 6 3。
+一般取第一个数 5 作为基准，从它左边和最后一个数使用[]进行标志， 如果左边的数比基准数大，那么该数要往右边扔，也就是两个[]数交换，这样大于它的数就在右边了，然后右边[]数左移，否则左边[]数右移。 5 [9] 1 6 8 14 6 49 25 4 6 [3] 因为 9 &amp;gt; 5，两个[]交换位置后，右边[]左移 5 [3] 1 6 8 14 6 49 25 4 [6] 9 因为 3 !&amp;gt; 5，两个[]不需要交换，左边[]右移 5 3 [1] 6 8 14 6 49 25 4 [6] 9 因为 1 !</description></item><item><title/><link>https://blog.poneding.com/aws/build-eks-cluster/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/aws/build-eks-cluster/</guid><description>我的博客 / AWS / 搭建EKS集群
+搭建EKS集群 # 安装aws，kubectl和eksctl命令行工具 # 引言 # 安装aws cli 安装kubectl cli 安装eksctl cli 安装aws cli # 参考 # https://docs.aws.amazon.com/zh_cn/cli/latest/userguide/cli-chap-install.html
+安装示例（windows） # 下载安装包： https://awscli.amazonaws.com/AWSCLIV2.msi 运行下载的安装包 确实安装是否成功 aws --version 使用Security Credentials配置aws cli # 访问aws控制台：Service =&amp;gt; IAM 选择IAM User，使用子用户，强烈不建议使用root用户 进入用户详情页面，Security Credentials页 创建Access Key 拷贝Access Key ID和Secret Access Key 使用aws命令配置 $ aws configure AWS Access Key ID [None]: ABCDEFGHIAZBERTUCNGG (替换Access Key ID) AWS Secret Access Key [None]: uMe7fumK1IdDB094q2sGFhM5Bqt3HQRw3IHZzBDTm (替换Secret Access Key) Default region name [None]: us-east-1 Default output format [None]: json 测试配置是否生效 aws ec2 describe-vpcs 卸载（windows） # 控制面板 =&amp;gt; 程序和功能，找到aws cli，卸载即可。 安装kubectl cli # 如果你确实是使用EKS的Kubernetes，建议使用aws提供的kubectl命令工具。</description></item><item><title/><link>https://blog.poneding.com/aws/cluster-autoscaler/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/aws/cluster-autoscaler/</guid><description>我的博客 / AWS / Cluster AutoScaler
+Cluster AutoScaler # 我当前已经有了一个EKS服务搭建起来的K8s集群，我现在希望我的集群拥有自动伸缩（体现在节点的扩缩）的能力。
+当我的集群资源充足，而我部署在集群中的应用只使用到了很少量的资源，我希望集群回收资源以节省费用；当我的应用服务越来越多，当前集群资源不足时，我希望集群能增加节点，以满足应用的部署条件。
+那么本篇就是介绍如何通过使用Kubernetes Cluster Autoscaler让你的集群拥有自动伸缩的能力，而不用你时刻关注集群的资源是否过于宽松或紧张。
+NodeGroup添加Tag # 我们创建EKS时，需要定义NodeGroup，一般在这个NodeGroup中定义:
+asg_desired_capacity：期望创建的Node数量；
+asg_max_size：最小Node数量，默认为1；
+asg_min_size：最大Node数量。
+定义的NodeGroup会生成Auto Scaling Group资源，并且由Auto Scaling Group来管理Node的创建。
+现在需要做的就是为你的Auto Scaling Group添加Tag。
+tag键值：
+Tag Key Tag Value k8s.io/cluster-autoscaler/&amp;lt;your_cluster_name&amp;gt; owned k8s.io/cluster-autoscaler/enabled true 第一个Tag Key中的集群名&amp;lt;your_cluster_name&amp;gt;需要替换；
+Tag Value的值是什么不重要，主要是需要这两个Tag Key来识别是否对这个集群开启Auto Scaling的能力。
+添加Policy # 创建IAM策略，将新创建的策略Attach到集群节点绑定的IAM role上，让你的集群节点拥有自动伸缩的能力。
+IAM策略Json内容：
+{ &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Action&amp;#34;: [ &amp;#34;autoscaling:DescribeAutoScalingGroups&amp;#34;, &amp;#34;autoscaling:DescribeAutoScalingInstances&amp;#34;, &amp;#34;autoscaling:DescribeLaunchConfigurations&amp;#34;, &amp;#34;autoscaling:DescribeTags&amp;#34;, &amp;#34;autoscaling:SetDesiredCapacity&amp;#34;, &amp;#34;autoscaling:TerminateInstanceInAutoScalingGroup&amp;#34;, &amp;#34;ec2:DescribeLaunchTemplateVersions&amp;#34; ], &amp;#34;Resource&amp;#34;: &amp;#34;*&amp;#34;, &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34; } ] } 部署Cluster AutoScaler # 在集群中部署Cluster AutoScaler，准备资源清单文件cluster-autoscaler.</description></item><item><title/><link>https://blog.poneding.com/aws/create-eks-cluster/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/aws/create-eks-cluster/</guid><description>我的博客 / AWS / 创建 EKS 集群
+创建 EKS 集群 # 1. EKS简介 # Amazon Elastic Kubernetes Service (Amazon EKS) 是一项托管服务，可让您在 AWS 上轻松运行 Kubernetes，而无需支持或维护您自己的 Kubernetes 控制层面。Kubernetes 是一个用于实现容器化应用程序的部署、扩展和管理的自动化的开源系统。（该段介绍来自Amazon EKS文档，更多了解 https://docs.aws.amazon.com/zh_cn/eks/latest/userguide/what-is-eks.html）
+2. eksctl创建eks集群 # 2.1 什么是eksctl # eksctl是一种用于在 Amazon EKS 上创建和管理 Kubernetes 集群的简单命令行实用程序。eksctl 命令行实用程序提供了使用工作线程节点为 Amazon EKS 创建新集群的最快、最简单的方式。
+eksctl更多了解 https://eksctl.io
+2.2 为什么用eksctl # 创建EKS集群可以在AWS的控制台创建，也可以使用AWS开发的eksctl工具创建，为什么选择使用eksctl创建eks集群呢，有以下几点原因：
+直接在AWS的控制台创建集群，需要手动创建各种Role，以及选择合适的Subnet，Security Group等繁杂操作，你需要在浏览器中打开多个页面，操作过程可能也要时不时参阅文档； eksctl创建EKS集群只需要一行eksctl create cluster &amp;lt;参数&amp;gt;命令即可，会自动的给你创建Role等资源； eksctl的命令可以记录到脚本，便于复用。 2.3 安装eksctl（基于ubuntu） # 使用以下命令下载并提取最新版本的 eksctl。 curl --silent --location &amp;#34;https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz&amp;#34; | tar xz -C /tmp 将提取的二进制文件移至 /usr/local/bin。 sudo mv /tmp/eksctl /usr/local/bin 使用以下命令测试您的安装是否成功。 eksctl version 注意：</description></item><item><title/><link>https://blog.poneding.com/aws/eks-config-alb-ingress/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/aws/eks-config-alb-ingress/</guid><description>我的博客 / AWS / EKS配置 ALB Ingress
+EKS配置 ALB Ingress # 官方文档： https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/controller/installation/
+部署Alb Ingress Controller # IAM中创建Policy，给集群的Node节点的Role添加该Policy。
+Policy的JSON配置如下：
+{ &amp;#34;Version&amp;#34;: &amp;#34;2012-10-17&amp;#34;, &amp;#34;Statement&amp;#34;: [ { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;acm:DescribeCertificate&amp;#34;, &amp;#34;acm:ListCertificates&amp;#34;, &amp;#34;acm:GetCertificate&amp;#34; ], &amp;#34;Resource&amp;#34;: &amp;#34;*&amp;#34; }, { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;ec2:AuthorizeSecurityGroupIngress&amp;#34;, &amp;#34;ec2:CreateSecurityGroup&amp;#34;, &amp;#34;ec2:CreateTags&amp;#34;, &amp;#34;ec2:DeleteTags&amp;#34;, &amp;#34;ec2:DeleteSecurityGroup&amp;#34;, &amp;#34;ec2:DescribeAccountAttributes&amp;#34;, &amp;#34;ec2:DescribeAddresses&amp;#34;, &amp;#34;ec2:DescribeInstances&amp;#34;, &amp;#34;ec2:DescribeInstanceStatus&amp;#34;, &amp;#34;ec2:DescribeInternetGateways&amp;#34;, &amp;#34;ec2:DescribeNetworkInterfaces&amp;#34;, &amp;#34;ec2:DescribeSecurityGroups&amp;#34;, &amp;#34;ec2:DescribeSubnets&amp;#34;, &amp;#34;ec2:DescribeTags&amp;#34;, &amp;#34;ec2:DescribeVpcs&amp;#34;, &amp;#34;ec2:ModifyInstanceAttribute&amp;#34;, &amp;#34;ec2:ModifyNetworkInterfaceAttribute&amp;#34;, &amp;#34;ec2:RevokeSecurityGroupIngress&amp;#34; ], &amp;#34;Resource&amp;#34;: &amp;#34;*&amp;#34; }, { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;elasticloadbalancing:AddListenerCertificates&amp;#34;, &amp;#34;elasticloadbalancing:AddTags&amp;#34;, &amp;#34;elasticloadbalancing:CreateListener&amp;#34;, &amp;#34;elasticloadbalancing:CreateLoadBalancer&amp;#34;, &amp;#34;elasticloadbalancing:CreateRule&amp;#34;, &amp;#34;elasticloadbalancing:CreateTargetGroup&amp;#34;, &amp;#34;elasticloadbalancing:DeleteListener&amp;#34;, &amp;#34;elasticloadbalancing:DeleteLoadBalancer&amp;#34;, &amp;#34;elasticloadbalancing:DeleteRule&amp;#34;, &amp;#34;elasticloadbalancing:DeleteTargetGroup&amp;#34;, &amp;#34;elasticloadbalancing:DeregisterTargets&amp;#34;, &amp;#34;elasticloadbalancing:DescribeListenerCertificates&amp;#34;, &amp;#34;elasticloadbalancing:DescribeListeners&amp;#34;, &amp;#34;elasticloadbalancing:DescribeLoadBalancers&amp;#34;, &amp;#34;elasticloadbalancing:DescribeLoadBalancerAttributes&amp;#34;, &amp;#34;elasticloadbalancing:DescribeRules&amp;#34;, &amp;#34;elasticloadbalancing:DescribeSSLPolicies&amp;#34;, &amp;#34;elasticloadbalancing:DescribeTags&amp;#34;, &amp;#34;elasticloadbalancing:DescribeTargetGroups&amp;#34;, &amp;#34;elasticloadbalancing:DescribeTargetGroupAttributes&amp;#34;, &amp;#34;elasticloadbalancing:DescribeTargetHealth&amp;#34;, &amp;#34;elasticloadbalancing:ModifyListener&amp;#34;, &amp;#34;elasticloadbalancing:ModifyLoadBalancerAttributes&amp;#34;, &amp;#34;elasticloadbalancing:ModifyRule&amp;#34;, &amp;#34;elasticloadbalancing:ModifyTargetGroup&amp;#34;, &amp;#34;elasticloadbalancing:ModifyTargetGroupAttributes&amp;#34;, &amp;#34;elasticloadbalancing:RegisterTargets&amp;#34;, &amp;#34;elasticloadbalancing:RemoveListenerCertificates&amp;#34;, &amp;#34;elasticloadbalancing:RemoveTags&amp;#34;, &amp;#34;elasticloadbalancing:SetIpAddressType&amp;#34;, &amp;#34;elasticloadbalancing:SetSecurityGroups&amp;#34;, &amp;#34;elasticloadbalancing:SetSubnets&amp;#34;, &amp;#34;elasticloadbalancing:SetWebACL&amp;#34; ], &amp;#34;Resource&amp;#34;: &amp;#34;*&amp;#34; }, { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;iam:CreateServiceLinkedRole&amp;#34;, &amp;#34;iam:GetServerCertificate&amp;#34;, &amp;#34;iam:ListServerCertificates&amp;#34; ], &amp;#34;Resource&amp;#34;: &amp;#34;*&amp;#34; }, { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;cognito-idp:DescribeUserPoolClient&amp;#34; ], &amp;#34;Resource&amp;#34;: &amp;#34;*&amp;#34; }, { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;waf-regional:GetWebACLForResource&amp;#34;, &amp;#34;waf-regional:GetWebACL&amp;#34;, &amp;#34;waf-regional:AssociateWebACL&amp;#34;, &amp;#34;waf-regional:DisassociateWebACL&amp;#34; ], &amp;#34;Resource&amp;#34;: &amp;#34;*&amp;#34; }, { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;tag:GetResources&amp;#34;, &amp;#34;tag:TagResources&amp;#34; ], &amp;#34;Resource&amp;#34;: &amp;#34;*&amp;#34; }, { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;waf:GetWebACL&amp;#34; ], &amp;#34;Resource&amp;#34;: &amp;#34;*&amp;#34; }, { &amp;#34;Effect&amp;#34;: &amp;#34;Allow&amp;#34;, &amp;#34;Action&amp;#34;: [ &amp;#34;shield:DescribeProtection&amp;#34;, &amp;#34;shield:GetSubscriptionState&amp;#34;, &amp;#34;shield:DeleteProtection&amp;#34;, &amp;#34;shield:CreateProtection&amp;#34;, &amp;#34;shield:DescribeSubscription&amp;#34;, &amp;#34;shield:ListProtections&amp;#34; ], &amp;#34;Resource&amp;#34;: &amp;#34;*&amp;#34; } ] } 下载alb-ingress-controller.</description></item><item><title/><link>https://blog.poneding.com/aws/eks-details/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/aws/eks-details/</guid><description>我的博客 / AWS / EKS小细节汇总
+EKS小细节汇总 # 如果alb的ingress使用了自定义的security group，那么需要将该安全组加入到worker
+« EKS配置 ALB Ingress
+» EKS实践 集成Gitlab自动发布（一）</description></item><item><title/><link>https://blog.poneding.com/aws/eks-intergrate-gitlab-auto-release-01/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/aws/eks-intergrate-gitlab-auto-release-01/</guid><description>我的博客 / AWS / EKS实践 集成Gitlab自动发布（一）
+EKS实践 集成Gitlab自动发布（一） # 系列介绍如何使用Gitlab CI/CD自动部署应用到EKS（K8s）集群中。本篇介绍如何在EKS（K8s）集群中为Gitlab的CI/CD创建Gitlab Runner。
+Gitlab添加K8s集群 # 添加方式 # 第一种方式，基于单个仓库添加K8s集群：
+进入Gitlab仓库，依次从左边菜单栏Operations =&amp;gt; Kubernetes进入添加页面，点击Add Kubernetes cluster按钮。这种方式添加的K8s集群只对该项目仓库有效。
+第二种方式，基于Group添加K8s集群：
+进入Gitlab主页，依次从上边菜单栏Groups =&amp;gt; Your groups，选择Group进入页面，然后依次从左边菜单栏Kuberentes进入添加页面，点击Add Kubernetes cluster。这种方式添加的K8s集群对该Group下的项目仓库有效。
+第三种方式，基于全局添加K8s集群：
+这种方式需要用到gitlab的root权限。进入Gitlab主页，从上边菜单栏Admin Area(扳手图标) 进入页面，然后依次从左边菜单栏Kuberentes进入添加页面，点击Add Kubernetes cluster。这种方式添加的K8s集群对所有项目仓库有效。
+添加步骤 # 添加已有的K8s集群，按照如下步骤获取到对应的值填入表单即可。
+Cluster Name： 这个可以自定义，能自行区分就行。
+API URL： 运行以下命令得到输出值：
+kubectl cluster-info | grep &amp;#39;Kubernetes master&amp;#39; | awk &amp;#39;/http/ {print $NF}&amp;#39; CA Certificate： 运行以下命令得到输出值：
+kubectl get secret $(kubectl get secret | grep default-token | awk &amp;#39;{print $1}&amp;#39;) -o jsonpath=&amp;#34;{[&amp;#39;data&amp;#39;][&amp;#39;ca\.</description></item><item><title/><link>https://blog.poneding.com/aws/eks-intergrate-gitlab-auto-release-02/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/aws/eks-intergrate-gitlab-auto-release-02/</guid><description>我的博客 / AWS / EKS实践 集成Gitlab自动发布（二）
+EKS实践 集成Gitlab自动发布（二） # 系列介绍如何使用Gitlab CI/CD自动部署应用到EKS（K8s）集群中。本篇介绍如何为Runnr镜像的制作。
+上文中创建的Gitlab Runner会持续存活在EKS集群中，但是它不做具体的Pipeline任务，当有Pipeline任务来临时，由它来创建临时的Runner来执行。而临时拆功创建的Runner使用什么容器环境以及具体执行什么任务是由仓库目录下.gitlab-ci.yml文件定义的。
+制作Temp Runner镜像 # 我们制作这个镜像的目的是为了能让镜像运行起来后，可以完成我们的自动发布任务。比如在容器temp-runner容器需要将我们的代码build成应用镜像，然后将应用镜像发布到EKS集群，可以看到，在容器中我们就必须可以使用docker build功能以及kubectl apply功能。
+按照以上的需要，我们制作的镜像至少需要安装好docker 以及kubectl。
+Dockerfile如下：
+FROM docker:18 RUN apk add --no-cache curl jq python3 git tar tree &amp;amp;&amp;amp; \ curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl &amp;amp;&amp;amp; chmod +x ./kubectl &amp;amp;&amp;amp; mv ./kubectl /usr/local/bin/kubectl 直接使用docker镜像作为基础镜像，然后安装kubectl
+使用命令制作并推送镜像到dockerhub（实际我的镜像推动到了ECR）
+docker build . -t gitlab-runner-base:latest --rm --no-cache docker push gitlab-runner-base:latest 仓库配置 # 项目仓库根目录下新增.gitlab-ci.yml文件，然后文件内容
+« EKS实践 集成Gitlab自动发布（一）
+» EKS-使用EFS</description></item><item><title/><link>https://blog.poneding.com/aws/eks-use-efs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/aws/eks-use-efs/</guid><description>我的博客 / AWS / EKS-使用EFS
+EKS-使用EFS # 创建EFS
+aws efs create-file-system \ --performance-mode generalPurpose \ --throughput-mode bursting \ --encrypted \ --tags Key=Name,Value=&amp;lt;fs-name&amp;gt; Key=creator,Value=dp Key=env:dev,Value=1 # 上面的命令会得到fs-id aws efs create-mount-target \ --file-system-id &amp;lt;fs-id&amp;gt; \ --subnet-id subnet-08d7609e614373fb8 \ --security-groups sg-0af0f0e8705380529 aws efs create-mount-target \ --file-system-id &amp;lt;fs-id&amp;gt; \ --subnet-id subnet-09c0707ea8ad281bb \ --security-groups sg-0af0f0e8705380529 aws efs create-mount-target \ --file-system-id &amp;lt;fs-id&amp;gt; \ --subnet-id subnet-063a8f10feb97868d \ --security-groups sg-0af0f0e8705380529 « EKS实践 集成Gitlab自动发布（二）
+» Gitlab &amp;amp; EKS</description></item><item><title/><link>https://blog.poneding.com/aws/gitlab-eks/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/aws/gitlab-eks/</guid><description>我的博客 / AWS / Gitlab &amp;amp; EKS
+Gitlab &amp;amp; EKS # 创建IAM User&amp;amp;Group # User：gitlab-ci，保存生成的Access key ID和Secret Access Key，后面会用到
+Group：Gitlab.CI，添加Policy如下：
+Policy Name AmazonEKSWorkerNodePolicy AmazonEC2ContainerRegistryFullAccess AmazonEC2ContainerRegistryReadOnly AmazonEC2ContainerServiceFullAccess AmazonEKS_CNI_Policy 将user gitlab-ci添加到Group Gitlab.CI
+将IAM User添加到ConfigMap # kubectl edit cm aws-auth -n kube-system 在mapUsers键追加：
+- &amp;#34;groups&amp;#34;: - &amp;#34;system:masters&amp;#34; &amp;#34;userarn&amp;#34;: &amp;#34;arn:aws:iam::xxxxxxx:user/gitlab-ci&amp;#34; &amp;#34;username&amp;#34;: &amp;#34;gitlab-ci&amp;#34; Gitlab仓库设置 # Setting =&amp;gt; CI/CD =&amp;gt; Variables，添加变量：
+AWS_ACCESS_KEY_ID：&amp;lt;gitlab-ci用户的Access key ID&amp;gt; AWS_SECRET_ACCESS_KEY：&amp;lt;gitlab-ci用户的Secret Access Key&amp;gt; Gitlab仓库.gitlab-ci.yml # « EKS-使用EFS
+» K8s 部署 Kong 服务</description></item><item><title/><link>https://blog.poneding.com/aws/k8s-deploy-kong/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/aws/k8s-deploy-kong/</guid><description>我的博客 / AWS / K8s 部署 Kong 服务
+K8s 部署 Kong 服务 # 本篇只涉及 Kong 服务在 K8s 集群的部署操作，不涉及概念知识。
+提前准备 # K8s 集群，本文使用的是 AWS EKS 集群服务 一台可以连接 K8s 集群的服务器，已经安装 kubectl 和 docker 等基础应用，之后称之为操作机器 Postgres 数据库，作为 Kong 服务的后端数据库 初始化数据库 # 使用 Postgres 作为 Kong 服务的后端数据库，我们需要提前做数据库的初始化，准备 Kong 服务需要的数据表等。这里使用 K8s-Job 来实现数据库的初始化工作。
+kong-migrations-job.yaml：
+apiVersion: batch/v1 kind: Job metadata: name: kong-migrations namespace: kong spec: template: metadata: name: kong-migrations spec: containers: - command: - /bin/sh - -c - kong migrations bootstrap env: - name: KONG_PG_PASSWORD value: &amp;#34;kong&amp;#34; - name: KONG_PG_HOST value: &amp;#34;postgres/postgres&amp;#34; - name: KONG_PG_PORT value: &amp;#34;5432&amp;#34; image: kong:1.</description></item><item><title/><link>https://blog.poneding.com/aws/k8s-deploy-konga/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/aws/k8s-deploy-konga/</guid><description>我的博客 / AWS / K8s 部署 konga
+K8s 部署 konga # 本篇只涉及 konga 的部署操作，不涉及概念知识。
+提前准备 # K8s 集群，本文使用的是 AWS EKS 集群服务 一台可以连接 K8s 集群的服务器，已经安装 kubectl 和 docker 等基础应用，之后称之为操作机器 Postgres数据库 ！注意：该数据库使用 9.5 版本，其他最新版本的数据库在初始化 konga 数据库时会报如下错：
+error: Failed to prepare database: error: column r.consrc does not exist 这是部署 konga 踩过的坑之一。
+确保 K8s 集群中已经创建了 nginx-ingress，nginx-ingress 用于根据定制的 Rule（如后文 kong-ingress 的配置）将流量转发至 K8s 集群的 Service 中去。 创建 nginx-ingress 指令（可参照 https://kubernetes.github.io/ingress-nginx/deploy/）步骤如下：
+Step 1. 执行以下强制命令
+kubectl apply -f https://raw.</description></item><item><title/><link>https://blog.poneding.com/aws/k8s-deploy-postgres/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/aws/k8s-deploy-postgres/</guid><description>我的博客 / AWS / K8s 部署 Postgres
+K8s 部署 Postgres # 本篇只涉及 Postgres 的部署操作，不涉及概念知识。
+特别说明：Postgres 相对于普通的程序应用而言，属于有状态的服务，因为它存储的数据是需要持久保存的，这点决定了我们选择 K8s-StatefulSet 的部署而非 K8s-Deployment。
+提前准备 # K8s 集群，本文使用的是AWS EKS集群服务 一台可以连接 K8s 集群的服务器，已经安装 kubectl 和 docker 等基础应用 K8s资源文件 # postgres-namespace.yaml：
+apiVersion: v1 kind: Namespace metadata: name: postgres postgres-config.yaml：
+apiVersion: v1 kind: ConfigMap metadata: name: postgres-config namespace: postgres labels: app: postgres data: POSTGRES_DB: master POSTGRES_USER: dba POSTGRES_PASSWORD: pg_pass 这里的数据库密码涉及到信息敏感，更建议使用 Secret 资源而非 ConfigMap，这里就偷懒了。
+postgres-statefulset.yaml：
+apiVersion: apps/v1 kind: StatefulSet metadata: name: postgres namespace: postgres spec: serviceName: &amp;#34;postgres&amp;#34; replicas: 1 selector: matchLabels: app: postgres template: metadata: labels: app: postgres spec: containers: - name: postgres image: postgres:9.</description></item><item><title/><link>https://blog.poneding.com/aws/terraform-remanage-resource/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/aws/terraform-remanage-resource/</guid><description>我的博客 / AWS / Terraform 重新管理资源
+Terraform 重新管理资源 # 看到这个标题你可能会有点懵，我先来解释下。
+在使用Terraform管理AWS的VPC-Subnet资源时（下面是定义资源的代码清单），我遇到了一个问题：当我修改aws_subnet.eks-private-subnet-1资源的cidr_block时，假设我修改成了172.28.2.0/24，这时候旧的
+resource &amp;#34;aws_subnet&amp;#34; &amp;#34;eks-private-subnet-1&amp;#34; { vpc_id = &amp;#34;${var.vpc_id}&amp;#34; cidr_block = &amp;#34;172.28.1.0/24&amp;#34; map_public_ip_on_launch = &amp;#34;false&amp;#34; availability_zone = &amp;#34;${var.region}a&amp;#34; tags = merge( {Name = &amp;#34;${var.cluster_name}-private-subnet-1a&amp;#34;}, &amp;#34;${local.cluster_private_subnet_tags}&amp;#34;) } « K8s 部署 Postgres</description></item><item><title/><link>https://blog.poneding.com/cka/001/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/cka/001/</guid><description>我的博客 / CKA / 001
+001 # 01 Task - 英文 # Create a new ClusterRole named deployment-clusterrole that only allows the creation of the following resource types:
+Deployment StatefulSet DaemonSet Create a new ServiceAccount named cicd-token in the existing namespace app-team1. Limited to namespace app-team1, bind the new ClusterRole deployment-clusterrole to the new ServiceAccount cicd-token. kubectl create ns app-team1 kubectl create serviceaccount cicd-token -n app-team1 kubectl create clusterrole deployment-clusterrole --verb=create --resource=deployment,statefulset,daemonset #limted to the namespace app-team1。需要限制的是namespace级别，clusterrolebinding为设置全局，rolebinding正确 kubectl create rolebinding cicd-clusterrole -n app-team1 --clusterrole=deployment-clusterrole --serviceaccount=app-team1:cicd-token 02 Task - 英文 # Set the node named ek8s-node-1 as unavaliable and reschedule all the pods running on it.</description></item><item><title/><link>https://blog.poneding.com/cka/prepare-cka/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/cka/prepare-cka/</guid><description>我的博客 / CKA / 准备CKA
+准备CKA # 办理护照 # 优惠券：
+Affkub95-268483
+Frequently Asked Questions: CKA and CKAD &amp;amp; CKS - T&amp;amp;C DOC (linuxfoundation.org)
+« 001
+» 考题</description></item><item><title/><link>https://blog.poneding.com/cka/tasks/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/cka/tasks/</guid><description>我的博客 / CKA / 考题
+考题 # kubectl scale deployment nginx --replicas=3 创建busybox：
+kubectl run busybox --image=busybox --generator=run-pod/v1 --command=true -- sleep 7d # nslookup kubectl run nginx-dns --image=nginx kubectl run busybox --image=busybox --generator=run-pod/v1 --command=true -- sleep 7d kubectl exec -it busybox -- nslookup nginx-dns kubectl exec -it busybox -- nslookup &amp;lt;pod-ip&amp;gt; etcd备份和还原：
+ETCDCTL_API=3 etcdctl --endpoints=https://[127.0.0.1]:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt \ --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key \ snapshot save ETCDCTL_API=3 etcdctl --endpoints=https://[127.0.0.1]:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt \ --name=master \ --cert=/etc/kubernetes/pki/etcd/server.</description></item><item><title/><link>https://blog.poneding.com/cs/internet/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/cs/internet/</guid><description>我的博客 / 计算机科学 / 互联网如何运作？
+互联网如何运作？ # 本篇文章翻译自： 原文地址
+作为开发人员，深入了解互联网是什么及其工作原理非常重要。它是构建大多数现代软件应用程序的基础。为了构建有效、安全且可扩展的应用程序和服务，您需要深入了解互联网的工作原理以及如何利用其功能和连接性。
+在本文中，我们将介绍互联网的基础知识，包括它的工作原理、一些基本概念、术语和一些用于在互联网上构建应用程序和服务的通用协议。
+我们有很多内容要介绍，所以让我们开始吧！
+互联网简介 # 在了解什么是互联网之前，我们需要先了解什么是网络。网络是一组相互连接的计算机或其他设备。例如，您家里可能有一个由计算机和设备组成的网络。您住在隔壁的朋友可能有类似的设备网络。他们的邻居可能有类似的设备网络。所有这些网络连接在一起就形成了互联网。
+互联网是一个网络的网络。
+互联网是美国国防部于 20 世纪 60 年代末开发的，作为创建能够抵御核攻击的去中心化通信网络的一种手段。多年来，它已发展成为一个遍布全球的复杂而精密的网络。
+如今，互联网已成为现代生活的重要组成部分，世界各地数十亿人使用互联网来获取信息、与朋友和家人交流、开展业务等等。作为开发人员，必须充分了解互联网的工作原理以及支撑互联网的各种技术和协议。
+互联网如何运作：概述 # 在较高层面上，互联网的工作原理是使用一组标准化协议将设备和计算机系统连接在一起。这些协议定义了设备之间如何交换信息，并确保数据可靠、安全地传输。
+互联网的核心是互连路由器的全球网络，负责引导不同设备和系统之间的流量。当您通过互联网发送数据时，数据会被分解为小数据包，然后从您的设备发送到路由器。路由器检查数据包并将其转发到通往目的地的路径中的下一个路由器。这个过程一直持续到数据包到达最终目的地。
+为了确保数据包的正确发送和接收，互联网使用了多种协议，包括互联网协议（IP）和传输控制协议（TCP）。 IP 负责将数据包路由到正确的目的地，而 TCP 确保数据包以正确的顺序可靠地传输。
+除了这些核心协议之外，还有许多其他技术和协议用于通过互联网实现通信和数据交换，包括域名系统 (DNS)、超文本传输​​协议 (HTTP) 和安全协议套接字层/传输层安全 (SSL/TLS) 协议。作为开发人员，深入了解这些不同的技术和协议如何协同工作以实现互联网上的通信和数据交换非常重要。
+基本概念和术语 # 要了解互联网，熟悉一些基本概念和术语很重要。以下是一些需要注意的关键术语和概念：
+数据包：通过互联网传输的小数据单位。 路由器：在不同网络之间引导数据包的设备。 IP 地址：分配给网络上每个设备的唯一标识符，用于将数据路由到正确的目的地。 域名：用于识别网站的人类可读名称，例如 google.com。 DNS：域名系统负责将域名转换为IP地址。 HTTP：超文本传输​​协议用于在客户端（例如网络浏览器）和服务器（例如网站）之间传输数据。 HTTPS：HTTP 的加密版本，用于在客户端和服务器之间提供安全通信。 SSL/TLS：安全套接字层和传输层安全协议用于通过互联网提供安全通信。 了解这些基本概念和术语对于使用互联网和开发基于互联网的应用程序和服务至关重要。
+协议在互联网中的作用 # 协议在通过互联网进行通信和数据交换方面发挥着至关重要的作用。协议是一组规则和标准，定义设备和系统之间如何交换信息。
+互联网通信中使用许多不同的协议，包括互联网协议 (IP)、传输控制协议 (TCP)、用户数据报协议 (UDP)、域名系统 (DNS) 等。
+IP 负责将数据包路由到正确的目的地，而 TCP 和 UDP 则确保数据包可靠且高效地传输。 DNS 用于将域名转换为 IP 地址，HTTP 用于在客户端和服务器之间传输数据。</description></item><item><title/><link>https://blog.poneding.com/cs/networking/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/cs/networking/</guid><description>我的博客 / 计算机科学 / 网络通信
+网络通信 # I/O 模型 # 《UNIX 网络编程》中总结了 5 种 I/O 模型，包括同步和异步 I/O：
+阻塞 I/O (Blocking I/O) 非阻塞 I/O (Nonblocking I/O) I/O 多路复用 (I/O multiplexing) 信号驱动 I/O (Signal driven I/O) 异步 I/O (Asynchronous I/O) 操作系统上的 I/O 是用户空间和内核空间的数据交互。
+« 互联网如何运作？
+» 虚拟内存</description></item><item><title/><link>https://blog.poneding.com/cs/virtual-memory/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/cs/virtual-memory/</guid><description>我的博客 / 计算机科学 / 虚拟内存
+虚拟内存 # 为了更加有效的管理内存并且降低内存出错的概率。
+计算机存储器 # 速度快 容量大 价格便宜 类型，自上向下分别是寄存器，高速缓存，主存（RAM），磁盘。成本与访问速度负相关。
+寄存器的容量：32 位：32x32 bit吗，64 位：64x64 bit
+1 个字节（Bytes）等于 8 bit，因此 1kb 是 8x1024 bit
+主存（RAM）与 CPU 直接交换数据的内部存储器。
+物理内存 虚拟内存 虚拟内存核心原理 # 为每个程序设置一段&amp;quot;连续&amp;quot;的虚拟地址空间，把这个地址空间分割成多个具有连续地址范围的页 (Page)，并把这些页和物理内存做映射，在程序运行期间动态映射到物理内存。当程序引用到一段在物理内存的地址空间时，由硬件立刻执行必要的映射；而当程序引用到一段不在物理内存中的地址空间时，由操作系统负责将缺失的部分装入物理内存并重新执行失败的指令。
+内存交换（swap） # 在进程运行期间只分配映射当前使用到的内存，暂时不使用的数据则写回磁盘作为副本保存，需要用的时候再读入内存，动态地在磁盘和内存之间交换数据。
+参考 # 虚拟内存精粹 « 网络通信</description></item><item><title/><link>https://blog.poneding.com/dapr/dapr/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/dapr/dapr/</guid><description>我的博客 / Dapr / Dapr 0-1
+Dapr 0-1 # 介绍 # Dapr（Distributed Application Runtime）,提供分布式应用运行所需要的环境。
+Sidecar架构。
+目的：
+快速落地微服务，将业务和基础设施分离，专注于业务开发，降低微服务的复杂性。
+运行环境：
+服务发现 负载均衡 故障转移 熔断限流 缓存 异步通信 日志组件 链路监控 &amp;hellip; 核心功能：
+Service Invocation（服务调用） State Management（状态管理） Publish and Subscribe（消息发布订阅） Resource bingdings and triggers（资源绑定，事件触发） Actors（单线程模型）分布式锁 Observability（遥测）ELK，链路监控，告警 Secrets（安全）IdentityServer4 安装 # 依赖 # Docker： https://docs.docker.com/install/ 注意：windows平台，Docker必须运行Linux Containers模式
+安装cli # https://github.com/dapr/cli
+以在linux中安装dapr为例：
+wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O-|/bin/bash dapr init --runtime-version Service Invocation # 解决微服务之间通信的问题。</description></item><item><title/><link>https://blog.poneding.com/design-pattern/cicd/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/design-pattern/cicd/</guid><description> 我的博客 / 设计模式 / CI/CD
+CI/CD # Concepts # Pipeline # PipelineStage # Fields：
+Name Type Desc ID string PipelineID string PrevPipelineStageID string Status uint8 Pending, Runing, Success, Failed, Abort Name string PipelineStageTask # Fields：
+Name Type Desc ID string PipelineStageID string PrevPipelineStageTaskID string Image string Container image task running on. DindRequired boolean Docker in docker? DindImage string dependency DindRequired default: docker:18-dind. Scripts string CacheDirs string EnvironmentVariables string Status string EnvironmentVariables string EnvironmentVariables string</description></item><item><title/><link>https://blog.poneding.com/devops/agile/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/agile/</guid><description>我的博客 / DevOps / Agile
+Agile # 敏捷 交付产品可以看作饭店上菜 顾客点了十个菜 后厨把十个菜做完，最后十个菜一起上桌 ——不敏捷 后厨做完一个菜就上一个菜 ——敏捷
+敏捷的优点：
+做一盘上一盘，顾客早早就能吃上了，优先横扫饥饿；尽早给用户体验上产品； 做一盘上一盘，每个菜都是新出锅，顾客能吃上一口热的；对比十盘菜一起上，可能先炒的菜已经凉了，凉的菜换做成产品的话，可能就是已经过时的功能了，不符合需求了 做一盘上一盘， 如果前面的菜咸了，可以反馈给饭店，后面的菜做淡点；对比十盘菜一起上，顾客就无法从中间反馈意见了，做一个用户插不上意见的产品，严重的后果可能是用户已经不感兴趣了。 » Ansible</description></item><item><title/><link>https://blog.poneding.com/devops/ansible/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/ansible/</guid><description>我的博客 / DevOps / Ansible
+Ansible # 介绍 # 一款轻量级的自动化运维工具，只需要一台主机安装Ansible，便可以管理其他可连通的Linux服务器。
+开源
+python
+特点 # 自动化引擎，实现管理配置，应用部署，服务编排及其他各种服务器管理需求； 使用简单，具有客户端的特点； 基于ssh实现配置管理； 依赖python； 功能强大，支持云服务操作。 安装 # ​ 由于Ansible使用Python开发，所以可以直接使用pip安装
+pip install ansible ​ 也可以使用yum或apt-get安装
+yum install ansible -y apt-get install ansible -y ansible --version ​ 只需要在Control Node上安装即可。
+主要概念 # Control node：
+安装了Ansible的主机都可以称之为Control node，反过来说，Ansible安装在Contriol Node上；
+一般为linux机器（注：目前也已经对windows做了支持）。
+Managed nodes：
+待管理的网络设备或者服务器；
+linux机器（安装了python）。
+Inventory：
+Modules：
+Tasks：
+Ansible配置 # ​ 配置文件位置：/etc/ansible/ansible.cfg，为ini格式文件。
+配置示例 # ​ inventory：主机清单配置文件位置，在使用Ansible命令时，也开始-i &amp;lt;path&amp;gt;指定；
+​ host_key_checking：当know_hosts中不存在的主机（即尚未访问过的主机，是否需要输入密钥）；
+​ become_user：sudo用户；</description></item><item><title/><link>https://blog.poneding.com/devops/bule-green-rollback-gray/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/bule-green-rollback-gray/</guid><description>我的博客 / DevOps / 蓝绿部署、滚动部署和灰度部署
+蓝绿部署、滚动部署和灰度部署 # 直接举例说明：
+现环境中运行着3个V1版本的实例，计划更新到V2版本。
+蓝绿部署 # 直接使用新的服务资源部署3个V2版本实例（仍然保留3个V1版本），然后将请求流量全部转到V2版本。
+优点：
+无需中断服务；
+有回旋的余地，如果V2版本有bug的话，可以很快速的重新回到V1版本。
+缺点：
+资源占用较大，在发布过程中需要用到6个实例的服务资源。
+滚动部署 # 现停掉一个V1版本的实例，待其停止后，部署一个V2版本的实例，V2实例部署成功之后，再停掉一个V1实例，往复，直至全部替换为V2版本实例。
+优点：
+无需中断服务；
+部署新版本时无需增加服务资源，节省成本。
+缺点：
+V2版本有bug的话，不能及时回滚。
+灰度部署 # 也叫金丝雀部署，停掉一个V1版本的实例，部署一个V2版本的实例，将部分用户请求流量的转到V2版本，如果没有问题，再逐步替换V1版本。A/B测试就是一种灰度发布。
+优点：
+无需中断服务；
+同样无需增加服务器，能较为平稳的过渡到新版本，并且当有bug时也能做到快速回滚。
+« Ansible
+» 混沌工程原则 （PRINCIPLES OF CHAOS ENGINEERING）</description></item><item><title/><link>https://blog.poneding.com/devops/chaos-engineering/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/chaos-engineering/</guid><description>我的博客 / DevOps / 混沌工程原则 （PRINCIPLES OF CHAOS ENGINEERING）
+混沌工程原则 （PRINCIPLES OF CHAOS ENGINEERING） # http://principlesofchaos.org/ 简体中文版
+混沌工程是在分布式系统上进行实验的学科, 目的是建立对系统抵御生产环境中失控条件的能力以及信心。：
+大规模分布式软件系统的发展正在改变软件工程。作为一个行业，我们很快采用了提高开发灵活性和部署速度的实践。紧随着这些优点的一个迫切问题是：我们对投入生产的复杂系统有多少信心？
+即使分布式系统中的所有单个服务都正常运行, 这些服务之间的交互也会导致不可预知的结果。 这些不可预知的结果, 由影响生产环境的罕见且破坏性的事件复合而成，令这些分布式系统存在内在的混沌。
+我们需要在异常行为出现之前，在整个系统内找出这些弱点。这些弱点包括以下形式:
+当服务不可用时的不正确回滚设置; 不当的超时设置导致的重试风暴; 由于下游依赖的流量过载导致的服务中断; 单点故障时的级联失败等。 我们必须主动的发现这些重要的弱点，在这些弱点通过生产环境暴露给我们的用户之前。我们需要一种方法来管理这些系统固有的混沌, 通过增加的灵活性和速率以提升我们对生产环境部署的信心, 尽管系统的复杂性是由这些部署所导致的。
+我们采用基于经验和系统的方法解决了分布式系统在规模增长时引发的问题, 并以此建立对系统抵御这些事件的能力和信心。通过在受控实验中观察分布式系统的行为来了解它的特性，我们称之为混沌工程。
+混沌工程实践 # 为了具体地解决分布式系统在规模上的不确定性，可以把混沌工程看作是为了揭示系统弱点而进行的实验。这些实验遵循四个步骤：
+首先，用系统在正常行为下的一些可测量的输出来定义“稳定状态”。 其次，假设这个在控制组和实验组都会继续保持稳定状态。 然后，在实验组中引入反映真实世界事件的变量，如服务器崩溃、硬盘故障、网络连接断开等。 最后，通过控制组和实验组之间的状态差异来反驳稳定状态的假说。 破坏稳态的难度越大，我们对系统行为的信心就越强。如果发现了一个弱点，那么我们就有了一个改进目标。避免在系统规模化之后被放大。
+高级原则 # 以下原则描述了应用混沌工程的理想方式，这些原则基于上述实验过程。对这些原则的匹配程度能够增强我们在大规模分布式系统的信心。
+建立一个围绕稳定状态行为的假说 # 要关注系统的可测量输出, 而不是系统的属性。对这些输出在短时间内的度量构成了系统稳定状态的一个代理。 整个系统的吞吐量、错误率、延迟百分点等都可能是表示稳态行为的指标。 通过在实验中的系统性行为模式上的关注, 混沌工程验证了系统是否正常工作, 而不是试图验证它是如何工作的。
+多样化真实世界的事件 # 混沌变量反映了现实世界中的事件。 我们可以通过潜在影响或估计频率排定这些事件的优先级。考虑与硬件故障类似的事件, 如服务器宕机、软件故障 (如错误响应) 和非故障事件 (如流量激增或伸缩事件)。 任何能够破坏稳态的事件都是混沌实验中的一个潜在变量。
+在生产环境中运行实验 # 系统的行为会依据环境和流量模式都会有所不同。 由于资源使用率变化的随时可能发生, 因此通过采集实际流量是捕获请求路径的唯一可靠方法。 为了保证系统执行方式的真实性与当前部署系统的相关性, 混沌工程强烈推荐直接采用生产环境流量进行实验。</description></item><item><title/><link>https://blog.poneding.com/devops/commercial-canvas/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/commercial-canvas/</guid><description>我的博客 / DevOps / 商业画布
+商业画布 # 用来描述商业模式、可视化商业模式、评估商业模式以及改变商业模式的通用语言。
+商业模式：通过商业产品创造价值，传递价值，获取价值的一种原理。
+九个模块 # CS客户细分（Customer Segments）：企业或机构所服务的一个或多个客户分类群体。
+VP价值主张（Value Propositions）：通过价值主张来解决客户难题和满足客户需求。
+CH渠道通路（Channels）：通过沟通、分销和销售渠道向客户传递价值主张。
+CR客户关系（Customer Relationships）：在每一个客户细分市场建立和维护客户关系。
+R$收入来源（Revenue Streams）：收入来源产生于成功提供给客户的价值主张。
+KR核心资源（Key Resoures）：核心资源是提供和交付先前描述要素所必备的重要资产。
+KA关键业务（Key Activities）：通过执行一些关键业务活动，运转商业模式。
+KP重要合作（Key Partnership）：有些业务要外包，而另外一些资源需要从企业外部获得。
+C$成本结构（Cost Structure）：商业模式上述要素所引发的成本构成。
+基本认知 # 客户细分 # 客户是商业模式的核心。哪些是重要客户
+« 混沌工程原则 （PRINCIPLES OF CHAOS ENGINEERING）
+» 使用grafana监控5xx服务</description></item><item><title/><link>https://blog.poneding.com/devops/grafana-monite-service-with-5xx/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/grafana-monite-service-with-5xx/</guid><description>我的博客 / DevOps / 使用grafana监控5xx服务
+使用grafana监控5xx服务 # 1. Grafana信息 # grafana服务： https://devops.example.com/grafana
+如果要注册账号请联系devops组。
+2. Grafana监控预览 # grafana已经配置了对service.hompartners.com域名下的service访问状态返回5xx的监控，可以查看对应的grafana面板 https://devops.example.com/grafana/d/Q_zv-HrWz/cst-service-status?orgId=1
+该监控面板中可以查看如userapi、emailapi等服务是否正常，当面板的网格视图中出现红点，说明访问对应的服务返回了5xx状态，即服务端异常。开发人员等可以根据该视图及时发现服务异常情况。
+3. Grafana添加监控5xx服务 # 如果项继续添加Grafana面板来监控更多的服务，请参照以下教程。
+Step 1 复制模板视图：
+选中并进入xxx service http_status_5xx template面板，按操作如下复制xxx.xxx.com http_status_5xx视图
+（可通过该链接访问： https://devops.example.com/grafana/d/XNnusprWz/xxx-service-http_status_5xx-template?orgId=1）
+Step 2 创建新面板：
+按如下操作创建新面板并粘贴视图。
+随后会在页面呈现一个视图，这时可以先编辑面板信息，并新命名，选择面板分类，并保存面板信息。
+Step 3 定制xxx.xxx.com http_status_5xx视图：
+保存完成之后，点击左上角的回退箭头图标：&amp;lt;&amp;ndash;，回到视图页面，按如下操作编辑视图。
+修改查询sql语句，域名修改为要监控的域名或服务名，比如你想监控www.example.com域名下所有服务，那么你可以定制sql如下：
+SELECT &amp;#34;service_code&amp;#34; FROM &amp;#34;service_status&amp;#34; WHERE (&amp;#34;health_code&amp;#34; = 500 AND &amp;#34;domain_name&amp;#34; = &amp;#39;www.example.com&amp;#39;) AND $timeFilter GROUP BY &amp;#34;service_name&amp;#34; ，当然你可能只想监控某个域名下的其中一个服务，如你想监控www.example.com域名下operationplatgform服务，那么你可以定制sql如下：
+SELECT &amp;#34;service_code&amp;#34; FROM &amp;#34;service_status&amp;#34; WHERE (&amp;#34;health_code&amp;#34; = 500 AND &amp;#34;domain_name&amp;#34; = &amp;#39;www.</description></item><item><title/><link>https://blog.poneding.com/devops/grafana-monite-service/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/grafana-monite-service/</guid><description>我的博客 / DevOps / 使用Grafana监控service
+使用Grafana监控service # 监控live上的应用服务,如果服务http状态为5xx,则反应到grafana图表中,DevOps和开发人员都能及时从图表中获取信息,及时确认和排查问题.
+Service Http状态数据来源 # 使用程序定时轮询获取aws elb的日志数据,将日志数据以时序形式存储在influxdb,目前数据结构如下:
+tag keys:
+# TagKeyName Remark 1 domain_name 2 service_name 默认取pathbase,如果pathbase为空,取domain field keys:
+# FieldKeyName Remark 1 domain_name 2 elb_status_code 数字类型,200;500 3 health_code 数字类型,200;500 4 request_url 请求路径 5 service_code 一个域名下的多个service,按序从1自增,作为grafana图表的y轴数据 创建Dashboard # =&amp;gt; Add Query
+目前数据源已经配置完成，选择Influxdb_Elb_Logs作为QUuery DataSource，并且开始配置query
+查询语句可以参考：
+SELECT mean(&amp;#34;service_code&amp;#34;) FROM &amp;#34;service_status&amp;#34; WHERE (&amp;#34;domain_name&amp;#34; = &amp;#39;service.example.com&amp;#39; AND &amp;#34;health_code&amp;#34; = 500) AND $timeFilter GROUP BY time($__interval), &amp;#34;service_name&amp;#34; 根据自身需求修改query即可。</description></item><item><title/><link>https://blog.poneding.com/devops/grafana/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/grafana/</guid><description>我的博客 / DevOps / Grafana
+Grafana # 官方文档： https://grafana.com/docs/grafana/latest/
+简介 # 特性 # 可视化：通过图表展示指标信息，直观，便于分析
+报警：指标数据超出阈值
+统一：多种数据源可以应用到同一个Dashboard中
+多平台支持：windows、linux、docker、mac
+丰富的插件扩展
+丰富的模板支持
+使用Grafana监控Jenkins # 监控指标包括:jenkins发布状态,jenkins的发布时长等.
+前提条件 # 已安装jenkins
+已安装prometheus
+已安装grafana
+Jenkins安装插件 # 登入Jenkins =&amp;gt; Manage Jenkins =&amp;gt; Manage Plugins =&amp;gt; Available页签 搜索Prometheus插件,安装即可.
+此节可以参考: https://medium.com/@eng.mohamed.m.saeed/monitoring-jenkins-with-grafana-and-prometheus-a7e037cbb376
+« 使用Grafana监控service
+» Jaeger</description></item><item><title/><link>https://blog.poneding.com/devops/jeager/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/jeager/</guid><description>我的博客 / DevOps / Jaeger
+Jaeger # 前言 # 微服务之间的调用关系错综复杂，当你在京东下单时，应用背后的服务调用链可能超你想象。调用链的追踪是微服务绕不过去的技术栈，
+简介 # 关于 # Jaeger，受Dapper和OpenZipkin启发，由Uber开源的一个分布式跟踪系统，用于基于微服务分布式系统的监控和排错，包括：
+分布式上下文传递 分布式事务监控 问题根由分析 服务依赖分析 性能、延迟优化 功能 # 兼容OpenTracing数据模型和工具库 对每个服务、端点使用一致的抽样概率 支持多样的后端数据库：Cassandra，Elasticsearch，Memory 追踪数据拓扑图形展示 基础概念 # Span：
+跨度，是跨服务的一次调用。包含名称，开始时间和截止时间，Span之间可以并列，也可以嵌套。
+Trace：
+是一次完成的分布式调用链，包含多个Span
+技术规格 # 后端Go语言实现 前端React/Javascript 支持的数据库：Cassandra3.4+，Elasticsearch5.x+，Kafka&amp;hellip; 组件介绍 # jaeger-client：
+jaeger客户端，可以使用多种主流语言实现OpenTracing协议，将调用链数据收集到agent。
+jaeger-agent：
+jaeger的代理程序，将收集到的client调用链数据上报到collector。
+jaeger-collector：
+jaeger调用链数据收集器，对收集到的调用链数据进行校验，处理，存储到后端数据库。
+jaeger-query：
+jaeger调用链数据查询服务，有独立UI。
+OpenTracing # 分布式的追踪系统其实不止Jaeger一种，但是它们的核心原理都大相径庭，都是从入侵到代码中埋点，然后像追踪系统上报数据信息，最终我们在追踪系统得到数据，从而实现追踪分析。
+为了兼容统一各追踪系统API，OpenTracing规范诞生了，它与平台无关，与厂商无关。有了它的存在，你可以方便的切换你想使用的追踪系统。
+安装 # Docker # docker run -d --name jaeger \ -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \ -p 5775:5775/udp \ -p 6831:6831/udp \ -p 6832:6832/udp \ -p 5778:5778 \ -p 16686:16686 \ -p 14268:14268 \ -p 14250:14250 \ -p 9411:9411 \ jaegertracing/all-in-one:1.</description></item><item><title/><link>https://blog.poneding.com/devops/nginx/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/nginx/</guid><description>我的博客 / DevOps / nginx
+nginx # nginx简介 # 高性能的反向代理工具，负载均衡器；
+nginx配置 # 全局配置 # event配置 # http配置 # 配置反向代理 # 正向代理：
+在国内是
+配置location:
+localtion [ = | ~ | ~* | ^~] uri { } =：用于不包含正则表达式的url前，要求请求字符串与uri严格匹配； ~：用于表示uri包含正则表达式，并且区分大小写； ~*：用于表示uri包含正则表达式，并且不区分大小写； ^~：用于不包含正则表达式的uri前，要求nginx服务器找到表示ui和请求字符串匹配度最高的location后，立即使用此location处理请求 配置负载均衡 # 将负载分摊到不同的服务单元，保证服务的快速响应，高可用。
+upstream myserver { server 192.168.0.1:8081; server 192.168.0.2:8082; } server { listen 80; server_name 192.168.0.1; location / { proxy_pass http://myserver; root html; index index.html index.htm; } } 均衡策略：</description></item><item><title/><link>https://blog.poneding.com/docker/container-diff/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/container-diff/</guid><description>我的博客 / Docker / container-diff 工具的使用
+container-diff 工具的使用 # 简介 # container-diff 是 google 开源的一款用于分析和比较 Docker 镜像的工具，它可以从多个维度分析一个或者比较两个容器镜像：
+镜像构建历史 镜像文件系统 镜像大小 软件包管理 项目地址： https://github.com/GoogleContainerTools/container-diff
+安装 # macOS # curl -LO https://storage.googleapis.com/container-diff/latest/container-diff-darwin-amd64 &amp;amp;&amp;amp; chmod +x container-diff-darwin-amd64 &amp;amp;&amp;amp; sudo mv container-diff-darwin-amd64 /usr/local/bin/container-diff Linux # curl -LO https://storage.googleapis.com/container-diff/latest/container-diff-linux-amd64 &amp;amp;&amp;amp; chmod +x container-diff-linux-amd64 &amp;amp;&amp;amp; sudo mv container-diff-linux-amd64 /usr/local/bin/container-diff # or curl -LO https://storage.googleapis.com/container-diff/latest/container-diff-linux-amd64 &amp;amp;&amp;amp; chmod +x container-diff-linux-amd64 &amp;amp;&amp;amp; mkdir -p $HOME/bin &amp;amp;&amp;amp; export PATH=$PATH:$HOME/bin &amp;amp;&amp;amp; mv container-diff-linux-amd64 $HOME/bin/container-diff Windows # 下载地址： https://storage.</description></item><item><title/><link>https://blog.poneding.com/docker/dind/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/dind/</guid><description>我的博客 / Docker / Docker in Docker
+Docker in Docker # Docker-in-Docker 的意思是在 Docker 容器中使用 docker，就像和在宿主机上使用 docker 一样，你可以理解为套娃。
+场景：
+如果你的 Jenkins 是使用 Docker 容器的方式运行的，如果你想使用 Jenkins 的 Docker 插件来为 Jenkins Job 提供运行容器，这时候你就需要用到 Docker-in-Docker；
+一般这个技术使用在应用的程序集成中 CI/CD。
+1. 挂载主机 /var/run/docker.sock # Docker 容器：
+docker run -v /var/run/docker.sock:/var/run/docker.sock --name docker-in-docker -it docker 在运行起来的容器中使用docker：
+$ docker run -v /var/run/docker.sock:/var/run/docker.sock --name docker-in-docker -it docker / # docker run hello-world Hello from Docker! This message shows that your installation appears to be working correctly.</description></item><item><title/><link>https://blog.poneding.com/docker/docker-buildx/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/docker-buildx/</guid><description>我的博客 / Docker / docker buildx
+docker buildx # $ docker buildx Usage: docker buildx [OPTIONS] COMMAND Extended build capabilities with BuildKit Options: --builder string Override the configured builder instance Management Commands: imagetools Commands to work on images in registry Commands: bake Build from a file build Start a build create Create a new builder instance du Disk usage inspect Inspect current builder instance ls List builder instances prune Remove build cache rm Remove a builder instance stop Stop builder instance use Set the current builder instance version Show buildx version information Run &amp;#39;docker buildx COMMAND --help&amp;#39; for more information on a command.</description></item><item><title/><link>https://blog.poneding.com/docker/docker-commands/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/docker-commands/</guid><description>我的博客 / Docker / Docker 常用命令
+Docker 常用命令 # 启动容器命令 # 默认需要sudo权限执行
+sudo docker run -d -p 80:80 --name nginx nginx &amp;ndash;name：容器命名
+-d：在后台启动
+-p：&amp;lt;host端口&amp;gt;：&amp;lt;容器端口&amp;gt;
+&amp;ndash;rm：容器退出即删除
+-it：i-与容器交互，t-终端
+以root权限进入容器 # sudo docker exec -it -u root nginx bash 让容器一直睡眠 # 使用 curlimages/curl 镜像，并让其一直睡眠。
+docker run -d --name sleep curlimages/curl sleep infinity 操作镜像命令 # 查看镜像 # sudo docker images 删除镜像 # sudo docker rmi &amp;lt;image&amp;gt; # or sudo docker image rm &amp;lt;image&amp;gt; 删除所有镜像 # sudo docker rmi $(docker images -q) 清除未使用镜像 # sudo docker image prune # or sudo docker rmi $(sudo docker images | grep &amp;#34;^&amp;lt;none&amp;gt;&amp;#34; | awk &amp;#34;{print $3}&amp;#34;) 模糊清除镜像 # docker rmi $(docker images | grep &amp;#39;query&amp;#39; | awk &amp;#39;{print $3}&amp;#39;) 操作容器命令 # 查看已经退出的容器 # sudo docker ps -a | grep Exited 清理已经退出的容器 # sudo docker rm $(sudo docker ps -qf status=exited) # or sudo docker rm `sudo docker ps -a | grep Exited | awk &amp;#39;{print $1}&amp;#39;` 清除所有容器 # 使用 -f 参数才能清除所有容器，不使用则只会清理已经退出的容器</description></item><item><title/><link>https://blog.poneding.com/docker/docker-compose-practice/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/docker-compose-practice/</guid><description>我的博客 / Docker / Docker Compose 实践
+Docker Compose 实践 # 安装 # 如果你安装了 Docker Desktop，那么它已经帮你自动安装了 Docker Compose 插件。否则，需要额外安装插件。
+使用一下命令安装或升级 Docker Compose（linux）：
+Ubuntu，Debian： sudo apt update sudo apt install docker-compose-plugin 基于 RPM 发行版: sudo yum update sudo yum install docker-compose-plugin 验证安装版本：
+docker-compose version 常用命令 # 运行
+docker-compose up 查看运行
+docker-compose ps 停止
+docker-compose stop 启动&amp;amp;重启
+docker-compose start docker-compose restart 退出
+docker-compose down 使用 docker-compose -h 查看更多命令及参数。
+实践 # 使用 Docker Compose 运行一个简单的 golang web 程序。</description></item><item><title/><link>https://blog.poneding.com/docker/docker-container-install-pfx-cert/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/docker-container-install-pfx-cert/</guid><description>我的博客 / Docker / Docker 容器中安装 PFX 证书
+Docker 容器中安装 PFX 证书 # 如果正在开发 .NetCore 项目，并且你的项目需要使用到 PFX 证书。此时你需要将你的项目发布到 Docker 容器中，那么你就需要在你的 Docker 容器中安装 PFX 证书了。
+代码中编写 # 使用 X509Store Api 编写你的程序
+using (var certificate = new X509Certificate2(pfxFileBytes, pfxPassword, X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet)) using (var store = new X509Store(storeName, storeLocation, OpenFlags.ReadWrite)) { store.Add(certificate); store.Close(); } Dockerfile 中编写 # 使用 dotnet-certificate-tool 工具安装 pfx 证书。
+首先获取到 Pfx 文件的 Thumbprint，这在 dotnet-certificate-tool 命令中作为参数被使用。
+使用 Powershell Get-PfxCertificate 函数获取 Thumbprint Get-PfxCertificate -FilePath C:\Pfx\Hello-to-World.</description></item><item><title/><link>https://blog.poneding.com/docker/docker-copy-between-host-container/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/docker-copy-between-host-container/</guid><description>我的博客 / Docker / Docker 主机容器互拷贝文件
+Docker 主机容器互拷贝文件 # 命令：docker cp
+1. 将 Docker 容器内文件拷贝到 Host # 获取 docker 容器的 Container ID 或Name
+sudo docker ps 使用以下命令从容器内拷出文件
+sudo docker cp [CONTAINER ID/NAME]:[CONTAINER_PATH] [HOST_PATH] 例如我需要将容器内 /app/appsettings.json 文件拷贝到宿主机的 ~/temp/ 目录 （该目录必须存在） 下
+sudo docker cp b3e608e28f21:/app/appsettings.json ~/temp/appsettings.json # 不指定文件名亦可，默认使用原文件名 sudo docker cp b3e608e28f21:/app/appsettings.json ~/temp/ 2. 将 Host 文件拷贝至 Docker 容器 # 同样，需要先获取容器的 Container ID 或 Name；
+使用以下命令将文件拷贝至容器内
+sudo docker cp [HOST_PATH] [CONTAINER ID/NAME]:[CONTAINER_PATH] 例如我需要将宿主机的 ~/temp/hello.</description></item><item><title/><link>https://blog.poneding.com/docker/docker-manifest-build-cross-arch-image/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/docker-manifest-build-cross-arch-image/</guid><description>我的博客 / Docker / 使用 docker manifest 命令构建多架构镜像
+使用 docker manifest 命令构建多架构镜像 # # 创建 docker manifest create poneding/myimage:v1 poneding/myimage-amd64:v1 poneding/myimage-arm64:v1 # 注解 docker manifest annotate poneding/myimage:v1 poneding/myimage-amd64:v1 --arch amd64 docker manifest annotate poneding/myimage:v1 poneding/asmyimageh-arm64:v1 --arch arm64 # 检查 docker manifest inspect poneding/myimage:v1 # 推送 docker manifest push poneding/myimage:v1 在 x86 机器上构建 arm64 镜像
+docker run --rm --privileged multiarch/qemu-user-static --reset --persistent yes « Docker 主机容器互拷贝文件
+» 理解 docker run &amp;ndash;link</description></item><item><title/><link>https://blog.poneding.com/docker/docker-run-link/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/docker-run-link/</guid><description>我的博客 / Docker / 理解 docker run &amp;ndash;link
+理解 docker run &amp;ndash;link # 使用方式 # # 前提已经存在一个 container2 在运行 docker run img1 --name container1 --link container2 作用 # container1 连接 container2，达到：
+与 container2 直接通信 获取 container2 的环境变量 « 使用 docker manifest 命令构建多架构镜像
+» Docker 可视化工具 Kitematic</description></item><item><title/><link>https://blog.poneding.com/docker/docker-visiable-tool-kitematic/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/docker-visiable-tool-kitematic/</guid><description>我的博客 / Docker / Docker 可视化工具 Kitematic
+Docker 可视化工具 Kitematic # 使用 Kitematic，以可视化的方式管理 docker 镜像，容器等。
+安装 Kitematic # 在 ubuntu（desktop）中安装 kitematic 作为示例，其他平台安装下载地址： https://github.com/docker/kitematic/releases
+# download wget https://github.com/docker/kitematic/releases/download/v0.17.11/Kitematic-0.17.11-Ubuntu.zip unzip Kitematic-0.17.11-Ubuntu.zip # install sudo dpkg -i Kitematic-0.17.11_amd64.deb 用户组管理 # ubuntu 已经安装了 docker 了，当我们安装完 Kitematic 之后，第一次打开会遇到
+将当前用户加入到 docker 组：
+sudo usermod -aG docker $USER # 重启 docker sudo systemctl restart docker sudo chmod a+rw /var/run/docker.sock 完成上面操作后，重启主机，应该就可以使用 Kitamatic 了。
+使用 Kitematic # 第一次启动 Kitematic，需要登录 docker 账号，登录完成后，界面如下。</description></item><item><title/><link>https://blog.poneding.com/docker/dockerfile/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/dockerfile/</guid><description>我的博客 / Docker / Dockerfile
+Dockerfile # 官方文档参考： https://docs.docker.com/engine/reference/builder/
+Dockerfile Linter： https://hadolint.github.io/hadolint/
+Usage # docker build [work-dir] -t [image-tag] -f [dockerfile-path] --build-arg [arg-key]=[arg-value] 指令 # Dockerfile reference | Docker Documentation
+FROM # ARG # 由docker build命令传的参数。
+ARG在multi-stage的作用范围 # 如果ARG放置在第一个FROM之前，那么作用范围是全局的；如果ARG放在FROM之后，那么只对FROM的stage作用。
+ARG USERNAME FROM alpine RUN echo hello, ${USERNAME} FROM alpine RUN echo hi, ${USERNAME} CMD # CMD 指令的目的是为一个可执行容器提供初始运行命令或运行参数。
+CMD 指令有三种形式：
+可执行命令 + 命令参数列表，推荐使用 CMD [&amp;#34;executable&amp;#34;,&amp;#34;param1&amp;#34;,&amp;#34;param2&amp;#34;] 命令参数列表，作为 ENTRYPOINT 的参数 CMD [&amp;#34;param1&amp;#34;,&amp;#34;param2&amp;#34;] Shell 形式，字符串形式的命令 CMD command param1 param2 单个 build stage 只允许存在一个 CMD 指令，如果存在多个 CMD 指令，只有最后一个 CMD 指令生效。</description></item><item><title/><link>https://blog.poneding.com/docker/linux-container/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/linux-container/</guid><description>我的博客 / Docker / Linux 容器
+Linux 容器 # 容器是轻量级的虚拟化技术。
+资源隔离和限制
+容器镜像 # 联合文件系统 # 允许文件存放在不同的层级上，但是最终可以通过统一的视图查看到这些层级的所有文件。
+cgroup # namespace # mount：文件系统隔离 uts：hostname domain pid：1号进程 network user ipc：进程间通信 cgroup « Dockerfile
+» 非 root 账号获取 docker 权限</description></item><item><title/><link>https://blog.poneding.com/docker/non-root-account-get-docker-permission/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/non-root-account-get-docker-permission/</guid><description>我的博客 / Docker / 非 root 账号获取 docker 权限
+非 root 账号获取 docker 权限 # 默认 docker 的命令是需要 sudo 权限的，如果你觉得麻烦，想直接在当前用户下执行 docker 权限，你可以尝试使用下面这个解决方案。
+拢共分两步：
+第一步，将当前用户添加到 docker 组
+sudo usermod -aG docker $USER 第二步，授权
+sudo chmod a+rw /var/run/docker.sock 快去试试吧。
+« Linux 容器
+» some-apps.md</description></item><item><title/><link>https://blog.poneding.com/docker/some-apps/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/some-apps/</guid><description>我的博客 / Docker / some-apps.md
+Docker 应用
+Cloudreve # 项目地址： https://github.com/cloudreve/Cloudreve
+docker run -d --name cloudreve \ -p 5212:5212 \ --mount type=bind,source=/root/apps/cloudreve/conf.ini,target=/cloudreve/conf.ini \ --mount type=bind,source=/root/apps/cloudreve/cloudreve.db,target=/cloudreve/cloudreve.db \ -v /root/apps/cloudreve/uploads:/cloudreve/uploads \ -v /root/apps/cloudreve/avatar:/cloudreve/avatar \ cloudreve/cloudreve:latest Etcd # docker run -d --name etcd \ -p 12379:2379 \ -p 12380:2380 \ -e ALLOW_NONE_AUTHENTICATION=yes \ -e ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379 \ -e ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379,http://0.0.0.0:2379 \ -v /root/apps/etcd/data:/var/run/etcd \ quay.io/coreos/etcd:v3.5.6 Minio # docker run -d --name minio \ -p 9000:9000 \ -p 9001:9001 \ -e MINIO_ROOT_USER=minio \ -e MINIO_ROOT_PASSWORD=&amp;#39;pd1n9@1024&amp;#39; \ -v /root/apps/minio/data:/data \ quay.</description></item><item><title/><link>https://blog.poneding.com/ebpf/ebpf/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/ebpf/ebpf/</guid><description>我的博客 / EBPF / eBPF
+eBPF # 简介 # eBPF (extended Berkeley Packet Filter) 是一项革命性的技术，起源于 Linux 内核，它可以在特权上下文中（如操作系统内核）运行沙盒程序。它用于安全有效地扩展内核的功能，而无需通过更改内核源代码或加载内核模块的方式来实现。
+从历史上看，由于内核具有监督和控制整个系统的特权，操作系统一直是实现可观测性、安全性和网络功能的理想场所。同时，由于操作系统内核的核心地位和对稳定性和安全性的高要求，操作系统内核很难快速迭代发展。因此在传统意义上，与在操作系统本身之外实现的功能相比，操作系统级别的创新速度要慢一些。
+eBPF 从根本上改变了这个方式。通过允许在操作系统中运行沙盒程序的方式，应用程序开发人员可以运行 eBPF 程序，以便在运行时向操作系统添加额外的功能。然后在 JIT 编译器和验证引擎的帮助下，操作系统确保它像本地编译的程序一样具备安全性和执行效率。这引发了一股基于 eBPF 的项目热潮，它们涵盖了广泛的用例，包括下一代网络实现、可观测性和安全功能等领域。
+如今，eBPF 被广泛用于驱动各种用例：在现代数据中心和云原生环境中提供高性能网络和负载均衡，以低开销提取细粒度的安全可观测性数据，帮助应用程序开发人员跟踪应用程序，为性能故障排查、预防性的安全策略执行(包括应用层和容器运行时)提供洞察，等等。可能性是无限的，eBPF 开启的创新才刚刚开始。
+钩子 # eBPF 程序是事件驱动的，当内核或应用程序通过某个钩子点时运行。预定义的钩子包括系统调用、函数入口/退出、内核跟踪点、网络事件等。
+如果预定义的钩子不能满足特定需求，则可以创建内核探针（kprobe）或用户探针（uprobe），以便在内核或用户应用程序的几乎任何位置附加 eBPF 程序。
+编写程序 # 在很多情况下，eBPF 不是直接使用，而是通过像 Cilium、 bcc 或 bpftrace 这样的项目间接使用，这些项目提供了 eBPF 之上的抽象，不需要直接编写程序，而是提供了指定基于意图的来定义实现的能力，然后用 eBPF 实现。
+如果不存在更高层次的抽象，则需要直接编写程序。Linux 内核期望 eBPF 程序以字节码的形式加载。虽然直接编写字节码当然是可能的，但更常见的开发实践是利用像 LLVM 这样的编译器套件将伪 c 代码编译成 eBPF 字节码。
+安全性 # 由于 eBPF 允许我们在内核中运行任意代码，需要有一种机制来确保它的安全运行，不会使用户的机器崩溃，也不会损害他们的数据。这个机制就是 eBPF 验证器。
+验证器对 eBPF 程序进行分析，以确保无论输入什么，它都会在一定数量的指令内安全地终止。</description></item><item><title/><link>https://blog.poneding.com/front-end/build-site-seo-config/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/front-end/build-site-seo-config/</guid><description>我的博客 / 前端技术 / SEO
+SEO # Google 百度 Bing » Pinia 入门</description></item><item><title/><link>https://blog.poneding.com/front-end/pinia/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/front-end/pinia/</guid><description>我的博客 / 前端技术 / Pinia 入门
+Pinia 入门 # 什么是pinia # Pinia 是 Vue 的专属状态管理库，可以实现跨组件或页面共享状态，是 vuex 状态管理工具的替代品，和 Vuex相比，具备以下优势
+提供更加简单的API （去掉了 mutation ） 提供符合组合式API风格的API （和 Vue3 新语法统一） 去掉了modules的概念，每一个store都是一个独立的模块 搭配 TypeScript 一起使用提供可靠的类型推断 创建空Vue项目并安装Pinia # 1. 创建空Vue项目 # npm init vue@latest 2. 安装Pinia并注册 # npm i pinia import { createPinia } from &amp;#39;pinia&amp;#39; const app = createApp(App) // 以插件的形式注册 app.use(createPinia()) app.use(router) app.mount(&amp;#39;#app&amp;#39;) 实现counter # 核心步骤：
+定义store 组件使用store 1- 定义store
+import { defineStore } from &amp;#39;pinia&amp;#39; import { ref } from &amp;#39;vue&amp;#39; export const useCounterStore = defineStore(&amp;#39;counter&amp;#39;, ()=&amp;gt;{ // 数据 （state） const count = ref(0) // 修改数据的方法 （action） const increment = ()=&amp;gt;{ count.</description></item><item><title/><link>https://blog.poneding.com/front-end/vitepress/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/front-end/vitepress/</guid><description>我的博客 / 前端技术 / VitePress
+VitePress # 搭建项目 # mkdir vitepress-demo npm add -D vitepress npx vitepress init 运行 # npm run docs:dev # 或者直接调用 VitePress npx vitepress dev docs 打包 # npm run docs:build GitHub Action # .github/workflows/deploy.yaml
+# 构建 VitePress 站点并将其部署到 GitHub Pages 的示例工作流程 # name: Deploy VitePress site to Pages on: # 在针对 `main` 分支的推送上运行。如果你 # 使用 `master` 分支作为默认分支，请将其更改为 `master` push: branches: [master] # 允许你从 Actions 选项卡手动运行此工作流程 workflow_dispatch: # 设置 GITHUB_TOKEN 的权限，以允许部署到 GitHub Pages permissions: contents: read pages: write id-token: write # 只允许同时进行一次部署，跳过正在运行和最新队列之间的运行队列 # 但是，不要取消正在进行的运行，因为我们希望允许这些生产部署完成 concurrency: group: pages cancel-in-progress: false jobs: # 构建工作 build: runs-on: ubuntu-latest steps: - name: Checkout uses: actions/checkout@v4 with: fetch-depth: 0 # 如果未启用 lastUpdated，则不需要 # - uses: pnpm/action-setup@v3 # 如果使用 pnpm，请取消注释 # - uses: oven-sh/setup-bun@v1 # 如果使用 Bun，请取消注释 - name: Setup Node uses: actions/setup-node@v4 with: node-version: 20 cache: npm # 或 pnpm / yarn - name: Setup Pages uses: actions/configure-pages@v4 - name: Install dependencies run: npm ci # 或 pnpm install / yarn install / bun install - name: Build with VitePress run: npm run docs:build # 或 pnpm docs:build / yarn docs:build / bun run docs:build - name: Upload artifact uses: actions/upload-pages-artifact@v3 with: path: .</description></item><item><title/><link>https://blog.poneding.com/front-end/vue3/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/front-end/vue3/</guid><description>我的博客 / 前端技术 / 认识Vue3
+认识Vue3 # 1. Vue3组合式API体验 # 通过 Counter 案例 体验Vue3新引入的组合式API
+&amp;lt;script&amp;gt; export default { data(){ return { count:0 } }, methods:{ addCount(){ this.count++ } } } &amp;lt;/script&amp;gt; &amp;lt;script setup&amp;gt; import { ref } from &amp;#39;vue&amp;#39; const count = ref(0) const addCount = ()=&amp;gt; count.value++ &amp;lt;/script&amp;gt; 特点：
+代码量变少 分散式维护变成集中式维护 2. Vue3更多的优势 # 使用create-vue搭建Vue3项目 # 1. 认识create-vue # create-vue是Vue官方新的脚手架工具，底层切换到了 vite （下一代前端工具链），为开发提供极速响应
+2. 使用create-vue创建项目 # 前置条件 - 已安装16.0或更高版本的Node.js</description></item><item><title/><link>https://blog.poneding.com/git/common-usage/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/common-usage/</guid><description>我的博客 / Git / Git 常用
+Git 常用 # 本篇主要介绍 Git 的常用命令，包括 Git 的基本配置、创建仓库、添加文件、提交文件、查看状态、查看提交历史、撤销修改、删除文件、分支管理、远程仓库等。
+Git 基本配置 # 配置 SSH 密钥 # 提交代码到远程仓库时，需要使用 SSH 密钥进行身份验证，因此需要先配置 SSH 密钥。
+# 生成 SSH 密钥 ssh-keygen -t rsa -C poneding@gmail.com # 查看 SSH 密钥，复制到 GitHub/GitLab 等 SSH Keys 中 cat ~/.ssh/id_rsa.pub 添加 .ssh/config 文件，配置 SSH 密钥的别名，方便管理多个 SSH 密钥。
+vim ~/.ssh/config 以 GitHub 为例，配置如下：
+# GitHub Host github.com HostName github.com IdentityFile ~/.ssh/id_rsa 配置用户名和邮箱 # 提交代码时，需要配置用户名和邮箱。</description></item><item><title/><link>https://blog.poneding.com/git/git-secret/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/git-secret/</guid><description>我的博客 / Git / 使用 git-secret 保护仓库敏感数据
+使用 git-secret 保护仓库敏感数据 # 如何保护 git 仓库中的敏感数据，例如数据库连接字符串，账号密码等？
+首先，最好先将仓库设置成私有仓库！然后，
+第一种方式：带有敏感数据的文件加入到. gitignore，不提交到仓库中； 第二种方式：敏感数据库文件加密后再提交到仓库中，这个就是今天要说的 git-secret。 这两种方式都有优缺点：
+第一种方式，较为靠谱，敏感文件在 git 仓库之外，根本上避免仓库敏感数据的泄露，但是敏感文件不受版本控制了，开发人员需要在其他频道同步敏感文件的更新，而且使用到自动部署时需要另外去拉取敏感数据，最好是有自己的敏感数据配置中心统一管理；
+第二种方式，使用 git-secret 加密敏感文件，这样敏感文件被仓库 ignore 掉，转而提交加密后的文件，但是敏感文件如果更新了开发人员要记得再次加密。
+git-secret 简介 # git-secret 是一个在 git 仓库中加密文件的工具，将敏感文件加密，得到加密文件，将文件保存到仓库中，这样敏感文件也是版本控制，你可以获取到该文件的所有提交记录。
+使用 gpg 和所有信任用户的公钥加密文件，每个信任用户可以使用个人密钥解密文件，如果用户离开团队，将删除用户的公钥即可，他也就不能再解密文件了。
+git-secret 使用 # 假设我现在有一个仓库 git-secret-demo，仓库下有一个包含敏感信息的文件 secret.json：
+我现在想做的是使用 git-secret 将 secret.json 文件加密。
+首先得安装 gpg 工具 # Debian &amp;amp; Ubuntu sudo apt install gnupg -y ​ # Macos brew install gnupg 本地创建 gpg RSA 密钥对 gpg --gen-key 在创建时需要输入自己的用户名和邮箱，并且需要输入你的加密密码。</description></item><item><title/><link>https://blog.poneding.com/git/github-action-best-practice/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/github-action-best-practice/</guid><description>我的博客 / Git / Github Action 使用最佳实践
+Github Action 使用最佳实践 # Commit 构建 beta 版本镜像 # 仓库根目录下创建 .github/workflows/commit-cicd.yml 文件，用于提交代码触发 github action。
+beta 版本的镜像 tag 命名规则：{vx.x.x}-beta-{COMMIT_ID}，例如：v1.0.0-beta-f37cfa2
+name: commit-cicd ​ env: BASE_VERSION: v1.0.0 ​ on: push: branches: [main] workflow_dispatch: ​ jobs: build: runs-on: ubuntu-latest steps: - uses: actions/checkout@v3 ​ - name: Set ENV run: | echo &amp;#34;VERSION=${BASE_VERSION}-beta-${GITHUB_SHA::7}&amp;#34; &amp;gt;&amp;gt; $GITHUB_ENV ​ - name: Set up QEMU uses: docker/setup-qemu-action@v2 - name: Set up Docker Buildx uses: docker/setup-buildx-action@v2 ​ - name: Login to docker hub uses: docker/login-action@v2 with: username: poneding password: ${{ secrets.</description></item><item><title/><link>https://blog.poneding.com/git/github-host-helm-chart/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/github-host-helm-chart/</guid><description>我的博客 / Git / 使用 GitHub 托管 helm-chart 仓库
+使用 GitHub 托管 helm-chart 仓库 # helm 官方文档：
+Helm | Chart Releaser Action to Automate GitHub Page Charts 创建 GitHub 仓库，例如：helm-charts，克隆到本地。 git clone git@github.com:[gh_id]/helm-charts.git cd helm-charts 创建干净的 gh-pages 分支。 git checkout --orphan gh-pages git rm -rf . vim README.md # helm-charts ## Usage [Helm](https://helm.sh) must be installed to use the charts. Please refer to Helm&amp;#39;s [documentation](https://helm.sh/docs) to get started. Once Helm has been set up correctly, add the repo as follows: ```bash helm repo add mycharts https://[gh_id].</description></item><item><title/><link>https://blog.poneding.com/git/github-hosting-helm-reop/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/github-hosting-helm-reop/</guid><description>我的博客 / Git / GitHub 托管 helm-chart 仓库
+GitHub 托管 helm-chart 仓库 # 创建 GitHub 仓库 # 创建 GitHub helm charts 仓库，例如：helm-charts，克隆到本地。
+git clone git@github.com:poneding/helm-charts.git cd helm-charts 创建 gh-pages 孤立分支 # git checkout --orphan gh-pages git rm -rf . vim README.md 编写 README.md 文件，例如：
+# helm-charts ## Usage [Helm](https://helm.sh) must be installed to use the charts. Please refer to Helm&amp;#39;s [documentation](https://helm.sh/docs) to get started. Once Helm has been set up correctly, add the repo as follows: ```bash helm repo add poneding https://poneding.</description></item><item><title/><link>https://blog.poneding.com/git/github/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/github/</guid><description>我的博客 / Git / GitHub
+GitHub # GitHub 托管 helm chart 仓库 # GitHub 托管 helm chart 仓库
+获取仓库最新 Release 的版本 # 方法一：
+curl -s https://api.github.com/repos/ketches/registry-proxy/releases/latest | jq -r .tag_name 方法二：
+basename $(curl -s -w %{redirect_url} https://github.com/ketches/registry-proxy/releases/latest) « GitHub 托管 helm-chart 仓库
+» Gitlab 添加 K8s 集群</description></item><item><title/><link>https://blog.poneding.com/git/gitlab-intergrate-k8s/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/gitlab-intergrate-k8s/</guid><description>我的博客 / Git / Gitlab 添加 K8s 集群
+Gitlab 添加 K8s 集群 # 本文介绍如何在 Gitlab 项目中添加 K8s 集群，以便使用 K8s 集群部署 gitlab-runner 帮我们运行 gitlab 的 CI/CD。
+参考官方文档： https://docs.gitlab.com/ee/user/project/clusters/add_remove_clusters.html#add-existing-cluster
+操作步骤 # 找到添加位置：
+登入 gitlab 后，进入自己的项目主页，菜单栏 Operations =&amp;gt; Kubernetes =&amp;gt; Add Kubernetes cluster，选择页签 Add existing cluster。
+我们只需要获取响应的值填录到该表单即可。Kubernetes cluster name 集群名称随意填，Project namespace 可不填。
+获取 API URL：
+运行以下命令得到输出值：
+kubectl cluster-info | grep &amp;#39;Kubernetes master&amp;#39; | awk &amp;#39;/http/ {print $NF}&amp;#39; 获取 CA Certificate：
+运行以下命令得到输出值：
+kubectl get secret $(kubectl get secret | grep default-token | awk &amp;#39;{print $1}&amp;#39;) -o jsonpath=&amp;#34;{[&amp;#39;data&amp;#39;][&amp;#39;ca\.</description></item><item><title/><link>https://blog.poneding.com/git/gitlab-upgrade-cross-version/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/gitlab-upgrade-cross-version/</guid><description>我的博客 / Git / Gitlab 跨版本升级
+Gitlab 跨版本升级 # 本文记录 Gitlab 跨版本升级的具体操作过程。
+按照官方的说法，gitlab 允许小版本直接升级，大版本需要阶段升级。
+跨版本升级示例：11.0.x -&amp;gt; 11.11.x -&amp;gt; 12.0.x -&amp;gt; 12.10.x -&amp;gt; 13.0.x。
+官方推荐的升级路线文档： https://docs.gitlab.com/ee/policy/maintenance.html#upgrade-recommendations
+目的 # 实现 gitlab 版本：11.2.3 到 13.0.0 版本的升级，我选择的升级路线是：11.2.3 =&amp;gt; 11.11.8 =&amp;gt; 12.0.12 =&amp;gt; 12.10.6 =&amp;gt; 13.0.0 =&amp;gt; 13.1.2
+我当前创建 gitlab 容器的脚本如下：
+sudo docker run --detach \ --hostname gitlab.example.com \ --publish 8443:443 --publish 8080:80 --publish 8022:22 \ --name gitlab \ --restart always \ --volume /home/ubuntu/Apps/gitlab/etc/gitlab:/etc/gitlab \ --volume /home/ubuntu/Apps/gitlab/var/log/gitlab/logs:/var/log/gitlab \ --volume /home/ubuntu/Apps/gitlab/var/opt/gitlab:/var/opt/gitlab \ gitlab/gitlab-ce:11.</description></item><item><title/><link>https://blog.poneding.com/git/multi-github-account-management/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/multi-github-account-management/</guid><description>我的博客 / Git / 多 GitHub 账号管理
+多 GitHub 账号管理 # 实际开发工作中，你有可能多个 GitHub 账号：个人开发账号，工作开发账号。
+在仓库代码管理的过程中你需要重复的使用 git config user.* 来切换代码提交账号，很是麻烦。以下方案可以帮你解决你的烦恼。
+请确保你的 git 版本最低为 2.13
+~/.gitconfig
+[user] name = poneding email = poneding@gmail.com [includeIf &amp;#34;gitdir:~/src/workspace/&amp;#34;] path = ~/src/workspace/.gitconfig [url &amp;#34;git@github-workspace&amp;#34;] insteadOf = git@github.com [pull] rebase = false [init] defaultBranch = master [core] excludesfile = ~/.gitignore_global ~/src/workspace/.gitconfig
+[user] name = dingpeng24001 email = dingpeng24001@talkweb.com.cn [url &amp;#34;git@github-workspace&amp;#34;] insteadOf = git@github.com [pull] rebase = false [init] defaultBranch = master [core] excludesfile = ~/.</description></item><item><title/><link>https://blog.poneding.com/git/simplest-git-server/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/git/simplest-git-server/</guid><description>我的博客 / Git / 搭建最简单的 git 仓库服务
+搭建最简单的 git 仓库服务 # 远端 # 创建仓库服务目录：
+git init --bare git-server-demo.git 其实也可以直接在终端创建，但是你首先要可以能够通过 ssh 的方式连接远端，例如远端 IP 是 192.168.10.24
+ssh root@192.168.10.24 git init --bare git-server-demo.git 执行完命令之后，将在远端目标目录下生成 git-server-demo 目录，子目录结构如下：
+tree git-server-demo.git git-server-demo.git ├── branches ├── config ├── description ├── HEAD ├── hooks │ ├── applypatch-msg.sample │ ├── commit-msg.sample │ ├── fsmonitor-watchman.sample │ ├── post-update.sample │ ├── pre-applypatch.sample │ ├── pre-commit.sample │ ├── pre-merge-commit.sample │ ├── prepare-commit-msg.</description></item><item><title/><link>https://blog.poneding.com/go/dev-env-config/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/dev-env-config/</guid><description>我的博客 / Golang 编程 / Go 开发环境配置
+Go 开发环境配置 # cobra-cli # 安装：
+go install github.com/spf13/cobra-cli@latest 自动补全：
+cobra-cli completion zsh &amp;gt; .zfunc/_cobra-cli 在 .zshrc 文件中添加内容（如果已添加，则忽略）：
+fpath+=~/.zfunc autoload -Uz compinit &amp;amp;&amp;amp; compinit » Golang 函数可选参数模式</description></item><item><title/><link>https://blog.poneding.com/go/function-optional-pattern/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/function-optional-pattern/</guid><description>我的博客 / Golang 编程 / Golang 函数可选参数模式
+Golang 函数可选参数模式 # 函数可选参数模式 # type Server struct { Addr string Timeout time.Duration } type Option func(*Server) func newServer(addr string, options ...Option) (*Server, error) { s := &amp;amp;Server{ Addr: addr, } for _, opt := range options { opt(s) } // ... return s, nil } func WithTimeout(timeout time.Duration) Option { return func(s *Server) { s.Timeout = timeout } } 通用函数可选参数模式 # type BasicService struct { redisClient string } type ServiceOption func(*BasicService) func WithRedisClient(redisClient string) ServiceOption { return func(s *BasicService) { s.</description></item><item><title/><link>https://blog.poneding.com/go/go-cert-management/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/go-cert-management/</guid><description>我的博客 / Golang 编程 / Golang 密钥对、数字签名和证书管理
+Golang 密钥对、数字签名和证书管理 # Golang 实现密钥对生成 相当于使用 openssl 生成私钥和公钥：
+openssl genrsa -out pri.key 2048 openssl rsa -in pri.key -pubout -out pub.key package main import ( &amp;#34;crypto/rand&amp;#34; &amp;#34;crypto/rsa&amp;#34; ) func GenerateKeyPair() (*rsa.PrivateKey, *rsa.PublicKey, error) { prikey, err := rsa.GenerateKey(rand.Reader, 2048) if err != nil { return nil, nil, err } return prikey, &amp;amp;prikey.PublicKey, nil } 实现加密和解密 加密解密：公钥加密，私钥解密
+package main import ( &amp;#34;crypto/rand&amp;#34; &amp;#34;crypto/rsa&amp;#34; ) func Encrypt(data []byte, publicKey *rsa.</description></item><item><title/><link>https://blog.poneding.com/go/go-cross-complie/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/go-cross-complie/</guid><description>我的博客 / Golang 编程 / Golang 不同平台架构编译
+Golang 不同平台架构编译 # 在 MacOS 平台编译成 Windows、Linux 可执行文件：
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build main.go CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build main.go CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build main.go CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build main.go 在 Windows 平台编译成 Linux、MacOS 可执行文件：
+$env:GOOS = &amp;#34;linux&amp;#34;;$env:CGO_ENABLED = &amp;#34;0&amp;#34;;$env:GOARCH = &amp;#34;amd64&amp;#34;;go build carbon/carbon.go $env:GOOS = &amp;#34;linux&amp;#34;;$env:CGO_ENABLED = &amp;#34;0&amp;#34;;$env:GOARCH = &amp;#34;arm64&amp;#34;;go build carbon/carbon.go $env:GOOS = &amp;#34;darwin&amp;#34;;$env:CGO_ENABLED = &amp;#34;0&amp;#34;;$env:GOARCH = &amp;#34;amd64&amp;#34;;go build carbon/carbon.</description></item><item><title/><link>https://blog.poneding.com/go/go-gen-cert/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/go-gen-cert/</guid><description>我的博客 / Golang 编程 / Golang 生成证书
+Golang 生成证书 # 代码实现 # package certutil import ( &amp;#34;bytes&amp;#34; &amp;#34;crypto/rand&amp;#34; &amp;#34;crypto/rsa&amp;#34; &amp;#34;crypto/x509&amp;#34; &amp;#34;crypto/x509/pkix&amp;#34; &amp;#34;encoding/pem&amp;#34; &amp;#34;math/big&amp;#34; &amp;#34;net&amp;#34; &amp;#34;time&amp;#34; ) // CA ca type CA struct { caInfo *x509.Certificate caPrivKey *rsa.PrivateKey caPem, caKeyPem []byte } // GetCAPem get ca pem bytes func (c *CA) GetCAPem() ([]byte, error) { if c.caPem == nil { // create the CA caBytes, err := x509.CreateCertificate(rand.Reader, c.caInfo, c.caInfo, &amp;amp;c.</description></item><item><title/><link>https://blog.poneding.com/go/go-linkname/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/go-linkname/</guid><description>我的博客 / Golang 编程 / go:linkname 指令
+go:linkname 指令 # 背景 # 阅读 Golang 源码时，发现在标准库 time.Sleep 方法没有没有方法体。如下：
+// Sleep pauses the current goroutine for at least the duration d. // A negative or zero duration causes Sleep to return immediately. func Sleep(d Duration) 当我们直接在代码中写一个空方法 func Foo()，编译时会报错：missing function body。所以标准库使用了什么魔法来实现空方法的呢？ 进一步研究，得知 time.Sleep 运行时实际调用了 runtime.timeSleep方法，如下：
+// timeSleep puts the current goroutine to sleep for at least ns nanoseconds. // //go:linkname timeSleep time.Sleep func timeSleep(ns int64) { if ns &amp;lt;= 0 { return } gp := getg() t := gp.</description></item><item><title/><link>https://blog.poneding.com/go/go-list-to-tree/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/go-list-to-tree/</guid><description>我的博客 / Golang 编程 / Golang 列表转树
+Golang 列表转树 # 场景介绍 # 从数据库获取到了菜单列表数据，这些菜单数据通过字段 ParentID 表示父子层级关系，现在需要将菜单列表数据转成树状的实例对象。
+数据库取出的初始数据：
+raw := []Menu{ {Name: &amp;#34;一级菜单 1&amp;#34;, ID: 1, PID: 0}, {Name: &amp;#34;一级菜单 2&amp;#34;, ID: 2, PID: 0}, {Name: &amp;#34;一级菜单 3&amp;#34;, ID: 3, PID: 0}, {Name: &amp;#34;二级菜单 1-1&amp;#34;, ID: 11, PID: 1}, {Name: &amp;#34;二级菜单 1-2&amp;#34;, ID: 12, PID: 1}, {Name: &amp;#34;二级菜单 1-3&amp;#34;, ID: 13, PID: 1}, {Name: &amp;#34;二级菜单 2-1&amp;#34;, ID: 21, PID: 2}, {Name: &amp;#34;二级菜单 2-2&amp;#34;, ID: 22, PID: 2}, {Name: &amp;#34;二级菜单 2-3&amp;#34;, ID: 23, PID: 2}, } 需要得到的目标数据：</description></item><item><title/><link>https://blog.poneding.com/go/go-mtls/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/go-mtls/</guid><description>我的博客 / Golang 编程 / Golang 实现双向认证
+Golang 实现双向认证 # TLS # 传输层安全协议（TLS），在互联网上，通常是由服务器单向的向客户端提供证书，以证明其身份。
+mTLS # 双向 TLS 认证，是指在客户端和服务器之间使用双行加密通道，mTLS 是云原生应用中常用的通信安全协议。
+使用双向TLS连接的主要目的是当服务器应该只接受来自有限的允许的客户端的 TLS 连接时。例如，一个组织希望将服务器的 TLS 连接限制为只来自该组织的合法合作伙伴或客户。显然，为客户端添加IP白名单不是一个好的安全实践，因为IP可能被欺骗。
+为了简化 mTLS 握手的过程，我们这样简单梳理：
+客户端发送访问服务器上受保护信息的请求； 服务器向客户端提供公钥证书； 客户端通过使用 CA 的公钥来验证服务器公钥证书的数字签名，以验证服务器的证书； 如果步骤 3 成功，客户机将其客户端公钥证书发送到服务器； 服务器使用步骤 3 中相同的方法验证客户机的证书； 如果成功，服务器将对受保护信息的访问权授予客户机。 代码实现 # 需要实现客户端验证服务端的公钥证书，服务端验证客户端的公钥证书。
+生成证书 # echo &amp;#39;清理并生成目录&amp;#39; OUT=./certs DAYS=365 RSALEN=2048 CN=poneding rm -rf ${OUT}/* mkdir ${OUT} &amp;gt;&amp;gt; /dev/null 2&amp;gt;&amp;amp;1 cd ${OUT} echo &amp;#39;生成CA的私钥&amp;#39; openssl genrsa -out ca.key ${RSALEN} &amp;gt;&amp;gt; /dev/null 2&amp;gt;&amp;amp;1 echo &amp;#39;生成CA的签名证书&amp;#39; openssl req -new \ -x509 \ -key ca.</description></item><item><title/><link>https://blog.poneding.com/go/go-publish-package-01/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/go-publish-package-01/</guid><description>我的博客 / Golang 编程 / Golang 发布类库 - 1
+Golang 发布类库 - 1 # 本页介绍如何在 Github 上发布我们自己的 Golang 类库。
+1、创建 github 仓库托管 go 类库代码，例如 common-go：：
+2、将仓库克隆至本地：：
+git clone https://github.com/poneding/common-go.git 3、初始化go类库的module：：
+cd common-go go mod init github.com/poneding/common-go mkdir hello 注意：
+使用 go env 命令查看是否开启 go-module 功能，如果没开启需要设置环境变量：go env -w GO111MODULE=on；
+module 名称需要与 github 仓库一致，这样其他人才能通过 go get github.com/poneding/commmon-go 下载到你的类库。
+4、编写 go 类库代码，例如：：
+hell/hello.go：
+package hello import &amp;#34;fmt&amp;#34; func Say(name string) { fmt.Printf(&amp;#34;Hello, %s\n&amp;#34;, name) } 5、提交 go 代码到 github：：</description></item><item><title/><link>https://blog.poneding.com/go/go-publish-package-02/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/go-publish-package-02/</guid><description>我的博客 / Golang 编程 / Golang 发布类库 - 2
+Golang 发布类库 - 2 # 本页介绍如何在 Github 上升级我们已发布的 Golang 类库。
+Go 类库版本规则 # go 类库版本的规则：主版本号.次版本号.修订号，其中：
+主版本号：类库进行了不可向下兼容的修改，例如功能重构，这时候主版本号往上追加； 次版本号：类库进行了可向下兼容的修改，例如新增功能，这时候次版本号往上追加； 修订号：类库进行了可向下兼容的修改（修改的规模更小），例如修复或优化功能，这时候修订好往上追加。 Go 类库发版示例 # 同样以 github.com/poneding/common-go 类库为示例。
+小版本升级 # 主版本不升级，次版本或修订版本升级。
+v0.x.x 版本升级至 v1.x.x 也是可以直接升级的。
+当前版本是 v1.0.0，现对该类库进行了功能修改，发布 v1.0.1 版本：
+1、切换至 v1 分支：
+git checkout v1 2、修改类库代码：
+hello/hello.go：
+package hello import &amp;#34;fmt&amp;#34; func Say(name string) { fmt.Printf(&amp;#34;Hello, %s\n&amp;#34;, name) fmt.Println(&amp;#34;common-go version: v1.0.1&amp;#34;) } 3、提交代码并发布：
+git add .</description></item><item><title/><link>https://blog.poneding.com/go/go-solid/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/go-solid/</guid><description>我的博客 / Golang 编程 / Go 程序 SOLID 设计原则
+Go 程序 SOLID 设计原则 # 可重用软件设计的五个原则，SOLID 原则：
+单一职责原则（Single Responsibility Principle） 开放 / 封闭原则（Open / Closed Principle） 里氏替换原则（Liskov Substitution Principle） 接口隔离原则（Interface Segregation Principle） 依赖倒置原则（Dependency Inversion Principle） 单一职责原则 # SOLID 的第一个原则，S，是单一责任原则。
+A class should have one, and only one, reason to change. – Robert C Martin
+现在 Go 显然没有 classses - 相反，我们有更强大的组合概念 - 但是如果你能回顾一下 class 这个词的用法，我认为此时会有一定价值。
+为什么一段代码只有一个改变的原因很重要？嗯，就像你自己的代码可能会改变一样令人沮丧，发现您的代码所依赖的代码在您脚下发生变化更痛苦。当你的代码必须改变时，它应该响应直接刺激作出改变，而不应该成为附带损害的受害者。
+因此，具有单一责任的代码修改的原因最少。
+耦合和内聚 # 描述改变一个软件是多么容易或困难的两个词是：耦合和内聚。
+耦合只是一个词，描述了两个一起变化的东西 —— 一个运动诱导另一个运动。 一个相关但独立的概念是内聚，一种相互吸引的力量。 在软件上下文中，内聚是描述代码片段之间自然相互吸引的特性。</description></item><item><title/><link>https://blog.poneding.com/go/go-stdlib/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/go-stdlib/</guid><description>我的博客 / Golang 编程 / Golang 标准库
+Golang 标准库 # fmt # 格式化打印
+%v 原样输出 %T 打印类型 %t bool %s string %f float %d 10进制整数 %b 2进制整数 %o 8进制整数 %x 16进制整数 0-9，a-f %X 16进制整数 0-9，A-F %c char %p pointer %.2f float 保留两位 path # file := &amp;#34;./logs/2021-01-25/error.log&amp;#34; fileName := path.Base(file) # 返回文件名：error.log fileExt := path.Ext(file) # 返回文件后缀：.log fileDir := path.Dir(file) # 返回文件路径： ./logs/2021-01-25 os/exec # Golang语言有一个包叫做 os/exec，使用该包可以直接在程序中调用主机的命令，使用示例如下：
+func OsExecUsage() error { fmt.</description></item><item><title/><link>https://blog.poneding.com/go/go-testing/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/go-testing/</guid><description>我的博客 / Golang 编程 / testing
+testing # 命令 # 测试
+go test -run=TestCompare -v . 运行测试，测试函数名称中仅包含 TestCompare 前缀。
+列出包内测试文件
+go list -f={{.GoTestFiles}} . 列出包外测试文件
+go list -f={{.XTestGoFiles}} . 包内测试：测试文件的包名称与被测包一致，可以访问被测包内所有成员，相当于白盒测试；
+包外测试：测试文件的包名称与被测包不一致，一般在被测包名称后面添加 _test 后缀，只能访问被测包内公开成员，相当于黑盒测试。
+« Golang 标准库
+» Golang</description></item><item><title/><link>https://blog.poneding.com/go/go/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/go/</guid><description>我的博客 / Golang 编程 / Golang
+Golang # 资料 # Go 安全指南 Go 语言编程规范 Golang channel # golang 实现并发是通过通信共享内存，channel 是 go 语言中goroutine 的通信管道，通过 channel 将值从一个 goroutine 发送到另一个 goroutine。
+语法 # 创建 channel：
+使用 make() 函数创建：
+ch := make(chan int) 默认创建一个无缓存 channel。
+发送数据到 channel：
+ch &amp;lt;- x 从 channel 读取数据：
+x := &amp;lt;-ch 关闭 channel：
+使用 close() 函数关闭：
+close(ch) 当你的程序不再需要往 channel 中发送数据时，可以关闭 channel。
+如果往已经关闭的 channal 发送数据，程序发生异常。
+无缓冲 channel # 如果当前没有一个 goroutine 对无缓冲 channel 接收数据，那么无缓冲 channel 会阻止发送数据。</description></item><item><title/><link>https://blog.poneding.com/go/gopkg-errors/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/gopkg-errors/</guid><description>我的博客 / Golang 编程 / gopkg-errors.md
+title: Go 包 - errors date: 2022-10-19T14:44:06+08:00 lastmod: 2022-11-03T03:32:31.646Z tags:
+Golang gopkg keywords: Golang gopkg errors weight: 1 errors 包为你的 Go 程序提供一种对程序员调试、查看日志更友好的错误处理方式。
+Go 程序中传统的错误处理方法：
+if err != nil { return err } 递归的向上传递错误，这种方式有一个缺陷：最终处理错误的位置无法获取错误的调用上下文信息。
+errors 包以不破坏错误的原始值的方式向错误中的添加调用上下文信息。
+获取包 # go get github.com/pkg/errors 错误添加上下文 # The errors.Wrap function returns a new error that adds context to the original error. For example
+_, err := ioutil.ReadAll(r) if err !</description></item><item><title/><link>https://blog.poneding.com/go/goreleaser/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/goreleaser/</guid><description>我的博客 / Golang 编程 / Goreleaser
+Goreleaser # Go 程序项目的自动化发布工具，简单的发布命令帮助我们省去大量的重复工作。
+安装 # MacOs：
+brew install goreleaser/tap/goreleaser 源码编译：
+git clone https://github.com/goreleaser/goreleaser cd goreleaser go get ./... go build -o goreleaser . ./goreleaser --version 初始化 # 在go项目下运行以下命令，生成.goreleaser.yml文件：
+goreleaser init 生成文件后，自行配置，相信你能看的懂。
+验证 .goreleaser.yml # goreleaser check 使用本地环境构建
+goreleaser build --single-target 配置 github token # token 必须至少包含 write:package 权限，才能上传到发布资源中。
+从github生成token，写入文件：
+mkdir ~/.config/goreleaser vim ~/.config/goreleaser/github_token 或者直接在终端导入环境配置：
+export GITHUB_TOKEN=&amp;#34;YOUR_GITHUB_TOKEN&amp;#34; 为项目打上 tag # git tag v0.1.0 -m &amp;#34;release v0.</description></item><item><title/><link>https://blog.poneding.com/go/mac-appl-silicon-cross-compile-cgo/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/mac-appl-silicon-cross-compile-cgo/</guid><description>我的博客 / Golang 编程 / Mac M1 交叉编译 CGO
+Mac M1 交叉编译 CGO # 方法一 # 1、安装依赖
+brew tap messense/macos-cross-toolchains brew install x86_64-unknown-linux-gnu brew install aarch64-unknown-linux-gnu 2、添加到 PATH
+export PATH=$PATH:/opt/homebrew/Cellar/x86_64-unknown-linux-gnu/11.2.0_1/bin::/opt/homebrew/Cellar/aarch64-unknown-linux-gnu/11.2.0_1/bin 3、编译 CGO 程序
+CGO_ENABLED=1 GOOS=linux GOARCH=amd64 CC=x86_64-unknown-linux-gnu-gcc CXX=x86_64-unknown-linux-gnu-g++ go build CGO_ENABLED=1 GOOS=linux GOARCH=arm64 CC=aarch64-unknown-linux-gnu-gcc CXX=aarch64-unknown-linux-gnu-g++ go build 方法二 # 1、安装依赖
+brew install FiloSottile/musl-cross/musl-cross 2、添加到 PATH
+export PATH=$PATH:/opt/homebrew/Cellar/musl-cross/0.9.9_1/bin 3、编译 CGO 程序
+# -tags=musl 不能省略不然会出现其他错误 CGO_ENABLED=1 GOOS=linux GOARCH=amd64 CC=x86_64-linux-musl-gcc CXX=x86_64-linux-musl-g++ go build -tags=musl # 如果linux不想安装musl支持 CGO_ENABLED=1 GOOS=linux GOARCH=amd64 CC=x86_64-linux-musl-gcc CXX=x86_64-linux-musl-g++ CGO_LDFLAGS=&amp;#34;-static&amp;#34; go build -tags=musl CGO_ENABLED=1 GOOS=linux GOARCH=amd64 CC=x86_64-linux-musl-gcc CGO_LDFLAGS=&amp;#34;-static&amp;#34; go build CGO_ENABLED=1 GOOS=linux GOARCH=arm64 CC=x86_64-linux-musl-gcc CGO_LDFLAGS=&amp;#34;-static&amp;#34; go build 参考 # https://blog.</description></item><item><title/><link>https://blog.poneding.com/go/pprof/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/pprof/</guid><description>我的博客 / Golang 编程 / pprof
+pprof # pprof 是性能调试工具，可以生成类似火焰图、堆栈图，内存分析图等。
+package main import ( &amp;#34;fmt&amp;#34; &amp;#34;math/rand&amp;#34; &amp;#34;net/http&amp;#34; &amp;#34;time&amp;#34; _ &amp;#34;net/http/pprof&amp;#34; ) // 吃内存 type Eater struct { Name string Buffer [][]int } var e Eater func main() { e = Eater{Name: &amp;#34;eater&amp;#34;} http.HandleFunc(&amp;#34;/go&amp;#34;, goHandler) http.ListenAndServe(&amp;#34;:8080&amp;#34;, nil) // 如果不使用默认的 mux（http.DefaultServeMux），可以使用如下方式集成 pprof // mux := http.NewServeMux() // mux.HandleFunc(&amp;#34;/go&amp;#34;, goHandler) // mux.HandleFunc(&amp;#34;/debug/pprof/&amp;#34;, pprof.Index) // mux.HandleFunc(&amp;#34;/debug/pprof/cmdline&amp;#34;, pprof.Cmdline) // mux.HandleFunc(&amp;#34;/debug/pprof/profile&amp;#34;, pprof.Profile) // mux.HandleFunc(&amp;#34;/debug/pprof/symbol&amp;#34;, pprof.Symbol) // mux.</description></item><item><title/><link>https://blog.poneding.com/go/ssh-keygen-with-go/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/go/ssh-keygen-with-go/</guid><description>我的博客 / Golang 编程 / 使用 Go 生成 OpenSSH 兼容的 RSA 密钥对
+使用 Go 生成 OpenSSH 兼容的 RSA 密钥对 # 我们可以使用 ssh-keygen 命令生成一对用于 SSH 访问的私钥和公钥。本文将介绍如何使用 Go 生成一对 OpenSSH 兼容的 RSA 密钥对。
+以下代码中 GenOpenSSHKeyPair 方法用于生成一对用于 SSH 访问的私钥和公钥。生成的私钥以 PEM 编码，公钥以 OpenSSH authorized_keys 文件中包含的格式进行编码。
+package util import ( &amp;#34;crypto/rand&amp;#34; &amp;#34;crypto/rsa&amp;#34; &amp;#34;crypto/x509&amp;#34; &amp;#34;encoding/pem&amp;#34; &amp;#34;golang.org/x/crypto/ssh&amp;#34; ) // GenOpenSSHKeyPair make a pair of private and public keys for SSH access. // Private Key generated is PEM encoded // Public key is encoded in the format for inclusion in an OpenSSH authorized_keys file.</description></item><item><title/><link>https://blog.poneding.com/graphql/graphql/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/graphql/graphql/</guid><description>我的博客 / Graphql / Graphql
+Graphql # https://graphql.cn/learn/
+介绍 # 一种 API 查询语言，也是一种满足使用现有数据完成几乎所有数据查询的运行时。
+对 API 数据提供可理解的完整描述，赋予客户端准确获取所需数据，使得 API 的演进更加轻松，也可以使用它来构建强大的开发者工具（LowCode?）。
+特性 # 所得即所取：
+请求什么，返回什么，因为总是根据你请求的结构返回可预见的结果。
+单取多得：
+单次请求，返回多种结构的数据，不仅对资源属性查询，而且还会沿着资源的引用关系进一步查询。
+这也是对比 Restful API 的一种优势，Restful API 对多资源的查询时，往往需要多次访问不同的API，这无疑增加了网络连接的压力。
+类型系统描述所有：
+GraphQL API 基于类型和字段的方式进行组织，而非入口端点。你可以通过一个单一入口端点得到你的访问数据的所有能力。GraphQL 使用类型来保证应用只请求可能的数据，否则会提供了明确的有用的错误信息。应用也可以使用类型，而避免编写手动解析代码。
+API无版本：
+API 演进只需要往 Graphql 类型系统中添加字段和类型，而不影响现有查询。
+统一共享：
+GraphQL 让你的整个应用共享一套 API，而不用被限制于特定存储引擎。GraphQL 引擎已经有多种语言实现，通过 GraphQL API 能够更好利用你的现有数据和代码。你只需要为类型系统的字段编写函数，GraphQL 就能通过优化并发的方式来调用它们。
+资源定义，请求和响应 # 数据描述：
+type User { name: String phone: String Friends: [User] } 数据请求：
+{ user(name: &amp;#34;dp&amp;#34;) { phone } } 请求结果：</description></item><item><title/><link>https://blog.poneding.com/grpc/gRPC/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/grpc/gRPC/</guid><description> 我的博客 / Grpc / gRPC 实战
+gRPC 实战 # 准备 # golang 1.13+ Protoc</description></item><item><title/><link>https://blog.poneding.com/istio/aws-acm-tls-management/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/aws-acm-tls-management/</guid><description>我的博客 / Istio / 使用 aws-acm 管理 tls 密钥和证书
+使用 aws-acm 管理 tls 密钥和证书 # 参考： https://medium.com/faun/managing-tls-keys-and-certs-in-istio-using-amazons-acm-8ff9a0b99033
+在Ingressgateway service的annotation中添加:
+kind: Service apiVersion: v1 metadata: name: my-ingressgateway namespace: istio-system labels: app: my-ingressgateway annotations: # external-dns.alpha.kubernetes.io/hostname: example.com service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: &amp;#39;3600&amp;#39; service.beta.kubernetes.io/aws-load-balancer-ssl-cert: &amp;gt;- arn:aws:acm:ap-southeast-1:xxxxxxxxxxxx:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx service.beta.kubernetes.io/aws-load-balancer-ssl-ports: https .... service.yaml:
+apiVersion: v1 kind: Service metadata: name: demo-api labels: app: demop-api spec: ports: - name: http port: 80 targetPort: 80 selector: app: demo-api pod 所在的 namespace 需要开启 istio-injection，例如：kubectl label namespace default istio-injection=enabled</description></item><item><title/><link>https://blog.poneding.com/istio/installation/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/installation/</guid><description>我的博客 / Istio / 安装 Istio
+安装 Istio # 安装istioctl # Step 1 下载：
+以下操作步骤默认会安装最新版 istioctl。
+curl -L https://istio.io/downloadIstio | sh - 以上命令默认会安装最新版 istioctl，如果需要安装指定版本例如 1.6.8，使用以下命令。
+curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.6.8 TARGET_ARCH=x86_64 sh - Step 2 配置：
+step 1会下载istio包，目录istio-{ISTIO_VERSION}，进入目录
+cd istio-{ISTIO_VERSION} 拷贝bin目录下的istioctl二进制文件到PATH目录下：
+cp bin/istio /usr/local/bin « 使用 aws-acm 管理 tls 密钥和证书
+» 授权策略 Authorization Policy</description></item><item><title/><link>https://blog.poneding.com/istio/istio-auth-policy/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/istio-auth-policy/</guid><description>我的博客 / Istio / 授权策略 Authorization Policy
+授权策略 Authorization Policy # 授权架构 # 由于服务网格的 Sidecar 设计模式，每个工作负载都会有一个 Envoy 代理，而每个代理都运行着授权引擎，以此给请求授权。授权引擎依靠授权策略来鉴定请求权限，返回 ALLOW 或 DENY 鉴权结果。
+授权启用 # 将授权策略应用到工作负载即生效访问控制。对于没有应用授权策略的工作负载，则不会对请求做访问控制。
+授权策略 # 资源定义 # selector：
+标签选择器，通过标签选择器选择同命名空间下的目标工作负载，对目标工作负载启用访问控制。
+action：
+当满足rules条件时，控制ALLOW或DENY请求。
+rules：
+访问控制的请求条件：
+from：请求来源 to：请求目标 when：应用规则所需的提交 示例 # 以下授权策略允许两个源（服务帐号 cluster.local/ns/default/sa/sleep 和命名空间 dev），在使用有效的 JWT 令牌发送请求时，可以访问命名空间 foo 中的带有标签 app: httpbin 和 version: v1 的工作负载。
+apiVersion: security.istio.io/v1beta1 kind: AuthorizationPolicy metadata: name: httpbin namespace: foo spec: selector: matchLabels: app: httpbin version: v1 action: ALLOW rules: - from: - source: principals: [&amp;#34;cluster.</description></item><item><title/><link>https://blog.poneding.com/istio/istio-canary-deploy/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/istio-canary-deploy/</guid><description>我的博客 / Istio / 应用平台实现应用金丝雀发布
+应用平台实现应用金丝雀发布 # 实现思路 # 应用正常的 CI 流程添加请求参数：
+CanaryMode【bool，true | false，缺省值 false】 CanaryWeight 【int，缺省值 10】 使用 Istio 的 DetinationRule + VirtualService 实现流量按权重分配到不同版本应用。
+概念 # Iteration：发布迭代号，。是一个字段值，使用金丝雀发布时累加该值，从 0 累加。
+Retract：动作，弃用金丝雀版本。当金丝雀版本存在不可忽视的问题时撤回金丝雀执行该动作。
+Ratify：动作，确认使用金丝雀版本。当金丝雀版本确认可以全面投入使用执行该动作。
+前提 # 使用金丝雀发布的前提条件：
+应用处于发布状态，已经至少发布一次，当前存在稳定的运行版本； 应用已经开启 Istio Gateway，涉及到 VirtualService 的流量转发； 应用当前不是金丝雀状态，要不然乱套了。 发布细节 # CI 发布除了创建或更新 Deployment，Service 之外，默认创建或更新 istio 的 DestinationRule 资源；
+deployment：
+apiVersion: apps/v1 kind: Deployment metadata: name: myapp-pbd3n69-v{iteration} # 出于兼容历史发布，当iteration为0时，name不附带iteration，iteration大于0时，name将附带iteration labels: app: myapp-pbd3n69 version: v{iteration} spec: selector: matchLabels: app: myapp-pbd3n69 version: v{iteration} template: metadata: labels: app: myapp-pbd3n69 version: v{iteration} .</description></item><item><title/><link>https://blog.poneding.com/istio/istio-cors/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/istio-cors/</guid><description>我的博客 / Istio / Istio 0-1 使用Istio实现Cors
+Istio 0-1 使用Istio实现Cors # Cors # Cors（Cross-Origin Resource Sharing）：跨域资源共享，是一种基于 HTTP Header 的机制，该机制通过允许服务器标示除了它自己以外的其它 origin（域，协议和端口），这样浏览器可以访问加载这些资源。跨源资源共享还通过一种机制来检查服务器是否会允许要发送的真实请求，该机制通过浏览器发起一个到服务器托管的跨源资源的&amp;quot;预检&amp;quot;请求。在预检中，浏览器发送的头中标示有 HTTP 方法和真实请求中会用到的头。
+跨源HTTP请求的一个例子：运行在 https://a.com 的JavaScript代码使用 XMLHttpRequest来发起一个到 https://b.com/data.js 的请求。
+出于安全性，浏览器限制脚本内发起的跨域 HTTP 请求。 例如，XMLHttpRequest 和 Fetch API 遵循同源策略。 这意味着使用这些 API 的 Web 应用程序只能从加载应用程序的同一个域请求 HTTP 资源，除非响应报文包含了正确 CORS 响应头。
+更多 Cors 知识： 跨域资源共享（CORS）
+Istio 实现 # 基于 Istio VirtualService 的配置实现。
+官方文档： Istio / Virtual Service#CorsPolicy
+在目标服务上设置允许的请求域 Hello：
+apiVersion: networking.istio.io/v1beta1 kind: VirtualService metadata: name: b spec: http: - route: - destination: host: b.</description></item><item><title/><link>https://blog.poneding.com/istio/istio-timeout/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/istio-timeout/</guid><description>我的博客 / Istio / 使用 Istio 实现服务超时
+使用 Istio 实现服务超时 # 参考 # https://www.servicemesher.com/blog/circuit-breaking-and-outlier-detection-in-istio/ 超时 # 为了防止无限期的等待服务，一般都会给服务设置超时时间，AWS 的 LoadBalancer 默认的超时时间是 60s。但是不同的服务，可能需要不同的超时设置，例如 DocumentApi 超时时间可能需要设置的长一点。
+LoadBalancer 的超时是全局的，我们基于 Istio 服务网格集成了针对单个服务的超时功能。
+重试 # 重试也是一个服务很常用的功能，例如某次请求分配到了一个问题节点，请求失败，则自动重试特定次数。
+熔断/限流 # 为了防止大量涌入请求使得服务崩溃，引入熔断功能。熔断，可以限制当前请求连接数在一个特定范围内。
+配置服务 VirtualService 既可实现：
+apiVersion: networking.istio.io/v1beta1 kind: VirtualService metadata: name: myapp spec: hosts: - myapp http: - route: - destination: host: myapp subset: v1 timeout: 1s timeout：请求超过设定的超时时间，响应返回 504 请求超时。
+« Istio 0-1 使用Istio实现Cors
+» 应用层级设置访问白名单</description></item><item><title/><link>https://blog.poneding.com/istio/istio-white-manifest/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/istio-white-manifest/</guid><description>我的博客 / Istio / 应用层级设置访问白名单
+应用层级设置访问白名单 # 需求 # 两个应用，foo 和 bar，应用 foo 只允许 IP 地址为 1.2.3.4 访问，应用 bar 只允许 IP 地址为 5.6.7.8 访问。
+实现 # 基于 istio 的 AuthorizationPolicy 实现。
+假设，现在 K8s 集群中已经安装 istio，并且有一个正在运行着的 istio-ingressgateway 转发应用 foo 和 bar：
+通过： https://www.example.com/foo 访问 foo;
+通过： https://www.example.com/bar 访问 bar;
+插曲 # 按照 istio 官方文档，使用 AuthorizationPolicy 即可实现基于应用层级的访问白名单设置：
+apiVersion: security.istio.io/v1beta1 kind: AuthorizationPolicy metadata: name: foo spec: selector: matchLabels: app: foo action: ALLOW rules: - from: - source: ipBlocks: [&amp;#34;1.</description></item><item><title/><link>https://blog.poneding.com/istio/Istio/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/Istio/</guid><description>我的博客 / Istio / Istio
+Istio # 简介 # Istio，是一种服务网格的平台。在微服务系统中起着连接，保护，控制和观察服务的作用。它可以降低微服务部署的复杂程度，减轻开发团队压力，无缝接入现有分布式应用程序，可以集成日志，遥测，和策略系统的 API 接口。
+服务网格：
+Service Mesh 是一个基础设施层，用于处理服务间通信。云原生应用有着复杂的服务拓扑，Service Mesh 保证请求可以在这些拓扑中可靠地穿梭。在实际应用当中，Service Mesh 通常是由一系列轻量级的网络代理组成的，它们与应用程序部署在一起，但应用程序不需要知道它们的存在。
+用来描述组成应用程序的微服务网络以及它们之间的交互。
+实现需求包括：
+服务发现 负载均衡 故障恢复 指标和监控 A/B 测试 金丝雀发布 速率控制 访问控制 端到端认证 istioctl # 管理 istio 的命令行工具。
+安装 # curl -L https://istio.io/downloadIstio | sh - cp istio-x.x.x /usr/local cd istio-x.x.x export PATH=$PWD/bin:$PATH Istio 的绝大多数治理能力都是在 Sidecar 而非应用程序中实现，因此是非侵入的； Istio 的调用链埋点逻辑也是在 Sidecar 代理中完成，对应用程序非侵入，但应用程序需做适当的修改，即配合在请求头上传递生成的 Trace 相关信息。 关键功能：
+流量管理 可观察性 策略执行 服务身份和安全 平台支持 集成和定制 架构 # 数据面板 # Envoy # Envoy 是用 C++ 开发的高性能代理，用于协调服务网格中所有服务的入站和出站流量。Envoy 代理是唯一与数据平面流量交互的 Istio 组件。</description></item><item><title/><link>https://blog.poneding.com/istio/tls-transform/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/tls-transform/</guid><description>我的博客 / Istio / 实现 Https 协议的转发
+实现 Https 协议的转发 # apiVersion: networking.istio.io/v1beta1 kind: VirtualService metadata: name: demo spec: http: - headers: request: set: X-Forwarded-Proto: https match: - uri: prefix: / name: demo.default « 应用层级设置访问白名单
+» Istio 0-1 流量管理方案</description></item><item><title/><link>https://blog.poneding.com/istio/traffic-management/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/traffic-management/</guid><description>我的博客 / Istio / Istio 0-1 流量管理方案
+Istio 0-1 流量管理方案 # 设置 istio-system 命名空间下 istiod Deployment 的环境变量：
+PILOT_ENABLE_VIRTUAL_SERVICE_DELEGATE =true：
+« 实现 Https 协议的转发</description></item><item><title/><link>https://blog.poneding.com/kubernetes/anti-affinity-improves-service-availability/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/anti-affinity-improves-service-availability/</guid><description>我的博客 / Kubernetes / 反亲和性提高服务可用性
+反亲和性提高服务可用性 # 在 Kubernetes 中部署服务时，我们通常会部署多副本来提高服务的可用性。但是当这些副本集中部署在一个节点，而且很不幸，该节点出现故障，那么服务很容易陷入不可用状态。
+下面介绍一种方法，将服务副本分散部署在不同的节点（把鸡蛋放在不同的篮子里），避免单个节点故障导致服务多副本毁坏，提高服务可用性。
+反亲和 # apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx spec: selector: matchLabels: app: nginx replicas: 5 template: metadata: labels: app: nginx spec: affinity: podAntiAffinity: requiredDuringSchedulingIgnoredDuringExecution: podAffinityTerm: labelSelector: matchExpressions: - key: app operator: In values: - nginx topologyKey: kubernetes.io/hostname containers: - name: nginx image: nginx ports: - name: tcp containerPort: 80 使用 kubernetes.io/hostname 作为拓扑域,查看匹配规则，即同一打有同样标签 app=nginx 的 pod 会调度到不同的节点。</description></item><item><title/><link>https://blog.poneding.com/kubernetes/apiserver-builder/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/apiserver-builder/</guid><description>我的博客 / Kubernetes / apiserver-builder
+apiserver-builder # 安装 # go install sigs.k8s.io/apiserver-builder-alpha/cmd/apiserver-boot@v1.23.0 搭建 # 初始化项目：
+⚠️ 注意：由于历史原因需要进入 $(go env GOPATH)/src/&amp;lt;package&amp;gt; 包目录下执行初始化命令。
+mkdir -p $(go env GOPATH)/src/github.com/poneding/apiserver-demo &amp;amp;&amp;amp; cd $(go env GOPATH)/src/github.com/poneding/apiserver-demo apiserver-boot init repo --domain k8sdev.poneding.com 创建 API：
+# apiserver-boot create &amp;lt;group&amp;gt; &amp;lt;version&amp;gt; &amp;lt;resource&amp;gt; apiserver-boot create demo v1alpha1 User apiserver-boot create group version resource --group demo --version v1alpha1 --kind User 参考 # https://github.com/kubernetes-sigs/apiserver-builder-alpha/blob/master/docs/tools_user_guide.md https://github.com/kubernetes-sigs/apiserver-builder-alpha/blob/master/README.md « 反亲和性提高服务可用性
+» apiserver</description></item><item><title/><link>https://blog.poneding.com/kubernetes/apiserver/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/apiserver/</guid><description>我的博客 / Kubernetes / apiserver
+apiserver # 每一个 api 版本均有一个 apiservice 与之对应
+k api-versions | wc -l 30 k get apiservices.apiregistration.k8s.io| wc -l 30 « apiserver-builder
+» 二进制搭建 K8s - 1 机器准备</description></item><item><title/><link>https://blog.poneding.com/kubernetes/binary-build-k8s-01-prepare-nodes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/binary-build-k8s-01-prepare-nodes/</guid><description>我的博客 / Kubernetes / 二进制搭建 K8s - 1 机器准备
+二进制搭建 K8s - 1 机器准备 # 写在前面 # 记录和分享使用二进制搭建 K8s 集群的详细过程，由于操作比较冗长，大概会分四篇写完：
+机器准备： 部署 etcd 集群： 部署 Master： 部署 Node： 整个目标是使用二进制的方式搭建一个小型 K8s 集群（1 个 Master，2 个 Node），供自己学习测试。
+至于为什么要自己去用二进制的方式去搭建 K8s，而不是选用 minikube 或者 kubeadm 去搭建？
+因为使用二进制搭建，K8s 的每个组件，每个工具都需要你手动的安装和配置，帮助你加深对 K8s 组织架构和工作原理的了解。
+准备工作 # 三台 centos7 虚拟机，自己学习使用的话 1 核 1G 应该就够了。
+虚拟机能够连网，相关的安装包文件下载和 Docker 下载镜像需要使用到外网。
+当前虚拟机：
+k8s-master01: 192.168.115.131 k8s-node01: 192.168.115.132 k8s-node02: 192.168.115.133 虚拟机初始化 # 不做特殊说明的话：
+以下操作需要在 Master 和 Node 的所有机器上执行</description></item><item><title/><link>https://blog.poneding.com/kubernetes/binary-build-k8s-02-deploy-etcd/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/binary-build-k8s-02-deploy-etcd/</guid><description>我的博客 / Kubernetes / 二进制搭建 K8s - 2 部署 etcd 集群
+二进制搭建 K8s - 2 部署 etcd 集群 # 写在前面 # 记录和分享使用二进制搭建 K8s 集群的详细过程，由于操作比较冗长，大概会分四篇写完：
+机器准备： 部署 etcd 集群： 部署 Master： 部署 Node： etcd 作为 K8s 的数据库，需要首先安装，为其他组件做服务基础。
+etcd 是一个分布式的数据库系统，为了模拟 etcd 的高可用，我们将 etcd 部署在三台虚拟机上，正好就部署在 K8s 集群所使用的三台机器上吧。
+etcd 集群，K8s 组件之间通信，为了安全可靠，我们最好启用 HTTPS 安全机制。K8s 提供了基于 CA 签名的双向数字证书认证方式和简单的基于 HTTP Base 或 Token 的认证方式，其中 CA 证书方式的安全性最高。我们使用 cfssl 为我们的 K8s 集群配置 CA 证书，此外也可以使用 openssl。
+安装 cfssl # 在 Master 机器执行：</description></item><item><title/><link>https://blog.poneding.com/kubernetes/binary-build-k8s-03-deploy-master/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/binary-build-k8s-03-deploy-master/</guid><description>我的博客 / Kubernetes / 二进制搭建 K8s - 3 部署 Master
+二进制搭建 K8s - 3 部署 Master # 写在前面 # 记录和分享使用二进制搭建 K8s 集群的详细过程，由于操作比较冗长，大概会分四篇写完：
+机器准备： 部署 etcd 集群： 部署 Master： 部署 Node： 我们已经知道在 K8s 的 Master 上存在着 kube-apiserver、kube-controller-manager、kube-scheduler 三大组件。本篇介绍在 Master 机器安装这些组件，除此之外，如果想在 Master 机器上操作集群，还需要安装 kubectl 工具。
+安装 kubectl # kubernetes 的安装包里已经将 kubectl 包含进去了，部署很简单：
+cd /root/kubernetes/resources/ tar -zxvf ./kubernetes-server-linux-amd64.tar.gz cp kubernetes/server/bin/kubectl /usr/bin kubectl api-versions 制作 kubernetes 证书 # mkdir /root/kubernetes/resources/cert/kubernetes /etc/kubernetes/{ssl,bin} -p cp kubernetes/server/bin/kube-apiserver kubernetes/server/bin/kube-controller-manager kubernetes/server/bin/kube-scheduler /etc/kubernetes/bin cd /root/kubernetes/resources/cert/kubernetes 接下来都在 Master 机器上执行，编辑 ca-config.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/binary-build-k8s-04-deploy-worker/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/binary-build-k8s-04-deploy-worker/</guid><description>我的博客 / Kubernetes / 二进制搭建 K8s - 4 部署 Node
+二进制搭建 K8s - 4 部署 Node # 写在前面 # 记录和分享使用二进制搭建 K8s 集群的详细过程，由于操作比较冗长，大概会分四篇写完：
+机器准备： 部署 etcd 集群： 部署 Master： 部署 Node： K8s 的 Node 上需要运行 kubelet 和 kube-proxy。本篇介绍在 Node 机器安装这两个组件，除此之外，安装通信需要的 cni 插件。
+本篇的执行命令需要在准备的两台Node机器上执行。
+安装 docker # 可以参照官网： https://docs.docker.com/engine/install/
+# 卸载老版本或重装 docker 时执行第一行 yum remove docker \ docker-client \ docker-client-latest \ docker-common \ docker-latest \ docker-latest-logrotate \ docker-logrotate \ docker-engine -y # 安装 docker yum install -y yum-utils yum-config-manager \ --add-repo \ https://download.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/cloud-native-understood/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/cloud-native-understood/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 尝试理解云原生
+Kubernetes 0-1 尝试理解云原生 # 最初的云原生定义：
+应用容器化 面向微服务架构 应用支持容器编排调度 重新定义云原生：
+云原生技术有利于各组织在公有云、私有云和混合云等新型动态环境中，构建和运行可弹性扩展的应用。云原生的代表技术包括容器、服务网格、微服务、不可变基础设施和声明式API。
+这些技术能够构建容错性好、易于管理和便于观察的松耦合系统。结合可靠的自动化手段，云原生技术使工程师能够轻松地对系统作出频繁和可预测的重大变更。
+云原生本身不能称为是一种架构，它首先是一种基础设施，运行在其上的应用称作云原生应用，只有符合云原生设计哲学的应用架构才叫云原生应用架构。
+« 二进制搭建 K8s - 4 部署 Node
+» 集群联邦</description></item><item><title/><link>https://blog.poneding.com/kubernetes/cluster-federation/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/cluster-federation/</guid><description>我的博客 / Kubernetes / 集群联邦
+集群联邦 # 云服务提供商的集群联邦是一种将多个独立的 Kubernetes 集群组合在一起的方法。这种方法允许用户在多个集群之间共享资源，例如 Pods、Services、Deployments 等。集群联邦的目标是在多个集群上引入新的控制面板，提供一个统一的视图，使用户可以在多个集群之间无缝地部署和管理应用程序。
+概念 # 数据中心：Region，是一个物理位置，包含多个可用性区域。 可用性区域：Availability Zone（AZ），是一个独立的数据中心，包含 N 多服务器节点。 管理集群：或者宿主集群，是一个集群联邦的核心，用于管理多个工作集群。 联邦集群：或者工作集群，是一个普通的 Kubernetes 集群，用于部署工作负载。 集群联邦需要解决的问题 # 跨集群服务发现：连通多个集群，使得服务可以在多个集群之间发现，让请求跨越集群边界。 跨集群调度：将负载调度到多个集群，保证服务的稳定性以及可用性。 集群联邦开源项目 # Kubefed # 项目地址
+之前由 Kubernetes 官方多集群兴趣小组开发，目前已经停止维护。
+架构原理：
+将联邦资源（FederationResource）从管理集群同步到工作集群。
+这其中通过三个概念来实现：
+Template：定义了联邦资源的模板，用于指定联邦资源的属性 Placement：定义了联邦集群资源的部署位置，用于指定联邦资源的部署位置。 Overrides：定义了联邦集群资源的覆盖规则，用于覆盖联邦资源的属性。 kubefed 为所有的 Kubernetes 原生资源提供了对应的联邦资源，例如 FederatedService、FederatedDeployment 等。
+联邦资源中定义了原生资源的 Template、又通过 Overrides 定义了资源同步到不同的工作集群时需要做的变更，例如：
+kind: FederatedDeployment ... spec: ... overrides: # Apply overrides to cluster1 - clusterName: cluster1 clusterOverrides: # Set the replicas field to 5 - path: &amp;#34;/spec/replicas&amp;#34; value: 5 # Set the image of the first container - path: &amp;#34;/spec/template/spec/containers/0/image&amp;#34; value: &amp;#34;nginx:1.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/configmap-understood/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/configmap-understood/</guid><description>我的博客 / Kubernetes / 了解 ConfigMap
+了解 ConfigMap # 几乎所有的应用都需要配置信息，在 K8s 部署应用，最佳实践是将应用的配置信息（环境变量或者配置文件）和程序本身分离，这样配置信息的更新和复用都可以更简单，也使得程序更加灵活。
+Kubernetes 允许将配置选项分离到单独的资源对象 ConfigMap 中，本质上是一个键值对映射，值可以是一个短 string 串，也可以是一个完整的配置文件。
+本篇主要介绍 ConfigMap 资源的创建和使用。
+ConfigMap 的创建 # 可以直接通过 kubectl create configmap 命令创建，也可以先编写 configmap 的 yaml 文件再使用kubectl apply -f &amp;lt;filename&amp;gt;创建，推荐使用后者。
+单行命令创建 ConfigMap # 创建一个键值对的 ConfigMap： kubectl create configmap first-config --from-literal=user=admin 创建完成之后，使用 kubectl describe configmap first-config 查看，可以看到这个 configmap 的键值内容。
+可以使用多组 --from-literal=&amp;lt;key&amp;gt;=&amp;lt;value&amp;gt; 参数，在 configmap 中定义多组键值对。
+创建一个文件内容的 ConfigMap 假如我当前有一个配置文件 app.json，文件内容如下：
+{ &amp;#34;App&amp;#34;: &amp;#34;MyApp&amp;#34;, &amp;#34;Version&amp;#34;: &amp;#34;v1.0&amp;#34; } 使用以下命令创建 ConfigMap：</description></item><item><title/><link>https://blog.poneding.com/kubernetes/delete-es-log-index-scheduler/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/delete-es-log-index-scheduler/</guid><description>我的博客 / Kubernetes / 定期删除 ElasticSearch 日志索引
+定期删除 ElasticSearch 日志索引 # 背景 # 当前在 K8s 集群中部署了一套 EFK 日志监控系统，日复一日，ElasticSearch收集的数据越来越多，内存以及存储占用越来越高，需要定期来删除老旧的日志数据，来解放内存和存储空间，考虑到 K8s 中 cronjob 的功能特性，打算使用它制定一个es日志索引清除脚本，定时清除日志数据。
+ConfigMap # 这个configMap用来存储一个shell脚本，该shell脚本执行日志索引清除操作：
+apiVersion: v1 kind: ConfigMap metadata: name: es-log-indices-clear-configmap namespace: efk data: clean-indices.sh: | #/bin/bash LAST_MONTH_DATE=`date -d &amp;#34;1 month ago&amp;#34; +&amp;#34;%Y.%m.%d&amp;#34;` echo Start clear es indices *-${LAST_MONTH_DATE} curl -XDELETE http://elasticsearch:9200/*-${LAST_MONTH_DATE} --- 说明：这里我配置的configmap所在命名空间和efk部署的命名空间一致，并且es的Service的名称是elasticsearch，所以可以使用 http://elasticsearch:9200访问到es服务，否则的话需要是无法访问到的，所以这里需要根据具体情况配置es的服务地址；
+CronJob # CronJob使用了 poneding/sparrow
+apiVersion: batch/v1beta1 kind: CronJob metadata: name: clean-indices namespace: efk spec: schedule: &amp;#34;0 0 1/1 * *&amp;#34; jobTemplate: spec: template: spec: containers: - name: auto-recycle-job image: poneding/sparrow args: [&amp;#34;/bin/sh&amp;#34;, &amp;#34;/job/clean-indices.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/delete-k8s-resource-force/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/delete-k8s-resource-force/</guid><description>我的博客 / Kubernetes / 强制删除 K8s 资源
+强制删除 K8s 资源 # 强制删除 Pod # kubectl delete po &amp;lt;pod&amp;gt; -n &amp;lt;namespace&amp;gt; --force --grace-period=0 强制删除 PVC # kubectl patch pv &amp;lt;pv&amp;gt; -n &amp;lt;namespace&amp;gt; -p &amp;#39;{&amp;#34;metadata&amp;#34;:{&amp;#34;finalizers&amp;#34;:null}}&amp;#39; 强制删除 PV # kubectl patch pvc &amp;lt;pvc&amp;gt; -n &amp;lt;namespace&amp;gt; -p &amp;#39;{&amp;#34;metadata&amp;#34;:{&amp;#34;finalizers&amp;#34;:null}}&amp;#39; 强制删除命名空间 # 在删除 kubesphere 的命名空间时遇到无法删除成功的现象，命名空间一直处于 Terminating 状态。
+$ kubectl get ns |grep kubesphere NAME STATUS AGE kubesphere-controls-system Terminating 22d kubesphere-monitoring-system Terminating 21d 在网上找到了一种解决方案。
+首先获取命名空间的 json 文件，</description></item><item><title/><link>https://blog.poneding.com/kubernetes/gateway-api-practice/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/gateway-api-practice/</guid><description>我的博客 / Kubernetes / Gateway API 实践
+Gateway API 实践 # Gateway API 还在积极开发中，目前已经发布了 v1.0.0 版本。可以通过 gateway-api 文档 获取最新进展。
+Gateway API 概述 # Gateway API 是一个 Kubernetes 的扩展 API，它定义了一套 API 来管理网关、路由、TLS 等资源对象，可以用来替代传统的 Ingress。
+和 Ingress 一样，Gateway API 也是一个抽象层，它定义了一套 API 接口，这些接口由社区中的不同厂商来实现，比如 nginx、envoy、traefik 等。
+API 清单 # GatewayClass Gateway HTTPRoute GRPCRoute BackendTLSPolicy ReferenceGrant 安装 Gateway API # # 安装最新版 gateway-api CRDs export LATEST=$(curl -s https://api.github.com/repos/kubernetes-sigs/gateway-api/releases/latest | jq -r .tag_name) kubectl apply -f https://github.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/helm-k8s-package-management-tool/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/helm-k8s-package-management-tool/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 Helm Kubernetes 的包管理工具
+Kubernetes 0-1 Helm Kubernetes 的包管理工具 # Helm is the best way to find, share, and use software built for Kubernetes.
+Helm是为Kubernetes寻找，共享和使用软件构建的最佳方式。
+简介 # Helm帮助管理Kubernetes应用程序，即使是面对复杂的K8s引用，Helm Charts也可以轻松实现定义，安装和升级。
+Helm是CNCF的毕业项目，由Helm社区维护。
+Charts：
+Charts可以看作是Helm的程序包，一个Chart是描述Kubernetes资源集的文件集合。
+Repository：
+存储和共享Charts，可以看作是Kubernetes程序包的存储中心。
+Release：
+由一个Chart运行起来的实例，这将在kubernetes集群中生成或更新一组资源，可以使用同一个chart运行成多个release。例如，如果你想运行多个redis服务，你可以通过多次安装redis的chart得到。
+看到以上三个概念，你可能会觉得似曾相识，没错，与docker三个概念——image，registry，container如出一辙，也许现在你会加深点理解了。
+安装 # 可以方便的使用脚本安装
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 chmod 700 ./get-helm.sh ./get-helm.sh 也可以下载指定版本手动安装
+下载地址： https://github.com/helm/helm/releases
+wget https://get.helm.sh/helm-v3.5.2-linux-amd64.tar.gz tar -zxvf ./helm-v3.5.2-linux-amd64.tar.gz sudo mv linux-amd64/helm /usr/local/bin/helm 第一个helm命令
+helm help 更多安装方式可查看： https://helm.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/hpa-usage/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/hpa-usage/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 实现Pod自动扩缩HPA
+Kubernetes 0-1 实现Pod自动扩缩HPA # https://blog.51cto.com/14143894/2458468?source=dra
+前言 # 在K8s集群中，我们可以通过部署Metrics Server来持续收集Pod的资源利用指标数据，我们可以根据收集到的指标数据来评估是否需要调整Pod的数量以贴合它的使用需求。例如，当我们观察到Pod的CPU利用率过高时，我们可以适当上调Deployment的Replicas字段值，来手动实现Pod的横向扩容。
+Metrics Server的指标数据可以通过Dashboard查看到； 安装Metrics Server # HPA介绍 # HPA（Horizontal Pod Autoscaler，Pod水平自动扩缩），根据Pod的资源利用率自动调整Pod管理器中副本数：Pod资源利用率低，降低Pod副本数，降低资源的使用，节约成本；Pod资源利用率高，增加Pod副本数，提高应用的负载能力。
+示例 # 以部署redis为例，现使用redis
+« Kubernetes 0-1 Helm Kubernetes 的包管理工具
+» HTTP 客户端调用 Kubernetes APIServer</description></item><item><title/><link>https://blog.poneding.com/kubernetes/http-call-k8s-apiserver/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/http-call-k8s-apiserver/</guid><description>我的博客 / Kubernetes / HTTP 客户端调用 Kubernetes APIServer
+HTTP 客户端调用 Kubernetes APIServer # 本篇介绍几种如何通过 HTTP 客户端调用 Kubernetes APIServer 的姿势。
+如何获取 Kubernetes api-server 地址 # 查看 api-server 的几种方式：
+# 1. 直接查看 kubeconfig 文件 $ cat ~/.kube/config apiVersion: v1 clusters: - cluster: server: https://192.168.58.2:8443 ... # 2. kubectl 查看集群信息 $ kubectl cluster-info Kubernetes control plane is running at https://192.168.58.2:8443 ... # 3. kubectl 查看集群配置 $ kubectl config view clusters: - cluster: .</description></item><item><title/><link>https://blog.poneding.com/kubernetes/informer/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/informer/</guid><description>我的博客 / Kubernetes / Informer
+Informer # Informer是client-go中实现的一个工具包，目前已经被kubernetes中各个组件所使用，例如controller-manager。Informer本质是一个api资源的缓存。
+主要功能：
+将etcd数据同步至本地缓存，客户端通过本地缓存读取和监听资源
+注册资源Add，Update，Delete的触发事件
+目的：
+本地缓存，避免组件直接与api-server交互，减缓对api-server及etcd的访问压力。
+组件 # Reflector
+Delta FIFO Queue
+Indexer（local strorage）
+下面结合流程示意图简单介绍这些组件的角色。
+流程示意图 # 这张示意图展示了client-go类库中各个组件的工作机制，以及它们与咱们将要编写的自定义控制器的交互点（黄颜色标注的块是需要自行开发的部分）。
+Reflector：
+负责监听（Watch）特定Kubernetes资源对象，监听的资源对象可以是内置的资源例如Pod，Ingress等，也可以是定制的CR对象。
+Reflettor与ApiServer建立连接，第一次使用List&amp;amp;Watch机制从ApiServer中List特定资源的所有实例，这些实例附带的ResourceVersion字段可以用来区分实例是否更新。后续在使用List&amp;amp;Watch机制从ApiServer中Watch特定资源的新增，更新，删除等变化（增量Delta）。
+将监听到的资源的新增，更新，删除顺序写入到DeltaFIFO队列中。
+DeltaFIFO：
+一个增量的先进先出的队列，存储监听到的资源，以及资源事件类型，例如Added，Updated，Deleted，Replaced，Sync。
+Informer：
+Indexer：
+一个自带索引功能的本地存储，用于存储资源对象。Informer从DeltaFIFO中Pop出资源，存储到Indexer。Indexer中资源与k8s etcd数据保持一致。本地读取时直接查询本地存储，从而减少k8s apiserver和etcd的压力。
+使用示例 # 自定义控制器
+clientset, err := kubernetes.NewForConfig(config) stopCh := make(chan struct{}) defer close(stopch) sharedInformers := informers.NewSharedInformerFactory(clientset, time.Minute) informer := sharedInformer.Core().V1().Pods().Informer() informer.AddEventHandler(cache.ResourceEventHandlerFuncs{ AddFunc: func(obj interface{} { // ... }, UpdateFunc: func(obj interface{} { // .</description></item><item><title/><link>https://blog.poneding.com/kubernetes/ingress-gray-deploy/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/ingress-gray-deploy/</guid><description>我的博客 / Kubernetes / 通过 Ingress 进行灰度发布
+通过 Ingress 进行灰度发布 # https://start.aliyun.com/handson/Tn0HcdCZ/grap_publish_by_ingress
+Step 1 ：实验介绍 # 本实验，你将运行运行一个简单的应用，部署一个新的应用用于新的发布，并通过 Ingress 能力实现灰度发布。
+灰度及蓝绿发布是为新版本创建一个与老版本完全一致的生产环境，在不影响老版本的前提下，按照一定的规则把部分流量切换到新版本，当新版本试运行一段时间没有问题后，将用户的全量流量从老版本迁移至新版本。
+通过本实验，你将学习：
+通过 Ingress 按权重进行灰度发布 通过 Ingress 按 Header 进行灰度发布 容器服务 Kubernetes 版（简称 ACK） 本节课使用的 Kubernetes(k8s) 集群就是由 ACK 提供的，本实验涵盖的都是一些基本操作。更多高级用法，可以去 ACK 的产品页面了解哦。
+Step 2 ：部署 Deployment V1 应用 # 创建如下 YAML 文件(app-v1.yaml)
+apiVersion: v1 kind: Service metadata: name: my-app-v1 labels: app: my-app spec: ports: - name: http port: 80 targetPort: http selector: app: my-app version: v1.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/installation/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/installation/</guid><description>我的博客 / Kubernetes / 安装 Kubernetes
+安装 Kubernetes # « 通过 Ingress 进行灰度发布
+» K3s</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k3s/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k3s/</guid><description>我的博客 / Kubernetes / K3s
+K3s # k3s 是一款轻量级的 Kubernetes 发行版，专为物联网及边缘计算设计。
+要求 # K3s 有望在大多数现代 Linux 系统上运行。
+规格要求：
+CPU: 1 核 Memory：512M 端口要求：
+K3s Server 节点的入站规则如下：
+协议 端口 源 描述 TCP 6443 K3s agent 节点 Kubernetes API Server UDP 8472 K3s server 和 agent 节点 仅对 Flannel VXLAN 需要 UDP 51820 K3s server 和 agent 节点 只有 Flannel Wireguard 后端需要 UDP 51821 K3s server 和 agent 节点 只有使用 IPv6 的 Flannel Wireguard 后端才需要 TCP 10250 K3s server 和 agent 节点 Kubelet metrics TCP 2379-2380 K3s server 节点 只有嵌入式 etcd 高可用才需要 启动 # curl -sfL https://rancher-mirror.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k8s-deploy-coredns/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k8s-deploy-coredns/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 K8s部署coredns
+Kubernetes 0-1 K8s部署coredns # 在K8s集群未部署DNS之前，K8s中运行的Pod是无法访问外部网络的，因为无法完成域名解析。
+比如我们运行一个busybox的Pod，然后在Pod里面是无法ping通外部网络的：
+[root@k8s-master01 ~]# kubectl run -it --rm busybox --image=busybox sh If you don&amp;#39;t see a command prompt, try pressing enter. / # ping www.baidu.com ping: bad address &amp;#39;www.baidu.com&amp;#39; 我们可以通过在K8s中部署coredns解决这一问题。
+准备coredns.yaml文件，写入文件内容：
+apiVersion: v1 kind: ServiceAccount metadata: name: coredns namespace: kube-system labels: kubernetes.io/cluster-service: &amp;#34;true&amp;#34; addonmanager.kubernetes.io/mode: Reconcile --- apiVersion: rbac.authorization.k8s.io/v1 kind: ClusterRole metadata: labels: kubernetes.io/bootstrapping: rbac-defaults addonmanager.kubernetes.io/mode: Reconcile name: system:coredns rules: - apiGroups: - &amp;#34;&amp;#34; resources: - endpoints - services - pods - namespaces verbs: - list - watch - apiGroups: - &amp;#34;&amp;#34; resources: - nodes verbs: - get --- apiVersion: rbac.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k8s-deploy-dashboard/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k8s-deploy-dashboard/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 K8s部署Dashboard
+Kubernetes 0-1 K8s部署Dashboard # 首先下载部署的必要文件：
+wget https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended.yaml -O kube-dash.yaml --no-check-certificate 默认Dashboard的Service类型是ClusterIP，我们集群外面不方便访问，我们最好是将Service类型修改为NodePoart或LoadBalancer（前提是你的集群支持LoadBalancer），以LoadBalancer为例。
+修改文件kube-dash.yaml文件，将kubernetes-dashboard Service部分修改成如下：
+kind: Service apiVersion: v1 metadata: labels: k8s-app: kubernetes-dashboard name: kubernetes-dashboard namespace: kubernetes-dashboard spec: type: LoadBalancer ports: - port: 443 targetPort: 8443 selector: k8s-app: kubernetes-dashboard 创建kube-dash-admin-user.yaml文件:
+vim kube-dash-admin-user.yaml 写入如下内容：
+apiVersion: v1 kind: ServiceAccount metadata: name: admin-user namespace: kubernetes-dashboard --- apiVersion: rbac.authorization.k8s.io/v1 kind: ClusterRoleBinding metadata: name: admin-user roleRef: apiGroup: rbac.authorization.k8s.io kind: ClusterRole name: cluster-admin subjects: - kind: ServiceAccount name: admin-user namespace: kubernetes-dashboard 执行命令：</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k8s-deploy-efk/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k8s-deploy-efk/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 K8s部署EFK
+Kubernetes 0-1 K8s部署EFK # 写在前面 # 本篇目标是在K8s集群中搭建EFK。
+EFK是由ElasticSearch，Fluentd，Kibane组成的一套目前比较主流的日志监控系统，使用EFK监控应用日志，可以让开发人员在一个统一的入口查看日志然后分析应用运行情况。
+EFK简单的工作原理可以参考下图。通过fluentd的agent收集日志数据，写入es，kibana从es中读取日志数据展示到ui。
+部署ElasticSearch # 最好选择部署一个ES集群，这样你的ES可用性更高一点。
+采用StatefulSet部署ES。
+编写es-statefulSet.yaml文件如下：
+apiVersion: apps/v1 kind: StatefulSet metadata: name: es-cluster namespace: dev spec: serviceName: elasticsearch replicas: 3 selector: matchLabels: app: elasticsearch template: metadata: labels: app: elasticsearch spec: containers: - name: elasticsearch image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0 resources: limits: cpu: 1000m requests: cpu: 100m ports: - containerPort: 9200 name: rest protocol: TCP - containerPort: 9300 name: inter-node protocol: TCP volumeMounts: - name: data mountPath: /usr/share/elasticsearch/data env: - name: cluster.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k8s-deploy-prometheus-grafana/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k8s-deploy-prometheus-grafana/</guid><description>我的博客 / Kubernetes / 可能需要运行多次以下命令，确保k8s资源都创建
+Step # 下载相关k8s资源文件 git clone https://github.com/coreos/kube-prometheus.git 修改文件kube-prometheus/manifests/prometheus-prometheus.yaml，做这一步的目的是为prometheus的访问分配子路径，访问方式为http(s)://xxx/prometheus
+在prometheus.spec下添加
+externalUrl: prometheus routePrefix: prometheus 修改文件kube-prometheus/manifests/grafana-deployment.yaml，做这一步的目的是为grafana的访问分配子路径，访问方式为：http(s)://xxx/grafana
+在deployment.spec.template.spec.container[0]下添加
+env: - name: GF_SERVER_ROOT_URL value: &amp;#34;http://localhost:3000/grafana&amp;#34; - name: GF_SERVER_SERVE_FROM_SUB_PATH value: &amp;#34;true&amp;#34; Apply k8s资源 # 可能需要运行多次以下命令，确保k8s资源都创建 kubectl create -f manifests/setup -f manifests # !如果要删除以上创建的k8s资源，运行以下命令 kubectl delete --ignore-not-found=true -f manifests/ -f manifests/setup Ingress转发 apiVersion: extensions/v1beta1 kind: Ingress metadata: name: prometheus namespace: monitoring spec: rules: - host: dp.example.tech http: paths: - path: /prometheus backend: serviceName: prometheus-k8s servicePort: 9090 - path: /grafana backend: serviceName: grafana servicePort: 3000 - path: /alertmanager backend: serviceName: alertmanager-main servicePort: 9093 « Kubernetes 0-1 K8s部署EFK</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k8s-deploy-zookeeper-kafka/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k8s-deploy-zookeeper-kafka/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 K8s部署Zookeeper和Kafka
+Kubernetes 0-1 K8s部署Zookeeper和Kafka # 按照官方定义，Kafka是一个分布式的流处理平台。更多了解官方文档： http://kafka.apachecn.org/intro.html
+那么直接开始在K8s中部署kafka吧。
+部署kafka，首先要有一个可用的Zookeeper集群，所以我们还需要先部署一个Zookeeper集群。
+首先说明，我的K8s集群是使用的AWS的EKS服务，与自建的K8s集群的配置方面可能会有所差别。
+部署Zookeeper # 编写zookeeper-statefulSet.yaml文件：
+vim zookeeper-statefulSet.yaml 写入内容:
+kind: StatefulSet apiVersion: apps/v1beta1 metadata: name: zookeeper-1 namespace: dev spec: serviceName: zookeeper-1 replicas: 1 selector: matchLabels: app: zookeeper-1 template: metadata: labels: app: zookeeper-1 spec: containers: - name: zookeeper image: digitalwonderland/zookeeper ports: - containerPort: 2181 env: - name: ZOOKEEPER_ID value: &amp;#34;1&amp;#34; - name: ZOOKEEPER_SERVER_1 value: zookeeper-1 - name: ZOOKEEPER_SERVER_2 value: zookeeper-2 - name: ZOOKEEPER_SERVER_3 value: zookeeper-3 volumeMounts: - name: zookeeper-data mountPath: &amp;#34;/var/lib/zookeeper/data&amp;#34; subPath: zookeeper volumeClaimTemplates: - metadata: name: zookeeper-data labels: app: zookeeper-1 spec: accessModes: [&amp;#34;ReadWriteOnce&amp;#34;] storageClassName: gp2 resources: requests: storage: 30Gi --- kind: StatefulSet apiVersion: apps/v1beta1 metadata: name: zookeeper-2 namespace: dev spec: serviceName: zookeeper-2 replicas: 1 selector: matchLabels: app: zookeeper-2 template: metadata: labels: app: zookeeper-2 spec: containers: - name: zookeeper image: digitalwonderland/zookeeper ports: - containerPort: 2181 env: - name: ZOOKEEPER_ID value: &amp;#34;2&amp;#34; - name: ZOOKEEPER_SERVER_1 value: zookeeper-1 - name: ZOOKEEPER_SERVER_2 value: zookeeper-2 - name: ZOOKEEPER_SERVER_3 value: zookeeper-3 volumeMounts: - name: zookeeper-data mountPath: &amp;#34;/var/lib/zookeeper/data&amp;#34; subPath: zookeeper-data volumeClaimTemplates: - metadata: name: zookeeper-data labels: app: zookeeper-2 spec: accessModes: [&amp;#34;ReadWriteOnce&amp;#34;] storageClassName: gp2 resources: requests: storage: 30Gi --- kind: StatefulSet apiVersion: apps/v1beta1 metadata: name: zookeeper-3 namespace: dev spec: serviceName: zookeeper-3 replicas: 1 selector: matchLabels: app: zookeeper-3 template: metadata: labels: app: zookeeper-3 spec: containers: - name: zookeeper image: digitalwonderland/zookeeper ports: - containerPort: 2181 env: - name: ZOOKEEPER_ID value: &amp;#34;3&amp;#34; - name: ZOOKEEPER_SERVER_1 value: zookeeper-1 - name: ZOOKEEPER_SERVER_2 value: zookeeper-2 - name: ZOOKEEPER_SERVER_3 value: zookeeper-3 volumeMounts: - name: zookeeper-data mountPath: &amp;#34;/var/lib/zookeeper/data&amp;#34; subPath: zookeeper volumeClaimTemplates: - metadata: name: zookeeper-data labels: app: zookeeper-3 spec: accessModes: [&amp;#34;ReadWriteOnce&amp;#34;] storageClassName: gp2 resources: requests: storage: 30Gi 编写zookeeper-service.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k8s-dev-01-api-concept/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k8s-dev-01-api-concept/</guid><description>我的博客 / Kubernetes / Kubernetes 定制开发 01：K8s API 概念
+Kubernetes 定制开发 01：K8s API 概念 # 在 K8s 集群中，API 是一切的基础，K8s 的所有资源对象都是通过 API 来管理的，所以我们在定制开发的时候，首先要了解 K8s 的 API 概念。
+基本概念 # Group（G）：
+API 组，例如：apps、networking.k8s.io 等
+Version（V）：
+API 版本，例如：v1alpha1、v1、v2 等
+Resource（R）：
+API 资源，例如：pods，configmaps 等
+Kind（K）：
+API 类型，例如：Deployment，Service 等 通过 kubectl api-versions 获取集群中所有 API 的版本列表：
+$ kubectl api-versions acme.cert-manager.io/v1 admissionregistration.k8s.io/v1 apiextensions.k8s.io/v1 apiregistration.k8s.io/v1 apps/v1 authentication.k8s.io/v1 通过 kubectl api-resources 命令获取集群所有 API 的资源列表，并且可以看到资源的简写名称，版本以及类型：
+$ kubectl api-resources NAME SHORTNAMES APIVERSION NAMESPACED KIND bindings v1 true Binding componentstatuses cs v1 false ComponentStatus configmaps cm v1 true ConfigMap endpoints ep v1 true Endpoints events ev v1 true Event limitranges limits v1 true LimitRange namespaces ns v1 false Namespace nodes no v1 false Node API 资源端点 # GVR 端点：</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k8s-dev-02-crd/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k8s-dev-02-crd/</guid><description>我的博客 / Kubernetes / Kubernetes 定制开发 02：CRD
+Kubernetes 定制开发 02：CRD # « Kubernetes 定制开发 01：K8s API 概念
+» Kubernetes 定制开发 50：扩展调度器</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k8s-dev-50-extend-kube-scheduler/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k8s-dev-50-extend-kube-scheduler/</guid><description>我的博客 / Kubernetes / Kubernetes 定制开发 50：扩展调度器
+Kubernetes 定制开发 50：扩展调度器 # 简介 # Kubernetes Scheduler（调度器）是一个控制面进程，负责将 Pods 指派到节点上。调度器基于约束和可用资源为调度队列中每个 Pod 确定其可合法放置的节点。调度器之后对所有合法的节点进行排序，将 Pod 绑定到一个合适的节点。
+kube-scheduler 是 Kubernetes 自带的一个默认调度器，它会根据 Pod 的资源需求和节点的资源容量，将 Pod 调度到合适的节点上。
+如果默认调度器不符合你的需求，你可以实现自己的调度器，并且你的调度器可以和默认调度器或其他调度器一起运行在集群中。你可以通过声明 Pod 的 spec.schedulerName 字段来指定要使用的调度器。
+扩展调度器 # 有三种方式可以实现自定义调度器：
+修改 kube-scheduler 源码调度逻辑，然后编译成定制的调度器镜像，然后使用这个镜像部署调度进程 自定义 Pod 控制器，监听 Pod 的 spec.schedulerName 字段，在 Pod 被创建时，为其绑定节点 使用 Scheduler Extender 的方式，这种方式不需要修改默认调度器的配置文件 编译定制调度器镜像 # 克隆 kubernetes 源码，然后修改 kube-scheduler 源码，然后编译成定制的调度器镜像。
+git clone https://github.com/kubernetes/kubernetes.git cd kubernetes # 修改源码 make 编写 Dockerfile：</description></item><item><title/><link>https://blog.poneding.com/kubernetes/k8s-get-started/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/k8s-get-started/</guid><description>我的博客 / Kubernetes / 简单介绍 K8s
+简单介绍 K8s # 简介 # 我们的应用部署趋势由大型单体应用向微服务演变，微服务应用之间解耦，形成可被独立开发、部署、升级、伸缩的软件单元。
+另一方面容器技术由于它的轻量级，资源隔离，可移植、部署高效等特性得到了迅速的发展和普及。越来越多的应用选择使用容器来部署，微服务更不例外。
+这时，便有了管理微服务+容器的需求，Kubernetes 开始大放异彩。
+Kubernetes 是基于容器技术的服务器集群管理系统，通过它，可以托管数量庞大的应用集，并且内置完备的集群管理能力，它有能力帮你做到这些：
+应用的容器化部署、健康检查、自我修复、自动伸缩、滚动更新、资源分配等 服务的注册、发现、均衡负载等 Kubernetes 对于运维团队来说，是一个强大的帮手，更自动化的部署和管理应用，更高效的利用硬件资源。
+基本概念 # Kubernetes 集群，后面简称为K8s，主要是由控制节点（Master）和工作节点（Node）组成。
+在 Master 节点中运行着三大组件：kube-api-server、kube-controller-manager、kube-scheduler，通常也会将 etcd 数据库部署在 Master 节点。
+在 Node 节点中，也是需要部署三个主要组件，容器引擎（基本默认 docker 了）、kubelet、kube-proxy。
+K8s 的组成结构大致如下图：
+Master 节点 # 负责 K8s 资源的调度管理，由 Master 向 Node 下达控制命令，并且一般运维人员使用 Master 操作和执行命令。
+Master 节点扮演的角色相当于 K8s 的大脑，其重要性可想而知，因此建议部署 3 台 Master 节点保证 K8s 的高可用性。
+kube-api-server：http rest 接口服务，与 K8s 其他组件通信，负责 K8s 资源的 CURD 的操作入口；</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubeadm-install-k8s-docker/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubeadm-install-k8s-docker/</guid><description>我的博客 / Kubernetes / kubeadm 安装 Kubernetes (Docker)
+kubeadm 安装 Kubernetes (Docker) # 使用 kubeadm 安装 k8s 集群，是社区推荐的安装方式，本文档将介绍使用 kubeadm 安装 k8s 集群（使用 Docker 作为容器运行时）的详细过程。
+Notes:
+随着 kubeadm &amp;amp; k8s 版本的更新，安装过程可能会有所不同，截至目前，本文档使用的是 kubeadm v1.28.3 &amp;amp; k8s v1.28.3 版本； 本文档使用的操作系统是 Ubuntu 22.04，其他操作系统可能会有所不同。 要求 # 至少一台物理机或虚拟机（例如：Ubuntu 22.04）作为集群节点，最少 2 核 2G 内存； 多节点之前网络互通，且节点主机名不冲突； Master 节点需要开放以下端口：6443、2379-2380、10250、10251、10252； 准备工作 # 禁用交换分区：
+# 临时禁用交换分区 sudo swapoff -a vim /etc/fstab # 注释掉 swap 分区的配置 配置系统：
+cat &amp;lt;&amp;lt;EOF | sudo tee /etc/modules-load.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubeadm-install-k8s/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubeadm-install-k8s/</guid><description>我的博客 / Kubernetes / kubeadm 安装 k8s (containerd)
+kubeadm 安装 k8s (containerd) # 使用 kubeadm 安装 k8s 集群，是社区推荐的安装方式，本文档将介绍使用 kubeadm 安装 k8s 集群的详细过程。
+Notes:
+随着 kubeadm &amp;amp; k8s 版本的更新，安装过程可能会有所不同，截至目前，本文档使用的是 kubeadm v1.28.3 &amp;amp; k8s v1.28.3 版本； 本文档使用的操作系统是 Ubuntu 22.04，其他操作系统可能会有所不同。 要求 # 至少一台物理机或虚拟机（例如：Ubuntu 22.04）作为集群节点，最少 2 核 2G 内存； 多节点之前网络互通，且节点主机名不冲突； Master 节点需要开放以下端口：6443、2379-2380、10250、10251、10252； 准备工作 # 禁用交换分区：
+# 临时禁用交换分区 sudo swapoff -a vim /etc/fstab # 注释掉 swap 分区的配置 配置系统：
+cat &amp;lt;&amp;lt;EOF | sudo tee /etc/modules-load.d/k8s.conf overlay br_netfilter EOF sudo modprobe overlay sudo modprobe br_netfilter # sysctl params required by setup, params persist across reboots cat &amp;lt;&amp;lt;EOF | sudo tee /etc/sysctl.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubeadm-upgrade/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubeadm-upgrade/</guid><description>我的博客 / Kubernetes / Kubeadm 升级 K8s
+Kubeadm 升级 K8s # 本篇以升级 1.29.0（旧版本：1.28.x ） 版本为例，介绍如何通过 kubeadm 工具来升级 K8s 集群。
+注意：
+不支持跨主版本升级，如 1.27.x 升级到 1.29.x，中间必须先升级到 1.28.x 主版本更新必须先升级到最新的次版本，如 1.28.3 升级到 1.28.4，然后再升级到 1.29.x 升级步骤 # 控制节点（control plane node）升级 工作节点（worker node）升级 升级过程 # 1、升级至当前主版本的最新次版本 # sudo apt update sudo apt-cache madison kubeadm 以上命令后，将可以得到类似如下输出：
+$ sudo apt-cache madison kubeadm kubeadm | 1.28.4-1.1 | https://pkgs.k8s.io/core:/stable:/v1.28/deb Packages kubeadm | 1.28.3-1.1 | https://pkgs.k8s.io/core:/stable:/v1.28/deb Packages kubeadm | 1.28.2-1.1 | https://pkgs.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubebuilder-inaction/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubebuilder-inaction/</guid><description>我的博客 / Kubernetes / kubebuilder 实战
+kubebuilder 实战 # 简介 # kubebuilder 是一个构建 Operator（CRD + Controller）的框架的工具，它可以帮助我们快速的构建一个 Operator 项目，并提供了一些常用的命令，例如：创建 API、创建 Controller、Webhook 等。
+安装 # 条件 # kustomize curl -s &amp;#34;https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh&amp;#34; | bash controller-gen go install sigs.k8s.io/controller-tools/cmd/controller-gen@latest ⚠️ 注意：以上命令都是直接下载了对应命令工具最新的版本，在使用 kubebuilder 创建项目之后，在 Makefile 文件中会指定 kustomize 和 controller-gen 的版本，为了避免不兼容，推荐下载对应指定的版本。
+使用以下命令安装 kubebuilder：
+# download kubebuilder and install locally. GOOS=$(go env GOOS) GOARCH=$(go env GOARCH) curl -L -o kubebuilder https://go.kubebuilder.io/dl/latest/$GOOS/$GOARCH chmod +x kubebuilder &amp;amp;&amp;amp; mv kubebuilder /usr/local/bin/ 代码自动补全：</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubectl/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubectl/</guid><description>我的博客 / Kubernetes / kubectl
+kubectl # 安装 # 参考文档： kubectl 安装文档
+常用命令 # 自动补全 # source &amp;lt;(kubectl completion bash) 可以将上面的命令写入 ~/.bashrc 或 /etc/bash.bashrc 中，这样每次登录都会自动补全。
+$ vim ~/.bashrc ... source &amp;lt;(kubectl completion bash) 命令别名 # alias k=kubectl complete -F __start_kubectl k Troubleshooting # Q1. _get_comp_words_by_ref: command not found # 解决方法：
+apt install bash-completion -y source /usr/share/bash-completion/bash_completion source &amp;lt;(kubectl completion bash) « kubebuilder 实战
+» Kubernetes 0-1 Kubernetes最佳实践</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubernetes-best-practice/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubernetes-best-practice/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 Kubernetes最佳实践
+Kubernetes 0-1 Kubernetes最佳实践 # https://github.com/learnk8s/kubernetes-production-best-practices
+« kubectl
+» Kubernetes Dashboard</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubernetes-dashboard/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubernetes-dashboard/</guid><description>我的博客 / Kubernetes / Kubernetes Dashboard
+Kubernetes Dashboard # Installation # Steps # 登入Kubernetes Master机器。
+Copy最新的recommended.yaml文件内容，写入本地kubernetes-dashboard.yaml文件。recommended.yaml文件地址： kubernetes dashboard github
+![image-20191223173827866](
+C:\Users\dp\AppData\Roaming\Typora\typora-user-images\image-20191223173827866.png)
+# Copyright 2017 The Kubernetes Authors. # # Licensed under the Apache License, Version 2.0 (the &amp;#34;License&amp;#34;); # you may not use this file except in compliance with the License. # You may obtain a copy of the License at # # http://www.apache.org/licenses/LICENSE-2.0 # # Unless required by applicable law or agreed to in writing, software # distributed under the License is distributed on an &amp;#34;AS IS&amp;#34; BASIS, # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubernetes-naming-constraints/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubernetes-naming-constraints/</guid><description>我的博客 / Kubernetes / Kubernetes 中资源名称规范
+Kubernetes 中资源名称规范 # 在Kubernetes中，同一种资源（GVR）在同一个命名空间下名称是唯一。但是名称也需要遵循命名规则。本篇主要介绍 Kubernetes 中三种资源名称的命名规范。
+DNS1123Subdomain # 不能超过 253 个字符 只能包含小写字母、数字，以及 &amp;lsquo;-&amp;rsquo; 和 &amp;lsquo;.&amp;rsquo; 必须以字母数字开头 必须以字母数字结尾 以此规范约束的资源有：
+Ingress Pod ConfigMap NetworkPolicy DNS1123Label # 最多 63 个字符 只能包含小写字母、数字，以及 &amp;lsquo;-&amp;rsquo; 必须以字母数字开头 必须以字母数字结尾 以此规范约束的资源有：
+Namespace Service DNS1035Label # 最多 63 个字符 只能包含小写字母、数字，以及 &amp;lsquo;-&amp;rsquo; 必须以字母开头 必须以字母数字结尾 以此规范约束的资源有：
+Deployment StatefulSet 建议 # 如果资源命名符合 DNS1035Label 规范，那么一定符合 Kubernetes 资源命名规范。假如在容器平台开发过程中，为了命名约束更加统一，建议使用 DNS1035Label 规范来约束资源命名。
+可以使用下面的代码（Go）来检查资源名称是否符合规范：
+引入包：
+go get k8s.io/apimachinery/pkg/util/validation 示例代码：
+package main import ( &amp;#34;k8s.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubernetes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubernetes/</guid><description>我的博客 / Kubernetes / Kuberentes
+Kuberentes # « Kubernetes 中资源名称规范
+» KubeVirt 创建 Windows 虚拟机</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubevirt-create-windows-vm/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubevirt-create-windows-vm/</guid><description>我的博客 / Kubernetes / KubeVirt 创建 Windows 虚拟机
+KubeVirt 创建 Windows 虚拟机 # virtctl image-upload --image-path windows-10.iso --pvc-name=windows-10-iso --size 10G --uploadproxy-url https://&amp;lt;cdi-uploadproxy.cdi.svc&amp;gt; --insecure --wait-secs 240 apiVersion: v1 kind: PersistentVolumeClaim metadata: name: windows-10-data spec: accessModes: - ReadWriteOnce resources: requests: storage: 40G storageClassName: longhorn volumeMode: Filesystem --- apiVersion: kubevirt.io/v1 kind: VirtualMachine metadata: name: windows-10 spec: running: true template: metadata: labels: kubevirt.io/domain: windows-10 spec: domain: cpu: cores: 4 devices: networkInterfaceMultiqueue: true #开启网卡多队列模式 blockMultiQueue: true #开启磁盘多队列模式 disks: - cdrom: bus: sata name: virtiocontainerdisk - cdrom: bus: sata name: cdromiso bootOrder: 1 - disk: bus: virtio name: harddrive bootOrder: 2 interfaces: - masquerade: {} model: virtio name: default resources: requests: memory: 8G networks: - name: default pod: {} volumes: - name: cdromiso persistentVolumeClaim: claimName: windows-10-iso - name: harddrive persistentVolumeClaim: claimName: windows-10-data - containerDisk: image: kubevirt/virtio-container-disk name: virtiocontainerdisk « Kuberentes</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubevirt-practice/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubevirt-practice/</guid><description>我的博客 / Kubernetes / Kubevirt 实践
+Kubevirt 实践 # 简介 # Kubevirt 是 Redhat 开源的以容器方式运行虚拟机的项目，以 k8s add-on 方式，利用 k8s CRD 为增加资源类型 VirtualMachineInstance（VMI）， 使用容器的 image registry 去创建虚拟机并提供 VM 生命周期管理。 CRD 的方式使得 kubevirt 对虚拟机的管理不局限于 pod 管理接口，但是也无法使用 pod 的 RS DS Deployment 等管理能力，也意味着 kubevirt 如果想要利用 pod 管理能力，要自主去实现，目前 kubevirt 实现了类似 RS 的功能。 kubevirt 目前支持的 runtime 是 docker 和 runc。
+安装 # 部署 K8s 资源 # 最新版本 export KUBEVIRT_VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq -r .</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kustomize/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kustomize/</guid><description>我的博客 / Kubernetes / Kustomize
+Kustomize # Kustomize 是一个通过 kustomization 文件 定制 Kubernetes 对象的工具。它提供以下功能特性来管理应用配置文件：
+从其他来源生成资源 为资源设置贯穿性（Cross-Cutting）字段 组织和定制资源集合 从 1.14 版本开始，kubectl 也开始支持使用 kustomization 文件来管理 Kubernetes 对象。 要查看包含 kustomization 文件的目录中的资源，执行下面的命令：
+kubectl kustomize &amp;lt;kustomization_directory&amp;gt; 要应用这些资源，使用 --kustomize 或 -k 参数来执行 kubectl apply：
+kubectl apply -k &amp;lt;kustomization_directory&amp;gt; 生成资源 # ConfigMap 和 Secret 包含其他 Kubernetes 对象（如 Pod）所需要的配置或敏感数据。 ConfigMap 或 Secret 中数据的来源往往是集群外部，例如某个 .properties 文件或者 SSH 密钥文件。 Kustomize 提供 secretGenerator 和 configMapGenerator，可以基于文件或字面值来生成 Secret 和 ConfigMap。
+configMapGenerator # 要基于文件来生成 ConfigMap，可以在 configMapGenerator 的 files 列表中添加表项。 下面是一个根据 .</description></item><item><title/><link>https://blog.poneding.com/kubernetes/liveness-readiness-probe/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/liveness-readiness-probe/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 Pod中的livenessProbe和readinessProbe解读
+Kubernetes 0-1 Pod中的livenessProbe和readinessProbe解读 # 写在前面 # K8s对Pod的健康状态可以通过两类探针来检查：livenessProbe和readinessProbe，kubelet通过定期执行这两类探针来诊断容器的健康状况。
+livenessProbe简介 # 存活指针，判断Pod（中的应用容器）是否健康，可以理解为健康检查。我们使用livenessProbe来定期的去探测，如果探测成功，则Pod状态可以判定为Running；如果探测失败，可kubectl会根据Pod的重启策略来重启容器。
+如果未给Pod设置livenessProbe，则默认探针永远返回Success。
+当我们执行kubectl get pods命令，输出信息中STATUS一列我们可以看到Pod是否处于Running状态。
+readinessProbe简介 # 就绪指针，就绪的意思是已经准备好了，Pod的就绪我们可以理解为这个Pod可以接受请求和访问。我们使用readinessProbe来定期的去探测，如果探测成功，则Pod 的Ready状态判定为True；如果探测失败，Pod的Ready状态判定为False。
+与livenessProbe不同的是，kubelet不会对readinessProbe的探测情况有重启操作。
+当我们执行kubectl get pods命令，输出信息中READY一列我们可以看到Pod的READY状态是否为True。
+定义参数 # livenessProbe和readinessProbe的定义参数是一致的，可以通过kubectl explain pods.spec.containers.readinessProbe或kubectl explain pods.spec.containers.livenessProbe命令了解：
+就绪探针的几种类型：
+httpGet：
+向容器发送Http Get请求，调用成功（通过Http状态码判断）则确定Pod就绪；
+使用方式：
+livenessProbe: httpGet: path: /app/healthz port: 80 exec：
+在容器内执行某命令，命令执行成功（通过命令退出状态码为0判断）则确定Pod就绪；
+使用方式：
+livenessProbe: exec: command: - cat - /app/healthz tcpSocket：
+打开一个TCP连接到容器的指定端口，连接成功建立则确定Pod就绪。
+使用方式：
+livenessProbe: tcpSocket: port: 80 一般就绪探针会在启动容器一段时间后才开始第一次的就绪探测，之后做周期性探测。所以在定义就绪指针时，会给以下几个参数：
+initialDelaySeconds：在初始化容器多少秒后开始第一次就绪探测； timeoutSeconds：如果该次就绪探测超过多少秒后还未成功，判定为超时，该次探测失败，Pod不就绪。默认值1，最小值1； periodSeconds：如果Pod未就绪，则每隔多少秒周期性的做就绪探测。默认值10，最小值1； failureThreshold：如果容器之前探测成功，后续连续几次探测失败，则确定容器未就绪。默认值3，最小值1； successThreshold：如果容器之前探测失败，后续连续几次探测成功，则确定容器就绪。默认值1，最小值1。 使用示例 # 目前我在docker hub有一个测试镜像：poneding/helloweb:v1，容器启动后，有一个健康检查路由/healthz/return200，访问该路由状态码返回200；有一个检查路由/health/return404，访问该路由状态码返回404。</description></item><item><title/><link>https://blog.poneding.com/kubernetes/local-storageclass/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/local-storageclass/</guid><description>我的博客 / Kubernetes / local 存储卷实践
+local 存储卷实践 # 在 Kubernetes 中有一种存储卷类型为 local。
+local 卷所代表的是某个被挂载的本地存储设备，例如磁盘、分区或者目录。
+local 卷只能用作静态创建的持久卷。不支持动态配置。
+与 hostPath 卷相比，local 卷能够以持久和可移植的方式使用，而无需手动将 Pod 调度到节点。系统通过查看 PersistentVolume 的节点亲和性配置，就能了解卷的节点约束。
+然而，local 卷仍然取决于底层节点的可用性，并不适合所有应用程序。 如果节点变得不健康，那么 local 卷也将变得不可被 Pod 访问。使用它的 Pod 将不能运行。 使用 local 卷的应用程序必须能够容忍这种可用性的降低，以及因底层磁盘的耐用性特征而带来的潜在的数据丢失风险。
+创建 local-storage 存储类 # apiVersion: storage.k8s.io/v1 kind: StorageClass metadata: name: local-storage provisioner: kubernetes.io/no-provisioner volumeBindingMode: WaitForFirstConsumer 手动创建 PV/PVC # 1、使用 local 卷时，你需要设置 PersistentVolume 对象的 nodeAffinity 字段。 Kubernetes 调度器使用 PersistentVolume 的 nodeAffinity 信息来将使用 local 卷的 Pod 调度到正确的节点；</description></item><item><title/><link>https://blog.poneding.com/kubernetes/metallb/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/metallb/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 K8s自建LoadBalancer
+Kubernetes 0-1 K8s自建LoadBalancer # Metallb介绍 # 一般只有云平台支持LoadBalancer，如果脱离云平台，自己搭建的K8s集群，Service的类型使用LoadBalancer是没有任何效果的。为了让私有网络中的K8s集群也能体验到LoadBalabcer，Metallb成为了解决方案。
+Metallb运行在K8s集群中，监视集群内LoadBalancer类型的服务，然后从配置的IP池中为其分配一个可用IP，以ARP/NDP或BGP的方式将其广播出去，这个可用IP成为了LoadBalancer的Url，可供集群外访问。
+Metallb搭建过程 # 创建命名空间 metallb-system：
+vim metallb-namespace.yaml 写入文件内容：
+apiVersion: v1 kind: Namespace metadata: name: metallb-system 下载metallb.yaml文件
+wget https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/metallb.yaml -O metallb.yaml --no-check-certificate 定义LoadBalancer的IP池，先创建configmap
+vim metallb-configMap.yaml 写入文件内容：
+apiVersion: v1 kind: ConfigMap metadata: namespace: metallb-system name: config data: config: | address-pools: - name: default protocol: layer2 addresses: - 192.168.115.140-192.168.115.199 注意：IP池的网络需要和K8s集群的IP处于同一网段，我的K8s集群网络是192.168.115.13x，这里IP池则是给到192.168.115.140-192.168.115.199的范围。
+执行命令：
+kubectl apply -f metallb-namespace.yaml kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey=&amp;#34;$(openssl rand -base64 128)&amp;#34; kubectl apply -f metallb.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/nfs-as-pvc/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/nfs-as-pvc/</guid><description>我的博客 / Kubernetes / 使用 nfs 持久化存储
+使用 nfs 持久化存储 # 一般云平台都会提供云存储服务，如 AWS EBS 服务，K8s 可以直接使用云存储服务创建 PV 和 PVC 作为 Volume 的存储后端。假设你没有使用到云存储，那么 NFS 可能会适合你。
+NFS（Network File System），网络文件系统，允许计算机之间共享存储资源，这里也就不具体介绍了。
+部署 nfs # 以下命令需要root权限，示例中机器IP为192.168.115.137。
+安装 nfs： # Ubuntu &amp;amp; Debian apt install nfs-kernel-server -y # CentOS yum install nfs-util -y 创建共享目录： mkdir /nfs/data -p 修改 nfs 的默认配置，在文末添加配置： vim /etc/exports /nfs/data *(rw,sync,no_root_squash) 其中：
+/nfs/data：共享目录 *：对所有开放访问，可以配置成网段，IP，域名等 rw：读写权限 sync：文件同时写入磁盘和内存 no_root_squash：当登录 NFS 主机使用共享目录的使用者是 root 时，其权限将被转换成为匿名使用者，通常它的 UID 与 GID，都会变成 nobody 身份 重启 rpc，nfs 需要向 rpc 注册： systemctl restart rpcbind.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/pod-understood/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/pod-understood/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 了解 Pod
+Kubernetes 0-1 了解 Pod # Pod 介绍 # Pod，是 K8s 对象模型中的最小单元，Pod 里面包含着一组容器（单个容器或多个紧密耦合的容器），这时候 Pod 可以理解为一个机器，而 Pod 里面的容器则理解为该机器里面的进程。
+Pod 的容器运行时由容器引擎提供，默认的容器引擎是 Docker；并且 K8s 管理的是 Pod，而不是容器。
+一个 Pod 内部的容器共享：
+存储：一个 Pod 可以指定一组共享存储卷。 网络：每个 Pod 分配一个唯一 IP（集群内 IP），共享网络命名空间，包括 IP 地址和网络端口。Pod 内的容器可以使用 localhost 互相通信，集群内 Pod 与 Pod通信可以使用 Pod 分配的 IP，但是由于 Pod 的 IP 是随机分配的，这种互通信的方式不太适合使用。 尽管一个 Pod 内可以包含多个 Pod，但我们在部署应用容器时的最佳实践是一个 Pod 里面只包含一个应用容器作为主容器，其他容器为主容器服务，称之为辅助容器。例如主容器崩溃了，会有一个辅助容器去重启主容器。辅助容器可以有也可以没有，因为 Pod 里面容器的生命周期可以被 Pod 的生命周期取代，而 Pod 的生命周期可以通过 Pod 管理器来管理维护。</description></item><item><title/><link>https://blog.poneding.com/kubernetes/prgramming-kubernetes/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/prgramming-kubernetes/</guid><description>我的博客 / Kubernetes / Kubernetes 编程
+Kubernetes 编程 # 开始 Kuberntes 编程之旅～
+mkdir programming-kubernetes &amp;amp;&amp;amp; cd programming-kubernetes git mod init programming-kubernetes 常用包：
+kubeconfig 对应的结构 clientcmdapi &amp;#34;k8s.io/client-go/tools/clientcmd/api&amp;#34; clientcmdapi.Config 编写自定义 API # 随机生成字符 &amp;#34;k8s.io/apimachinery/pkg/util/rand&amp;#34; rand.String(5) 参考：
+kubernetes/code-generator: Generators for kube-like API types (github.com)
+code-generator 使用
+B站 code-generator 介绍
+mkdir hack vim hack/boilerplate.go.txt /* Copyright 2022 programming-kubernetes. Licensed under the Apache License, Version 2.0 (the &amp;#34;License&amp;#34;); you may not use this file except in compliance with the License.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/prometheus-collect-kong-metrics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/prometheus-collect-kong-metrics/</guid><description>我的博客 / Kubernetes / Prometheus-监控Kong完整操作
+Prometheus-监控Kong完整操作 # 本篇记录使用Prometheus收集Kong暴露的/metrics接口，收集指标数据，从而实现对Kong的监控。
+先决条件 # Prometheus部署完成； Kong（Kong 服务，端口8000）部署完成； Kong 的Admin Api（端口8001）部署完成 Konga（Kong的WebUI，端口1337）部署完成。 Kong添加Prometheus插件 # 登录进入Konga； 点击右边菜单栏”PLUGINS“，进入Plugins管理，点击“Analytics &amp;amp; Monitoring”，选择添加Promethus插件 Kong添加metrics接口 # 我们知道Prometheus主要通过读取 http://host/metrics接口, 来收集相关服务的性能数据，但是Kong的metrics接口服务默认是没有开启的，所以需要先为Kong添加/metrics。
+登录进入Konga； 点击右边菜单栏”SERVICES“，进入Services管理，点击“ADD NEW SERVICE” 添加页面输入“Name”和“Url”参数即可，例如“Name”=“prometheusService”，“Url”=“ http://localhost:8001/metrics” 添加完Prometheus Service之后，Service列表选中并点击进入prometheusService，选择”Routes“菜单，点击“ADD ROUTE” 添加页面输入“Paths”参数即可，例如“Paths”=[“/metrics”]（Path必须以“/”为首） 这时候访问“ http://localhost:8000/metrics”，看到页面如下显示，说明已经成功的添加了metrics接口 Prometheus添加Kong指标收集 # 修改Prometheus配置文件，prometheus.yml
+scrape_configs配置项下添加如下配置
+- job_name: &amp;#39;kong&amp;#39; scrape_interval: 5s static_configs: - targets: [&amp;#39;localhost:8000&amp;#39;] 配置完之后重启Prometheus，访问“ http://localhost:9090/graph”
+可以看到一已经生成了很多kong的指标项，如http访问，nginx当前访问量等指标
+« Kubernetes 编程
+» Prometheus</description></item><item><title/><link>https://blog.poneding.com/kubernetes/prometheus/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/prometheus/</guid><description>我的博客 / Kubernetes / Prometheus
+Prometheus # Intro # 是一个面向云原生应用程序的开源的监控&amp;amp;报警工具。
+开源：继Kubernetes之后的第二个CNCF开源项目，Go语言开发 监控：通过HTTP服务定时从配置的目标收集指标数据，识别数据展示规则，展示监控系统和服务指标数据 报警：监控到的指标数据达到某一设定好的条件时，触发报警机制 时间序列数据库： 时间序列是由唯一的指标名称（Metrics）和一组标签（key=value）的形式组成 PromeQL：基于Prometheus时间序列数据库的一个灵活的查询语言 Prometheus的监控对象 # 资源监控：
+服务器的资源使用情况，在Kubernetes集群中，则可以做到对Kubernetes Node、 Deployment 、Pod的资源利用以及apiserver，controller-manager，etcd等组件的监控。
+应用监控：
+业务应用暴露端口供Prometheus调用实现监测，比如实时的用户在线人数，数据库的当前连接数等。
+Prometheus优势 # 支持机器资源和动态配置的应用监控； 多维数据收集和查询； 服务独立，少依赖。 Prometheus组件 # Prometheus Server：采集监控数据，存储时序指标，提供数据查询； Prometheus Client SDK：对接开发工具包，提供自定义的指标数据等； Push Gateway：推送指标数据的网关组件； Third-part Exporter：外部指标采集系统，暴露接口供Prometheus采集； AlertManager：指标数据的分析告警管理器； Architecture overview # 上图来源于官网：
+处理流程： 配置资源目标或应用抓取； 抓取资源或应用指标数据； 制定报警规则，推送报警； 灵活查询语言，结合Grafana展示 Installation &amp;amp; Start Up # 1. 以服务进程运行Prometheus # ​ 在ubuntu系统上安装Prometheus，一般有两种方式
+第一种，安装命令如下：
+wget https://github.com/prometheus/prometheus/releases/download/v2.13.1/prometheus-2.13.1.linux-amd64.tar.gz tar xvfz prometheus-2.13.1.linux-amd64.tar.gz # 启动Prometheus cd prometheus-2.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/pvc-expansion/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/pvc-expansion/</guid><description>我的博客 / Kubernetes / PVC 扩容
+PVC 扩容 # K8s 部署的 Kafka 程序突然挂了，查看相关日志发现原来是挂日志的磁盘空间不足，那么现在需要对磁盘进行扩容。
+使用以下命令执行 PVC 扩容的操作：
+kubectl edit pvc &amp;lt;pvc-name&amp;gt; -n &amp;lt;namespace&amp;gt; 执行过程中发现，无法对该 PVC 进行动态扩容，需要分配 PVC 存储的 StorageClass 支持动态扩容。
+那么怎么是的 StorageClass 支持动态扩容呢，很简单，更新 StorageClass 即可。
+kubectl edit storageclass &amp;lt;storageclass-name&amp;gt; 添加属性：
+allowVolumeExpansion: true # 允许卷扩充 之后再次执行 PVC 扩容的操作即可。
+« Prometheus
+» 了解 Secret</description></item><item><title/><link>https://blog.poneding.com/kubernetes/secret-understood/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/secret-understood/</guid><description>我的博客 / Kubernetes / 了解 Secret
+了解 Secret # 通常我们的应用程序的配置都会包含一些敏感信息，例如数据库连接字符串，证书，私钥等，为了保证其安全性，K8s 提供了 Secret 资源对象来保存敏感数据，它和 CongfigMap 类似，也是键值对的映射，并且使用方式也几乎一样。
+介绍 Secret # Secret 中存储着键值对数据，可以
+作为环境变量传递给容器 作为文件挂载到容器的 Volume Secret 会存储在 Pod 所调度的节点的内存中，而不是写入磁盘。
+Pod 默认生成的 Secret # 每个 Pod 都会被自动挂载一个 Secret 卷，只需要使用 kubectl desribe pod 命令就能看到一个名称类似 default-token-n4q6m 的 Secret，Secret 也是一种 K8s 资源，所以，可以使用 kubectl get secret 或 kubectl describe secret 获取查看。
+从上面图例可以看出，Pod 默认生成的 Secret 会包含三个配置项：ca.crt、namespace、token。其实这三个配置项是 Pod 内部安全访问Kubernetes API 服务的所有信息，而在 kubectl describe pod 的时候，你可以看到 Secret 所挂载的具体目录在 /var/run/secrets/kubernetes.io/serviceaccount.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/service-understood/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/service-understood/</guid><description>我的博客 / Kubernetes / 了解 Service
+了解 Service # Service 介绍 # 按照官方文档的说法，在 K8s 中，Service 是将运行在集群中的一组 Pod 的应用公开为网络服务的抽象方法，是 K8s 的核心概念之一，Service 的主要作用是使客户端发现 Pod 并与之通信。
+简单理解起来就是，由 Service 提供统一的入口地址，然后将请求负载分发到后端 Pod 的容器应用。
+为什么有 Service # 集群中部署了 Pod，应用是成功的部署起来了，但是只是至此的话，Pod 提供服务访问存在以下一些问题。
+Pod 是短暂的，可能会被销毁或重新调度，这使得 Pod 的 IP 是随时变动和更新的； 部署多个 Pod 的伸缩问题，流量分配问题； 集群外部客户端无法直接访问 Pod。 这时候就需要 Service，Pod 作为 Service 的后端提供服务。所以我们可以想象，Service 需要完成的事情：
+服务发现，通过 Pod 的 lable 查找目标 Pod，将查找的 Pod 的注册到自己的后端列表，Pod 的 IP 信息发生更改，后端列表也同步更新； 负载均衡，请求到达 Service 之后，将请求均衡转发的后端列表； 服务暴露：对外提供统一的请求地址。 创建 Service # 在创建 Sercvice 之前我们首先创建 service 代理的 Pod，nginx-pod.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/telepresence/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/telepresence/</guid><description>我的博客 / Kubernetes / Telepresence
+Telepresence # Telepresence是一款
+« 了解 Service
+» Kubernetes 0-1 使用preStop优雅终止Pod</description></item><item><title/><link>https://blog.poneding.com/kubernetes/terminate-pod-gracefully/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/terminate-pod-gracefully/</guid><description>我的博客 / Kubernetes / Kubernetes 0-1 使用preStop优雅终止Pod
+Kubernetes 0-1 使用preStop优雅终止Pod # Kubernetes允许Pod终止之前，执行自定义逻辑。
+字段定义 # 字段定义：pod.spec.containers.lifecycle.preStop
+$ kubectl explain pod.spec.containers.lifecycle.preStop KIND: Pod VERSION: v1 RESOURCE: preStop &amp;lt;Object&amp;gt; DESCRIPTION: PreStop is called immediately before a container is terminated due to an API request or management event such as liveness/startup probe failure, preemption, resource contention, etc. The handler is not called if the container crashes or exits. The reason for termination is passed to the handler.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/terraform/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/terraform/</guid><description>我的博客 / Kubernetes / Terraform
+Terraform # 创建ec2同时安装应用的三种方式 # Mode 1: userdata # 需要shell脚本文件install_nginx.sh resource &amp;#34;aws_instance&amp;#34; &amp;#34;demo&amp;#34; { # ... # Mode 1: userdata user_data = &amp;#34;${file(&amp;#34;../templates/install_nginx.sh&amp;#34;)}&amp;#34; # ... } Mode 2: remote-exec # 需要连接主机，connection; 密钥文件xxx.pem resource &amp;#34;aws_instance&amp;#34; &amp;#34;demo&amp;#34; { # ... # Mode 2: remote-exec connection { host = &amp;#34;${self.private_ip}&amp;#34; private_key = &amp;#34;${file(&amp;#34;xxx.pem&amp;#34;)}&amp;#34; user = &amp;#34;${var.ansible_user}&amp;#34; } provisioner &amp;#34;remote-exec&amp;#34; { inline = [ &amp;#34;sudo apt-get update&amp;#34;, &amp;#34;sudo apt-get install -y nginx&amp;#34;, &amp;#34;sudo service nginx start&amp;#34; ] } # .</description></item><item><title/><link>https://blog.poneding.com/kubernetes/velero-minio-backup-restore-volume/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/velero-minio-backup-restore-volume/</guid><description>我的博客 / Kubernetes / Velero + Minio 备份与恢复
+Velero + Minio 备份与恢复 # 安装 Minio # docker run -d --name minio \\ -p 9000:9000 \\ -p 9001:9001 \\ -e MINIO_ROOT_USER=minio \\ -e MINIO_ROOT_PASSWORD=minio \\ -v /minio-data:/data \\ quay.io/minio/minio:latest server /data --console-address &amp;#34;:9001&amp;#34; 创建 Bucket # 设置 Region # 点击保存后，会出现一个横幅，点击横幅上的 Restart 即可。
+创建 AccessKey # 保存 AccessKey 和 SecretKey 到文件 credentials-velero：
+[default] aws_access_key_id = &amp;lt;access_key&amp;gt; aws_secret_access_key = &amp;lt;secret_key&amp;gt; 安装 Velero CLI # # linux wget &amp;lt;https://github.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/volume-understood/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/volume-understood/</guid><description>我的博客 / Kubernetes / 了解 Volume
+了解 Volume # 我们知道容器与容器之间是隔离的，有独立的文件系统。并且存储的文件性质时临时的，当容器被销毁时，容器内的文件一并被清除。
+在 Pod 内可能运行着多个容器，这可能需要容器共享文件。在 K8s 中，抽象除了 Volume 的概念来满足这种需求。
+Volume 介绍 # 在 Docker 中，也有 Volume 的概念，它是将容器内某文件目录挂载到宿主机的目录。
+在 K8s 中，Volume 供 Pod 内的容器使用，一个容器可以使用多个 Volume，同一 Pod 内的多个容器可以同时使用一个 Volume，实现文件共享，或数据持久存储。
+容器与 Volume 的简单关系：
+Volume 定义 # 定义在 pod.spec.container 属性下：
+kind: Pod ... spec: container: ... volumeMounts: - mountPath: &amp;lt;path&amp;gt; name: &amp;lt;volume-name&amp;gt; subPath: &amp;lt;volume-path&amp;gt; volumes: - name: &amp;lt;volume-name&amp;gt; &amp;lt;volume-type&amp;gt;: ... mountPath： 容器内的目录，如果不存在则创建该目录 subPath：默认会将 mountPath 直接映射到 volume 的根目录，使用 subpath 映射到 volume 特定的目录。 Volume 类型 # Volume 有多种类型，有的可以直接在集群中使用，有的则需要第三方服务或云平台的支持。简单罗列几种常见类型，更多了类型参考： https://kubernetes.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/vpa/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/vpa/</guid><description>我的博客 / Kubernetes / VPA
+VPA # 安装 # git clone https://github.com/kubernetes/autoscaler.git cd ./autoscaler/vertical-pod-autoscaler ./hack/vpa-up.sh 卸载：
+./hack/vpa-down.sh VPA运行模式 # Auto（默认模式）：VPA在pod创建时分配资源请求，并使用首选的更新机制在现有的pod上更新它们。目前，这相当于“重建”(见下文)。一旦pod请求的免费重启(“原位”)更新可用，它就可以被“Auto”模式用作首选的更新机制。注意:VPA的这个特性是实验性的，可能会导致您的应用程序停机。
+Recreate：VPA在pod创建时分配资源请求，并在现有pod上更新它们，当请求的资源与新建议有显著差异时(如果定义了pod中断预算，则考虑到它们)，将它们赶出现有pod。这种模式应该很少使用，只有当您需要确保在资源请求更改时重新启动pods时才会使用。否则更喜欢“自动”模式，这可能会利用重新启动免费更新，一旦他们可用。注意:VPA的这个特性是实验性的，可能会导致您的应用程序停机。
+Initial：VPA只在pod创建时分配资源请求，以后不会更改它们。
+Off：VPA不会自动更改pods的资源需求。计算并可以在VPA对象中检查建议。
+示例 # « 了解 Volume</description></item><item><title/><link>https://blog.poneding.com/linux/certbot-auto-gen-cert/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/certbot-auto-gen-cert/</guid><description>我的博客 / Linux / certbot-auto 生成证书
+certbot-auto 生成证书 # 安装 # wget https://dl.eff.org/certbot-auto chmod a+x ./certbot-auto cp ./certbot-auto /usr/local/bin 生成证书 # 条件：
+提前已经将域名解析到本服务器； 本服务器端口 80、443 处于未被占用的状态，如果 web 服务占用了 80 端口，需要临时关闭。 certbot-auto certonly --standalone --email poneding@gmail.com -d test.poneding.com 以上命令执行完成后，将会在 /etc/letsencrypt/live 目录下生成域名证书文件。默认证书有效期为 3 个月。
+nginx 配置证书 # 参考示例：
+server { listen 80; server_name abc.com; rewrite ^(.*) https://test.poneding.com permanent; } server{ listen 443 ssl default_server; listen [::]:443 ssl default_server; ssl_certificate /etc/letsencrypt/live/test.poneding.com/fullchain.pem; ssl_certificate_key /etc/letsencrypt/live/test.</description></item><item><title/><link>https://blog.poneding.com/linux/history-with-date/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/history-with-date/</guid><description>我的博客 / Linux / Linux-history 输出附带日期
+Linux-history 输出附带日期 # 如果我们在 linux 系统中想看历史的命令记录，我们可以通过 command 命令来获取。
+history 输出大概会是下面这种样子，只有简单的 command 列表。
+1 ls 2 top 4 docker ps 5 df 6 ls 那么，如果想知道历史执行的 command 的时间该怎么做呢。
+按照如下步骤，一步一步来。
+首先设置 HISTTIMEFORMAT 变量 $ HISTTIMEFORMAT=&amp;#34;%d/%m/%y %T &amp;#34; # OR $ echo &amp;#39;export HISTTIMEFORMAT=&amp;#34;%d/%m/%y %T &amp;#34;&amp;#39; &amp;gt;&amp;gt; ~/.bash_profile 使用 source 命令加载 HISTTIMEFORMAT 变量到当前 shell 命令窗 $ . ~/.bash_profile # OR $ source ~/.bash_profile 再次运行 history 命令，已经可以输出附带执行时间的 history 了。 1 root 2020/02/18 11:28:19 ls 2 root 2020/02/18 11:28:21 top 4 root 2020/02/18 11:28:58 docker ps 5 root 2020/02/18 11:34:09 df 6 root 2020/02/18 11:34:15 ls « certbot-auto 生成证书</description></item><item><title/><link>https://blog.poneding.com/linux/linux-commands/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/linux-commands/</guid><description>我的博客 / Linux / Linux 命令
+Linux 命令 # Linux 命令大全
+cat # cat命令用于把档案串连接后传到基本输出（萤幕或加 &amp;gt; fileName 到另一个档案）
+使用权限 # 所有使用者
+语法格式 # cat [-AbeEnstTuv] [--help] [--version] fileName 参数说明 # -n 或 &amp;ndash;number 由 1 开始对所有输出的行数编号
+-b 或 &amp;ndash;number-nonblank 和 -n 相似，只不过对于空白行不编号
+-s 或 &amp;ndash;squeeze-blank 当遇到有连续两行以上的空白行，就代换为一行的空白行
+-v 或 &amp;ndash;show-nonprinting
+实例 # 把 textfile1 的档案内容加上行号后输入 textfile2 这个档案里
+cat -n textfile1 &amp;gt; textfile2 把 textfile1 和 textfile2 的档案内容加上行号（空白行不加）之后将内容附加到 textfile3 里。
+cat -b textfile1 textfile2 &amp;gt;&amp;gt; textfile3 清空/etc/test.</description></item><item><title/><link>https://blog.poneding.com/linux/linux-common-commands/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/linux-common-commands/</guid><description>我的博客 / Linux / Linux常用命令
+Linux常用命令 # 1.文件和目录相关 # cd .. 切换到上一级目录 cd ../.. 切换到上两级目录 cd [dir] 进入 dir 目录 cd 进入个人的主目录 cd ~[username] 进入个人的主目录 cd - 进入上次目录 pwd 查看目录路径 ls 查看当前目录下的目录和文件（不包含隐藏目录或文件） ls -a 查看当前目录下的所有目录和文件 ls -F 查看当前目录下的文件 （不包含目录和隐藏文件） ls -l 查看文件和目录的详细资料 ls *[0-9]* 查看包含字符的文件和目录 mkdir dir1 创建目录 mkdir dir1 dir2 mkdir -p dir1/dir1/dir1 创建一个目录树 rm -f file1 删除文件 rmdir dir1 删除空 rm -rf dir1 删除包含内容的目录 rm -rf dir1 dir2 删除多个目录 mv dir1 dir2 重命名或移动一个目录（看 dir2 是否存在） cp file1 file2 复制文件 cp dir/* .</description></item><item><title/><link>https://blog.poneding.com/linux/linux-enable-crontab-log/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/linux-enable-crontab-log/</guid><description>我的博客 / Linux / Linux 启用 crontab 日志
+Linux 启用 crontab 日志 # You can enable logging for cron jobs in order to track problems.
+You need to edit the /etc/rsyslog.conf or /etc/rsyslog.d/50-default.conf (on Ubuntu) file and make sure you have the following line uncommented or add it if it is missing:
+cron.* /var/log/cron.log Then restart rsyslog and cron:
+sudo service rsyslog restart sudo service cron restart Cron jobs will log to /var/log/cron.</description></item><item><title/><link>https://blog.poneding.com/linux/linux-secure-login/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/linux-secure-login/</guid><description>我的博客 / Linux / Linux-安全登录
+Linux-安全登录 # 我们都知道
+root 是 linux 系统默认的最高权限账号 linux 系统默认的 ssh 端口是 22 大多数人习惯使用 user/password 来登录 linux 系统 很遗憾，如果你的系统没有做特殊等登陆配置，那么其他人便可以利用 ssh ip:22 root/暴力密码 来破解登入你 的 linux 系统，一旦被他破解，你的系统就可以为他所用了。
+但是，我们可以通过以下三种方式来避免发生这类安全问题。
+1. 禁用 root 账号登录 # 禁用 root 账号，那么我们就必须创建其他登录账号，这里建议账号名不要为 admin 这类常见用户名。
+创建用户（以下都基于 ubuntu 系统操作） adduser dp 用户赋权 此时创建的用户不能使用 sudo 权限，考虑将用户加入 sudo 组
+usermod -a -G sudo dp 并且，为了避免使用 sudo 权限需要时不时的输入密码的麻烦，进行免密设置。在 /etc/sudoers 文件中新增行。
+dp ALL=(ALL) NOPASSWD: ALL 到了这一步，应该尝试使用新用户登录系统，如果成功登录再往下继续。 禁用 root 登录 打开 /etc/ssh/sshd_config 文件，找到 PermitRootLogin 项，修改该项成如下：</description></item><item><title/><link>https://blog.poneding.com/linux/shell-command-interval-character/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/shell-command-interval-character/</guid><description>我的博客 / Linux / shell 命令间隔符
+shell 命令间隔符 # 我们经常能看到Shell命令间有很多中间隔符：|，||，&amp;amp;&amp;amp; 等，它们到底有着什么样的作用呢？一一来看：
+1. |：
+间隔符 | 起着管道的作用，是将上一条命令的 stdout 作为下一条命令的 stdin：
+示例：
+echo hello world! | tee hello.txt 2. ||：
+命令被 || 分割，只有当前面的命令发生错误，才会执行后面的命令。
+示例：
+# 如果创业失败，那么就继续打工 sh chuangye.sh || sh dagong.sh 3. &amp;amp;&amp;amp;：
+命令被 &amp;amp;&amp;amp; 分割，命令会连续执行，但是如果前面的命令发生错误，会影响后面的命令继续执行。
+示例：
+# 洗了手才能吃饭 sh wash_hand.sh &amp;amp;&amp;amp; sh eat.sh 4. ;：
+命令被 ; 分割，命令会连续执行，即使前面的命令发生错误，也不影响后面的命令继续执行。
+示例：
+# 不管有没有赚到钱，都要回家过年 sh earn_money.sh; sh go_home.sh 5. &amp;gt;：
+输出到指定文件（文件不存在则创建文件，文件存在则会覆盖文件内容）
+echo &amp;#34;Hello World&amp;#34; &amp;gt; hello.</description></item><item><title/><link>https://blog.poneding.com/linux/shell/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/shell/</guid><description>我的博客 / Linux / shell 基础
+shell 基础 # shell 注释 # 单行注释：
+# 注释内容 多行注释：
+:&amp;lt;&amp;lt;EOF 注释内容 注释内容 注释内容 EOF 或
+:&amp;lt;&amp;lt;! 注释内容 注释内容 注释内容 ! 或
+:&amp;lt;&amp;lt;&amp;#39; 注释内容 注释内容 注释内容 &amp;#39; shell 变量 # 定义变量：
+my_name=&amp;#34;Ding Peng&amp;#34; 使用变量：
+$my_name ${my_name} 只读变量：
+my_name=&amp;#34;Ding Peng&amp;#34; readonly my_name 删除变量：
+unset my_name 变量类型：
+局部变量：在脚本或命令中定义，仅在当前shell实例有效 环境变量：所有shell实例有效 shell变量：shell程序设置的特殊变量 shell 字符串 # 单引号与双引号的区别：
+单引号里的任何字符都会原样输出，单引号字符串中的变量是无效的； 单引号字串中不能出现单独一个的单引号（对单引号使用转义符后也不行），但可成对出现，作为字符串拼接使用； 双引号里可以有变量； 双引号里可以出现转义字符 my_name=&amp;#34;Ding Peng&amp;#34; hello_string=&amp;#34;Hllo,\&amp;#34;$my_name\&amp;#34;!&amp;#34; echo $hello_string 获取字符串长度：
+my_name=&amp;#34;dp&amp;#34; echo ${#my_name} # 输出5 截取字符串：</description></item><item><title/><link>https://blog.poneding.com/linux/ssh-tunnel-connect-middleware/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/ssh-tunnel-connect-middleware/</guid><description>我的博客 / Linux / 使用 SSH Tunnel 连接中间件
+使用 SSH Tunnel 连接中间件 # 背景 # 一般线上的数据库是不允许本机直接访问的，只能通过跳板机访问。但是这么多的开发人员都要访问数据库的话，跳板机的数量就有压力了。
+本篇介绍如何使用 SSH Tunnel 的方式访问数据库，数据库不限于 Sql Server、MySql、Mongodb、Redis 等。
+前提条件 # 已经拥有数据库的登录信息，如数据库访问的 host、port、user、password； 拥有一台可以访问数据库的跳板机登录权限，如跳板机的 IP、user、password（或密钥文件）； 本机安装了有 SSH Tunnel 功能的数据库的可视化工具，如 DBeaver，Navicate，Robo 3T 等。 RDB # 使用 DBeaver 或 Navicate 等工具通过 SSH Tunnel 方式访问关系型数据库，以 Sql Server 为例。
+打开DBeaver，选择 Sql Server 连接。
+在连接配置页面 Main，输入 Sql Server 连接的基本信息，这里 host 直接使用原本的数据库 host 即可。
+切至 SSH，勾选 Use SSH Tunnel，输入跳板机的连接配置即可。
+配置完成，Ok连接即可。
+使用 SSMS + SSH Tunnel 连接 Sql Server # 本机需要安装 SSMS 和 Putty 工具。</description></item><item><title/><link>https://blog.poneding.com/linux/tee-keep-stderr/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/tee-keep-stderr/</guid><description>我的博客 / Linux / tee 保存 stderr 到文件
+tee 保存 stderr 到文件 # tee命令是将 stdout 写入到某文件当中，但是如何将 stderr 也写入到文件当中？
+示例如下：
+1.sh
+echo exec 1.sh start! &amp;amp;&amp;amp; \ cat hello.txt &amp;amp;&amp;amp; \ echo exec 1.sh end! 假如 hello.txt 文件不存在，执行 1.sh 文件中的 cat 命令将报错。如果我们想将执行 1.sh 文件的输出写入到一个 log 文件，例如：
+sh 1.sh | tee 1.log 执行以上命令，控制台的输出是：
+$ sh 1.sh | tee 1.log exec 1.sh start! cat: hello.txt: No such file or directory 但是写入到 1.log 日志文件中的内容是：</description></item><item><title/><link>https://blog.poneding.com/linux/vim-common-commands/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/vim-common-commands/</guid><description>我的博客 / Linux / vim 使用
+vim 使用 # 设置 # vim /etc/vim/vimrc 或者当前环境设置
+:set paste :set nopaste :set number :set nonumber :set hlsearch :set nohlsearch :set cursorline :set nocursorline vim删除所有行 # ggdG 撤销 # u ctrl+r 查找 # 大小写问题：
+默认大小写敏感。
+大小写不敏感：/hello\c
+大小写敏感：/hello\C
+设置大小写敏感：
+ecs+:set ignorecase：设置默认忽略大小写敏感
+ecs+:set smartcase：如果查找字符中存在大写则自动大小写敏感
+查找当前字符：
+光标移动 # h：向左 j：向下 k：向上 l：向右 替换 # :s/jay/dp/g 替换当前行中所有匹配 jay =&amp;gt; dp :1,$s/jay/dp/g 替换所有 :1,5s/jay/dp/g 替换 1 到 5 行 翻页 # ctrl+f：下一页 ctrl+d：下半页 ctrl+b：上一页 ctrl+u：上半页 行操作 # dG：删除当前行到尾行</description></item><item><title/><link>https://blog.poneding.com/middleware/elasticsearch/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/middleware/elasticsearch/</guid><description>我的博客 / 数据中间件 / Elasticsearch
+Elasticsearch # 全文搜索
+API # 题外话：
+幂等性：多次执行同样的请求，资源只能创建或修改一次
+POST 请求不是幂等性的，同样的数据请求，会造成不同的影响
+PUT 是幂等性的，同样的请求造成的影响是一样的
+创建索引 # PUT /users 查询索引 # 获取单个索引
+GET /users 获取所有索引
+GET /_cat/indices?v 删除索引 # DELETE /users 创建文档 # 这个操作是在单个索引下的
+POST /users/_doc # 一定需要body，否则报错 body: { &amp;#34;name&amp;#34;: &amp;#34;dp&amp;#34;, &amp;#34;age&amp;#34;: 18 } 上面这个文档创建时会生成随机 ID（返回结果中的 _id），不便维护，使用下面的方法自定义文档 ID，此时由于 ID 自定义了，就要求幂等，所以可以使用 PUT 方法
+POST | PUT /users/_doc/1002 PUT /users/_create/1003 # 一定需要body，否则报错 body: { &amp;#34;name&amp;#34;: &amp;#34;dp&amp;#34;, &amp;#34;age&amp;#34;: 18 } 查询文档 # 获取单个文档</description></item><item><title/><link>https://blog.poneding.com/middleware/mongodb/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/middleware/mongodb/</guid><description>我的博客 / 数据中间件 / MongoDB
+MongoDB # 资料 # http://cw.hubwiz.com/card/c/543b2f3cf86387171814c026/1/1/1/ http://cw.hubwiz.com/card/c/5438c259032c7817c40298b5/1/1/1/ 安装 # 按照官网给出的指南在 ubuntu 系统安装 mongod，参考 https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+验证 mongo 是否安装成功：进入 ubuntu shell 窗口，直接输入
+mongo --version 窗口正常输出 mongo 版本就说明 mongo 安装成功
+启动 mongo 服务
+sudo systemctl statt mongod #/stop/restart 创建 dba 用户并添加权限验证
+mongodb 没有开启权限验证之前，使用 mongo 命令可以直接连接本地 mongodb；
+sudo mongo 使用 db.createUser 命令创建 dba 用户,为 dba 用户添加所有 database 的管理员权限；
+&amp;gt; db.createUser({user:&amp;#34;dba&amp;#34;,pwd:&amp;#34;[your pass]&amp;#34;,roles:[ {role:&amp;#34;readWriteAnyDatabase&amp;#34;,db:&amp;#34;admin&amp;#34;},{role:&amp;#34;dbAdminAnyDatabase&amp;#34;,db:&amp;#34;admin&amp;#34;},{role:&amp;#34;userAdminAnyDatabase&amp;#34;,db:&amp;#34;admin&amp;#34;},{role:&amp;#34;clusterAdmin&amp;#34;,db:&amp;#34;admin&amp;#34;},{role:&amp;#34;restore&amp;#34;,db:&amp;#34;admin&amp;#34;},{role:&amp;#34;backup&amp;#34;,db:&amp;#34;admin&amp;#34;} ]}) Successfully added user: { &amp;#34;user&amp;#34; : &amp;#34;dba&amp;#34;, &amp;#34;roles&amp;#34; : [ // .</description></item><item><title/><link>https://blog.poneding.com/middleware/mysql/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/middleware/mysql/</guid><description>我的博客 / 数据中间件 / MySQL
+MySQL # 安装 # Windows 安装 MySQL # 下载 Mysql 安装包： https://dev.mysql.com/downloads/installer/
+下载完成后，双击 msi 文件安装。
+Ubuntu 安装 MySQL # sudo apt update sudo apt install mysql-server -y # 只安装 mysql 客户端 sudo apt install mysql-client -y Docker 安装 MySQL # docker run -d --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql:5.7 Troubleshooting # Q1. root 用户本地登录 # 使用命令 mysql -u root -p，输入密码后登录失败，提示如下：
+Access denied for user &amp;#39;root&amp;#39;@&amp;#39;localhost&amp;#39; 解决方案：：</description></item><item><title/><link>https://blog.poneding.com/middleware/postgres/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/middleware/postgres/</guid><description>我的博客 / 数据中间件 / Postgres
+Postgres # 自增 Id 数据插入权限
+GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO &amp;lt;user_name&amp;gt;; 修改用户密码
+alter user postgres with password &amp;#39;admin123&amp;#39;; « MySQL
+» Redis</description></item><item><title/><link>https://blog.poneding.com/middleware/redis/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/middleware/redis/</guid><description>我的博客 / 数据中间件 / Redis
+Redis # 安装 # Docker 安装 redis # sudo docker run --name redis-01 \ -p 2501:6379 \ -v /home/dp/apps/redis/redis-01/conf/redis.conf:/etc/redis/redis.conf \ -v /home/dp/apps/redis/redis-01/data:/data \ -d \ redis:6.0 redis-server /etc/redis/redis.conf --appendonly yes redis.conf 是配置文件 redis-server /etc/redis/redis.conf，启用配置，如果没有 redis-server 则 redis 默认是无配置启动 &amp;ndash;appendonly yes 启用数据持久化 redis.conf 参照：
+bind 127.0.0.1 # 注释掉这部分，使 redis 可以外部访问 daemonize no # 用守护线程的方式启动 requirepass your_pwd # 给 redis 设置密码 appendonly yes # redis 持久化　默认是 no tcp-keepalive 300 # 防止出现远程主机强迫关闭了一个现有的连接的错误 默认是 300 « Postgres</description></item><item><title/><link>https://blog.poneding.com/os/macos/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/os/macos/</guid><description>我的博客 / 操作系统 / MacOS
+MacOS # Git 忽略 .DS_Store 文件 # # 配置全局忽略文件 git config --global core.excludesfile ~/.gitignore_global # 添加 .DS_Store 文件到全局忽略文件 echo .DS_Store &amp;gt;&amp;gt; ~/.gitignore_global echo ._.DS_Store &amp;gt;&amp;gt; ~/.gitignore_global echo **/.DS_Store &amp;gt;&amp;gt; ~/.gitignore_global echo **/._.DS_Store &amp;gt;&amp;gt; ~/.gitignore_global 配置 PATH # 在终端使用 export 命令设置 PATH 并不能全局生效，如果你想设置全局 PATH ，可以使用以下这个方法：
+sudo mkdir /etc/paths.d/mypath vim /etc/paths.d/mypath /your/path 查看端口占用并退出程序 # 有时候使用 VSCode 调试或运行程序后，无法成功推出程序，端口一直占用。
+查看端口占用：
+# [port] 替换成你想查看的端口号，例如：sudo lsof -i tcp:8080 sudo lsof -i tcp:[port] 上述命令可以得到程序的进程 PID，退出进程：</description></item><item><title/><link>https://blog.poneding.com/os/ohmyzsh/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/os/ohmyzsh/</guid><description>我的博客 / 操作系统 / ohmyzsh
+ohmyzsh # macos # echo $SHELL /bin/zsh 安装 ohmyzsh sh -c &amp;#34;$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)&amp;#34; 安装 zsh-autosuggestions git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions 配置 .zshrc 文件添加 ohmyzsh 插件： plugins=(git docker docker-compose kubectl autojump zsh-autosuggestions) linux # 安装 zsh： sudo apt update sudo apt install zsh -y 修改 shell： chsh -s /usr/bin/zsh 打开新的终端，将使用 zsh
+echo $SHELL /usr/bin/zsh 安装 ohmyzsh： sh -c &amp;#34;$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)&amp;#34; 安装 zsh-autosuggestions： git clone https://github.</description></item><item><title/><link>https://blog.poneding.com/os/openssl/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/os/openssl/</guid><description>我的博客 / 操作系统 / openssl
+openssl # openssl 常用于生成证书、签名、加密等操作。它是一个开源的工具，可以在 Linux、Windows、MacOS 等操作系统上运行。
+包含三个组件：
+openssl：命令行工具 libcrypto：加密算法库 libssl：加密模块应用库，实现了 SSL 和 TLS 协议 对称加密 # echo test &amp;gt; test.txt # 加密 openssl enc -e -des3 -a -salt -in test.txt -out test.txt.enc # 解密 openssl enc -d -des3 -a -salt -in test.txt.enc -out test.txt.dec -salt：加盐，增加破解难度，使用 openssl 默认盐值 -S [salt]：指定盐值
+非对称加密 # 生成密钥对
+openssl genrsa -out rsa_private_key.pem 2048 openssl rsa -in rsa_private_key.pem -pubout -out rsa_public_key.pem 加密（公钥加密，私钥解密）</description></item><item><title/><link>https://blog.poneding.com/os/ubuntu/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/os/ubuntu/</guid><description>我的博客 / 操作系统 / Ubuntu
+Ubuntu # 终端默认使用英文 # LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8 下载 arm64 桌面镜像 # https://cdimage.ubuntu.com/jammy/daily-live/current/jammy-desktop-arm64.iso 关闭防火墙 # sudo ufw disable sudo ufw status 修改时区 # sudo cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime sudo timedatectl set-timezone Asia/Shanghai date # 同步时间 sudo apt install ntpdate -y sudo ntpdate cn.pool.ntp.org 解决英文系统下中文显示问题 # 修改字体优先级
+sudo vim /etc/fonts/conf.avail/64-language-selector-prefer.conf 注意：在 Ubuntu 23.10 或更新版本的系统上修改文件：
+sudo vim /etc/fonts/conf.d/64-language-selector-cjk-prefer.conf 将 `JP` 和 `KR` 所在行往下调整即可，调整成如下所示： ```xml &amp;lt;?xml version=&amp;#34;1.0&amp;#34;?&amp;gt; &amp;lt;!DOCTYPE fontconfig SYSTEM &amp;#34;fonts.</description></item><item><title/><link>https://blog.poneding.com/os/windows/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/os/windows/</guid><description>我的博客 / 操作系统 / Windows 使用姿势
+Windows 使用姿势 # 0. 激活 windows # 以管理员身份运行命令行，输入以下三行命令：
+slmgr /ipk W269N-WFGWX-YVC9B-4J6C9-T83GX # 等待弹窗出现，点击确定之后，再继续执行下一行命令 slmgr /skms kms.loli.best # slmgr /skms kms.03k.org # 同样需要等待弹窗出现，点击确定之后，再继续执行 slmgr /ato # 正常情况下应该会出现激活成功的弹窗 1. Windows Terminal SSH 连接超时自动断开 # 使用 Windows Terminal SSH 连接 linux 服务器，每过一段时间后，就会自动断开。
+解决方案：
+打开配置文件 %USERPROFILE%/.ssh/config，在该配置文件中添加配置行：
+ServerAliveInterval 60 2. VSCode 搭配 Remote-SSH # 配置远程访问文件 %USERPROFILE%/.ssh/config：
+密钥文件进行SSH连接 # Host aliyun HostName 11.11.11.11 User root IdentityFile ~/.ssh/aliyun_key 用户密码进行SSH连接 # Host ubuntu HostName 192.</description></item><item><title/><link>https://blog.poneding.com/reading/%E4%BA%91%E5%8E%9F%E7%94%9F%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91Operator%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/reading/%E4%BA%91%E5%8E%9F%E7%94%9F%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91Operator%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/</guid><description>我的博客 / 阅读 / 云原生应用开发：Operator原理与实践
+云原生应用开发：Operator原理与实践 # 2. Operator原理 # 2.2 client-go原理 # client-go主要用在Kubernetes的Controller中，包括内置Controller（如kube-controller-manager）和CRD控制器；
+实现对各类K8s API资源的增删改查操作；
+包含Reflector，Informer，Indexr等组件。
+2.2.1 client-go介绍 # 是操作k8s集群资源的编程式交互客户端，利用对kube-apiserver的交互访问，实现对各类K8s API资源的增删改查操作；
+client-go不仅被k8s项目本身使用（如kubectl），还在基于k8s的二次开发中被外部用户广泛使用：自定义控制器，Operator等。
+使用：
+client-go库抽象封装了与k8s reset api的交互，便于开发者基于k8s做二次开发。利用client-go操作k8s资源的流程基本如下：
+通过kubeconfig信息构造Config实例，该实例记录了集群证书，k8s apiserver地址等信息； 根据Config实例携带的信息构建特定的客户端（clientset，dynamicset等）； 利用客户端向k8s apiserver发起请求，操作k8s资源。 以下是使用 client-go 获取 pod 的代码清单：
+func main() { var kubernetes *string if home := homeDir(); home != &amp;#34;&amp;#34; { kubeconfig := flag.String( &amp;#34;kubeconfig&amp;#34;, filePath.Join(home, &amp;#34;.kube&amp;#34;, &amp;#34;config&amp;#34;), &amp;#34;(optional) absolute path to the kubeconfig file&amp;#34;, ) } else { kubeconfig := flag.</description></item><item><title/><link>https://blog.poneding.com/reading/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E6%9C%AC%E7%AE%97%E6%B3%95%E4%B9%A6/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/reading/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E6%9C%AC%E7%AE%97%E6%B3%95%E4%B9%A6/</guid><description>我的博客 / 阅读 / 我的第一本算法书
+我的第一本算法书 # 作者：石田保辉，宫崎修一
+1. 算法的基础知识 # 1.1 什么是算法 # 算法是计算机计算和解决问题的步骤。
+选择排序：
+func selectionSort(nums []int) []int { for i := 0; i &amp;lt; len(nums); i++ { min := i for j := i + 1; j &amp;lt; len(nums); j++ { if nums[j] &amp;lt; nums[min] { min = j } } nums[i], nums[min] = nums[min], nums[i] } return nums } « 云原生应用开发：Operator原理与实践
+» 深入理解计算机网络.md</description></item><item><title/><link>https://blog.poneding.com/reading/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/reading/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</guid><description>我的博客 / 阅读 / 深入理解计算机网络.md
+二进制数的四种表示方法 # 原码 # 二进制数第一位用来表示正负符号，0 表示 +，1 表示 -。 原码就是带正负符号的二进制数，例如，+3 原码为 00000011，-3 原码为 10000011。 原码表示方法中，0 有 +0 和 -0 表现形式。
+反码 # 补码 # 原码在加减法运算中的不便，
+移码 # « 我的第一本算法书</description></item><item><title/><link>https://blog.poneding.com/rust/cargo/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/rust/cargo/</guid><description>我的博客 / Rust 编程 / Rust cargo 管理工具
+Rust cargo 管理工具 # cargo 是 Rust 的构建系统和包管理器。
+创建项目 # cargo new hello-world cd hello-world 可以使用 cargo new --vcs git hello-world 创建项目并初始化 git 仓库，它将自动创建一个 .gitignore 文件。
+编译项目 # cargo build # 编译之后将在 target/debug 目录下生成可执行文件 # 可以通过以下命令运行 ./target/debug/hello-world 默认构建模式是 debug，里面包含了大量的符号和调试信息，优化级别不高。建议使用 relase 模式构建发布到生产环境。
+release 模式构建花费的时间较长，但是构建出来的二进制文件则要精简很多。
+cargo build --release 运行项目 # cargo run 追踪 panic 位置运行：
+RUST_BACKTRACE=1 cargo run 创建类包 # cargo new --lib mylib 检测项目是否可以编译 # cargo check 安装可执行文件（更新） # cargo install --path .</description></item><item><title/><link>https://blog.poneding.com/rust/dev-env-config/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/rust/dev-env-config/</guid><description>我的博客 / Rust 编程 / Rust 开发环境配置
+Rust 开发环境配置 # 安装 # Linux &amp;amp; Mac：
+curl --proto &amp;#39;=https&amp;#39; --tlsv1.2 https://sh.rustup.rs -sSf | sh 一些常用的 Rust 包依赖于 C 代码，因此可能需要额外安装 C 编译器，在 Mac 上通过运行以下命令可以获得 C 编译器：
+xcode-select --install Ubuntu 上通过运行以下命令可以获得 C 编译器：
+sudo apt install build-essential 更新 # rustup update 卸载 # rustup self uninstall 配置命令补全 # 第一种方式，zsh 添加 rust 插件：
+vim ~/.zshrc 找到 plugins 配置位置，追加 rust:
+plugins=(... rust) 第二种方式：
+查看帮助：</description></item><item><title/><link>https://blog.poneding.com/rust/getting-started/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/rust/getting-started/</guid><description>我的博客 / Rust 编程 / Rust 入门
+Rust 入门 # Rust 是一种系统编程语言，类似于 C 和 C++。它的设计目标是提供安全性和并发性，同时保持高性能。Rust 通过所有权系统来实现这些目标。
+安装 Rust # MacOS，linux 或其他类 Unix 系统用户可以直接在终端中运行以下命令安装 Rust：
+curl --proto &amp;#39;=https&amp;#39; --tlsv1.2 -sSf https://sh.rustup.rs | sh Windows 用户可以在 Rust 官网 下载安装程序。
+Hello, World # 让我们从一个简单的 &amp;ldquo;Hello, World!&amp;rdquo; 程序开始。创建一个新文件 main.rs 并输入以下内容：
+fn main() { println!(&amp;#34;Hello, World!&amp;#34;); } 要运行这个程序，使用 rustc 编译器：
+rustc main.rs &amp;amp;&amp;amp; ./main 执行后，你应该看到输出 Hello, World!。
+« Rust 开发环境配置
+» 查看根目录</description></item><item><title/><link>https://blog.poneding.com/rust/rust-programming/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/rust/rust-programming/</guid><description>我的博客 / Rust 编程 / 查看根目录
+Rust 编程
+信息 # # 查看根目录 rustc --print sysroot # 二进制程序位置 $(rustc --print sysroot)/bin # 源码位置 $(rustc --print sysroot)/lib/rustlib/src/ String 与 &amp;amp;str # String：字符串
+&amp;amp;str：字符串切片
+let s: &amp;amp;str = &amp;#34;Hello World!&amp;#34;; let s1 = s.to_string(); let s1 = String::from(s); let s2 = &amp;amp;s1[..]; let s2 = s1.as_ref(); Panic # 设置 RUST_BACKTRACE=1 环境变量值，可以追踪到 panic 位置，例如：
+« Rust 入门
+» Rust VSCode 调试</description></item><item><title/><link>https://blog.poneding.com/rust/vscode-debugging/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/rust/vscode-debugging/</guid><description>我的博客 / Rust 编程 / Rust VSCode 调试
+Rust VSCode 调试 # 1. 安装插件 # CodeLLDB rust-analyzer 2. 配置 # 项目根目录配置 .vscode/launch.json，调试运行时打开 main.rs 文件。
+{ &amp;#34;version&amp;#34;: &amp;#34;0.2.0&amp;#34;, &amp;#34;configurations&amp;#34;: [ { &amp;#34;type&amp;#34;: &amp;#34;lldb&amp;#34;, &amp;#34;request&amp;#34;: &amp;#34;launch&amp;#34;, &amp;#34;name&amp;#34;: &amp;#34;Debug Rust Project&amp;#34;, &amp;#34;cargo&amp;#34;: { &amp;#34;args&amp;#34;: [ &amp;#34;build&amp;#34;, &amp;#34;--target-dir=${fileDirname}/../target&amp;#34;, &amp;#34;--manifest-path=${fileDirname}/../Cargo.toml&amp;#34; ] }, &amp;#34;args&amp;#34;: [], &amp;#34;cwd&amp;#34;: &amp;#34;${workspaceFolder}&amp;#34; }, { &amp;#34;type&amp;#34;: &amp;#34;lldb&amp;#34;, &amp;#34;request&amp;#34;: &amp;#34;launch&amp;#34;, &amp;#34;name&amp;#34;: &amp;#34;Debug Rust Unit Tests&amp;#34;, &amp;#34;cargo&amp;#34;: { &amp;#34;args&amp;#34;: [ &amp;#34;test&amp;#34;, &amp;#34;--no-run&amp;#34;, &amp;#34;--target-dir=${fileDirname}/../target&amp;#34;, &amp;#34;--manifest-path=${fileDirname}/.</description></item><item><title/><link>https://blog.poneding.com/rust/wasm-programming/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/rust/wasm-programming/</guid><description>我的博客 / Rust 编程 / Rust WASM 编程
+Rust WASM 编程 # 1. 初始化项目 # cargo new hello-wasm cd hello-wasm 2. 安装 wasm-pack # cargo install wasm-pack 3. 编写代码 # 编辑 src/main.rs 文件：
+// 使用 wasm-bindgen 在 Rust 与 JavaScript 之间通信 extern crate wasm_bindgen; use wasm_bindgen::prelude::*; #[wasm_bindgen] extern { pub fn alert(s: &amp;amp;str); } #[wasm_bindgen] pub fn greet(name: &amp;amp;str){ alert(&amp;amp;format!(&amp;#34;Hello, {}!&amp;#34;,name)); } 编辑 Cargo.toml 文件：
+[package] name = &amp;#34;hello-wasm&amp;#34; version = &amp;#34;0.</description></item></channel></rss>

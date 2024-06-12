@@ -1,0 +1,78 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / DevOps / nginx
+nginx # nginx简介 # 高性能的反向代理工具，负载均衡器；
+nginx配置 # 全局配置 # event配置 # http配置 # 配置反向代理 # 正向代理：
+在国内是
+配置location:
+localtion [ = | ~ | ~* | ^~] uri { } =：用于不包含正则表达式的url前，要求请求字符串与uri严格匹配； ~：用于表示uri包含正则表达式，并且区分大小写； ~*：用于表示uri包含正则表达式，并且不区分大小写； ^~：用于不包含正则表达式的uri前，要求nginx服务器找到表示ui和请求字符串匹配度最高的location后，立即使用此location处理请求 配置负载均衡 # 将负载分摊到不同的服务单元，保证服务的快速响应，高可用。
+upstream myserver { server 192.168.0.1:8081; server 192.168.0.2:8082; } server { listen 80; server_name 192.168.0.1; location / { proxy_pass http://myserver; root html; index index.html index.htm; } } 均衡策略："><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/devops/nginx/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / DevOps / nginx
+nginx # nginx简介 # 高性能的反向代理工具，负载均衡器；
+nginx配置 # 全局配置 # event配置 # http配置 # 配置反向代理 # 正向代理：
+在国内是
+配置location:
+localtion [ = | ~ | ~* | ^~] uri { } =：用于不包含正则表达式的url前，要求请求字符串与uri严格匹配； ~：用于表示uri包含正则表达式，并且区分大小写； ~*：用于表示uri包含正则表达式，并且不区分大小写； ^~：用于不包含正则表达式的uri前，要求nginx服务器找到表示ui和请求字符串匹配度最高的location后，立即使用此location处理请求 配置负载均衡 # 将负载分摊到不同的服务单元，保证服务的快速响应，高可用。
+upstream myserver { server 192.168.0.1:8081; server 192.168.0.2:8082; } server { listen 80; server_name 192.168.0.1; location / { proxy_pass http://myserver; root html; index index.html index.htm; } } 均衡策略："><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="devops"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Nginx | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/devops/nginx/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Nginx</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#nginx简介>nginx简介</a></li><li><a href=#nginx配置>nginx配置</a><ul><li><a href=#全局配置>全局配置</a></li><li><a href=#event配置>event配置</a></li><li><a href=#http配置>http配置</a></li></ul></li><li><a href=#nginx常用命令>Nginx常用命令</a><ul><li><a href=#重启>重启</a></li><li><a href=#检查配置文件格式是否正确>检查配置文件格式是否正确</a></li></ul></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/devops/>DevOps</a> / nginx</p><h1 id=nginx>nginx
+<a class=anchor href=#nginx>#</a></h1><h2 id=nginx简介>nginx简介
+<a class=anchor href=#nginx%e7%ae%80%e4%bb%8b>#</a></h2><p>高性能的反向代理工具，负载均衡器；</p><h2 id=nginx配置>nginx配置
+<a class=anchor href=#nginx%e9%85%8d%e7%bd%ae>#</a></h2><h3 id=全局配置>全局配置
+<a class=anchor href=#%e5%85%a8%e5%b1%80%e9%85%8d%e7%bd%ae>#</a></h3><h3 id=event配置>event配置
+<a class=anchor href=#event%e9%85%8d%e7%bd%ae>#</a></h3><h3 id=http配置>http配置
+<a class=anchor href=#http%e9%85%8d%e7%bd%ae>#</a></h3><h4 id=配置反向代理>配置反向代理
+<a class=anchor href=#%e9%85%8d%e7%bd%ae%e5%8f%8d%e5%90%91%e4%bb%a3%e7%90%86>#</a></h4><p><strong>正向代理</strong>：</p><p>在国内是</p><p>配置location:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nginx data-lang=nginx><span style=display:flex><span><span style=color:#66d9ef>localtion</span> <span style=color:#e6db74>[</span> = <span style=color:#e6db74>|</span> ~ <span style=color:#e6db74>|</span> ~<span style=color:#e6db74>*</span> <span style=color:#e6db74>|</span> <span style=color:#e6db74>^~]</span> <span style=color:#e6db74>uri</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><ul><li>=：用于不包含正则表达式的url前，要求请求字符串与uri严格匹配；</li><li>~：用于表示uri包含正则表达式，并且区分大小写；</li><li>~*：用于表示uri包含正则表达式，并且不区分大小写；</li><li>^~：用于不包含正则表达式的uri前，要求nginx服务器找到表示ui和请求字符串匹配度最高的location后，立即使用此location处理请求</li></ul><h4 id=配置负载均衡>配置负载均衡
+<a class=anchor href=#%e9%85%8d%e7%bd%ae%e8%b4%9f%e8%bd%bd%e5%9d%87%e8%a1%a1>#</a></h4><p>将负载分摊到不同的服务单元，保证服务的快速响应，高可用。</p><p><img src=https://fs.poneding.com/images/image-20200216174849571.png alt=image-20200216174849571></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nginx data-lang=nginx><span style=display:flex><span><span style=color:#66d9ef>upstream</span> <span style=color:#e6db74>myserver</span> {
+</span></span><span style=display:flex><span> <span style=color:#f92672>server</span> 192.168.0.1:<span style=color:#ae81ff>8081</span>;
+</span></span><span style=display:flex><span> <span style=color:#f92672>server</span> 192.168.0.2:<span style=color:#ae81ff>8082</span>;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>server</span> {
+</span></span><span style=display:flex><span> <span style=color:#f92672>listen</span> <span style=color:#ae81ff>80</span>;
+</span></span><span style=display:flex><span> <span style=color:#f92672>server_name</span> <span style=color:#ae81ff>192</span><span style=color:#e6db74>.168.0.1</span>;
+</span></span><span style=display:flex><span> 
+</span></span><span style=display:flex><span> <span style=color:#f92672>location</span> <span style=color:#e6db74>/</span> {
+</span></span><span style=display:flex><span>  <span style=color:#f92672>proxy_pass</span> <span style=color:#e6db74>http://myserver</span>;
+</span></span><span style=display:flex><span>  <span style=color:#f92672>root</span>  <span style=color:#e6db74>html</span>;
+</span></span><span style=display:flex><span>  <span style=color:#f92672>index</span>  <span style=color:#e6db74>index.html</span> <span style=color:#e6db74>index.htm</span>;
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>均衡策略</strong>：</p><ol><li><p><strong>轮询策略</strong>：</p><p>nginx默认使用的均衡策略，按请求时间先后顺序逐一分配到后端服务器列表，如果某后端服务器down掉了，则自动剔除服务器列表。</p></li><li><p><strong>权重策略</strong>：</p><p>后端服务器配置weight值，默认值为1，该值配置越大，则均衡到该服务器上的请求越多。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nginx data-lang=nginx><span style=display:flex><span><span style=color:#66d9ef>upstream</span> <span style=color:#e6db74>myserver</span> {
+</span></span><span style=display:flex><span> <span style=color:#f92672>server</span> 192.168.0.1:<span style=color:#ae81ff>8081</span>  <span style=color:#e6db74>weight=1</span>;
+</span></span><span style=display:flex><span> <span style=color:#f92672>server</span> 192.168.0.2:<span style=color:#ae81ff>8082</span> <span style=color:#e6db74>weight=2</span>;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div></li><li><p><strong>IP-Hash策略</strong>：</p><p>根据请求客户端的IP 的hash值给其分配固定的某个服务器，可以解决session问题。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nginx data-lang=nginx><span style=display:flex><span><span style=color:#66d9ef>upstream</span> <span style=color:#e6db74>myserver</span> {
+</span></span><span style=display:flex><span> <span style=color:#f92672>ip_hash</span>;
+</span></span><span style=display:flex><span> <span style=color:#f92672>server</span> 192.168.0.1:<span style=color:#ae81ff>8081</span>;
+</span></span><span style=display:flex><span> <span style=color:#f92672>server</span> 192.168.0.2:<span style=color:#ae81ff>8082</span>;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div></li><li><p><strong>Fair策略</strong>：</p><p>根据后端服务器的响应时间分配，响应时间短的优先分配。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nginx data-lang=nginx><span style=display:flex><span><span style=color:#66d9ef>upstream</span> <span style=color:#e6db74>myserver</span> {
+</span></span><span style=display:flex><span> <span style=color:#f92672>server</span> 192.168.0.1:<span style=color:#ae81ff>8081</span>;
+</span></span><span style=display:flex><span> <span style=color:#f92672>server</span> 192.168.0.2:<span style=color:#ae81ff>8082</span>;
+</span></span><span style=display:flex><span> <span style=color:#f92672>fair</span>;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div></li></ol><h4 id=配置动静分离>配置动静分离
+<a class=anchor href=#%e9%85%8d%e7%bd%ae%e5%8a%a8%e9%9d%99%e5%88%86%e7%a6%bb>#</a></h4><p>静态服务器用于响应html、css、js、图片等静态资源的访问，动态服务器用于响应业务处理等。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nginx data-lang=nginx><span style=display:flex><span> <span style=color:#66d9ef>location</span> <span style=color:#e6db74>/www/</span> {
+</span></span><span style=display:flex><span>  <span style=color:#f92672>root</span>  <span style=color:#e6db74>/data/</span>;
+</span></span><span style=display:flex><span>  <span style=color:#f92672>index</span>  <span style=color:#e6db74>index.html</span> <span style=color:#e6db74>index.htm</span>;
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> 
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>location</span> <span style=color:#e6db74>/image/</span> {
+</span></span><span style=display:flex><span>  <span style=color:#f92672>root</span>  <span style=color:#e6db74>/data/</span>;
+</span></span><span style=display:flex><span>  <span style=color:#f92672>autoindex</span>  <span style=color:#66d9ef>on</span>;   <span style=color:#75715e># 列出image目录下的静态文件
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> }
+</span></span></code></pre></div><p><img src=https://fs.poneding.com/images/image-20200610124408207.png alt=image-20200610124408207></p><h2 id=nginx常用命令>Nginx常用命令
+<a class=anchor href=#nginx%e5%b8%b8%e7%94%a8%e5%91%bd%e4%bb%a4>#</a></h2><h3 id=重启>重启
+<a class=anchor href=#%e9%87%8d%e5%90%af>#</a></h3><p>适用于修改了配置文件之后，重新加载</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>nginx -s reload
+</span></span></code></pre></div><h3 id=检查配置文件格式是否正确>检查配置文件格式是否正确
+<a class=anchor href=#%e6%a3%80%e6%9f%a5%e9%85%8d%e7%bd%ae%e6%96%87%e4%bb%b6%e6%a0%bc%e5%bc%8f%e6%98%af%e5%90%a6%e6%ad%a3%e7%a1%ae>#</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 检查默认配置文件 /etc/nginx/nginx.conf</span>
+</span></span><span style=display:flex><span>nginx -t
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 检查指定配置文件</span>
+</span></span><span style=display:flex><span>nginx -t -c /etc/nginx/conf.d/default.conf
+</span></span></code></pre></div><hr><p><a href=/devops/jeager/>« Jaeger</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/devops/nginx.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#nginx简介>nginx简介</a></li><li><a href=#nginx配置>nginx配置</a><ul><li><a href=#全局配置>全局配置</a></li><li><a href=#event配置>event配置</a></li><li><a href=#http配置>http配置</a></li></ul></li><li><a href=#nginx常用命令>Nginx常用命令</a><ul><li><a href=#重启>重启</a></li><li><a href=#检查配置文件格式是否正确>检查配置文件格式是否正确</a></li></ul></li></ul></nav></div></aside></main></body></html>

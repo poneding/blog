@@ -1,0 +1,50 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / Kubernetes
+Kubernetes # 反亲和性提高服务可用性
+apiserver-builder
+apiserver
+二进制搭建 K8s - 1 机器准备
+二进制搭建 K8s - 2 部署 etcd 集群
+二进制搭建 K8s - 3 部署 Master
+二进制搭建 K8s - 4 部署 Node
+Kubernetes 0-1 尝试理解云原生
+集群联邦
+了解 ConfigMap
+定期删除 ElasticSearch 日志索引
+强制删除 K8s 资源
+Gateway API 实践
+Kubernetes 0-1 Helm Kubernetes 的包管理工具
+Kubernetes 0-1 实现Pod自动扩缩HPA
+HTTP 客户端调用 Kubernetes APIServer
+Informer
+通过 Ingress 进行灰度发布
+安装 Kubernetes
+K3s
+Kubernetes 0-1 K8s部署coredns"><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/kubernetes/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / Kubernetes
+Kubernetes # 反亲和性提高服务可用性
+apiserver-builder
+apiserver
+二进制搭建 K8s - 1 机器准备
+二进制搭建 K8s - 2 部署 etcd 集群
+二进制搭建 K8s - 3 部署 Master
+二进制搭建 K8s - 4 部署 Node
+Kubernetes 0-1 尝试理解云原生
+集群联邦
+了解 ConfigMap
+定期删除 ElasticSearch 日志索引
+强制删除 K8s 资源
+Gateway API 实践
+Kubernetes 0-1 Helm Kubernetes 的包管理工具
+Kubernetes 0-1 实现Pod自动扩缩HPA
+HTTP 客户端调用 Kubernetes APIServer
+Informer
+通过 Ingress 进行灰度发布
+安装 Kubernetes
+K3s
+Kubernetes 0-1 K8s部署coredns"><meta property="og:locale" content="cn"><meta property="og:type" content="website"><title>Kubernetes | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script><link rel=alternate type=application/rss+xml href=https://blog.poneding.com/kubernetes/index.xml title=我的博客></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Kubernetes</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> / Kubernetes</p><h1 id=kubernetes>Kubernetes
+<a class=anchor href=#kubernetes>#</a></h1><p><a href=/kubernetes/anti-affinity-improves-service-availability/>反亲和性提高服务可用性</a></p><p><a href=/kubernetes/apiserver-builder/>apiserver-builder</a></p><p><a href=/kubernetes/apiserver/>apiserver</a></p><p><a href=/kubernetes/binary-build-k8s-01-prepare-nodes/>二进制搭建 K8s - 1 机器准备</a></p><p><a href=/kubernetes/binary-build-k8s-02-deploy-etcd/>二进制搭建 K8s - 2 部署 etcd 集群</a></p><p><a href=/kubernetes/binary-build-k8s-03-deploy-master/>二进制搭建 K8s - 3 部署 Master</a></p><p><a href=/kubernetes/binary-build-k8s-04-deploy-worker/>二进制搭建 K8s - 4 部署 Node</a></p><p><a href=/kubernetes/cloud-native-understood/>Kubernetes 0-1 尝试理解云原生</a></p><p><a href=/kubernetes/cluster-federation/>集群联邦</a></p><p><a href=/kubernetes/configmap-understood/>了解 ConfigMap</a></p><p><a href=/kubernetes/delete-es-log-index-scheduler/>定期删除 ElasticSearch 日志索引</a></p><p><a href=/kubernetes/delete-k8s-resource-force/>强制删除 K8s 资源</a></p><p><a href=/kubernetes/gateway-api-practice/>Gateway API 实践</a></p><p><a href=/kubernetes/helm-k8s-package-management-tool/>Kubernetes 0-1 Helm Kubernetes 的包管理工具</a></p><p><a href=/kubernetes/hpa-usage/>Kubernetes 0-1 实现Pod自动扩缩HPA</a></p><p><a href=/kubernetes/http-call-k8s-apiserver/>HTTP 客户端调用 Kubernetes APIServer</a></p><p><a href=/kubernetes/informer/>Informer</a></p><p><a href=/kubernetes/ingress-gray-deploy/>通过 Ingress 进行灰度发布</a></p><p><a href=/kubernetes/installation/>安装 Kubernetes</a></p><p><a href=/kubernetes/k3s/>K3s</a></p><p><a href=/kubernetes/k8s-deploy-coredns/>Kubernetes 0-1 K8s部署coredns</a></p><p><a href=/kubernetes/k8s-deploy-dashboard/>Kubernetes 0-1 K8s部署Dashboard</a></p><p><a href=/kubernetes/k8s-deploy-efk/>Kubernetes 0-1 K8s部署EFK</a></p><p><a href=/kubernetes/k8s-deploy-prometheus-grafana/>可能需要运行多次以下命令，确保k8s资源都创建</a></p><p><a href=/kubernetes/k8s-deploy-zookeeper-kafka/>Kubernetes 0-1 K8s部署Zookeeper和Kafka</a></p><p><a href=/kubernetes/k8s-dev-01-api-concept/>Kubernetes 定制开发 01：K8s API 概念</a></p><p><a href=/kubernetes/k8s-dev-02-crd/>Kubernetes 定制开发 02：CRD</a></p><p><a href=/kubernetes/k8s-dev-50-extend-kube-scheduler/>Kubernetes 定制开发 50：扩展调度器</a></p><p><a href=/kubernetes/k8s-get-started/>简单介绍 K8s</a></p><p><a href=/kubernetes/kubeadm-install-k8s-docker/>kubeadm 安装 Kubernetes (Docker)</a></p><p><a href=/kubernetes/kubeadm-install-k8s/>kubeadm 安装 k8s (containerd)</a></p><p><a href=/kubernetes/kubeadm-upgrade/>Kubeadm 升级 K8s</a></p><p><a href=/kubernetes/kubebuilder-inaction/>kubebuilder 实战</a></p><p><a href=/kubernetes/kubectl/>kubectl</a></p><p><a href=/kubernetes/kubernetes-best-practice/>Kubernetes 0-1 Kubernetes最佳实践</a></p><p><a href=/kubernetes/kubernetes-dashboard/>Kubernetes Dashboard</a></p><p><a href=/kubernetes/kubernetes-naming-constraints/>Kubernetes 中资源名称规范</a></p><p><a href=/kubernetes/kubernetes/>Kuberentes</a></p><p><a href=/kubernetes/kubevirt-create-windows-vm/>KubeVirt 创建 Windows 虚拟机</a></p><p><a href=/kubernetes/kubevirt-practice/>Kubevirt 实践</a></p><p><a href=/kubernetes/kustomize/>Kustomize</a></p><p><a href=/kubernetes/liveness-readiness-probe/>Kubernetes 0-1 Pod中的livenessProbe和readinessProbe解读</a></p><p><a href=/kubernetes/local-storageclass/>local 存储卷实践</a></p><p><a href=/kubernetes/metallb/>Kubernetes 0-1 K8s自建LoadBalancer</a></p><p><a href=/kubernetes/nfs-as-pvc/>使用 nfs 持久化存储</a></p><p><a href=/kubernetes/pod-understood/>Kubernetes 0-1 了解 Pod</a></p><p><a href=/kubernetes/prgramming-kubernetes/>Kubernetes 编程</a></p><p><a href=/kubernetes/prometheus-collect-kong-metrics/>Prometheus-监控Kong完整操作</a></p><p><a href=/kubernetes/prometheus/>Prometheus</a></p><p><a href=/kubernetes/pvc-expansion/>PVC 扩容</a></p><p><a href=/kubernetes/secret-understood/>了解 Secret</a></p><p><a href=/kubernetes/service-understood/>了解 Service</a></p><p><a href=/kubernetes/telepresence/>Telepresence</a></p><p><a href=/kubernetes/terminate-pod-gracefully/>Kubernetes 0-1 使用preStop优雅终止Pod</a></p><p><a href=/kubernetes/terraform/>Terraform</a></p><p><a href=/kubernetes/velero-minio-backup-restore-volume/>Velero + Minio 备份与恢复</a></p><p><a href=/kubernetes/volume-understood/>了解 Volume</a></p><p><a href=/kubernetes/vpa/>VPA</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/kubernetes/_index.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents></nav></div></aside></main></body></html>

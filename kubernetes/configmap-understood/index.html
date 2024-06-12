@@ -1,0 +1,181 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content='我的博客 / Kubernetes / 了解 ConfigMap
+了解 ConfigMap # 几乎所有的应用都需要配置信息，在 K8s 部署应用，最佳实践是将应用的配置信息（环境变量或者配置文件）和程序本身分离，这样配置信息的更新和复用都可以更简单，也使得程序更加灵活。
+Kubernetes 允许将配置选项分离到单独的资源对象 ConfigMap 中，本质上是一个键值对映射，值可以是一个短 string 串，也可以是一个完整的配置文件。
+本篇主要介绍 ConfigMap 资源的创建和使用。
+ConfigMap 的创建 # 可以直接通过 kubectl create configmap 命令创建，也可以先编写 configmap 的 yaml 文件再使用kubectl apply -f <filename>创建，推荐使用后者。
+单行命令创建 ConfigMap # 创建一个键值对的 ConfigMap： kubectl create configmap first-config --from-literal=user=admin 创建完成之后，使用 kubectl describe configmap first-config 查看，可以看到这个 configmap 的键值内容。
+可以使用多组 --from-literal=<key>=<value> 参数，在 configmap 中定义多组键值对。
+创建一个文件内容的 ConfigMap 假如我当前有一个配置文件 app.json，文件内容如下：
+{ "App": "MyApp", "Version": "v1.0" } 使用以下命令创建 ConfigMap：'><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/kubernetes/configmap-understood/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content='我的博客 / Kubernetes / 了解 ConfigMap
+了解 ConfigMap # 几乎所有的应用都需要配置信息，在 K8s 部署应用，最佳实践是将应用的配置信息（环境变量或者配置文件）和程序本身分离，这样配置信息的更新和复用都可以更简单，也使得程序更加灵活。
+Kubernetes 允许将配置选项分离到单独的资源对象 ConfigMap 中，本质上是一个键值对映射，值可以是一个短 string 串，也可以是一个完整的配置文件。
+本篇主要介绍 ConfigMap 资源的创建和使用。
+ConfigMap 的创建 # 可以直接通过 kubectl create configmap 命令创建，也可以先编写 configmap 的 yaml 文件再使用kubectl apply -f <filename>创建，推荐使用后者。
+单行命令创建 ConfigMap # 创建一个键值对的 ConfigMap： kubectl create configmap first-config --from-literal=user=admin 创建完成之后，使用 kubectl describe configmap first-config 查看，可以看到这个 configmap 的键值内容。
+可以使用多组 --from-literal=<key>=<value> 参数，在 configmap 中定义多组键值对。
+创建一个文件内容的 ConfigMap 假如我当前有一个配置文件 app.json，文件内容如下：
+{ "App": "MyApp", "Version": "v1.0" } 使用以下命令创建 ConfigMap：'><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="kubernetes"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Configmap Understood | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/configmap-understood/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Configmap Understood</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#configmap-的创建>ConfigMap 的创建</a><ul><li><a href=#单行命令创建-configmap>单行命令创建 ConfigMap</a></li><li><a href=#基于资源清单文件创建-configmap>基于资源清单文件创建 ConfigMap</a></li></ul></li><li><a href=#configmap-的使用>ConfigMap 的使用</a><ul><li><a href=#使用-configmap-作为容器的环境变量>使用 ConfigMap 作为容器的环境变量</a></li><li><a href=#使用-configmap-作为-volume-向容器提供文件>使用 ConfigMap 作为 Volume 向容器提供文件</a></li></ul></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/kubernetes/>Kubernetes</a> / 了解 ConfigMap</p><h1 id=了解-configmap>了解 ConfigMap
+<a class=anchor href=#%e4%ba%86%e8%a7%a3-configmap>#</a></h1><p>几乎所有的应用都需要配置信息，在 K8s 部署应用，最佳实践是将应用的配置信息（环境变量或者配置文件）和程序本身分离，这样配置信息的更新和复用都可以更简单，也使得程序更加灵活。</p><p>Kubernetes 允许将配置选项分离到单独的资源对象 ConfigMap 中，本质上是一个键值对映射，值可以是一个短 string 串，也可以是一个完整的配置文件。</p><p>本篇主要介绍 ConfigMap 资源的创建和使用。</p><h2 id=configmap-的创建>ConfigMap 的创建
+<a class=anchor href=#configmap-%e7%9a%84%e5%88%9b%e5%bb%ba>#</a></h2><p>可以直接通过 <code>kubectl create configmap</code> 命令创建，也可以先编写 configmap 的 yaml 文件再使用<code>kubectl apply -f &lt;filename></code>创建，推荐使用后者。</p><h3 id=单行命令创建-configmap>单行命令创建 ConfigMap
+<a class=anchor href=#%e5%8d%95%e8%a1%8c%e5%91%bd%e4%bb%a4%e5%88%9b%e5%bb%ba-configmap>#</a></h3><ul><li>创建一个键值对的 ConfigMap：</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl create configmap first-config --from-literal<span style=color:#f92672>=</span>user<span style=color:#f92672>=</span>admin
+</span></span></code></pre></div><p>创建完成之后，使用 <code>kubectl describe configmap first-config</code> 查看，可以看到这个 configmap 的键值内容。</p><p><img src=https://fs.poneding.com/images/image-20200703102551743.png alt=image-20200703102551743></p><blockquote><p>可以使用多组 <code>--from-literal=&lt;key>=&lt;value></code> 参数，在 configmap 中定义多组键值对。</p></blockquote><ul><li>创建一个文件内容的 ConfigMap</li></ul><p>假如我当前有一个配置文件 app.json，文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;App&#34;</span>: <span style=color:#e6db74>&#34;MyApp&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;Version&#34;</span>: <span style=color:#e6db74>&#34;v1.0&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>使用以下命令创建 ConfigMap：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl create configmap second-config --from-file<span style=color:#f92672>=</span>app.json
+</span></span></code></pre></div><p>创建完成之后，使用 <code>kubectl describe configmap second-config</code> 查看 configmap 的键值内容：</p><p><img src=https://fs.poneding.com/images/image-20200703114012333.png alt=image-20200703114012333></p><blockquote><p>默认使用文件名称 app.json 作为键值对的 key，也可以通过 <code>--from-file=app_config=app.json</code> 指定key为 <code>app_config</code>；</p><p>可以使用多组 <code>--from-file=&lt;key>=&lt;filename></code> 参数，在 configmap 中定义多组文件；</p><p><code>--from-file=</code> 后面可以直接跟某个文件路径，这样会将目录下的所有文件引入到 ConfigMap;</p><p><code>--from-literal</code> 和 <code>--from-file</code> 可以共同使用，键值合并。</p></blockquote><p>删除创建的 <code>first-config</code> 和 <code>second-config</code>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl delete configmap first-config
+</span></span><span style=display:flex><span>kubectl delete configmap second-config
+</span></span></code></pre></div><h3 id=基于资源清单文件创建-configmap>基于资源清单文件创建 ConfigMap
+<a class=anchor href=#%e5%9f%ba%e4%ba%8e%e8%b5%84%e6%ba%90%e6%b8%85%e5%8d%95%e6%96%87%e4%bb%b6%e5%88%9b%e5%bb%ba-configmap>#</a></h3><ul><li>创建一个键值对的 ConfigMap：</li></ul><p>首先定义 ConfigMap 的资源文件 first-config.yaml，定义如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim first-config.yaml
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ConfigMap</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>first-config</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>data</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>user</span>: <span style=color:#e6db74>&#34;admin&#34;</span>
+</span></span></code></pre></div><p>使用 <code>kubectl apply</code> 命令创建 ConfigMap 资源：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl apply -f first-config.yaml
+</span></span></code></pre></div><p>创建完成之后，使用 <code>kubectl describe configmap first-config</code> 查看，可以看到这个 configmap 的键值内容，结果与上文第一次创建的 <code>first-configmap</code> 是一致的。</p><blockquote><p>可以在 <code>data</code> 下定义多组键值对。</p></blockquote><ul><li>创建一个文件内容的 ConfigMap</li></ul><p>首先定义 ConfigMap 的资源文件 second-config.yaml，定义如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim second-config.yaml
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ConfigMap</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>second-config</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>data</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>app.json</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      &#34;App&#34;: &#34;MyApp&#34;,
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      &#34;Version&#34;: &#34;v1.0&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    }</span>    
+</span></span></code></pre></div><p>使用 <code>kubectl apply</code> 命令创建 ConfigMap 资源：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl apply -f second-config.yaml
+</span></span></code></pre></div><p>创建完成之后，使用 <code>kubectl describe configmap second-config</code> 查看，可以看到这个 configmap 的键值内容，结果与上文第一次创建的 <code>second-configmap</code> 是一致的。</p><blockquote><p>可以在 <code>data</code> 下定义多组文件，也可以和键值对一起定义；</p><p>其本质也是键值对，只是 value 为多行格式的文本内容；</p><p>对 value 有格式要求，”|“接换行并且文件内容的每行按照 key 都往后退格。</p></blockquote><p>删除创建的 <code>first-config</code> 和 <code>second-config</code>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl delete configmap first-config
+</span></span><span style=display:flex><span>kubectl delete configmap second-config
+</span></span></code></pre></div><h2 id=configmap-的使用>ConfigMap 的使用
+<a class=anchor href=#configmap-%e7%9a%84%e4%bd%bf%e7%94%a8>#</a></h2><p>我们创建了 ConfigMap 后，我们的 Pod 资源就可以利用了。主要有两种方式使用 ConfigMap：</p><ul><li>使用 ConfigMap 作为容器的环境变量</li><li>使用 ConfigMap 作为 Volume 向容器提供文件</li></ul><h3 id=使用-configmap-作为容器的环境变量>使用 ConfigMap 作为容器的环境变量
+<a class=anchor href=#%e4%bd%bf%e7%94%a8-configmap-%e4%bd%9c%e4%b8%ba%e5%ae%b9%e5%99%a8%e7%9a%84%e7%8e%af%e5%a2%83%e5%8f%98%e9%87%8f>#</a></h3><p>假如有一个名为 <code>first-config</code>的 ConfigMap，里面包含了一个键为 <code>user</code>，我想将这个 ConfigMap 中 <code>user</code> 键用到我的环境变量 <code>USER_NAME</code> 中，可以使用如下方式：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>...
+</span></span><span style=display:flex><span><span style=color:#f92672>env</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>USER_NAME</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>valueFrom</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>configMapKeyRef</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>first-config</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>key</span>: <span style=color:#ae81ff>user</span>
+</span></span><span style=display:flex><span>...
+</span></span></code></pre></div><p>如果有一个名为 <code>second-config</code> ConfigMap 中包含多个键如 <code>HOST</code>，<code>PORT</code>，<code>USER_NAME</code>，<code>PASSWORD</code>，我想将这个 ConfigMap 中所有的键都用到我的环境变量中，可以使用如下方式：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>...
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>container</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>image</span>: <span style=color:#ae81ff>&lt;some-image&gt;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>envFrom</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>prefix</span>: <span style=color:#ae81ff>DB_</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>configMapRef</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>name</span>: <span style=color:#ae81ff>second-config</span>
+</span></span><span style=display:flex><span>...
+</span></span></code></pre></div><p>容器将会生成 <code>DB_HOST</code>，<code>DB_PORT</code>，<code>DB_USER_NAME</code>，<code>DB_PASSWORD</code> 四个环境变量，<code>prefix</code> 也可以不配置，则直接使用 ConfigMap 的键。</p><p>注意：</p><ul><li><code>configMapRef</code> 与上面 <code>configMapKeyRef</code> 的区别；</li><li>如果ConfigMap中有一个为 <code>USER-NAME</code> 键，那么将不会生成 <code>DB_USER-NAME</code> 的环境变量，因为 <code>DB_USER-NAME</code> 不是一个合法的环境变量名称。</li></ul><h3 id=使用-configmap-作为-volume-向容器提供文件>使用 ConfigMap 作为 Volume 向容器提供文件
+<a class=anchor href=#%e4%bd%bf%e7%94%a8-configmap-%e4%bd%9c%e4%b8%ba-volume-%e5%90%91%e5%ae%b9%e5%99%a8%e6%8f%90%e4%be%9b%e6%96%87%e4%bb%b6>#</a></h3><p>从这里开始，结合实际演练可能效果会好一点。</p><p>我仍然使用 <code>poneding/mockapi:v1</code> 镜像运行模拟应用程序，程序的代码在这：
+<a href=https://github.com/poneding/for-docker>https://github.com/poneding/for-docker</a></p><p>这个应用程序根目录下存在 <code>mysettings/app.json</code> 和 <code>mysettings/secret.json</code> 两个配置文件，需要提前说明的是这个镜像中已经存在了这两个文件，并且文件内容如下：</p><p><em>mysettings/app.json</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;App&#34;</span>: <span style=color:#e6db74>&#34;Hello Web&#34;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;Version&#34;</span>: <span style=color:#e6db74>&#34;v1&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><em>mysettings/secret.json</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;UserName&#34;</span>: <span style=color:#e6db74>&#34;admin&#34;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;Password&#34;</span>: <span style=color:#e6db74>&#34;123456&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>我现在将这两个配置文件放在我的 ConfigMap 中，并且内容与镜像中略微区别，用于区分程序读取配置源自 ConfigMap，然后使用 Volume 的形式将文件挂载到应用中去。</p><p>首先，定义 ConfigMap 文件如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim mockapi-mysettings.yaml
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ConfigMap</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>mockapi-mysettings</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>data</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>app.json</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      &#34;App&#34;:&#34;Hello Web [From ConfigMap]&#34;,
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      &#34;Version&#34;:&#34;v1 [From ConfigMap]&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    }  </span>    
+</span></span><span style=display:flex><span>  <span style=color:#f92672>secret.json</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      &#34;UserName&#34;:&#34;admin [From ConfigMap]&#34;,
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      &#34;Password&#34;:&#34;123456 [From ConfigMap]&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    }</span>    
+</span></span></code></pre></div><p>定义 Pod 文件如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim mockapi-pod.yaml
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Pod</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>mockapi</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>containers</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>mockapi</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>image</span>: <span style=color:#ae81ff>poneding/mockapi:v1</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>containerPort</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>volumeMounts</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>mountPath</span>: <span style=color:#ae81ff>/app/mysettings</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>name</span>: <span style=color:#ae81ff>mockapi-mysettings</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>volumes</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>:  <span style=color:#ae81ff>mockapi-mysettings</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>configMap</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>mockapi-mysettings</span>
+</span></span></code></pre></div><p>Apply 资源：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl apply -f mockapi-mysettings.yaml
+</span></span><span style=display:flex><span>kubectl apply -f mockapi-pod.yaml
+</span></span></code></pre></div><p>等待 mockapi 的 Pod 起来之后，我们调用 <code>http://&lt;pod-ip>/configuration/mysettings</code> 查看挂载的配置文件是否生效：</p><p><img src=https://fs.poneding.com/images/image-20200703145347110.png alt=image-20200703145347110></p><blockquote><p>mockapi 应用访问 <code>/configuration/mysettings</code> 会获取 app.json 和 secret.json 里面的总共四个配置项，然后输出到客户端。</p></blockquote><p>可以看到，已经获取到了 ConfigMap 里面的配置，进入容器也可以看到里面的问题件内容：</p><p><img src=https://fs.poneding.com/images/image-20200703145553692.png alt=image-20200703145553692></p><p><strong>修改 ConfigMap 自动更新挂载文件</strong>：</p><p>现在，如果我想要修改我的配置，比如我的密码修改成了 <code>abcdefg</code>，我不用重新启动 Pod，我只需要修改 ConfigMap 文件：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ConfigMap</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>mockapi-mysettings</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>data</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>app.json</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      &#34;App&#34;:&#34;Hello Web [From ConfigMap]&#34;,
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      &#34;Version&#34;:&#34;v1 [From ConfigMap]&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    }  </span>    
+</span></span><span style=display:flex><span>  <span style=color:#f92672>secret.json</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      &#34;UserName&#34;:&#34;admin [From ConfigMap]&#34;,
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      &#34;Password&#34;:&#34;abcdefg [From ConfigMap]&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    }</span>    
+</span></span></code></pre></div><p>然后重新 Apply 资源：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl apply -f mockapi-mysettings.yaml
+</span></span></code></pre></div><p>配置文件的更新需要 1-2 分钟的时间，我们可以连续观察文件的更新情况：</p><p><img src=https://fs.poneding.com/images/image-20200703150408425.png alt=image-20200703150408425></p><p>可以看到，过段时间后配置文件更新了。</p><blockquote><p>这里遇到了一个小问题，继续访问 <code>/configuration/mysettings</code>，应用程序并没有热更新，但是我使用 hostPath 的 Volume 形式挂载时，修改配置文件是可以热更新的，希望有缘人能给我解答吧。</p></blockquote><p><strong>多文件目录下挂载单个文件</strong>：</p><p>在实际的应用中，可能 <code>secret.json</code> 的变动更为频繁，而 <code>app.json</code> 文件几乎不会变动，我现在只想使用 ConfigMap 传递 <code>secret.json</code> 文件，而不再传递 <code>app.json</code>，这时，修改 ConfigMap 文件如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ConfigMap</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>mockapi-mysettings</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>data</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>secret.json</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      &#34;UserName&#34;:&#34;admin [From ConfigMap]&#34;,
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      &#34;Password&#34;:&#34;123456 [From ConfigMap]&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    }</span>    
+</span></span></code></pre></div><p>然后，重新 Apply 资源:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl apply -f mockapi-mysettings.yaml
+</span></span></code></pre></div><p>这时候，我们继续访问 <code>/configuration/mysettings</code>：</p><p><img src=https://fs.poneding.com/images/image-20200703165501675.png alt=image-20200703165501675></p><p>很遗憾的发现，我们的 <code>app.json</code> 的配置项都失效了，我们接着去容器中一探究竟：</p><p><img src=https://fs.poneding.com/images/image-20200703165644716.png alt=image-20200703165644716></p><p>原来，app.json 文件已经不存在了。</p><p>大概推测一下可以知道，**如果使用 ConfigMap 挂载到容器的一个目录，那么该目录会被 ConfigMap 所覆盖。**那么如果只挂载单个目录呢？使用 <strong>subPath</strong>！</p><p>修改 Pod 文件如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Pod</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>mockapi</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>containers</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>mockapi</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>image</span>: <span style=color:#ae81ff>poneding/mockapi:v1</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>containerPort</span>: <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>volumeMounts</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>mountPath</span>: <span style=color:#ae81ff>/app/mysettings/secret.json</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>name</span>: <span style=color:#ae81ff>mockapi-mysettings</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>subPath</span>: <span style=color:#ae81ff>secret.json</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>volumes</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>:  <span style=color:#ae81ff>mockapi-mysettings</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>configMap</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>mockapi-mysettings</span>
+</span></span></code></pre></div><blockquote><p><code>mountPath</code> 是容器中目标文件路径；</p><p><code>subPath</code> 是ConfgMap文件的 Key 值。</p></blockquote><p>然后，重新 Apply 资源:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>kubectl delete -f mockapi-pod.yaml
+</span></span><span style=display:flex><span>kubectl apply -f mockapi-pod.yaml
+</span></span></code></pre></div><p>等待Pod运行后，我们访问 <code>/configuration/mysettings</code>，并查看 mysettings 目录下文件：</p><p><img src=https://fs.poneding.com/images/image-20200703170634355.png alt=image-20200703170634355></p><p>可以看到成功的挂载 <code>secret.json</code> 文件而没有挂载 <code>app.json</code> 文件，[From ConfigMap] 就是证明。</p><p>需要额外注意的是，在使用过程中发现，使用 <code>subPath</code> 挂载单文件的话，ConfigMap 的更新不会同步更新到容器对应文件中。这时候的解决办法是一个目录只存放一个配置文件，然后 ConfigMap 挂载到目录。</p><p>如果一个 ConfigMap（app-config）中定义了多个文件（app1.json、app2.json），但是 app1-pod 中只会使用到 <code>app1.json</code>，可以使用如下方式：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>...
+</span></span><span style=display:flex><span>      <span style=color:#f92672>volumeMounts</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>mountPath</span>: <span style=color:#ae81ff>/config/path</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>name</span>: <span style=color:#ae81ff>mockapi-mysettings</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>volumes</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>:  <span style=color:#ae81ff>app-config</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>configMap</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>app-config</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>items</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>key</span>: <span style=color:#ae81ff>app1.json</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>path</span>: <span style=color:#ae81ff>app.json</span>
+</span></span></code></pre></div><blockquote><p>items 的 key 用于指定 ConfigMap 的 key，path 则可以定义为程序中的文件名。</p></blockquote><hr><p><a href=/kubernetes/cluster-federation/>« 集群联邦</a></p><p><a href=/kubernetes/delete-es-log-index-scheduler/>» 定期删除 ElasticSearch 日志索引</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/kubernetes/configmap-understood.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#configmap-的创建>ConfigMap 的创建</a><ul><li><a href=#单行命令创建-configmap>单行命令创建 ConfigMap</a></li><li><a href=#基于资源清单文件创建-configmap>基于资源清单文件创建 ConfigMap</a></li></ul></li><li><a href=#configmap-的使用>ConfigMap 的使用</a><ul><li><a href=#使用-configmap-作为容器的环境变量>使用 ConfigMap 作为容器的环境变量</a></li><li><a href=#使用-configmap-作为-volume-向容器提供文件>使用 ConfigMap 作为 Volume 向容器提供文件</a></li></ul></li></ul></nav></div></aside></main></body></html>

@@ -1,0 +1,187 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content='我的博客 / Golang 编程 / Golang 生成证书
+Golang 生成证书 # 代码实现 # package certutil import ( "bytes" "crypto/rand" "crypto/rsa" "crypto/x509" "crypto/x509/pkix" "encoding/pem" "math/big" "net" "time" ) // CA ca type CA struct { caInfo *x509.Certificate caPrivKey *rsa.PrivateKey caPem, caKeyPem []byte } // GetCAPem get ca pem bytes func (c *CA) GetCAPem() ([]byte, error) { if c.caPem == nil { // create the CA caBytes, err := x509.CreateCertificate(rand.Reader, c.caInfo, c.caInfo, &amp;c.'><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/go/go-gen-cert/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content='我的博客 / Golang 编程 / Golang 生成证书
+Golang 生成证书 # 代码实现 # package certutil import ( "bytes" "crypto/rand" "crypto/rsa" "crypto/x509" "crypto/x509/pkix" "encoding/pem" "math/big" "net" "time" ) // CA ca type CA struct { caInfo *x509.Certificate caPrivKey *rsa.PrivateKey caPem, caKeyPem []byte } // GetCAPem get ca pem bytes func (c *CA) GetCAPem() ([]byte, error) { if c.caPem == nil { // create the CA caBytes, err := x509.CreateCertificate(rand.Reader, c.caInfo, c.caInfo, &amp;c.'><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="go"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Go Gen Cert | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/go/go-gen-cert/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Go Gen Cert</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#代码实现>代码实现</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/go/>Golang 编程</a> / Golang 生成证书</p><h1 id=golang-生成证书>Golang 生成证书
+<a class=anchor href=#golang-%e7%94%9f%e6%88%90%e8%af%81%e4%b9%a6>#</a></h1><h2 id=代码实现>代码实现
+<a class=anchor href=#%e4%bb%a3%e7%a0%81%e5%ae%9e%e7%8e%b0>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>certutil</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span>	<span style=color:#e6db74>&#34;bytes&#34;</span>
+</span></span><span style=display:flex><span>	<span style=color:#e6db74>&#34;crypto/rand&#34;</span>
+</span></span><span style=display:flex><span>	<span style=color:#e6db74>&#34;crypto/rsa&#34;</span>
+</span></span><span style=display:flex><span>	<span style=color:#e6db74>&#34;crypto/x509&#34;</span>
+</span></span><span style=display:flex><span>	<span style=color:#e6db74>&#34;crypto/x509/pkix&#34;</span>
+</span></span><span style=display:flex><span>	<span style=color:#e6db74>&#34;encoding/pem&#34;</span>
+</span></span><span style=display:flex><span>	<span style=color:#e6db74>&#34;math/big&#34;</span>
+</span></span><span style=display:flex><span>	<span style=color:#e6db74>&#34;net&#34;</span>
+</span></span><span style=display:flex><span>	<span style=color:#e6db74>&#34;time&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// CA ca
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>CA</span> <span style=color:#66d9ef>struct</span> {
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>caInfo</span>          <span style=color:#f92672>*</span><span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>Certificate</span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>caPrivKey</span>       <span style=color:#f92672>*</span><span style=color:#a6e22e>rsa</span>.<span style=color:#a6e22e>PrivateKey</span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>caPem</span>, <span style=color:#a6e22e>caKeyPem</span> []<span style=color:#66d9ef>byte</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// GetCAPem get ca pem bytes
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>c</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>CA</span>) <span style=color:#a6e22e>GetCAPem</span>() ([]<span style=color:#66d9ef>byte</span>, <span style=color:#66d9ef>error</span>) {
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> <span style=color:#a6e22e>c</span>.<span style=color:#a6e22e>caPem</span> <span style=color:#f92672>==</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>		<span style=color:#75715e>// create the CA
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>		<span style=color:#a6e22e>caBytes</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>CreateCertificate</span>(<span style=color:#a6e22e>rand</span>.<span style=color:#a6e22e>Reader</span>, <span style=color:#a6e22e>c</span>.<span style=color:#a6e22e>caInfo</span>, <span style=color:#a6e22e>c</span>.<span style=color:#a6e22e>caInfo</span>, <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>c</span>.<span style=color:#a6e22e>caPrivKey</span>.<span style=color:#a6e22e>PublicKey</span>, <span style=color:#a6e22e>c</span>.<span style=color:#a6e22e>caPrivKey</span>)
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>, <span style=color:#a6e22e>err</span>
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>		<span style=color:#75715e>// pem encode
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>		<span style=color:#a6e22e>caPEM</span> <span style=color:#f92672>:=</span> new(<span style=color:#a6e22e>bytes</span>.<span style=color:#a6e22e>Buffer</span>)
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>_</span> = <span style=color:#a6e22e>pem</span>.<span style=color:#a6e22e>Encode</span>(<span style=color:#a6e22e>caPEM</span>, <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>pem</span>.<span style=color:#a6e22e>Block</span>{
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>Type</span>:  <span style=color:#e6db74>&#34;CERTIFICATE&#34;</span>,
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>Bytes</span>: <span style=color:#a6e22e>caBytes</span>,
+</span></span><span style=display:flex><span>		})
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>c</span>.<span style=color:#a6e22e>caPem</span> = <span style=color:#a6e22e>caPEM</span>.<span style=color:#a6e22e>Bytes</span>()
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>return</span> <span style=color:#a6e22e>c</span>.<span style=color:#a6e22e>caPem</span>, <span style=color:#66d9ef>nil</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// GetCAKeyPem get ca key pem
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>c</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>CA</span>) <span style=color:#a6e22e>GetCAKeyPem</span>() ([]<span style=color:#66d9ef>byte</span>, <span style=color:#66d9ef>error</span>) {
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> <span style=color:#a6e22e>c</span>.<span style=color:#a6e22e>caKeyPem</span> <span style=color:#f92672>==</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>caPrivKeyPEM</span> <span style=color:#f92672>:=</span> new(<span style=color:#a6e22e>bytes</span>.<span style=color:#a6e22e>Buffer</span>)
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>_</span> = <span style=color:#a6e22e>pem</span>.<span style=color:#a6e22e>Encode</span>(<span style=color:#a6e22e>caPrivKeyPEM</span>, <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>pem</span>.<span style=color:#a6e22e>Block</span>{
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>Type</span>:  <span style=color:#e6db74>&#34;RSA PRIVATE KEY&#34;</span>,
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>Bytes</span>: <span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>MarshalPKCS1PrivateKey</span>(<span style=color:#a6e22e>c</span>.<span style=color:#a6e22e>caPrivKey</span>),
+</span></span><span style=display:flex><span>		})
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>c</span>.<span style=color:#a6e22e>caKeyPem</span> = <span style=color:#a6e22e>caPrivKeyPEM</span>.<span style=color:#a6e22e>Bytes</span>()
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>return</span> <span style=color:#a6e22e>c</span>.<span style=color:#a6e22e>caKeyPem</span>, <span style=color:#66d9ef>nil</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// CreateCert make Certificate
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>c</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>CA</span>) <span style=color:#a6e22e>CreateCert</span>(<span style=color:#a6e22e>ips</span> []<span style=color:#66d9ef>string</span>, <span style=color:#a6e22e>domains</span> <span style=color:#f92672>...</span><span style=color:#66d9ef>string</span>) (<span style=color:#a6e22e>certPem</span>, <span style=color:#a6e22e>certKey</span> []<span style=color:#66d9ef>byte</span>, <span style=color:#a6e22e>err</span> <span style=color:#66d9ef>error</span>) {
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>var</span> <span style=color:#a6e22e>ipAddresses</span> []<span style=color:#a6e22e>net</span>.<span style=color:#a6e22e>IP</span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>for</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>ip</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>range</span> <span style=color:#a6e22e>ips</span> {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> <span style=color:#a6e22e>i</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>net</span>.<span style=color:#a6e22e>ParseIP</span>(<span style=color:#a6e22e>ip</span>); <span style=color:#a6e22e>i</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>ipAddresses</span> = append(<span style=color:#a6e22e>ipAddresses</span>, <span style=color:#a6e22e>i</span>)
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#75715e>// set up our server certificate
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#a6e22e>cert</span> <span style=color:#f92672>:=</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>Certificate</span>{
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>SerialNumber</span>: <span style=color:#a6e22e>big</span>.<span style=color:#a6e22e>NewInt</span>(<span style=color:#ae81ff>2019</span>),
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>Subject</span>: <span style=color:#a6e22e>pkix</span>.<span style=color:#a6e22e>Name</span>{
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>Organization</span>:  []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;poneding.com&#34;</span>},
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>Country</span>:       []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;CN&#34;</span>},
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>Province</span>:      []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;Beijing&#34;</span>},
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>Locality</span>:      []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;Beijing&#34;</span>},
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>StreetAddress</span>: []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;Beijing&#34;</span>},
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>PostalCode</span>:    []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;000000&#34;</span>},
+</span></span><span style=display:flex><span>		},
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>DNSNames</span>:     <span style=color:#a6e22e>domains</span>,
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>IPAddresses</span>:  <span style=color:#a6e22e>ipAddresses</span>,
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>NotBefore</span>:    <span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Now</span>(),
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>NotAfter</span>:     <span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Now</span>().<span style=color:#a6e22e>AddDate</span>(<span style=color:#ae81ff>99</span>, <span style=color:#ae81ff>0</span>, <span style=color:#ae81ff>0</span>),
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>SubjectKeyId</span>: []<span style=color:#66d9ef>byte</span>{<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>3</span>, <span style=color:#ae81ff>4</span>, <span style=color:#ae81ff>6</span>},
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>ExtKeyUsage</span>:  []<span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>ExtKeyUsage</span>{<span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>ExtKeyUsageClientAuth</span>, <span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>ExtKeyUsageServerAuth</span>},
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>KeyUsage</span>:     <span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>KeyUsageDigitalSignature</span>,
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>certPrivKey</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>rsa</span>.<span style=color:#a6e22e>GenerateKey</span>(<span style=color:#a6e22e>rand</span>.<span style=color:#a6e22e>Reader</span>, <span style=color:#ae81ff>4096</span>)
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>, <span style=color:#66d9ef>nil</span>, <span style=color:#a6e22e>err</span>
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>certBytes</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>CreateCertificate</span>(<span style=color:#a6e22e>rand</span>.<span style=color:#a6e22e>Reader</span>, <span style=color:#a6e22e>cert</span>, <span style=color:#a6e22e>c</span>.<span style=color:#a6e22e>caInfo</span>, <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>certPrivKey</span>.<span style=color:#a6e22e>PublicKey</span>, <span style=color:#a6e22e>c</span>.<span style=color:#a6e22e>caPrivKey</span>)
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>, <span style=color:#66d9ef>nil</span>, <span style=color:#a6e22e>err</span>
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>certPEM</span> <span style=color:#f92672>:=</span> new(<span style=color:#a6e22e>bytes</span>.<span style=color:#a6e22e>Buffer</span>)
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>_</span> = <span style=color:#a6e22e>pem</span>.<span style=color:#a6e22e>Encode</span>(<span style=color:#a6e22e>certPEM</span>, <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>pem</span>.<span style=color:#a6e22e>Block</span>{
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>Type</span>:  <span style=color:#e6db74>&#34;CERTIFICATE&#34;</span>,
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>Bytes</span>: <span style=color:#a6e22e>certBytes</span>,
+</span></span><span style=display:flex><span>	})
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>certPrivKeyPEM</span> <span style=color:#f92672>:=</span> new(<span style=color:#a6e22e>bytes</span>.<span style=color:#a6e22e>Buffer</span>)
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>_</span> = <span style=color:#a6e22e>pem</span>.<span style=color:#a6e22e>Encode</span>(<span style=color:#a6e22e>certPrivKeyPEM</span>, <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>pem</span>.<span style=color:#a6e22e>Block</span>{
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>Type</span>:  <span style=color:#e6db74>&#34;RSA PRIVATE KEY&#34;</span>,
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>Bytes</span>: <span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>MarshalPKCS1PrivateKey</span>(<span style=color:#a6e22e>certPrivKey</span>),
+</span></span><span style=display:flex><span>	})
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>return</span> <span style=color:#a6e22e>certPEM</span>.<span style=color:#a6e22e>Bytes</span>(), <span style=color:#a6e22e>certPrivKeyPEM</span>.<span style=color:#a6e22e>Bytes</span>(), <span style=color:#66d9ef>nil</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// CreateCA create ca info
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>CreateCA</span>() (<span style=color:#f92672>*</span><span style=color:#a6e22e>CA</span>, <span style=color:#66d9ef>error</span>) {
+</span></span><span style=display:flex><span>	<span style=color:#75715e>// set up our CA certificate
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#a6e22e>ca</span> <span style=color:#f92672>:=</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>Certificate</span>{
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>SerialNumber</span>: <span style=color:#a6e22e>big</span>.<span style=color:#a6e22e>NewInt</span>(<span style=color:#ae81ff>2019</span>),
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>Subject</span>: <span style=color:#a6e22e>pkix</span>.<span style=color:#a6e22e>Name</span>{
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>Organization</span>:  []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;poneding.com&#34;</span>},
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>Country</span>:       []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;CN&#34;</span>},
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>Province</span>:      []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;Beijing&#34;</span>},
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>Locality</span>:      []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;Beijing&#34;</span>},
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>StreetAddress</span>: []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;Beijing&#34;</span>},
+</span></span><span style=display:flex><span>			<span style=color:#a6e22e>PostalCode</span>:    []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;000000&#34;</span>},
+</span></span><span style=display:flex><span>		},
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>NotBefore</span>:             <span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Now</span>(),
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>NotAfter</span>:              <span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Now</span>().<span style=color:#a6e22e>AddDate</span>(<span style=color:#ae81ff>99</span>, <span style=color:#ae81ff>0</span>, <span style=color:#ae81ff>0</span>),
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>IsCA</span>:                  <span style=color:#66d9ef>true</span>,
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>ExtKeyUsage</span>:           []<span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>ExtKeyUsage</span>{<span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>ExtKeyUsageClientAuth</span>, <span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>ExtKeyUsageServerAuth</span>},
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>KeyUsage</span>:              <span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>KeyUsageDigitalSignature</span> | <span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>KeyUsageCertSign</span>,
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>BasicConstraintsValid</span>: <span style=color:#66d9ef>true</span>,
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#75715e>// create our private and public key
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#a6e22e>caPrivKey</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>rsa</span>.<span style=color:#a6e22e>GenerateKey</span>(<span style=color:#a6e22e>rand</span>.<span style=color:#a6e22e>Reader</span>, <span style=color:#ae81ff>4096</span>)
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>, <span style=color:#a6e22e>err</span>
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>return</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>CA</span>{
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>caInfo</span>:    <span style=color:#a6e22e>ca</span>,
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>caPrivKey</span>: <span style=color:#a6e22e>caPrivKey</span>,
+</span></span><span style=display:flex><span>	}, <span style=color:#66d9ef>nil</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// ParseCA parse caPem
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>ParseCA</span>(<span style=color:#a6e22e>caPem</span>, <span style=color:#a6e22e>caKeyPem</span> []<span style=color:#66d9ef>byte</span>) (<span style=color:#f92672>*</span><span style=color:#a6e22e>CA</span>, <span style=color:#66d9ef>error</span>) {
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>p</span> <span style=color:#f92672>:=</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>pem</span>.<span style=color:#a6e22e>Block</span>{}
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>p</span>, <span style=color:#a6e22e>caPem</span> = <span style=color:#a6e22e>pem</span>.<span style=color:#a6e22e>Decode</span>(<span style=color:#a6e22e>caPem</span>)
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>ca</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>ParseCertificate</span>(<span style=color:#a6e22e>p</span>.<span style=color:#a6e22e>Bytes</span>)
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>, <span style=color:#a6e22e>err</span>
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>p2</span> <span style=color:#f92672>:=</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>pem</span>.<span style=color:#a6e22e>Block</span>{}
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>p2</span>, <span style=color:#a6e22e>caKeyPem</span> = <span style=color:#a6e22e>pem</span>.<span style=color:#a6e22e>Decode</span>(<span style=color:#a6e22e>caKeyPem</span>)
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>caKey</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>x509</span>.<span style=color:#a6e22e>ParsePKCS1PrivateKey</span>(<span style=color:#a6e22e>p2</span>.<span style=color:#a6e22e>Bytes</span>)
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>, <span style=color:#a6e22e>err</span>
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>return</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>CA</span>{
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>caInfo</span>:    <span style=color:#a6e22e>ca</span>,
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>caPrivKey</span>: <span style=color:#a6e22e>caKey</span>,
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>caPem</span>:     <span style=color:#a6e22e>caPem</span>,
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>caKeyPem</span>:  <span style=color:#a6e22e>caKeyPem</span>,
+</span></span><span style=display:flex><span>	}, <span style=color:#66d9ef>nil</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// DomainSign create cert
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>DomainSign</span>(<span style=color:#a6e22e>ips</span> []<span style=color:#66d9ef>string</span>, <span style=color:#a6e22e>domains</span> <span style=color:#f92672>...</span><span style=color:#66d9ef>string</span>) ([]<span style=color:#66d9ef>byte</span>, []<span style=color:#66d9ef>byte</span>, []<span style=color:#66d9ef>byte</span>, <span style=color:#66d9ef>error</span>) {
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>ca</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>CreateCA</span>()
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>, <span style=color:#66d9ef>nil</span>, <span style=color:#66d9ef>nil</span>, <span style=color:#a6e22e>err</span>
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>caPem</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>ca</span>.<span style=color:#a6e22e>GetCAPem</span>()
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>, <span style=color:#66d9ef>nil</span>, <span style=color:#66d9ef>nil</span>, <span style=color:#a6e22e>err</span>
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#a6e22e>certPem</span>, <span style=color:#a6e22e>certKey</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>ca</span>.<span style=color:#a6e22e>CreateCert</span>(<span style=color:#a6e22e>ips</span>, <span style=color:#a6e22e>domains</span><span style=color:#f92672>...</span>)
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>, <span style=color:#66d9ef>nil</span>, <span style=color:#66d9ef>nil</span>, <span style=color:#a6e22e>err</span>
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>return</span> <span style=color:#a6e22e>caPem</span>, <span style=color:#a6e22e>certPem</span>, <span style=color:#a6e22e>certKey</span>, <span style=color:#66d9ef>nil</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><hr><p><a href=/go/go-cross-complie/>« Golang 不同平台架构编译</a></p><p><a href=/go/go-linkname/>» go:linkname 指令</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/go/go-gen-cert.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#代码实现>代码实现</a></li></ul></nav></div></aside></main></body></html>

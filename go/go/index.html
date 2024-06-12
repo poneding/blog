@@ -1,0 +1,806 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / Golang 编程 / Golang
+Golang # 资料 # Go 安全指南 Go 语言编程规范 Golang channel # golang 实现并发是通过通信共享内存，channel 是 go 语言中goroutine 的通信管道，通过 channel 将值从一个 goroutine 发送到另一个 goroutine。
+语法 # 创建 channel：
+使用 make() 函数创建：
+ch := make(chan int) 默认创建一个无缓存 channel。
+发送数据到 channel：
+ch <- x 从 channel 读取数据：
+x := <-ch 关闭 channel：
+使用 close() 函数关闭：
+close(ch) 当你的程序不再需要往 channel 中发送数据时，可以关闭 channel。
+如果往已经关闭的 channal 发送数据，程序发生异常。
+无缓冲 channel # 如果当前没有一个 goroutine 对无缓冲 channel 接收数据，那么无缓冲 channel 会阻止发送数据。"><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/go/go/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / Golang 编程 / Golang
+Golang # 资料 # Go 安全指南 Go 语言编程规范 Golang channel # golang 实现并发是通过通信共享内存，channel 是 go 语言中goroutine 的通信管道，通过 channel 将值从一个 goroutine 发送到另一个 goroutine。
+语法 # 创建 channel：
+使用 make() 函数创建：
+ch := make(chan int) 默认创建一个无缓存 channel。
+发送数据到 channel：
+ch <- x 从 channel 读取数据：
+x := <-ch 关闭 channel：
+使用 close() 函数关闭：
+close(ch) 当你的程序不再需要往 channel 中发送数据时，可以关闭 channel。
+如果往已经关闭的 channal 发送数据，程序发生异常。
+无缓冲 channel # 如果当前没有一个 goroutine 对无缓冲 channel 接收数据，那么无缓冲 channel 会阻止发送数据。"><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="go"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Go | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/go/go/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>Go</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#资料>资料</a></li><li><a href=#golang-channel>Golang channel</a><ul><li><a href=#语法>语法</a></li><li><a href=#无缓冲-channel>无缓冲 channel</a></li><li><a href=#有缓冲-channel>有缓冲 channel</a></li><li><a href=#无缓冲-channel-与有缓冲-channel的区别>无缓冲 channel 与有缓冲 channel的区别</a></li></ul></li><li><a href=#读取文件>读取文件</a><ul><li><a href=#一次性全读>一次性全读</a></li><li><a href=#按行读取>按行读取</a></li></ul></li><li><a href=#优雅退出>优雅退出</a><ul><li><a href=#不处理优雅退出>不处理优雅退出</a></li><li><a href=#优雅退出-1with-context>优雅退出 1（with context）</a></li><li><a href=#优雅退出-2without-context>优雅退出 2（without context）</a></li></ul></li><li><a href=#函数式选项模式>函数式选项模式</a></li><li><a href=#调用-api>调用 API</a><ul><li><a href=#get>Get</a></li><li><a href=#post>Post</a></li></ul></li><li><a href=#调用-jenkins-api>调用 Jenkins API</a></li><li><a href=#位运算>位运算</a></li><li><a href=#实现简易网络连接客户端>实现简易网络连接客户端</a></li><li><a href=#git>git</a></li><li><a href=#elasticsearch>elasticsearch</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/go/>Golang 编程</a> / Golang</p><h1 id=golang>Golang
+<a class=anchor href=#golang>#</a></h1><h2 id=资料>资料
+<a class=anchor href=#%e8%b5%84%e6%96%99>#</a></h2><ul><li><a href=https://github.com/Tencent/secguide/blob/main/Go%E5%AE%89%E5%85%A8%E6%8C%87%E5%8D%97.md>Go 安全指南</a></li><li><a href=https://github.com/xxjwxc/uber_go_guide_cn>Go 语言编程规范</a></li></ul><h2 id=golang-channel>Golang channel
+<a class=anchor href=#golang-channel>#</a></h2><p>golang 实现并发是通过通信共享内存，channel 是 go 语言中goroutine 的通信管道，通过 channel 将值从一个 goroutine 发送到另一个 goroutine。</p><h3 id=语法>语法
+<a class=anchor href=#%e8%af%ad%e6%b3%95>#</a></h3><p><strong>创建 channel</strong>：</p><p>使用 <code>make()</code> 函数创建：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#a6e22e>ch</span> <span style=color:#f92672>:=</span> make(<span style=color:#66d9ef>chan</span> <span style=color:#66d9ef>int</span>)
+</span></span></code></pre></div><blockquote><p>默认创建一个无缓存 channel。</p></blockquote><p><strong>发送数据到 channel</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#a6e22e>ch</span> <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>x</span>
+</span></span></code></pre></div><p><strong>从 channel 读取数据</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#a6e22e>x</span> <span style=color:#f92672>:=</span> <span style=color:#f92672>&lt;-</span><span style=color:#a6e22e>ch</span>
+</span></span></code></pre></div><p><strong>关闭 channel</strong>：</p><p>使用 <code>close()</code> 函数关闭：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span>close(<span style=color:#a6e22e>ch</span>)
+</span></span></code></pre></div><blockquote><p>当你的程序不再需要往 channel 中发送数据时，可以关闭 channel。</p><p>如果往已经关闭的 channal 发送数据，程序发生异常。</p></blockquote><h3 id=无缓冲-channel>无缓冲 channel
+<a class=anchor href=#%e6%97%a0%e7%bc%93%e5%86%b2-channel>#</a></h3><p>如果当前没有一个 goroutine 对无缓冲 channel 接收数据，那么无缓冲 channel 会阻止发送数据。</p><h3 id=有缓冲-channel>有缓冲 channel
+<a class=anchor href=#%e6%9c%89%e7%bc%93%e5%86%b2-channel>#</a></h3><p>类似队列机制，创建时需要设定缓冲大小。</p><p><strong>创建一个有缓冲 channel</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#a6e22e>ch</span> <span style=color:#f92672>:=</span> make(<span style=color:#66d9ef>chan</span> <span style=color:#66d9ef>int</span> <span style=color:#a6e22e>ch</span>, <span style=color:#ae81ff>10</span>)
+</span></span></code></pre></div><blockquote><p>在有 goroutine 接收 channel 数据之前，可以先向 channel 中发送10个数据。</p></blockquote><h3 id=无缓冲-channel-与有缓冲-channel的区别>无缓冲 channel 与有缓冲 channel的区别
+<a class=anchor href=#%e6%97%a0%e7%bc%93%e5%86%b2-channel-%e4%b8%8e%e6%9c%89%e7%bc%93%e5%86%b2-channel%e7%9a%84%e5%8c%ba%e5%88%ab>#</a></h3><p>现在，你可能想知道何时使用这两种类型。 这完全取决于你希望 goroutine 之间的通信如何进行。 无缓冲 channel 同步通信。 它们保证每次发送数据时，程序都会被阻止，直到有人从 channel 中读取数据。</p><p>相反，有缓冲 channel 将发送和接收操作解耦。 它们不会阻止程序，但你必须小心使用，因为可能最终会导致死锁（如前文所述）。 使用无缓冲 channel 时，可以控制可并发运行的 goroutine 的数量。 例如，你可能要对 API 进行调用，并且想要控制每秒执行的调用次数。 否则，你可能会被阻止。</p><h2 id=读取文件>读取文件
+<a class=anchor href=#%e8%af%bb%e5%8f%96%e6%96%87%e4%bb%b6>#</a></h2><h3 id=一次性全读>一次性全读
+<a class=anchor href=#%e4%b8%80%e6%ac%a1%e6%80%a7%e5%85%a8%e8%af%bb>#</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-golang data-lang=golang><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;fmt&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;io/ioutil&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>bytes</span>, <span style=color:#a6e22e>e</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>ioutil</span>.<span style=color:#a6e22e>ReadFile</span>(<span style=color:#e6db74>&#34;/Users/dp/tmp/0811/03/file.txt&#34;</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>e</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  panic(<span style=color:#e6db74>&#34;read file error.&#34;</span>)
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Println</span>(string(<span style=color:#a6e22e>bytes</span>))
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=按行读取>按行读取
+<a class=anchor href=#%e6%8c%89%e8%a1%8c%e8%af%bb%e5%8f%96>#</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-golang data-lang=golang><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;bufio&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;fmt&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;io&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;os&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>f</span>, <span style=color:#a6e22e>e</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>os</span>.<span style=color:#a6e22e>Open</span>(<span style=color:#e6db74>&#34;C:/Users/dp/go/src/0811/03/file.txt&#34;</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>e</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  panic(<span style=color:#e6db74>&#34;read file error.&#34;</span>)
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>defer</span> <span style=color:#a6e22e>f</span>.<span style=color:#a6e22e>Close</span>()
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>r</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>bufio</span>.<span style=color:#a6e22e>NewReader</span>(<span style=color:#a6e22e>f</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>for</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>line</span>, <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>eof</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>r</span>.<span style=color:#a6e22e>ReadLine</span>()
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>eof</span> <span style=color:#f92672>==</span> <span style=color:#a6e22e>io</span>.<span style=color:#a6e22e>EOF</span> {
+</span></span><span style=display:flex><span>   <span style=color:#66d9ef>break</span> <span style=color:#75715e>// read last line.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>  }
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Println</span>(string(<span style=color:#a6e22e>line</span>))
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=优雅退出>优雅退出
+<a class=anchor href=#%e4%bc%98%e9%9b%85%e9%80%80%e5%87%ba>#</a></h2><h3 id=不处理优雅退出>不处理优雅退出
+<a class=anchor href=#%e4%b8%8d%e5%a4%84%e7%90%86%e4%bc%98%e9%9b%85%e9%80%80%e5%87%ba>#</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-golang data-lang=golang><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;log&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;net/http&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;os&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;os/signal&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;time&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;github.com/gin-gonic/gin&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>router</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>gin</span>.<span style=color:#a6e22e>Default</span>()
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>router</span>.<span style=color:#a6e22e>GET</span>(<span style=color:#e6db74>&#34;/&#34;</span>, <span style=color:#66d9ef>func</span>(<span style=color:#a6e22e>c</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>gin</span>.<span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Sleep</span>(<span style=color:#ae81ff>5</span> <span style=color:#f92672>*</span> <span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Second</span>)
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>c</span>.<span style=color:#a6e22e>String</span>(<span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>StatusOK</span>, <span style=color:#e6db74>&#34;Welcome Gin Server&#34;</span>)
+</span></span><span style=display:flex><span> })
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>server</span> <span style=color:#f92672>:=</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Server</span>{
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>Addr</span>:    <span style=color:#e6db74>&#34;:8080&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>Handler</span>: <span style=color:#a6e22e>router</span>,
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>quit</span> <span style=color:#f92672>:=</span> make(<span style=color:#66d9ef>chan</span> <span style=color:#a6e22e>os</span>.<span style=color:#a6e22e>Signal</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>signal</span>.<span style=color:#a6e22e>Notify</span>(<span style=color:#a6e22e>quit</span>, <span style=color:#a6e22e>os</span>.<span style=color:#a6e22e>Interrupt</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>go</span> <span style=color:#66d9ef>func</span>() {
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&lt;-</span><span style=color:#a6e22e>quit</span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;receive interrupt signal&#34;</span>)
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>server</span>.<span style=color:#a6e22e>Close</span>(); <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>   <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatal</span>(<span style=color:#e6db74>&#34;Server Close:&#34;</span>, <span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span> }()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>server</span>.<span style=color:#a6e22e>ListenAndServe</span>(); <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>==</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>ErrServerClosed</span> {
+</span></span><span style=display:flex><span>   <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;Server closed under request&#34;</span>)
+</span></span><span style=display:flex><span>  } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>   <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatal</span>(<span style=color:#e6db74>&#34;Server closed unexpect&#34;</span>)
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;Server exiting&#34;</span>)
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=优雅退出-1with-context>优雅退出 1（with context）
+<a class=anchor href=#%e4%bc%98%e9%9b%85%e9%80%80%e5%87%ba-1with-context>#</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-golang data-lang=golang><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;context&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;log&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;net/http&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;os/signal&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;syscall&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;time&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;github.com/gin-gonic/gin&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span> <span style=color:#75715e>// Create context that listens for the interrupt signal from the OS.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#a6e22e>ctx</span>, <span style=color:#a6e22e>stop</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>signal</span>.<span style=color:#a6e22e>NotifyContext</span>(<span style=color:#a6e22e>context</span>.<span style=color:#a6e22e>Background</span>(), <span style=color:#a6e22e>syscall</span>.<span style=color:#a6e22e>SIGINT</span>, <span style=color:#a6e22e>syscall</span>.<span style=color:#a6e22e>SIGTERM</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>defer</span> <span style=color:#a6e22e>stop</span>()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>router</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>gin</span>.<span style=color:#a6e22e>Default</span>()
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>router</span>.<span style=color:#a6e22e>GET</span>(<span style=color:#e6db74>&#34;/&#34;</span>, <span style=color:#66d9ef>func</span>(<span style=color:#a6e22e>c</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>gin</span>.<span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Sleep</span>(<span style=color:#ae81ff>10</span> <span style=color:#f92672>*</span> <span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Second</span>)
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>c</span>.<span style=color:#a6e22e>String</span>(<span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>StatusOK</span>, <span style=color:#e6db74>&#34;Welcome Gin Server&#34;</span>)
+</span></span><span style=display:flex><span> })
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>srv</span> <span style=color:#f92672>:=</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Server</span>{
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>Addr</span>:    <span style=color:#e6db74>&#34;:8080&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>Handler</span>: <span style=color:#a6e22e>router</span>,
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#75715e>// Initializing the server in a goroutine so that
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// it won&#39;t block the graceful shutdown handling below
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#66d9ef>go</span> <span style=color:#66d9ef>func</span>() {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>srv</span>.<span style=color:#a6e22e>ListenAndServe</span>(); <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> <span style=color:#f92672>&amp;&amp;</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>ErrServerClosed</span> {
+</span></span><span style=display:flex><span>   <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatalf</span>(<span style=color:#e6db74>&#34;listen: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span> }()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#75715e>// Listen for the interrupt signal.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#f92672>&lt;-</span><span style=color:#a6e22e>ctx</span>.<span style=color:#a6e22e>Done</span>()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#75715e>// Restore default behavior on the interrupt signal and notify user of shutdown.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#a6e22e>stop</span>()
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;shutting down gracefully, press Ctrl+C again to force&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#75715e>// The context is used to inform the server it has 5 seconds to finish
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// the request it is currently handling
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#a6e22e>ctx</span>, <span style=color:#a6e22e>cancel</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>context</span>.<span style=color:#a6e22e>WithTimeout</span>(<span style=color:#a6e22e>context</span>.<span style=color:#a6e22e>Background</span>(), <span style=color:#ae81ff>5</span><span style=color:#f92672>*</span><span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Second</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>defer</span> <span style=color:#a6e22e>cancel</span>()
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>srv</span>.<span style=color:#a6e22e>Shutdown</span>(<span style=color:#a6e22e>ctx</span>); <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatal</span>(<span style=color:#e6db74>&#34;Server forced to shutdown: &#34;</span>, <span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;Server exiting&#34;</span>)
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=优雅退出-2without-context>优雅退出 2（without context）
+<a class=anchor href=#%e4%bc%98%e9%9b%85%e9%80%80%e5%87%ba-2without-context>#</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-golang data-lang=golang><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;context&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;log&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;net/http&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;os&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;os/signal&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;syscall&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;time&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;github.com/gin-gonic/gin&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>router</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>gin</span>.<span style=color:#a6e22e>Default</span>()
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>router</span>.<span style=color:#a6e22e>GET</span>(<span style=color:#e6db74>&#34;/&#34;</span>, <span style=color:#66d9ef>func</span>(<span style=color:#a6e22e>c</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>gin</span>.<span style=color:#a6e22e>Context</span>) {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Sleep</span>(<span style=color:#ae81ff>5</span> <span style=color:#f92672>*</span> <span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Second</span>)
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>c</span>.<span style=color:#a6e22e>String</span>(<span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>StatusOK</span>, <span style=color:#e6db74>&#34;Welcome Gin Server&#34;</span>)
+</span></span><span style=display:flex><span> })
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>srv</span> <span style=color:#f92672>:=</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Server</span>{
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>Addr</span>:    <span style=color:#e6db74>&#34;:8080&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>Handler</span>: <span style=color:#a6e22e>router</span>,
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#75715e>// Initializing the server in a goroutine so that
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// it won&#39;t block the graceful shutdown handling below
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#66d9ef>go</span> <span style=color:#66d9ef>func</span>() {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>srv</span>.<span style=color:#a6e22e>ListenAndServe</span>(); <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> <span style=color:#f92672>&amp;&amp;</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>ErrServerClosed</span> {
+</span></span><span style=display:flex><span>   <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatalf</span>(<span style=color:#e6db74>&#34;listen: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span> }()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#75715e>// Wait for interrupt signal to gracefully shutdown the server with
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// a timeout of 5 seconds.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#a6e22e>quit</span> <span style=color:#f92672>:=</span> make(<span style=color:#66d9ef>chan</span> <span style=color:#a6e22e>os</span>.<span style=color:#a6e22e>Signal</span>, <span style=color:#ae81ff>1</span>)
+</span></span><span style=display:flex><span> <span style=color:#75715e>// kill (no param) default send syscall.SIGTERM
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// kill -2 is syscall.SIGINT
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// kill -9 is syscall.SIGKILL but can&#39;t be catch, so don&#39;t need add it
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#a6e22e>signal</span>.<span style=color:#a6e22e>Notify</span>(<span style=color:#a6e22e>quit</span>, <span style=color:#a6e22e>syscall</span>.<span style=color:#a6e22e>SIGINT</span>, <span style=color:#a6e22e>syscall</span>.<span style=color:#a6e22e>SIGTERM</span>)
+</span></span><span style=display:flex><span> <span style=color:#f92672>&lt;-</span><span style=color:#a6e22e>quit</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;Shutting down server...&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#75715e>// The context is used to inform the server it has 5 seconds to finish
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// the request it is currently handling
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#a6e22e>ctx</span>, <span style=color:#a6e22e>cancel</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>context</span>.<span style=color:#a6e22e>WithTimeout</span>(<span style=color:#a6e22e>context</span>.<span style=color:#a6e22e>Background</span>(), <span style=color:#ae81ff>5</span><span style=color:#f92672>*</span><span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Second</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>defer</span> <span style=color:#a6e22e>cancel</span>()
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>srv</span>.<span style=color:#a6e22e>Shutdown</span>(<span style=color:#a6e22e>ctx</span>); <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatal</span>(<span style=color:#e6db74>&#34;Server forced to shutdown: &#34;</span>, <span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;Server exiting&#34;</span>)
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=函数式选项模式>函数式选项模式
+<a class=anchor href=#%e5%87%bd%e6%95%b0%e5%bc%8f%e9%80%89%e9%a1%b9%e6%a8%a1%e5%bc%8f>#</a></h2><p>函数式选项模式：Functional Options Pattern，是 Golang 中一种常用的设计模式，用于解决构造函数参数过多的问题。</p><p>示例：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>NewServer</span>(<span style=color:#e6db74>&#34;test&#34;</span>, <span style=color:#a6e22e>SetHost</span>(<span style=color:#e6db74>&#34;localhost&#34;</span>), <span style=color:#a6e22e>SetPort</span>(<span style=color:#ae81ff>8081</span>))
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Server</span> <span style=color:#66d9ef>struct</span> {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>Label</span> <span style=color:#66d9ef>string</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>Host</span>  <span style=color:#66d9ef>string</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>Port</span>  <span style=color:#66d9ef>int32</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>NewServer</span>(<span style=color:#a6e22e>label</span> <span style=color:#66d9ef>string</span>, <span style=color:#a6e22e>opts</span> <span style=color:#f92672>...</span><span style=color:#66d9ef>func</span>(<span style=color:#a6e22e>s</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>Server</span>)) <span style=color:#f92672>*</span><span style=color:#a6e22e>Server</span> {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>s</span> <span style=color:#f92672>:=</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>Server</span>{
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>Label</span>: <span style=color:#a6e22e>label</span>,
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>for</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>opt</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>range</span> <span style=color:#a6e22e>opts</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>opt</span>(<span style=color:#a6e22e>s</span>)
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>s</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Option</span> <span style=color:#66d9ef>func</span>(<span style=color:#a6e22e>s</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>Server</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>SetHost</span>(<span style=color:#a6e22e>host</span> <span style=color:#66d9ef>string</span>) <span style=color:#a6e22e>Option</span> {
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>func</span>(<span style=color:#a6e22e>s</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>Server</span>) {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>s</span>.<span style=color:#a6e22e>Host</span> = <span style=color:#a6e22e>host</span>
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>SetPort</span>(<span style=color:#a6e22e>port</span> <span style=color:#66d9ef>int32</span>) <span style=color:#a6e22e>Option</span> {
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>func</span>(<span style=color:#a6e22e>s</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>Server</span>) {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>s</span>.<span style=color:#a6e22e>Port</span> = <span style=color:#a6e22e>port</span>
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=调用-api>调用 API
+<a class=anchor href=#%e8%b0%83%e7%94%a8-api>#</a></h2><p>使用 Golang 调用 API 代码示例：</p><h3 id=get>Get
+<a class=anchor href=#get>#</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-golang data-lang=golang><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>GetApi</span>() {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>resp</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Get</span>(<span style=color:#e6db74>&#34;https://baidu.com&#34;</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>defer</span> <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>Body</span>.<span style=color:#a6e22e>Close</span>()
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;Status: %s\n&#34;</span>, <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>Status</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;StatusCode: %d\n&#34;</span>, <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>StatusCode</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>body</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>ioutil</span>.<span style=color:#a6e22e>ReadAll</span>(<span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>Body</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;StatusCode: %s\n&#34;</span>, string(<span style=color:#a6e22e>body</span>))
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=post>Post
+<a class=anchor href=#post>#</a></h3><p><strong>1 简单 Post</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>PostApi1</span>() {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>json</span> <span style=color:#f92672>:=</span> <span style=color:#e6db74>`{&#34;id&#34;:&#34;u-001&#34;,&#34;name&#34;:&#34;Jay&#34;,&#34;age&#34;:18}`</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>resp</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Post</span>(<span style=color:#e6db74>&#34;https://example.com/user&#34;</span>, <span style=color:#e6db74>&#34;application/json&#34;</span>, <span style=color:#a6e22e>bytes</span>.<span style=color:#a6e22e>NewBuffer</span>([]byte(<span style=color:#a6e22e>json</span>)))
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>defer</span> <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>Body</span>.<span style=color:#a6e22e>Close</span>()
+</span></span><span style=display:flex><span> 
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;Status: %s\n&#34;</span>, <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>Status</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;StatusCode: %d\n&#34;</span>, <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>StatusCode</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>body</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>ioutil</span>.<span style=color:#a6e22e>ReadAll</span>(<span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>Body</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;StatusCode: %s\n&#34;</span>, string(<span style=color:#a6e22e>body</span>))
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>2 附带 Header</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>PostApi2</span>() {
+</span></span><span style=display:flex><span> <span style=color:#75715e>// 1. json
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>//json := `{&#34;id&#34;:&#34;u-001&#34;,&#34;name&#34;:&#34;Jay&#34;,&#34;age&#34;:18}`
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>//req, _ := http.NewRequest(http.MethodPost, &#34;https://example.com/user&#34;, bytes.NewBuffer([]byte(json)))
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span> <span style=color:#75715e>// 2. map
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#a6e22e>reqBody</span>, <span style=color:#a6e22e>_</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>json</span>.<span style=color:#a6e22e>Marshal</span>(<span style=color:#66d9ef>map</span>[<span style=color:#66d9ef>string</span>]<span style=color:#66d9ef>string</span>{
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;id&#34;</span>:   <span style=color:#e6db74>&#34;u-001&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;name&#34;</span>: <span style=color:#e6db74>&#34;Jay&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;age&#34;</span>:  <span style=color:#e6db74>&#34;18&#34;</span>,
+</span></span><span style=display:flex><span> })
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>req</span>, <span style=color:#a6e22e>_</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>NewRequest</span>(<span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>MethodPost</span>, <span style=color:#e6db74>&#34;https://example.com/user&#34;</span>, <span style=color:#a6e22e>bytes</span>.<span style=color:#a6e22e>NewBuffer</span>(<span style=color:#a6e22e>reqBody</span>))
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>req</span>.<span style=color:#a6e22e>Header</span>.<span style=color:#a6e22e>Set</span>(<span style=color:#e6db74>&#34;Content-Type&#34;</span>, <span style=color:#e6db74>&#34;application/json&#34;</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>req</span>.<span style=color:#a6e22e>Header</span>.<span style=color:#a6e22e>Set</span>(<span style=color:#e6db74>&#34;My_Custom_Header&#34;</span>, <span style=color:#e6db74>&#34;Value&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>client</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Client</span>{}
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>resp</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>client</span>.<span style=color:#a6e22e>Do</span>(<span style=color:#a6e22e>req</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>defer</span> <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>Body</span>.<span style=color:#a6e22e>Close</span>()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;Status: %s\n&#34;</span>, <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>Status</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;StatusCode: %d\n&#34;</span>, <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>StatusCode</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>body</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>ioutil</span>.<span style=color:#a6e22e>ReadAll</span>(<span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>Body</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;StatusCode: %s\n&#34;</span>, string(<span style=color:#a6e22e>body</span>))
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>3 构造请求对象</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>User</span> <span style=color:#66d9ef>struct</span> {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>Id</span>   <span style=color:#66d9ef>string</span> <span style=color:#e6db74>`json:&#34;id&#34;`</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>Name</span> <span style=color:#66d9ef>string</span> <span style=color:#e6db74>`json:&#34;name&#34;`</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>Age</span>  <span style=color:#66d9ef>int</span>    <span style=color:#e6db74>`json:&#34;age&#34;`</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>PostApi3</span>() {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>user</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>User</span>{
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>Id</span>:   <span style=color:#e6db74>&#34;u-001&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>Name</span>: <span style=color:#e6db74>&#34;Jay&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>Age</span>:  <span style=color:#ae81ff>18</span>,
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>buf</span> <span style=color:#f92672>:=</span> new(<span style=color:#a6e22e>bytes</span>.<span style=color:#a6e22e>Buffer</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>json</span>.<span style=color:#a6e22e>NewEncoder</span>(<span style=color:#a6e22e>buf</span>).<span style=color:#a6e22e>Encode</span>(<span style=color:#a6e22e>user</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>resp</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Post</span>(<span style=color:#e6db74>&#34;https://example.com/user&#34;</span>, <span style=color:#e6db74>&#34;application/json&#34;</span>, <span style=color:#a6e22e>buf</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>defer</span> <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>Body</span>.<span style=color:#a6e22e>Close</span>()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;Status: %s\n&#34;</span>, <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>Status</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;StatusCode: %d\n&#34;</span>, <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>StatusCode</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>body</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>ioutil</span>.<span style=color:#a6e22e>ReadAll</span>(<span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>Body</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;StatusCode: %s\n&#34;</span>, string(<span style=color:#a6e22e>body</span>))
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>4 OAuth2</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#75715e>// go get golang.org/x/oauth2
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>getAccessToken</span>()<span style=color:#66d9ef>string</span>{
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>authCfg</span> = <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>clientcredentials</span>.<span style=color:#a6e22e>Config</span>{
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>ClientID</span>:     <span style=color:#e6db74>&#34;xxx&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>ClientSecret</span>: <span style=color:#e6db74>&#34;xxx&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>TokenURL</span>:     <span style=color:#e6db74>&#34;https://example.com/connect/token&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>EndpointParams</span>: <span style=color:#a6e22e>url</span>.<span style=color:#a6e22e>Values</span>{
+</span></span><span style=display:flex><span>   <span style=color:#e6db74>&#34;grant_type&#34;</span>: {<span style=color:#e6db74>&#34;client_credentials&#34;</span>},
+</span></span><span style=display:flex><span>  },
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>token</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>authCfg</span>.<span style=color:#a6e22e>TokenSource</span>(<span style=color:#a6e22e>context</span>.<span style=color:#a6e22e>Background</span>()).<span style=color:#a6e22e>Token</span>()
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;get access token failed. ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>token</span>.<span style=color:#a6e22e>AccessToken</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>OAuth2Api</span>(){
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>json</span> <span style=color:#f92672>:=</span> <span style=color:#e6db74>`{&#34;id&#34;:&#34;u-001&#34;,&#34;name&#34;:&#34;Jay&#34;,&#34;age&#34;:18}`</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>req</span>, <span style=color:#a6e22e>_</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>NewRequest</span>(<span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>MethodPost</span>, <span style=color:#e6db74>&#34;https://example.com/user&#34;</span>, <span style=color:#a6e22e>bytes</span>.<span style=color:#a6e22e>NewBuffer</span>([]byte(<span style=color:#a6e22e>json</span>)))
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>req</span>.<span style=color:#a6e22e>Header</span>.<span style=color:#a6e22e>Set</span>(<span style=color:#e6db74>&#34;Content-Type&#34;</span>, <span style=color:#e6db74>&#34;application/json&#34;</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>req</span>.<span style=color:#a6e22e>Header</span>.<span style=color:#a6e22e>Set</span>(<span style=color:#e6db74>&#34;Bearer&#34;</span>, <span style=color:#a6e22e>getAccessToken</span>())
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>client</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Client</span>{}
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>resp</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>client</span>.<span style=color:#a6e22e>Do</span>(<span style=color:#a6e22e>req</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>defer</span> <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>Body</span>.<span style=color:#a6e22e>Close</span>()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;Status: %s\n&#34;</span>, <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>Status</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;StatusCode: %d\n&#34;</span>, <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>StatusCode</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>body</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>ioutil</span>.<span style=color:#a6e22e>ReadAll</span>(<span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>Body</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;StatusCode: %s\n&#34;</span>, string(<span style=color:#a6e22e>body</span>))
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>5 上传文件</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>FileApi</span>(){
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>file</span>,<span style=color:#a6e22e>err</span><span style=color:#f92672>:=</span><span style=color:#a6e22e>os</span>.<span style=color:#a6e22e>Open</span>(<span style=color:#e6db74>&#34;hello.txt&#34;</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span><span style=color:#f92672>!=</span><span style=color:#66d9ef>nil</span>{
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>defer</span> <span style=color:#a6e22e>file</span>.<span style=color:#a6e22e>Close</span>()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>reqBody</span> <span style=color:#a6e22e>bytes</span>.<span style=color:#a6e22e>Buffer</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>multiPartWriter</span><span style=color:#f92672>:=</span><span style=color:#a6e22e>multipart</span>.<span style=color:#a6e22e>NewWriter</span>(<span style=color:#f92672>&amp;</span><span style=color:#a6e22e>reqBody</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fileWriter</span>,<span style=color:#a6e22e>err</span><span style=color:#f92672>:=</span><span style=color:#a6e22e>multiPartWriter</span>.<span style=color:#a6e22e>CreateFormFile</span>(<span style=color:#e6db74>&#34;file_field&#34;</span>,<span style=color:#e6db74>&#34;hello.txt&#34;</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span><span style=color:#f92672>!=</span><span style=color:#66d9ef>nil</span>{
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> 
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>_</span>,<span style=color:#a6e22e>err</span>=<span style=color:#a6e22e>io</span>.<span style=color:#a6e22e>Copy</span>(<span style=color:#a6e22e>fileWriter</span>,<span style=color:#a6e22e>file</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span><span style=color:#f92672>!=</span><span style=color:#66d9ef>nil</span>{
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> 
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fieldWriter</span>,<span style=color:#a6e22e>err</span><span style=color:#f92672>:=</span><span style=color:#a6e22e>multiPartWriter</span>.<span style=color:#a6e22e>CreateFormField</span>(<span style=color:#e6db74>&#34;normal_field&#34;</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span><span style=color:#f92672>!=</span><span style=color:#66d9ef>nil</span>{
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> 
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>_</span>,<span style=color:#a6e22e>err</span>=<span style=color:#a6e22e>fieldWriter</span>.<span style=color:#a6e22e>Write</span>([]byte(<span style=color:#e6db74>&#34;value&#34;</span>))
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span><span style=color:#f92672>!=</span><span style=color:#66d9ef>nil</span>{
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> 
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>multiPartWriter</span>.<span style=color:#a6e22e>Close</span>()
+</span></span><span style=display:flex><span> 
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>req</span>,<span style=color:#a6e22e>err</span><span style=color:#f92672>:=</span><span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>NewRequest</span>(<span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>MethodPost</span>,<span style=color:#e6db74>&#34;http://example.com/file&#34;</span>,<span style=color:#f92672>&amp;</span><span style=color:#a6e22e>reqBody</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span><span style=color:#f92672>!=</span><span style=color:#66d9ef>nil</span>{
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>req</span>.<span style=color:#a6e22e>Header</span>.<span style=color:#a6e22e>Set</span>(<span style=color:#e6db74>&#34;Content-Type&#34;</span>,<span style=color:#a6e22e>multiPartWriter</span>.<span style=color:#a6e22e>FormDataContentType</span>())
+</span></span><span style=display:flex><span> 
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>client</span><span style=color:#f92672>:=</span><span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Client</span>{}
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>resp</span>,<span style=color:#a6e22e>err</span><span style=color:#f92672>:=</span><span style=color:#a6e22e>client</span>.<span style=color:#a6e22e>Do</span>(<span style=color:#a6e22e>req</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span><span style=color:#f92672>!=</span><span style=color:#66d9ef>nil</span>{
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>defer</span> <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>Body</span>.<span style=color:#a6e22e>Close</span>()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;Status: %s\n&#34;</span>, <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>Status</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;StatusCode: %d\n&#34;</span>, <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>StatusCode</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>body</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>ioutil</span>.<span style=color:#a6e22e>ReadAll</span>(<span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>Body</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;StatusCode: %s\n&#34;</span>, string(<span style=color:#a6e22e>body</span>))
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=调用-jenkins-api>调用 Jenkins API
+<a class=anchor href=#%e8%b0%83%e7%94%a8-jenkins-api>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;fmt&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;net/http&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;strings&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>JenkinsConfig</span> <span style=color:#66d9ef>struct</span> {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>User</span>  <span style=color:#66d9ef>string</span> <span style=color:#e6db74>`json:&#34;user&#34;`</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>Token</span> <span style=color:#66d9ef>string</span> <span style=color:#e6db74>`json:&#34;token&#34;`</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>var</span> <span style=color:#a6e22e>jenkinsConf</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>JenkinsConfig</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>jenkinsConf</span> <span style=color:#f92672>:=</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>JenkinsConfig</span>{
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>User</span>: <span style=color:#e6db74>&#34;xxx&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>Token</span>: <span style=color:#e6db74>&#34;xxxxxx&#34;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>job</span> <span style=color:#f92672>:=</span> <span style=color:#e6db74>&#34;jenkins-job-1&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>disableJenkins</span>(<span style=color:#a6e22e>job</span>)
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>disableJenkins</span>(<span style=color:#a6e22e>job</span> <span style=color:#66d9ef>string</span>) {
+</span></span><span style=display:flex><span> <span style=color:#75715e>// disabled jenkins job
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#a6e22e>r</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>NewRequest</span>(<span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>MethodPost</span>, <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Sprintf</span>(<span style=color:#e6db74>&#34;https://jenkins.example.com/job/%s/disable&#34;</span>, <span style=color:#a6e22e>job</span>), <span style=color:#66d9ef>nil</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;new jenkins request failed: %s&#34;</span>, <span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>r</span>.<span style=color:#a6e22e>SetBasicAuth</span>(<span style=color:#a6e22e>jenkinsConf</span>.<span style=color:#a6e22e>User</span>, <span style=color:#a6e22e>jenkinsConf</span>.<span style=color:#a6e22e>Token</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>client</span> <span style=color:#f92672>:=</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Client</span>{}
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>resp</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>client</span>.<span style=color:#a6e22e>Do</span>(<span style=color:#a6e22e>r</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;request failed: %s&#34;</span>, <span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>StatusCode</span> <span style=color:#f92672>==</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>StatusOK</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Healthf</span>(<span style=color:#e6db74>&#34;disable jenkins job [%s] successfully&#34;</span>, <span style=color:#a6e22e>job</span>)
+</span></span><span style=display:flex><span> } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Warnf</span>(<span style=color:#e6db74>&#34;disable jenkins job [%s] status [%d]&#34;</span>, <span style=color:#a6e22e>job</span>, <span style=color:#a6e22e>resp</span>.<span style=color:#a6e22e>StatusCode</span>)
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=位运算>位运算
+<a class=anchor href=#%e4%bd%8d%e8%bf%90%e7%ae%97>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> <span style=color:#e6db74>&#34;fmt&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span> <span style=color:#75715e>/*
+</span></span></span><span style=display:flex><span><span style=color:#75715e> 位运算符：
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  将数值，转为二进制后，按位操作
+</span></span></span><span style=display:flex><span><span style=color:#75715e> 按位&amp;：
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  对应位的值如果都为 1 才为 1，有一个为 0 就为 0
+</span></span></span><span style=display:flex><span><span style=color:#75715e> 按位|：
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  对应位的值如果都是 0 才为 0，有一个为 1 就为 1
+</span></span></span><span style=display:flex><span><span style=color:#75715e> 异或^：
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  二元：a^b
+</span></span></span><span style=display:flex><span><span style=color:#75715e>   对应位的值不同为 1，相同为 0
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  一元：^a
+</span></span></span><span style=display:flex><span><span style=color:#75715e>   按位取反：
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    1---&gt;0
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    0---&gt;1
+</span></span></span><span style=display:flex><span><span style=color:#75715e> 位清空：&amp;^
+</span></span></span><span style=display:flex><span><span style=color:#75715e>   对于 a &amp;^ b
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    对于 b 上的每个数值
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    如果为 0，则取 a 对应位上的数值
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    如果为 1，则结果位就取 0
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e> 位移运算符：
+</span></span></span><span style=display:flex><span><span style=color:#75715e> &lt;&lt;：按位左移，将 a 转为二进制，向左移动 b 位
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  a &lt;&lt; b
+</span></span></span><span style=display:flex><span><span style=color:#75715e> &gt;&gt;: 按位右移，将 a 转为二进制，向右移动 b 位
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  a &gt;&gt; b
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  */</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>a</span> <span style=color:#f92672>:=</span> <span style=color:#ae81ff>60</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>b</span> <span style=color:#f92672>:=</span> <span style=color:#ae81ff>13</span>
+</span></span><span style=display:flex><span> <span style=color:#75715e>/*
+</span></span></span><span style=display:flex><span><span style=color:#75715e> a: 60 0011 1100
+</span></span></span><span style=display:flex><span><span style=color:#75715e> b: 13 0000 1101
+</span></span></span><span style=display:flex><span><span style=color:#75715e> &amp;     0000 1100
+</span></span></span><span style=display:flex><span><span style=color:#75715e> |     0011 1101
+</span></span></span><span style=display:flex><span><span style=color:#75715e> ^   0011 0001
+</span></span></span><span style=display:flex><span><span style=color:#75715e> &amp;^    0011 0000
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e> a : 0000 0000 ... 0011 1100
+</span></span></span><span style=display:flex><span><span style=color:#75715e> ^   1111 1111 ... 1100 0011
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  */</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;a:%d, %b\n&#34;</span>,<span style=color:#a6e22e>a</span>,<span style=color:#a6e22e>a</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;b:%d, %b\n&#34;</span>,<span style=color:#a6e22e>b</span>,<span style=color:#a6e22e>b</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>res1</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>a</span> <span style=color:#f92672>&amp;</span> <span style=color:#a6e22e>b</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#a6e22e>res1</span>) <span style=color:#75715e>// 12
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>res2</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>a</span> | <span style=color:#a6e22e>b</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#a6e22e>res2</span>) <span style=color:#75715e>// 61
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>res3</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>a</span> ^ <span style=color:#a6e22e>b</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#a6e22e>res3</span>) <span style=color:#75715e>// 49
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>res4</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>a</span> <span style=color:#f92672>&amp;^</span> <span style=color:#a6e22e>b</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#a6e22e>res4</span>) <span style=color:#75715e>// 48
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>res5</span> <span style=color:#f92672>:=</span> ^<span style=color:#a6e22e>a</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#a6e22e>res5</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>c</span><span style=color:#f92672>:=</span><span style=color:#ae81ff>8</span>
+</span></span><span style=display:flex><span> <span style=color:#75715e>/*
+</span></span></span><span style=display:flex><span><span style=color:#75715e> c : ... 0000 1000
+</span></span></span><span style=display:flex><span><span style=color:#75715e>       0000 100000
+</span></span></span><span style=display:flex><span><span style=color:#75715e> &gt;&gt;        0000 10
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  */</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>res6</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>c</span> <span style=color:#f92672>&lt;&lt;</span> <span style=color:#ae81ff>2</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#a6e22e>res6</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>res7</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>c</span> <span style=color:#f92672>&gt;&gt;</span> <span style=color:#ae81ff>2</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#a6e22e>res7</span>)
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=实现简易网络连接客户端>实现简易网络连接客户端
+<a class=anchor href=#%e5%ae%9e%e7%8e%b0%e7%ae%80%e6%98%93%e7%bd%91%e7%bb%9c%e8%bf%9e%e6%8e%a5%e5%ae%a2%e6%88%b7%e7%ab%af>#</a></h2><p>实现类似 nc 的客户端命令工具：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ nc www.baidu.com <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>GET / HTTP/1.1 
+</span></span></code></pre></div><blockquote><p>注意：需要连续两次回车，才会连接</p></blockquote><p>废话少说，上代码：</p><p><em>main.go</em></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;io&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;log&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;net&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;os&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> len(<span style=color:#a6e22e>os</span>.<span style=color:#a6e22e>Args</span>) <span style=color:#f92672>!=</span> <span style=color:#ae81ff>3</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatalln</span>(<span style=color:#e6db74>&#34;Usage: nc [host] [port]&#34;</span>)
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>host</span>, <span style=color:#a6e22e>port</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>os</span>.<span style=color:#a6e22e>Args</span>[<span style=color:#ae81ff>1</span>], <span style=color:#a6e22e>os</span>.<span style=color:#a6e22e>Args</span>[<span style=color:#ae81ff>2</span>]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>c</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>net</span>.<span style=color:#a6e22e>Dial</span>(<span style=color:#e6db74>&#34;tcp&#34;</span>, <span style=color:#a6e22e>host</span><span style=color:#f92672>+</span><span style=color:#e6db74>&#34;:&#34;</span><span style=color:#f92672>+</span><span style=color:#a6e22e>port</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatalln</span>(<span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>go</span> <span style=color:#66d9ef>func</span>() {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>io</span>.<span style=color:#a6e22e>Copy</span>(<span style=color:#a6e22e>c</span>, <span style=color:#a6e22e>os</span>.<span style=color:#a6e22e>Stdin</span>)
+</span></span><span style=display:flex><span> }()
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>io</span>.<span style=color:#a6e22e>Copy</span>(<span style=color:#a6e22e>os</span>.<span style=color:#a6e22e>Stdout</span>, <span style=color:#a6e22e>c</span>)
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>测试：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ go build -o nc main.go
+</span></span><span style=display:flex><span>$ ./nc www.baidu.com <span style=color:#ae81ff>80</span>
+</span></span><span style=display:flex><span>GET / HTTP/1.1
+</span></span></code></pre></div><h2 id=git>git
+<a class=anchor href=#git>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>gitutil</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;fmt&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;github.com/go-git/go-git/v5&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;github.com/go-git/go-git/v5/plumbing&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;github.com/go-git/go-git/v5/plumbing/transport/http&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;os&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>Clone</span>() {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>git</span>.<span style=color:#a6e22e>PlainClone</span>(<span style=color:#e6db74>&#34;/var/app/ash&#34;</span>, <span style=color:#66d9ef>false</span>, <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>git</span>.<span style=color:#a6e22e>CloneOptions</span>{
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>URL</span>:           <span style=color:#e6db74>&#34;https://github.com/poneding/ash.git&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>ReferenceName</span>: <span style=color:#a6e22e>plumbing</span>.<span style=color:#a6e22e>NewBranchReferenceName</span>(<span style=color:#e6db74>&#34;master&#34;</span>),
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>Auth</span>: <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>BasicAuth</span>{
+</span></span><span style=display:flex><span>   <span style=color:#a6e22e>Username</span>: <span style=color:#e6db74>&#34;poneding&#34;</span>,
+</span></span><span style=display:flex><span>   <span style=color:#a6e22e>Password</span>: <span style=color:#e6db74>&#34;xxxxxx&#34;</span>,
+</span></span><span style=display:flex><span>  },
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>Progress</span>: <span style=color:#a6e22e>os</span>.<span style=color:#a6e22e>Stdout</span>,
+</span></span><span style=display:flex><span> })
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=elasticsearch>elasticsearch
+<a class=anchor href=#elasticsearch>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>esutil</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;bytes&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;encoding/json&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;errors&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;fmt&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;github.com/elastic/go-elasticsearch/v7&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;strings&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>NewESClient2</span>(<span style=color:#a6e22e>esAddress</span> []<span style=color:#66d9ef>string</span>) (<span style=color:#f92672>*</span><span style=color:#a6e22e>elasticsearch</span>.<span style=color:#a6e22e>Client</span>, <span style=color:#66d9ef>error</span>) {
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> len(<span style=color:#a6e22e>esAddress</span>) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>  panic(<span style=color:#e6db74>&#34;Invalid parameters: esAddress.&#34;</span>)
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>esConfig</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>elasticsearch</span>.<span style=color:#a6e22e>Config</span>{<span style=color:#a6e22e>Addresses</span>: <span style=color:#a6e22e>esAddress</span>}
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>esClient</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>elasticsearch</span>.<span style=color:#a6e22e>NewClient</span>(<span style=color:#a6e22e>esConfig</span>)
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;GetESClient ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span>  panic(<span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>esClient</span>, <span style=color:#66d9ef>nil</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>QueryLogs2</span>(<span style=color:#a6e22e>esClient</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>elasticsearch</span>.<span style=color:#a6e22e>Client</span>, <span style=color:#a6e22e>query</span> <span style=color:#a6e22e>QueryLogModel</span>) ([]<span style=color:#a6e22e>LogModel</span>, <span style=color:#66d9ef>error</span>) {
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>var</span> (
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>buf</span> <span style=color:#a6e22e>bytes</span>.<span style=color:#a6e22e>Buffer</span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>r</span>   <span style=color:#66d9ef>map</span>[<span style=color:#66d9ef>string</span>]<span style=color:#66d9ef>interface</span>{}
+</span></span><span style=display:flex><span> )
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>index</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>query</span>.<span style=color:#a6e22e>App</span> <span style=color:#f92672>+</span> <span style=color:#e6db74>&#34;-*&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>q</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>map</span>[<span style=color:#66d9ef>string</span>]<span style=color:#66d9ef>interface</span>{}{
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;query&#34;</span>: <span style=color:#66d9ef>map</span>[<span style=color:#66d9ef>string</span>]<span style=color:#66d9ef>interface</span>{}{
+</span></span><span style=display:flex><span>   <span style=color:#e6db74>&#34;match_phrase&#34;</span>: <span style=color:#66d9ef>map</span>[<span style=color:#66d9ef>string</span>]<span style=color:#66d9ef>interface</span>{}{
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;kubernetes.labels.app&#34;</span>: <span style=color:#a6e22e>query</span>.<span style=color:#a6e22e>App</span>,
+</span></span><span style=display:flex><span>   },
+</span></span><span style=display:flex><span>  },
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>json</span>.<span style=color:#a6e22e>NewEncoder</span>(<span style=color:#f92672>&amp;</span><span style=color:#a6e22e>buf</span>).<span style=color:#a6e22e>Encode</span>(<span style=color:#a6e22e>q</span>); <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;QueryLogs ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>, <span style=color:#a6e22e>err</span>
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>searchRes</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>esClient</span>.<span style=color:#a6e22e>Search</span>(
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>esClient</span>.<span style=color:#a6e22e>Search</span>.<span style=color:#a6e22e>WithIndex</span>(<span style=color:#a6e22e>index</span>),
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>esClient</span>.<span style=color:#a6e22e>Search</span>.<span style=color:#a6e22e>WithBody</span>(<span style=color:#f92672>&amp;</span><span style=color:#a6e22e>buf</span>),
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>esClient</span>.<span style=color:#a6e22e>Search</span>.<span style=color:#a6e22e>WithQuery</span>(<span style=color:#a6e22e>query</span>.<span style=color:#a6e22e>Filter</span>),
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>esClient</span>.<span style=color:#a6e22e>Search</span>.<span style=color:#a6e22e>WithFilterPath</span>(<span style=color:#e6db74>&#34;hits.hits&#34;</span>),
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>esClient</span>.<span style=color:#a6e22e>Search</span>.<span style=color:#a6e22e>WithSize</span>(<span style=color:#a6e22e>query</span>.<span style=color:#a6e22e>Size</span>),
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>esClient</span>.<span style=color:#a6e22e>Search</span>.<span style=color:#a6e22e>WithSort</span>(<span style=color:#e6db74>&#34;@timestamp:desc&#34;</span>),
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>esClient</span>.<span style=color:#a6e22e>Search</span>.<span style=color:#a6e22e>WithSource</span>(<span style=color:#e6db74>&#34;@timestamp&#34;</span>,<span style=color:#e6db74>&#34;level&#34;</span>,<span style=color:#e6db74>&#34;log&#34;</span>,<span style=color:#e6db74>&#34;msg&#34;</span>),
+</span></span><span style=display:flex><span> )
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>defer</span> <span style=color:#a6e22e>searchRes</span>.<span style=color:#a6e22e>Body</span>.<span style=color:#a6e22e>Close</span>()
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> <span style=color:#f92672>||</span> <span style=color:#a6e22e>searchRes</span>.<span style=color:#a6e22e>IsError</span>() {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;QueryLogs ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>, <span style=color:#a6e22e>errors</span>.<span style=color:#a6e22e>New</span>(<span style=color:#a6e22e>strings</span>.<span style=color:#a6e22e>Join</span>([]<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;es.Search ERROR:&#34;</span>, <span style=color:#a6e22e>searchRes</span>.<span style=color:#a6e22e>Status</span>(), <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>()}, <span style=color:#e6db74>&#34; &#34;</span>))
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>json</span>.<span style=color:#a6e22e>NewDecoder</span>(<span style=color:#a6e22e>searchRes</span>.<span style=color:#a6e22e>Body</span>).<span style=color:#a6e22e>Decode</span>(<span style=color:#f92672>&amp;</span><span style=color:#a6e22e>r</span>); <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;QueryLogs ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>, <span style=color:#a6e22e>err</span>
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>res</span> <span style=color:#f92672>:=</span> make([]<span style=color:#a6e22e>LogModel</span>, <span style=color:#ae81ff>0</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>for</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>hit</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>range</span> <span style=color:#a6e22e>r</span>[<span style=color:#e6db74>&#34;hits&#34;</span>].(<span style=color:#66d9ef>map</span>[<span style=color:#66d9ef>string</span>]<span style=color:#66d9ef>interface</span>{})[<span style=color:#e6db74>&#34;hits&#34;</span>].([]<span style=color:#66d9ef>interface</span>{}) {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>source</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>hit</span>.(<span style=color:#66d9ef>map</span>[<span style=color:#66d9ef>string</span>]<span style=color:#66d9ef>interface</span>{})[<span style=color:#e6db74>&#34;_source&#34;</span>].(<span style=color:#66d9ef>map</span>[<span style=color:#66d9ef>string</span>]<span style=color:#66d9ef>interface</span>{})
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>logModel</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>LogModel</span>{
+</span></span><span style=display:flex><span>   <span style=color:#a6e22e>Timestamp</span>: <span style=color:#a6e22e>source</span>[<span style=color:#e6db74>&#34;@timestamp&#34;</span>].(<span style=color:#66d9ef>string</span>),
+</span></span><span style=display:flex><span>   <span style=color:#a6e22e>Log</span>:       <span style=color:#a6e22e>source</span>[<span style=color:#e6db74>&#34;log&#34;</span>].(<span style=color:#66d9ef>string</span>),
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>level</span>, <span style=color:#a6e22e>ok</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>source</span>[<span style=color:#e6db74>&#34;level&#34;</span>]
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>ok</span> {
+</span></span><span style=display:flex><span>   <span style=color:#a6e22e>logModel</span>.<span style=color:#a6e22e>Level</span> = <span style=color:#a6e22e>level</span>.(<span style=color:#66d9ef>string</span>)
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>log</span>, <span style=color:#a6e22e>ok</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>source</span>[<span style=color:#e6db74>&#34;msg&#34;</span>]
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>ok</span> {
+</span></span><span style=display:flex><span>   <span style=color:#a6e22e>logModel</span>.<span style=color:#a6e22e>Log</span> = <span style=color:#a6e22e>log</span>.(<span style=color:#66d9ef>string</span>)
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>res</span> = append(<span style=color:#a6e22e>res</span>, <span style=color:#a6e22e>logModel</span>)
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>res</span>, <span style=color:#66d9ef>nil</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>es</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;context&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;fmt&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;github.com/olivere/elastic/v7&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;reflect&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;time&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>NewESClient</span>(<span style=color:#a6e22e>esAddresses</span> []<span style=color:#66d9ef>string</span>) (<span style=color:#f92672>*</span><span style=color:#a6e22e>elastic</span>.<span style=color:#a6e22e>Client</span>, <span style=color:#66d9ef>error</span>) {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>client</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>elastic</span>.<span style=color:#a6e22e>NewClient</span>(<span style=color:#a6e22e>elastic</span>.<span style=color:#a6e22e>SetSniff</span>(<span style=color:#66d9ef>false</span>), <span style=color:#a6e22e>elastic</span>.<span style=color:#a6e22e>SetURL</span>(<span style=color:#a6e22e>esAddresses</span><span style=color:#f92672>...</span>))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;NewESClient ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span>  panic(<span style=color:#a6e22e>err</span>)
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>client</span>, <span style=color:#66d9ef>nil</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>QueryLogs</span>(<span style=color:#a6e22e>esClient</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>elastic</span>.<span style=color:#a6e22e>Client</span>, <span style=color:#a6e22e>queryModel</span> <span style=color:#a6e22e>QueryLogModel</span>) ([]<span style=color:#a6e22e>LogModel</span>, <span style=color:#66d9ef>error</span>) {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>res</span> <span style=color:#f92672>:=</span> make([]<span style=color:#a6e22e>LogModel</span>, <span style=color:#ae81ff>0</span>)
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>boolQuery</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>elastic</span>.<span style=color:#a6e22e>NewBoolQuery</span>()
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>index</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>queryModel</span>.<span style=color:#a6e22e>App</span> <span style=color:#f92672>+</span> <span style=color:#e6db74>&#34;-*&#34;</span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>query</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>esClient</span>.<span style=color:#a6e22e>Search</span>(<span style=color:#a6e22e>index</span>).<span style=color:#a6e22e>FilterPath</span>(<span style=color:#e6db74>&#34;hits.hits&#34;</span>).<span style=color:#a6e22e>Sort</span>(<span style=color:#e6db74>&#34;@timestamp&#34;</span>, <span style=color:#66d9ef>false</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> len(<span style=color:#a6e22e>queryModel</span>.<span style=color:#a6e22e>Filter</span>) &gt; <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>boolQuery</span>.<span style=color:#a6e22e>Filter</span>(<span style=color:#a6e22e>elastic</span>.<span style=color:#a6e22e>NewQueryStringQuery</span>(<span style=color:#a6e22e>queryModel</span>.<span style=color:#a6e22e>Filter</span>))
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> len(<span style=color:#a6e22e>queryModel</span>.<span style=color:#a6e22e>Level</span>) &gt; <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>boolQuery</span>.<span style=color:#a6e22e>Filter</span>(<span style=color:#a6e22e>elastic</span>.<span style=color:#a6e22e>NewMatchPhraseQuery</span>(<span style=color:#e6db74>&#34;level&#34;</span>, <span style=color:#a6e22e>queryModel</span>.<span style=color:#a6e22e>Level</span>))
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>queryModel</span>.<span style=color:#a6e22e>Page</span> <span style=color:#f92672>&lt;=</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>queryModel</span>.<span style=color:#a6e22e>Page</span> = <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>queryModel</span>.<span style=color:#a6e22e>Size</span> <span style=color:#f92672>&lt;=</span> <span style=color:#ae81ff>0</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>queryModel</span>.<span style=color:#a6e22e>Size</span> = <span style=color:#ae81ff>50</span>
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>query</span> = <span style=color:#a6e22e>query</span>.<span style=color:#a6e22e>From</span>((<span style=color:#a6e22e>queryModel</span>.<span style=color:#a6e22e>Page</span><span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>)<span style=color:#f92672>*</span><span style=color:#a6e22e>queryModel</span>.<span style=color:#a6e22e>Size</span> <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>).<span style=color:#a6e22e>Size</span>(<span style=color:#a6e22e>queryModel</span>.<span style=color:#a6e22e>Size</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>queryModel</span>.<span style=color:#a6e22e>StartAt</span> <span style=color:#f92672>==</span> (<span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Time</span>{}) {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>queryModel</span>.<span style=color:#a6e22e>StartAt</span> = <span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Now</span>().<span style=color:#a6e22e>Add</span>(<span style=color:#f92672>-</span><span style=color:#ae81ff>15</span> <span style=color:#f92672>*</span> <span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Minute</span>).<span style=color:#a6e22e>UTC</span>()
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>queryModel</span>.<span style=color:#a6e22e>EndAt</span> <span style=color:#f92672>==</span> (<span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Time</span>{}) {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>queryModel</span>.<span style=color:#a6e22e>EndAt</span> = <span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Now</span>().<span style=color:#a6e22e>UTC</span>()
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>boolQuery</span>.<span style=color:#a6e22e>Filter</span>(<span style=color:#a6e22e>elastic</span>.<span style=color:#a6e22e>NewRangeQuery</span>(<span style=color:#e6db74>&#34;@timestamp&#34;</span>).<span style=color:#a6e22e>Gte</span>(<span style=color:#a6e22e>queryModel</span>.<span style=color:#a6e22e>StartAt</span>).<span style=color:#a6e22e>Lte</span>(<span style=color:#a6e22e>queryModel</span>.<span style=color:#a6e22e>EndAt</span>))
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>query</span> = <span style=color:#a6e22e>query</span>.<span style=color:#a6e22e>Query</span>(<span style=color:#a6e22e>boolQuery</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>queryRes</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>query</span>.<span style=color:#a6e22e>Do</span>(<span style=color:#a6e22e>context</span>.<span style=color:#a6e22e>Background</span>())
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;QueryLogs ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>res</span>, <span style=color:#a6e22e>err</span>
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>for</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>item</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>range</span> <span style=color:#a6e22e>queryRes</span>.<span style=color:#a6e22e>Each</span>(<span style=color:#a6e22e>reflect</span>.<span style=color:#a6e22e>TypeOf</span>(<span style=color:#a6e22e>LogModel</span>{})) {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>t</span>, <span style=color:#a6e22e>ok</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>item</span>.(<span style=color:#a6e22e>LogModel</span>); <span style=color:#a6e22e>ok</span> {
+</span></span><span style=display:flex><span>   <span style=color:#a6e22e>res</span> = append(<span style=color:#a6e22e>res</span>, <span style=color:#a6e22e>LogModel</span>{
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Timestamp</span>: <span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>Timestamp</span>,
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Level</span>:     <span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>Level</span>,
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Msg storing source log here.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>Log</span>: <span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>Msg</span>,
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Msg</span>: <span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>Log</span>,
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>App</span>: <span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>Kubernetes</span>.<span style=color:#a6e22e>Labels</span>.<span style=color:#a6e22e>App</span>,
+</span></span><span style=display:flex><span>   })
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>res</span>, <span style=color:#66d9ef>nil</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>QueryErrorLogs</span>(<span style=color:#a6e22e>esClient</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>elastic</span>.<span style=color:#a6e22e>Client</span>) <span style=color:#66d9ef>error</span> {
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>query</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>esClient</span>.<span style=color:#a6e22e>Search</span>(<span style=color:#e6db74>&#34;dev-core-*&#34;</span>).<span style=color:#a6e22e>FilterPath</span>(<span style=color:#e6db74>&#34;hits.hits&#34;</span>).<span style=color:#a6e22e>Sort</span>(<span style=color:#e6db74>&#34;@timestamp&#34;</span>, <span style=color:#66d9ef>false</span>).<span style=color:#a6e22e>Size</span>(<span style=color:#ae81ff>100</span>).<span style=color:#a6e22e>Query</span>(<span style=color:#a6e22e>elastic</span>.<span style=color:#a6e22e>NewMatchPhraseQuery</span>(<span style=color:#e6db74>&#34;level&#34;</span>, <span style=color:#e6db74>&#34;error&#34;</span>))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#a6e22e>queryRes</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>query</span>.<span style=color:#a6e22e>Do</span>(<span style=color:#a6e22e>context</span>.<span style=color:#a6e22e>Background</span>())
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Errorf</span>(<span style=color:#e6db74>&#34;QueryLogs ERROR: %s\n&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>for</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>item</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>range</span> <span style=color:#a6e22e>queryRes</span>.<span style=color:#a6e22e>Each</span>(<span style=color:#a6e22e>reflect</span>.<span style=color:#a6e22e>TypeOf</span>(<span style=color:#a6e22e>LogModel</span>{})) {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>t</span>, <span style=color:#a6e22e>ok</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>item</span>.(<span style=color:#a6e22e>LogModel</span>); <span style=color:#a6e22e>ok</span> {
+</span></span><span style=display:flex><span>   <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>Log</span>)
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span> }
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>nil</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><hr><p><a href=/go/go-testing/>« testing</a></p><p><a href=/go/gopkg-errors/>» gopkg-errors.md</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/go/go.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#资料>资料</a></li><li><a href=#golang-channel>Golang channel</a><ul><li><a href=#语法>语法</a></li><li><a href=#无缓冲-channel>无缓冲 channel</a></li><li><a href=#有缓冲-channel>有缓冲 channel</a></li><li><a href=#无缓冲-channel-与有缓冲-channel的区别>无缓冲 channel 与有缓冲 channel的区别</a></li></ul></li><li><a href=#读取文件>读取文件</a><ul><li><a href=#一次性全读>一次性全读</a></li><li><a href=#按行读取>按行读取</a></li></ul></li><li><a href=#优雅退出>优雅退出</a><ul><li><a href=#不处理优雅退出>不处理优雅退出</a></li><li><a href=#优雅退出-1with-context>优雅退出 1（with context）</a></li><li><a href=#优雅退出-2without-context>优雅退出 2（without context）</a></li></ul></li><li><a href=#函数式选项模式>函数式选项模式</a></li><li><a href=#调用-api>调用 API</a><ul><li><a href=#get>Get</a></li><li><a href=#post>Post</a></li></ul></li><li><a href=#调用-jenkins-api>调用 Jenkins API</a></li><li><a href=#位运算>位运算</a></li><li><a href=#实现简易网络连接客户端>实现简易网络连接客户端</a></li><li><a href=#git>git</a></li><li><a href=#elasticsearch>elasticsearch</a></li></ul></nav></div></aside></main></body></html>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>我的博客</title><link>https://blog.poneding.com/rust/</link><description>Recent content on 我的博客</description><generator>Hugo</generator><language>cn</language><atom:link href="https://blog.poneding.com/rust/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>https://blog.poneding.com/rust/cargo/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/rust/cargo/</guid><description>我的博客 / Rust 编程 / Rust cargo 管理工具
+Rust cargo 管理工具 # cargo 是 Rust 的构建系统和包管理器。
+创建项目 # cargo new hello-world cd hello-world 可以使用 cargo new --vcs git hello-world 创建项目并初始化 git 仓库，它将自动创建一个 .gitignore 文件。
+编译项目 # cargo build # 编译之后将在 target/debug 目录下生成可执行文件 # 可以通过以下命令运行 ./target/debug/hello-world 默认构建模式是 debug，里面包含了大量的符号和调试信息，优化级别不高。建议使用 relase 模式构建发布到生产环境。
+release 模式构建花费的时间较长，但是构建出来的二进制文件则要精简很多。
+cargo build --release 运行项目 # cargo run 追踪 panic 位置运行：
+RUST_BACKTRACE=1 cargo run 创建类包 # cargo new --lib mylib 检测项目是否可以编译 # cargo check 安装可执行文件（更新） # cargo install --path .</description></item><item><title/><link>https://blog.poneding.com/rust/dev-env-config/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/rust/dev-env-config/</guid><description>我的博客 / Rust 编程 / Rust 开发环境配置
+Rust 开发环境配置 # 安装 # Linux &amp;amp; Mac：
+curl --proto &amp;#39;=https&amp;#39; --tlsv1.2 https://sh.rustup.rs -sSf | sh 一些常用的 Rust 包依赖于 C 代码，因此可能需要额外安装 C 编译器，在 Mac 上通过运行以下命令可以获得 C 编译器：
+xcode-select --install Ubuntu 上通过运行以下命令可以获得 C 编译器：
+sudo apt install build-essential 更新 # rustup update 卸载 # rustup self uninstall 配置命令补全 # 第一种方式，zsh 添加 rust 插件：
+vim ~/.zshrc 找到 plugins 配置位置，追加 rust:
+plugins=(... rust) 第二种方式：
+查看帮助：</description></item><item><title/><link>https://blog.poneding.com/rust/getting-started/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/rust/getting-started/</guid><description>我的博客 / Rust 编程 / Rust 入门
+Rust 入门 # Rust 是一种系统编程语言，类似于 C 和 C++。它的设计目标是提供安全性和并发性，同时保持高性能。Rust 通过所有权系统来实现这些目标。
+安装 Rust # MacOS，linux 或其他类 Unix 系统用户可以直接在终端中运行以下命令安装 Rust：
+curl --proto &amp;#39;=https&amp;#39; --tlsv1.2 -sSf https://sh.rustup.rs | sh Windows 用户可以在 Rust 官网 下载安装程序。
+Hello, World # 让我们从一个简单的 &amp;ldquo;Hello, World!&amp;rdquo; 程序开始。创建一个新文件 main.rs 并输入以下内容：
+fn main() { println!(&amp;#34;Hello, World!&amp;#34;); } 要运行这个程序，使用 rustc 编译器：
+rustc main.rs &amp;amp;&amp;amp; ./main 执行后，你应该看到输出 Hello, World!。
+« Rust 开发环境配置
+» 查看根目录</description></item><item><title/><link>https://blog.poneding.com/rust/rust-programming/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/rust/rust-programming/</guid><description>我的博客 / Rust 编程 / 查看根目录
+Rust 编程
+信息 # # 查看根目录 rustc --print sysroot # 二进制程序位置 $(rustc --print sysroot)/bin # 源码位置 $(rustc --print sysroot)/lib/rustlib/src/ String 与 &amp;amp;str # String：字符串
+&amp;amp;str：字符串切片
+let s: &amp;amp;str = &amp;#34;Hello World!&amp;#34;; let s1 = s.to_string(); let s1 = String::from(s); let s2 = &amp;amp;s1[..]; let s2 = s1.as_ref(); Panic # 设置 RUST_BACKTRACE=1 环境变量值，可以追踪到 panic 位置，例如：
+« Rust 入门
+» Rust VSCode 调试</description></item><item><title/><link>https://blog.poneding.com/rust/vscode-debugging/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/rust/vscode-debugging/</guid><description>我的博客 / Rust 编程 / Rust VSCode 调试
+Rust VSCode 调试 # 1. 安装插件 # CodeLLDB rust-analyzer 2. 配置 # 项目根目录配置 .vscode/launch.json，调试运行时打开 main.rs 文件。
+{ &amp;#34;version&amp;#34;: &amp;#34;0.2.0&amp;#34;, &amp;#34;configurations&amp;#34;: [ { &amp;#34;type&amp;#34;: &amp;#34;lldb&amp;#34;, &amp;#34;request&amp;#34;: &amp;#34;launch&amp;#34;, &amp;#34;name&amp;#34;: &amp;#34;Debug Rust Project&amp;#34;, &amp;#34;cargo&amp;#34;: { &amp;#34;args&amp;#34;: [ &amp;#34;build&amp;#34;, &amp;#34;--target-dir=${fileDirname}/../target&amp;#34;, &amp;#34;--manifest-path=${fileDirname}/../Cargo.toml&amp;#34; ] }, &amp;#34;args&amp;#34;: [], &amp;#34;cwd&amp;#34;: &amp;#34;${workspaceFolder}&amp;#34; }, { &amp;#34;type&amp;#34;: &amp;#34;lldb&amp;#34;, &amp;#34;request&amp;#34;: &amp;#34;launch&amp;#34;, &amp;#34;name&amp;#34;: &amp;#34;Debug Rust Unit Tests&amp;#34;, &amp;#34;cargo&amp;#34;: { &amp;#34;args&amp;#34;: [ &amp;#34;test&amp;#34;, &amp;#34;--no-run&amp;#34;, &amp;#34;--target-dir=${fileDirname}/../target&amp;#34;, &amp;#34;--manifest-path=${fileDirname}/.</description></item><item><title/><link>https://blog.poneding.com/rust/wasm-programming/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/rust/wasm-programming/</guid><description>我的博客 / Rust 编程 / Rust WASM 编程
+Rust WASM 编程 # 1. 初始化项目 # cargo new hello-wasm cd hello-wasm 2. 安装 wasm-pack # cargo install wasm-pack 3. 编写代码 # 编辑 src/main.rs 文件：
+// 使用 wasm-bindgen 在 Rust 与 JavaScript 之间通信 extern crate wasm_bindgen; use wasm_bindgen::prelude::*; #[wasm_bindgen] extern { pub fn alert(s: &amp;amp;str); } #[wasm_bindgen] pub fn greet(name: &amp;amp;str){ alert(&amp;amp;format!(&amp;#34;Hello, {}!&amp;#34;,name)); } 编辑 Cargo.toml 文件：
+[package] name = &amp;#34;hello-wasm&amp;#34; version = &amp;#34;0.</description></item></channel></rss>

@@ -1,0 +1,304 @@
+<!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / Kubernetes / HTTP 客户端调用 Kubernetes APIServer
+HTTP 客户端调用 Kubernetes APIServer # 本篇介绍几种如何通过 HTTP 客户端调用 Kubernetes APIServer 的姿势。
+如何获取 Kubernetes api-server 地址 # 查看 api-server 的几种方式：
+# 1. 直接查看 kubeconfig 文件 $ cat ~/.kube/config apiVersion: v1 clusters: - cluster: server: https://192.168.58.2:8443 ... # 2. kubectl 查看集群信息 $ kubectl cluster-info Kubernetes control plane is running at https://192.168.58.2:8443 ... # 3. kubectl 查看集群配置 $ kubectl config view clusters: - cluster: ."><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/kubernetes/http-call-k8s-apiserver/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / Kubernetes / HTTP 客户端调用 Kubernetes APIServer
+HTTP 客户端调用 Kubernetes APIServer # 本篇介绍几种如何通过 HTTP 客户端调用 Kubernetes APIServer 的姿势。
+如何获取 Kubernetes api-server 地址 # 查看 api-server 的几种方式：
+# 1. 直接查看 kubeconfig 文件 $ cat ~/.kube/config apiVersion: v1 clusters: - cluster: server: https://192.168.58.2:8443 ... # 2. kubectl 查看集群信息 $ kubectl cluster-info Kubernetes control plane is running at https://192.168.58.2:8443 ... # 3. kubectl 查看集群配置 $ kubectl config view clusters: - cluster: ."><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="kubernetes"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>HTTP Call K8s Apiserver | 我的博客</title>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/http-call-k8s-apiserver/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
+</label><strong>HTTP Call K8s Apiserver</strong>
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#如何获取-kubernetes-api-server-地址>如何获取 Kubernetes api-server 地址</a></li><li><a href=#api-server-如何给客户端授权>api-server 如何给客户端授权</a><ul><li><a href=#使用证书授权>使用证书授权</a></li><li><a href=#使用-token-授权>使用 token 授权</a></li></ul></li><li><a href=#在-pod-内访问-api-server>在 Pod 内访问 api-server</a></li><li><a href=#使用-curl-执行基本的-crud-操作>使用 curl 执行基本的 CRUD 操作</a></li><li><a href=#如何使用-kubectl-调用-api>如何使用 kubectl 调用 API</a><ul><li><a href=#使用-kubectl-代理-kubernetes-api-server>使用 kubectl 代理 Kubernetes api-server</a></li><li><a href=#kubectl-使用原始模式调用-api>kubectl 使用原始模式调用 API</a></li></ul></li><li><a href=#如何查看-kubectl-命令如-apply发送的-api-请求>如何查看 kubectl 命令（如 apply）发送的 API 请求</a></li><li><a href=#参考>参考</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
+<a href=/kubernetes/>Kubernetes</a> / HTTP 客户端调用 Kubernetes APIServer</p><h1 id=http-客户端调用-kubernetes-apiserver>HTTP 客户端调用 Kubernetes APIServer
+<a class=anchor href=#http-%e5%ae%a2%e6%88%b7%e7%ab%af%e8%b0%83%e7%94%a8-kubernetes-apiserver>#</a></h1><p>本篇介绍几种如何通过 HTTP 客户端调用 Kubernetes APIServer 的姿势。</p><h2 id=如何获取-kubernetes-api-server-地址>如何获取 Kubernetes api-server 地址
+<a class=anchor href=#%e5%a6%82%e4%bd%95%e8%8e%b7%e5%8f%96-kubernetes-api-server-%e5%9c%b0%e5%9d%80>#</a></h2><p>查看 api-server 的几种方式：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 1. 直接查看 kubeconfig 文件</span>
+</span></span><span style=display:flex><span>$ cat ~/.kube/config 
+</span></span><span style=display:flex><span>apiVersion: v1
+</span></span><span style=display:flex><span>clusters:
+</span></span><span style=display:flex><span>- cluster:
+</span></span><span style=display:flex><span>    server: https://192.168.58.2:8443
+</span></span><span style=display:flex><span>...
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 2. kubectl 查看集群信息</span>
+</span></span><span style=display:flex><span>$ kubectl cluster-info
+</span></span><span style=display:flex><span>Kubernetes control plane is running at https://192.168.58.2:8443
+</span></span><span style=display:flex><span>...
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 3. kubectl 查看集群配置</span>
+</span></span><span style=display:flex><span>$ kubectl config view
+</span></span><span style=display:flex><span>clusters:
+</span></span><span style=display:flex><span>- cluster:
+</span></span><span style=display:flex><span>    ...
+</span></span><span style=display:flex><span>    server: https://192.168.58.2:8443
+</span></span><span style=display:flex><span>...
+</span></span></code></pre></div><p>配置环境变量</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>KUBE_API<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>kubectl config view -o jsonpath<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;{.clusters[0].cluster.server}&#39;</span><span style=color:#66d9ef>)</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>echo $KUBE_API
+</span></span></code></pre></div><h2 id=api-server-如何给客户端授权>api-server 如何给客户端授权
+<a class=anchor href=#api-server-%e5%a6%82%e4%bd%95%e7%bb%99%e5%ae%a2%e6%88%b7%e7%ab%af%e6%8e%88%e6%9d%83>#</a></h2><h3 id=使用证书授权>使用证书授权
+<a class=anchor href=#%e4%bd%bf%e7%94%a8%e8%af%81%e4%b9%a6%e6%8e%88%e6%9d%83>#</a></h3><p>直接调用：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ curl $KUBE_API/version
+</span></span><span style=display:flex><span>curl: <span style=color:#f92672>(</span>60<span style=color:#f92672>)</span> SSL certificate problem: unable to get local issuer certificate
+</span></span><span style=display:flex><span>More details here: https://curl.haxx.se/docs/sslcerts.html
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>curl failed to verify the legitimacy of the server and therefore could not
+</span></span><span style=display:flex><span>establish a secure connection to it. To learn more about this situation and
+</span></span><span style=display:flex><span>how to fix it, please visit the web page mentioned above.
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 忽略证书验证</span>
+</span></span><span style=display:flex><span>$ curl $KUBE_API/version --insecure
+</span></span><span style=display:flex><span><span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;kind&#34;</span>: <span style=color:#e6db74>&#34;Status&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;apiVersion&#34;</span>: <span style=color:#e6db74>&#34;v1&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;metadata&#34;</span>: <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;status&#34;</span>: <span style=color:#e6db74>&#34;Failure&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;message&#34;</span>: <span style=color:#e6db74>&#34;Unauthorized&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;reason&#34;</span>: <span style=color:#e6db74>&#34;Unauthorized&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;code&#34;</span>: <span style=color:#ae81ff>401</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></div><p>结果是我们无法顺利调用接口。</p><p>获取证书：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 服务端证书</span>
+</span></span><span style=display:flex><span>$ kubectl config view --raw <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  -o jsonpath<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;{.clusters[0].cluster.certificate-authority-data}&#39;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  | base64 --decode &gt; ./server-ca.crt
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 服务端证书</span>
+</span></span><span style=display:flex><span>$ kubectl config view --raw <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  -o jsonpath<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;{.users[0].user.client-certificate-data}&#39;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  | base64 --decode &gt; ./client-ca.crt
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 服务端证书密钥</span>
+</span></span><span style=display:flex><span>$ kubectl config view --raw <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  -o jsonpath<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;{.users[0].user.client-key-data}&#39;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  | base64 --decode &gt; ./client-ca.key
+</span></span></code></pre></div><p>我们这次尝试使用证书调用 API：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ curl $KUBE_API/version --cacert ./server-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cert ./client-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --key ./client-ca.key
+</span></span><span style=display:flex><span><span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;major&#34;</span>: <span style=color:#e6db74>&#34;1&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;minor&#34;</span>: <span style=color:#e6db74>&#34;22&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;gitVersion&#34;</span>: <span style=color:#e6db74>&#34;v1.22.6+k3s1&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;gitCommit&#34;</span>: <span style=color:#e6db74>&#34;3228d9cb9a4727d48f60de4f1ab472f7c50df904&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;gitTreeState&#34;</span>: <span style=color:#e6db74>&#34;clean&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;buildDate&#34;</span>: <span style=color:#e6db74>&#34;2022-01-25T01:27:44Z&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;goVersion&#34;</span>: <span style=color:#e6db74>&#34;go1.16.10&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;compiler&#34;</span>: <span style=color:#e6db74>&#34;gc&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;platform&#34;</span>: <span style=color:#e6db74>&#34;linux/amd64&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></div><p>此时，可以正常调用 API 了，我们继续调用其他接口：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ curl $KUBE_API/apis/apps/v1/deployments --cacert ./server-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cert ./client-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --key ./client-ca.key
+</span></span><span style=display:flex><span><span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;kind&#34;</span>: <span style=color:#e6db74>&#34;DeploymentList&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;apiVersion&#34;</span>: <span style=color:#e6db74>&#34;apps/v1&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;metadata&#34;</span>: <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;resourceVersion&#34;</span>: <span style=color:#e6db74>&#34;654514&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;items&#34;</span>: <span style=color:#f92672>[</span>...<span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></div><p>也 OK 了。</p><h3 id=使用-token-授权>使用 token 授权
+<a class=anchor href=#%e4%bd%bf%e7%94%a8-token-%e6%8e%88%e6%9d%83>#</a></h3><p>token 指的是 ServiceAccount 的 Token，每个命名空间内都会存在一个默认的 sa：default。</p><p>我们尝试来生成 sa token，我们首先生成一个 default 命名空间下 default sa 的 token：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 获取 sa 采用的 secret</span>
+</span></span><span style=display:flex><span>$ kubectl get sa default -o jsonpath<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;{.secrets[0].name}&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 获取 token</span>
+</span></span><span style=display:flex><span>DEFAULT_DEFAULT_TOKEN<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>kubectl get secrets <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  <span style=color:#66d9ef>$(</span>kubectl get sa default -o jsonpath<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;{.secrets[0].name}&#39;</span><span style=color:#66d9ef>)</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  -o jsonpath<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;{.data.token}&#39;</span> | base64 --decode<span style=color:#66d9ef>)</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$ echo $DEFAULT_DEFAULT_TOKEN
+</span></span><span style=display:flex><span>eyJhbGciOiJSUzI1NiIsImtpZCI6IjFJdzhRZlV3TkpRRm5aSzU4b2hWTWI3YmdPUTlyLTBWSU9OQmNlN3cwdGsifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tcW50bGsiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjE0OGJmM2U0LTkzY2EtNGJiMS04MDczLWMzZmIzM2NiYmJmNiIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.ivtk9eRH-35wIaPk4CtPSBoBkuiMxQyta17qMxNjhgedyV5i1QGYty36k0ufbOpBMXr2DsdRy8yQTx2qnH-AcduyxaoCxX-SQ4yGUsKSHCTipktcWqFi-CFzNo6EMCZiX8zAmeXjYOMmF8kh2T6wkHmjERDYsqWPaftasTUrKEYpcawFCMnv0QTpDe-okr6vQx6t7pJ5fx_PCw-GEEZUKQZn1tHIStd77eZd546--rrS6nPczKc3GnVFsDTcPM5HI7T_hXnId1TEnOYM8H5ornJ6uDP2oN_niwV41qOXMM52Bep0cvnikG-kUklLpmZxkwAtQCHDDh36A5JX_oaK5w
+</span></span></code></pre></div><p>💡 如果你的 kubectl 版本大于 1.24，那么你可以直接使用以下命令获取 token：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ DEFAULT_DEFAULT_TOKEN<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>kubectl create token default -n default<span style=color:#66d9ef>)</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$ echo $DEFAULT_DEFAULT_TOKEN
+</span></span><span style=display:flex><span>eyJhbGciOiJSUzI1NiIsImtpZCI6IjFJdzhRZlV3TkpRRm5aSzU4b2hWTWI3YmdPUTlyLTBWSU9OQmNlN3cwdGsifQ.eyJhdWQiOlsiaHR0cHM6Ly9rdWJlcm5ldGVzLmRlZmF1bHQuc3ZjLmNsdXN0ZXIubG9jYWwiLCJrM3MiXSwiZXhwIjoxNjc2NDUwODg2LCJpYXQiOjE2NzY0NDcyODYsImlzcyI6Imh0dHBzOi8va3ViZXJuZXRlcy5kZWZhdWx0LnN2Yy5jbHVzdGVyLmxvY2FsIiwia3ViZXJuZXRlcy5pbyI6eyJuYW1lc3BhY2UiOiJkZWZhdWx0Iiwic2VydmljZWFjY291bnQiOnsibmFtZSI6ImRlZmF1bHQiLCJ1aWQiOiIxNDhiZjNlNC05M2NhLTRiYjEtODA3My1jM2ZiMzNjYmJiZjYifX0sIm5iZiI6MTY3NjQ0NzI4Niwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50OmRlZmF1bHQ6ZGVmYXVsdCJ9.FC6SZ3fKhKML76AYnfaq4Y74mlRMBUxgfsEocrczzoN_NvDbqzZ_0sCAvA_ZdcVXv74hXTTeO1_DLoXZE_aLmGIxH1ImfbCDbxZH1xvNbE-7oozKmWBjYM7VRnNVvNC8EiRmcSEMttnQxgnBqUDZCyU8VA_pujld_RsB4SiD8tpXN5PaSaEx6vz6AWYWtW8wqwcAlIWTGk4hae090a0sLplyB4xx-7SiYjmkM9tVXFz5WWdUYSfyQeM-EfDpH4fNsvefWtW_KeJ5Wg28RuhiLbUv9_UV1RGt11Wh7lf0nNmxobqB8j-PEnphiECMKDv29x5KtQDU1wSgbSMI-_eTlQ
+</span></span></code></pre></div><p>使用 token 调用 API：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ curl $KUBE_API/apis/apps/v1/namespaces/default/deployments --cacert ./server-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  -H <span style=color:#e6db74>&#34;Authorization: Bearer </span>$DEFAULT_DEFAULT_TOKEN<span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;kind&#34;</span>: <span style=color:#e6db74>&#34;Status&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;apiVersion&#34;</span>: <span style=color:#e6db74>&#34;v1&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;metadata&#34;</span>: <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;status&#34;</span>: <span style=color:#e6db74>&#34;Failure&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;message&#34;</span>: <span style=color:#e6db74>&#34;deployments.apps is forbidden: User \&#34;system:serviceaccount:default:default\&#34; cannot list resource \&#34;deployments\&#34; in API group \&#34;apps\&#34; at the cluster scope&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;reason&#34;</span>: <span style=color:#e6db74>&#34;Forbidden&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;details&#34;</span>: <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;group&#34;</span>: <span style=color:#e6db74>&#34;apps&#34;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;kind&#34;</span>: <span style=color:#e6db74>&#34;deployments&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;code&#34;</span>: <span style=color:#ae81ff>403</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></div><p>可以看到用户 <code>system:serviceaccount:default:default</code> 并没有权限获取自身命名空间内的 Kubernetes 对象列表。</p><p>接下来让我们尝试给这个 sa 绑定一个 <code>cluster-admin</code> 的 ClusterRole，然后我们再次生成 token，并调用接口：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ kubectl create clusterrolebinding default-sa-with-cluster-admin-role <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --clusterrole cluster-admin --serviceaccount default:default
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$ DEFAULT_DEFAULT_TOKEN<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>kubectl create token default -n default<span style=color:#66d9ef>)</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$ curl $KUBE_API/apis/apps/v1/namespaces/default/deployments --cacert ./server-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  -H <span style=color:#e6db74>&#34;Authorization: Bearer </span>$DEFAULT_DEFAULT_TOKEN<span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;kind&#34;</span>: <span style=color:#e6db74>&#34;DeploymentList&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;apiVersion&#34;</span>: <span style=color:#e6db74>&#34;apps/v1&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;metadata&#34;</span>: <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;resourceVersion&#34;</span>: <span style=color:#e6db74>&#34;2824281&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;items&#34;</span>: <span style=color:#f92672>[]</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></div><p>这完美生效，因为 defualt sa 有了一个超级大的 admin 角色。（另外，你可以单独创建一个特定资源权限的 role，在绑定到一个 sa，来满足最小权限原则）</p><h2 id=在-pod-内访问-api-server>在 Pod 内访问 api-server
+<a class=anchor href=#%e5%9c%a8-pod-%e5%86%85%e8%ae%bf%e9%97%ae-api-server>#</a></h2><p>在 pod 内部，默认会生成 Kubernetes 服务地址相关的环境变量，并且会在特殊目录下保存证书以及 token，当然这个token 是根据 pod 所使用的 sa 生成的。</p><p>证书文件地址：/var/run/secrets/kubernetes.io/serviceaccount/ca.crt</p><p>token 文件地址：/var/run/secrets/kubernetes.io/serviceaccount/ca.crt</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ kubectl run -it --image curlimages/curl --restart<span style=color:#f92672>=</span>Never mypod -- sh
+</span></span><span style=display:flex><span>$ env | grep KUBERNETES
+</span></span><span style=display:flex><span>KUBERNETES_SERVICE_PORT<span style=color:#f92672>=</span><span style=color:#ae81ff>443</span>
+</span></span><span style=display:flex><span>KUBERNETES_PORT<span style=color:#f92672>=</span>tcp://10.43.0.1:443
+</span></span><span style=display:flex><span>KUBERNETES_PORT_443_TCP_ADDR<span style=color:#f92672>=</span>10.43.0.1
+</span></span><span style=display:flex><span>KUBERNETES_PORT_443_TCP_PORT<span style=color:#f92672>=</span><span style=color:#ae81ff>443</span>
+</span></span><span style=display:flex><span>KUBERNETES_PORT_443_TCP_PROTO<span style=color:#f92672>=</span>tcp
+</span></span><span style=display:flex><span>KUBERNETES_SERVICE_PORT_HTTPS<span style=color:#f92672>=</span><span style=color:#ae81ff>443</span>
+</span></span><span style=display:flex><span>KUBERNETES_PORT_443_TCP<span style=color:#f92672>=</span>tcp://10.43.0.1:443
+</span></span><span style=display:flex><span>KUBERNETES_SERVICE_HOST<span style=color:#f92672>=</span>10.43.0.1
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$ TOKEN<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>cat /var/run/secrets/kubernetes.io/serviceaccount/token<span style=color:#66d9ef>)</span>
+</span></span><span style=display:flex><span>$ curl https://<span style=color:#e6db74>${</span>KUBERNETES_SERVICE_HOST<span style=color:#e6db74>}</span>:<span style=color:#e6db74>${</span>KUBERNETES_SERVICE_PORT<span style=color:#e6db74>}</span>/apis/apps/v1 <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --header <span style=color:#e6db74>&#34;Authorization: Bearer </span>$TOKEN<span style=color:#e6db74>&#34;</span>
+</span></span></code></pre></div><h2 id=使用-curl-执行基本的-crud-操作>使用 curl 执行基本的 CRUD 操作
+<a class=anchor href=#%e4%bd%bf%e7%94%a8-curl-%e6%89%a7%e8%a1%8c%e5%9f%ba%e6%9c%ac%e7%9a%84-crud-%e6%93%8d%e4%bd%9c>#</a></h2><p>创建资源：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ curl $KUBE_API/apis/apps/v1/namespaces/default/deployments <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cacert ./server-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cert ./client-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --key ./client-ca.key <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  -X POST <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  -H <span style=color:#e6db74>&#39;Content-Type: application/yaml&#39;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  -d <span style=color:#e6db74>&#39;---
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>apiVersion: apps/v1
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>kind: Deployment
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>metadata:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  name: sleep
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>spec:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  replicas: 1
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  selector:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    matchLabels:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      app: sleep
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  template:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    metadata:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      labels:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        app: sleep
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    spec:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      containers:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      - name: sleep
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        image: curlimages/curl
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        command: [&#34;/bin/sleep&#34;, &#34;365d&#34;]
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$ kubectl get deploy
+</span></span><span style=display:flex><span>NAME    READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span style=display:flex><span>sleep   1/1     <span style=color:#ae81ff>1</span>            <span style=color:#ae81ff>1</span>           8s
+</span></span></code></pre></div><p>获取资源：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ curl $KUBE_API/apis/apps/v1/namespaces/default/deployments <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cacert ./server-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cert ./client-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --key ./client-ca.key
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 给定特定的资源名</span>
+</span></span><span style=display:flex><span>$ curl $KUBE_API/apis/apps/v1/namespaces/default/deployments/sleep <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cacert ./server-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cert ./client-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --key ./client-ca.key
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># watch</span>
+</span></span><span style=display:flex><span>$ curl $KUBE_API<span style=color:#e6db74>&#39;/apis/apps/v1/namespaces/default/deployments?watch=true&#39;</span> <span style=color:#ae81ff>\ </span>             
+</span></span><span style=display:flex><span>  --cacert ./server-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cert ./client-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --key ./client-ca.key
+</span></span></code></pre></div><p>更新资源：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>curl $KUBE_API/apis/apps/v1/namespaces/default/deployments/sleep <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cacert ./server-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cert ./client-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --key ./client-ca.key <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  -X PUT <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  -H <span style=color:#e6db74>&#39;Content-Type: application/yaml&#39;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  -d <span style=color:#e6db74>&#39;---
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>apiVersion: apps/v1
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>kind: Deployment
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>metadata:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  name: sleep
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>spec:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  replicas: 1
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  selector:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    matchLabels:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      app: sleep
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  template:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    metadata:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      labels:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        app: sleep
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    spec:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      containers:
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      - name: sleep
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        image: curlimages/curl
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        command: [&#34;/bin/sleep&#34;, &#34;730d&#34;]  # &lt;-- Making it sleep twice longer
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># patch 更新</span>
+</span></span><span style=display:flex><span>curl $KUBE_API/apis/apps/v1/namespaces/default/deployments/sleep <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cacert ./server-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cert ./client-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --key ./client-ca.key <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  -X PATCH <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  -H <span style=color:#e6db74>&#39;Content-Type: application/merge-patch+json&#39;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  -d <span style=color:#e6db74>&#39;{
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  &#34;spec&#34;: {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    &#34;template&#34;: {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      &#34;spec&#34;: {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        &#34;containers&#34;: [
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            &#34;name&#34;: &#34;sleep&#34;,
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            &#34;image&#34;: &#34;curlimages/curl&#34;,
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            &#34;command&#34;: [&#34;/bin/sleep&#34;, &#34;1d&#34;]
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>          }
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        ]
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      }
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>    }
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  }
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>}&#39;</span>
+</span></span></code></pre></div><p>删除资源：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ curl $KUBE_API/apis/apps/v1/namespaces/default/deployments <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cacert ./server-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cert ./client-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --key ./client-ca.key <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  -X DELETE
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 删除单个资源</span>
+</span></span><span style=display:flex><span>$ curl $KUBE_API/apis/apps/v1/namespaces/default/deployments/sleep <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cacert ./server-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --cert ./client-ca.crt <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --key ./client-ca.key <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  -X DELETE
+</span></span></code></pre></div><h2 id=如何使用-kubectl-调用-api>如何使用 kubectl 调用 API
+<a class=anchor href=#%e5%a6%82%e4%bd%95%e4%bd%bf%e7%94%a8-kubectl-%e8%b0%83%e7%94%a8-api>#</a></h2><h3 id=使用-kubectl-代理-kubernetes-api-server>使用 kubectl 代理 Kubernetes api-server
+<a class=anchor href=#%e4%bd%bf%e7%94%a8-kubectl-%e4%bb%a3%e7%90%86-kubernetes-api-server>#</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ kubectl proxy --port <span style=color:#ae81ff>8080</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 启动了代理服务后，调用 Kubernetes api-server 变得更简单</span>
+</span></span><span style=display:flex><span>$ curl localhost:8080/apis/apps/v1/deployments
+</span></span><span style=display:flex><span><span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;kind&#34;</span>: <span style=color:#e6db74>&#34;DeploymentList&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;apiVersion&#34;</span>: <span style=color:#e6db74>&#34;apps/v1&#34;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;metadata&#34;</span>: <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;resourceVersion&#34;</span>: <span style=color:#e6db74>&#34;660883&#34;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;items&#34;</span>: <span style=color:#f92672>[</span>...<span style=color:#f92672>]</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></div><h3 id=kubectl-使用原始模式调用-api>kubectl 使用原始模式调用 API
+<a class=anchor href=#kubectl-%e4%bd%bf%e7%94%a8%e5%8e%9f%e5%a7%8b%e6%a8%a1%e5%bc%8f%e8%b0%83%e7%94%a8-api>#</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 获取</span>
+</span></span><span style=display:flex><span>$ kubectl get --raw /api/v1/namespaces/default/pods
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 创建</span>
+</span></span><span style=display:flex><span>$ kubectl create --raw /api/v1/namespaces/default/pods -f file.yaml
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 更新</span>
+</span></span><span style=display:flex><span>$ kubectl replace --raw /api/v1/namespaces/default/pods/mypod -f file.json
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># 删除</span>
+</span></span><span style=display:flex><span>$ kubectl delete --raw /api/v1/namespaces/default/pods
+</span></span></code></pre></div><h2 id=如何查看-kubectl-命令如-apply发送的-api-请求>如何查看 kubectl 命令（如 apply）发送的 API 请求
+<a class=anchor href=#%e5%a6%82%e4%bd%95%e6%9f%a5%e7%9c%8b-kubectl-%e5%91%bd%e4%bb%a4%e5%a6%82-apply%e5%8f%91%e9%80%81%e7%9a%84-api-%e8%af%b7%e6%b1%82>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ kubectl create deployment nginx --image nginx -v <span style=color:#ae81ff>6</span>
+</span></span><span style=display:flex><span>I0215 17:07:35.188480   <span style=color:#ae81ff>43870</span> loader.go:372<span style=color:#f92672>]</span> Config loaded from file:  /Users/dp/.kube/config
+</span></span><span style=display:flex><span>I0215 17:07:35.362580   <span style=color:#ae81ff>43870</span> round_trippers.go:553<span style=color:#f92672>]</span> POST https://192.168.58.2:8443/apis/apps/v1/namespaces/default/deployments?fieldManager<span style=color:#f92672>=</span>kubectl-create&amp;fieldValidation<span style=color:#f92672>=</span>Strict <span style=color:#ae81ff>201</span> Created in <span style=color:#ae81ff>167</span> milliseconds
+</span></span><span style=display:flex><span>deployment.apps/nginx created
+</span></span></code></pre></div><h2 id=参考>参考
+<a class=anchor href=#%e5%8f%82%e8%80%83>#</a></h2><ul><li><a href=https://iximiuz.com/en/posts/kubernetes-api-call-simple-http-client/>How To Call Kubernetes API using Simple HTTP Client</a></li><li><a href=https://kubernetes.io/zh-cn/docs/tasks/administer-cluster/access-cluster-api/>使用 Kubernetes API 访问集群 | Kubernetes</a></li><li><a href=https://kubernetes.io/zh-cn/docs/tasks/run-application/access-api-from-pod/>从 Pod 中访问 Kubernetes API | Kuberentes</a></li></ul><hr><p><a href=/kubernetes/hpa-usage/>« Kubernetes 0-1 实现Pod自动扩缩HPA</a></p><p><a href=/kubernetes/informer/>» Informer</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/kubernetes/http-call-k8s-apiserver.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
+<span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#如何获取-kubernetes-api-server-地址>如何获取 Kubernetes api-server 地址</a></li><li><a href=#api-server-如何给客户端授权>api-server 如何给客户端授权</a><ul><li><a href=#使用证书授权>使用证书授权</a></li><li><a href=#使用-token-授权>使用 token 授权</a></li></ul></li><li><a href=#在-pod-内访问-api-server>在 Pod 内访问 api-server</a></li><li><a href=#使用-curl-执行基本的-crud-操作>使用 curl 执行基本的 CRUD 操作</a></li><li><a href=#如何使用-kubectl-调用-api>如何使用 kubectl 调用 API</a><ul><li><a href=#使用-kubectl-代理-kubernetes-api-server>使用 kubectl 代理 Kubernetes api-server</a></li><li><a href=#kubectl-使用原始模式调用-api>kubectl 使用原始模式调用 API</a></li></ul></li><li><a href=#如何查看-kubectl-命令如-apply发送的-api-请求>如何查看 kubectl 命令（如 apply）发送的 API 请求</a></li><li><a href=#参考>参考</a></li></ul></nav></div></aside></main></body></html>

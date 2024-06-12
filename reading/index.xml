@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>我的博客</title><link>https://blog.poneding.com/reading/</link><description>Recent content on 我的博客</description><generator>Hugo</generator><language>cn</language><atom:link href="https://blog.poneding.com/reading/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>https://blog.poneding.com/reading/%E4%BA%91%E5%8E%9F%E7%94%9F%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91Operator%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/reading/%E4%BA%91%E5%8E%9F%E7%94%9F%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91Operator%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/</guid><description>我的博客 / 阅读 / 云原生应用开发：Operator原理与实践
+云原生应用开发：Operator原理与实践 # 2. Operator原理 # 2.2 client-go原理 # client-go主要用在Kubernetes的Controller中，包括内置Controller（如kube-controller-manager）和CRD控制器；
+实现对各类K8s API资源的增删改查操作；
+包含Reflector，Informer，Indexr等组件。
+2.2.1 client-go介绍 # 是操作k8s集群资源的编程式交互客户端，利用对kube-apiserver的交互访问，实现对各类K8s API资源的增删改查操作；
+client-go不仅被k8s项目本身使用（如kubectl），还在基于k8s的二次开发中被外部用户广泛使用：自定义控制器，Operator等。
+使用：
+client-go库抽象封装了与k8s reset api的交互，便于开发者基于k8s做二次开发。利用client-go操作k8s资源的流程基本如下：
+通过kubeconfig信息构造Config实例，该实例记录了集群证书，k8s apiserver地址等信息； 根据Config实例携带的信息构建特定的客户端（clientset，dynamicset等）； 利用客户端向k8s apiserver发起请求，操作k8s资源。 以下是使用 client-go 获取 pod 的代码清单：
+func main() { var kubernetes *string if home := homeDir(); home != &amp;#34;&amp;#34; { kubeconfig := flag.String( &amp;#34;kubeconfig&amp;#34;, filePath.Join(home, &amp;#34;.kube&amp;#34;, &amp;#34;config&amp;#34;), &amp;#34;(optional) absolute path to the kubeconfig file&amp;#34;, ) } else { kubeconfig := flag.</description></item><item><title/><link>https://blog.poneding.com/reading/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E6%9C%AC%E7%AE%97%E6%B3%95%E4%B9%A6/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/reading/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E6%9C%AC%E7%AE%97%E6%B3%95%E4%B9%A6/</guid><description>我的博客 / 阅读 / 我的第一本算法书
+我的第一本算法书 # 作者：石田保辉，宫崎修一
+1. 算法的基础知识 # 1.1 什么是算法 # 算法是计算机计算和解决问题的步骤。
+选择排序：
+func selectionSort(nums []int) []int { for i := 0; i &amp;lt; len(nums); i++ { min := i for j := i + 1; j &amp;lt; len(nums); j++ { if nums[j] &amp;lt; nums[min] { min = j } } nums[i], nums[min] = nums[min], nums[i] } return nums } « 云原生应用开发：Operator原理与实践
+» 深入理解计算机网络.md</description></item><item><title/><link>https://blog.poneding.com/reading/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/reading/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</guid><description>我的博客 / 阅读 / 深入理解计算机网络.md
+二进制数的四种表示方法 # 原码 # 二进制数第一位用来表示正负符号，0 表示 +，1 表示 -。 原码就是带正负符号的二进制数，例如，+3 原码为 00000011，-3 原码为 10000011。 原码表示方法中，0 有 +0 和 -0 表现形式。
+反码 # 补码 # 原码在加减法运算中的不便，
+移码 # « 我的第一本算法书</description></item></channel></rss>
