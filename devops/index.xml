@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>我的博客</title><link>https://blog.poneding.com/devops/</link><description>Recent content on 我的博客</description><generator>Hugo</generator><language>cn</language><atom:link href="https://blog.poneding.com/devops/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>https://blog.poneding.com/devops/agile/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/agile/</guid><description>我的博客 / DevOps / Agile
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>🍁 秋河落叶</title><link>https://blog.poneding.com/devops/</link><description>Recent content on 🍁 秋河落叶</description><generator>Hugo</generator><language>cn</language><atom:link href="https://blog.poneding.com/devops/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>https://blog.poneding.com/devops/agile/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/agile/</guid><description>🏠 首页 / DevOps / Agile
 Agile # 敏捷 交付产品可以看作饭店上菜 顾客点了十个菜 后厨把十个菜做完，最后十个菜一起上桌 ——不敏捷 后厨做完一个菜就上一个菜 ——敏捷
 敏捷的优点：
-做一盘上一盘，顾客早早就能吃上了，优先横扫饥饿；尽早给用户体验上产品； 做一盘上一盘，每个菜都是新出锅，顾客能吃上一口热的；对比十盘菜一起上，可能先炒的菜已经凉了，凉的菜换做成产品的话，可能就是已经过时的功能了，不符合需求了 做一盘上一盘， 如果前面的菜咸了，可以反馈给饭店，后面的菜做淡点；对比十盘菜一起上，顾客就无法从中间反馈意见了，做一个用户插不上意见的产品，严重的后果可能是用户已经不感兴趣了。 » Ansible</description></item><item><title/><link>https://blog.poneding.com/devops/ansible/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/ansible/</guid><description>我的博客 / DevOps / Ansible
+做一盘上一盘，顾客早早就能吃上了，优先横扫饥饿；尽早给用户体验上产品； 做一盘上一盘，每个菜都是新出锅，顾客能吃上一口热的；对比十盘菜一起上，可能先炒的菜已经凉了，凉的菜换做成产品的话，可能就是已经过时的功能了，不符合需求了 做一盘上一盘， 如果前面的菜咸了，可以反馈给饭店，后面的菜做淡点；对比十盘菜一起上，顾客就无法从中间反馈意见了，做一个用户插不上意见的产品，严重的后果可能是用户已经不感兴趣了。 » Ansible</description></item><item><title/><link>https://blog.poneding.com/devops/ansible/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/ansible/</guid><description>🏠 首页 / DevOps / Ansible
 Ansible # 介绍 # 一款轻量级的自动化运维工具，只需要一台主机安装Ansible，便可以管理其他可连通的Linux服务器。
 开源
 python
@@ -20,7 +20,7 @@ Tasks：
 Ansible配置 # ​ 配置文件位置：/etc/ansible/ansible.cfg，为ini格式文件。
 配置示例 # ​ inventory：主机清单配置文件位置，在使用Ansible命令时，也开始-i &amp;lt;path&amp;gt;指定；
 ​ host_key_checking：当know_hosts中不存在的主机（即尚未访问过的主机，是否需要输入密钥）；
-​ become_user：sudo用户；</description></item><item><title/><link>https://blog.poneding.com/devops/bule-green-rollback-gray/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/bule-green-rollback-gray/</guid><description>我的博客 / DevOps / 蓝绿部署、滚动部署和灰度部署
+​ become_user：sudo用户；</description></item><item><title/><link>https://blog.poneding.com/devops/bule-green-rollback-gray/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/bule-green-rollback-gray/</guid><description>🏠 首页 / DevOps / 蓝绿部署、滚动部署和灰度部署
 蓝绿部署、滚动部署和灰度部署 # 直接举例说明：
 现环境中运行着3个V1版本的实例，计划更新到V2版本。
 蓝绿部署 # 直接使用新的服务资源部署3个V2版本实例（仍然保留3个V1版本），然后将请求流量全部转到V2版本。
@@ -40,7 +40,7 @@ V2版本有bug的话，不能及时回滚。
 无需中断服务；
 同样无需增加服务器，能较为平稳的过渡到新版本，并且当有bug时也能做到快速回滚。
 « Ansible
-» 混沌工程原则 （PRINCIPLES OF CHAOS ENGINEERING）</description></item><item><title/><link>https://blog.poneding.com/devops/chaos-engineering/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/chaos-engineering/</guid><description>我的博客 / DevOps / 混沌工程原则 （PRINCIPLES OF CHAOS ENGINEERING）
+» 混沌工程原则 （PRINCIPLES OF CHAOS ENGINEERING）</description></item><item><title/><link>https://blog.poneding.com/devops/chaos-engineering/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/chaos-engineering/</guid><description>🏠 首页 / DevOps / 混沌工程原则 （PRINCIPLES OF CHAOS ENGINEERING）
 混沌工程原则 （PRINCIPLES OF CHAOS ENGINEERING） # http://principlesofchaos.org/ 简体中文版
 混沌工程是在分布式系统上进行实验的学科, 目的是建立对系统抵御生产环境中失控条件的能力以及信心。：
 大规模分布式软件系统的发展正在改变软件工程。作为一个行业，我们很快采用了提高开发灵活性和部署速度的实践。紧随着这些优点的一个迫切问题是：我们对投入生产的复杂系统有多少信心？
@@ -53,7 +53,7 @@ V2版本有bug的话，不能及时回滚。
 高级原则 # 以下原则描述了应用混沌工程的理想方式，这些原则基于上述实验过程。对这些原则的匹配程度能够增强我们在大规模分布式系统的信心。
 建立一个围绕稳定状态行为的假说 # 要关注系统的可测量输出, 而不是系统的属性。对这些输出在短时间内的度量构成了系统稳定状态的一个代理。 整个系统的吞吐量、错误率、延迟百分点等都可能是表示稳态行为的指标。 通过在实验中的系统性行为模式上的关注, 混沌工程验证了系统是否正常工作, 而不是试图验证它是如何工作的。
 多样化真实世界的事件 # 混沌变量反映了现实世界中的事件。 我们可以通过潜在影响或估计频率排定这些事件的优先级。考虑与硬件故障类似的事件, 如服务器宕机、软件故障 (如错误响应) 和非故障事件 (如流量激增或伸缩事件)。 任何能够破坏稳态的事件都是混沌实验中的一个潜在变量。
-在生产环境中运行实验 # 系统的行为会依据环境和流量模式都会有所不同。 由于资源使用率变化的随时可能发生, 因此通过采集实际流量是捕获请求路径的唯一可靠方法。 为了保证系统执行方式的真实性与当前部署系统的相关性, 混沌工程强烈推荐直接采用生产环境流量进行实验。</description></item><item><title/><link>https://blog.poneding.com/devops/commercial-canvas/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/commercial-canvas/</guid><description>我的博客 / DevOps / 商业画布
+在生产环境中运行实验 # 系统的行为会依据环境和流量模式都会有所不同。 由于资源使用率变化的随时可能发生, 因此通过采集实际流量是捕获请求路径的唯一可靠方法。 为了保证系统执行方式的真实性与当前部署系统的相关性, 混沌工程强烈推荐直接采用生产环境流量进行实验。</description></item><item><title/><link>https://blog.poneding.com/devops/commercial-canvas/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/commercial-canvas/</guid><description>🏠 首页 / DevOps / 商业画布
 商业画布 # 用来描述商业模式、可视化商业模式、评估商业模式以及改变商业模式的通用语言。
 商业模式：通过商业产品创造价值，传递价值，获取价值的一种原理。
 九个模块 # CS客户细分（Customer Segments）：企业或机构所服务的一个或多个客户分类群体。
@@ -67,7 +67,7 @@ KP重要合作（Key Partnership）：有些业务要外包，而另外一些资
 C$成本结构（Cost Structure）：商业模式上述要素所引发的成本构成。
 基本认知 # 客户细分 # 客户是商业模式的核心。哪些是重要客户
 « 混沌工程原则 （PRINCIPLES OF CHAOS ENGINEERING）
-» 使用grafana监控5xx服务</description></item><item><title/><link>https://blog.poneding.com/devops/grafana-monite-service-with-5xx/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/grafana-monite-service-with-5xx/</guid><description>我的博客 / DevOps / 使用grafana监控5xx服务
+» 使用grafana监控5xx服务</description></item><item><title/><link>https://blog.poneding.com/devops/grafana-monite-service-with-5xx/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/grafana-monite-service-with-5xx/</guid><description>🏠 首页 / DevOps / 使用grafana监控5xx服务
 使用grafana监控5xx服务 # 1. Grafana信息 # grafana服务： https://devops.example.com/grafana
 如果要注册账号请联系devops组。
 2. Grafana监控预览 # grafana已经配置了对service.hompartners.com域名下的service访问状态返回5xx的监控，可以查看对应的grafana面板 https://devops.example.com/grafana/d/Q_zv-HrWz/cst-service-status?orgId=1
@@ -83,7 +83,7 @@ Step 3 定制xxx.xxx.com http_status_5xx视图：
 保存完成之后，点击左上角的回退箭头图标：&amp;lt;&amp;ndash;，回到视图页面，按如下操作编辑视图。
 修改查询sql语句，域名修改为要监控的域名或服务名，比如你想监控www.example.com域名下所有服务，那么你可以定制sql如下：
 SELECT &amp;#34;service_code&amp;#34; FROM &amp;#34;service_status&amp;#34; WHERE (&amp;#34;health_code&amp;#34; = 500 AND &amp;#34;domain_name&amp;#34; = &amp;#39;www.example.com&amp;#39;) AND $timeFilter GROUP BY &amp;#34;service_name&amp;#34; ，当然你可能只想监控某个域名下的其中一个服务，如你想监控www.example.com域名下operationplatgform服务，那么你可以定制sql如下：
-SELECT &amp;#34;service_code&amp;#34; FROM &amp;#34;service_status&amp;#34; WHERE (&amp;#34;health_code&amp;#34; = 500 AND &amp;#34;domain_name&amp;#34; = &amp;#39;www.</description></item><item><title/><link>https://blog.poneding.com/devops/grafana-monite-service/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/grafana-monite-service/</guid><description>我的博客 / DevOps / 使用Grafana监控service
+SELECT &amp;#34;service_code&amp;#34; FROM &amp;#34;service_status&amp;#34; WHERE (&amp;#34;health_code&amp;#34; = 500 AND &amp;#34;domain_name&amp;#34; = &amp;#39;www.</description></item><item><title/><link>https://blog.poneding.com/devops/grafana-monite-service/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/grafana-monite-service/</guid><description>🏠 首页 / DevOps / 使用Grafana监控service
 使用Grafana监控service # 监控live上的应用服务,如果服务http状态为5xx,则反应到grafana图表中,DevOps和开发人员都能及时从图表中获取信息,及时确认和排查问题.
 Service Http状态数据来源 # 使用程序定时轮询获取aws elb的日志数据,将日志数据以时序形式存储在influxdb,目前数据结构如下:
 tag keys:
@@ -91,7 +91,7 @@ tag keys:
 # FieldKeyName Remark 1 domain_name 2 elb_status_code 数字类型,200;500 3 health_code 数字类型,200;500 4 request_url 请求路径 5 service_code 一个域名下的多个service,按序从1自增,作为grafana图表的y轴数据 创建Dashboard # =&amp;gt; Add Query
 目前数据源已经配置完成，选择Influxdb_Elb_Logs作为QUuery DataSource，并且开始配置query
 查询语句可以参考：
-SELECT mean(&amp;#34;service_code&amp;#34;) FROM &amp;#34;service_status&amp;#34; WHERE (&amp;#34;domain_name&amp;#34; = &amp;#39;service.example.com&amp;#39; AND &amp;#34;health_code&amp;#34; = 500) AND $timeFilter GROUP BY time($__interval), &amp;#34;service_name&amp;#34; 根据自身需求修改query即可。</description></item><item><title/><link>https://blog.poneding.com/devops/grafana/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/grafana/</guid><description>我的博客 / DevOps / Grafana
+SELECT mean(&amp;#34;service_code&amp;#34;) FROM &amp;#34;service_status&amp;#34; WHERE (&amp;#34;domain_name&amp;#34; = &amp;#39;service.example.com&amp;#39; AND &amp;#34;health_code&amp;#34; = 500) AND $timeFilter GROUP BY time($__interval), &amp;#34;service_name&amp;#34; 根据自身需求修改query即可。</description></item><item><title/><link>https://blog.poneding.com/devops/grafana/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/grafana/</guid><description>🏠 首页 / DevOps / Grafana
 Grafana # 官方文档： https://grafana.com/docs/grafana/latest/
 简介 # 特性 # 可视化：通过图表展示指标信息，直观，便于分析
 报警：指标数据超出阈值
@@ -106,7 +106,7 @@ Grafana # 官方文档： https://grafana.com/docs/grafana/latest/
 Jenkins安装插件 # 登入Jenkins =&amp;gt; Manage Jenkins =&amp;gt; Manage Plugins =&amp;gt; Available页签 搜索Prometheus插件,安装即可.
 此节可以参考: https://medium.com/@eng.mohamed.m.saeed/monitoring-jenkins-with-grafana-and-prometheus-a7e037cbb376
 « 使用Grafana监控service
-» Jaeger</description></item><item><title/><link>https://blog.poneding.com/devops/jeager/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/jeager/</guid><description>我的博客 / DevOps / Jaeger
+» Jaeger</description></item><item><title/><link>https://blog.poneding.com/devops/jeager/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/jeager/</guid><description>🏠 首页 / DevOps / Jaeger
 Jaeger # 前言 # 微服务之间的调用关系错综复杂，当你在京东下单时，应用背后的服务调用链可能超你想象。调用链的追踪是微服务绕不过去的技术栈，
 简介 # 关于 # Jaeger，受Dapper和OpenZipkin启发，由Uber开源的一个分布式跟踪系统，用于基于微服务分布式系统的监控和排错，包括：
 分布式上下文传递 分布式事务监控 问题根由分析 服务依赖分析 性能、延迟优化 功能 # 兼容OpenTracing数据模型和工具库 对每个服务、端点使用一致的抽样概率 支持多样的后端数据库：Cassandra，Elasticsearch，Memory 追踪数据拓扑图形展示 基础概念 # Span：
@@ -123,7 +123,7 @@ jaeger-query：
 jaeger调用链数据查询服务，有独立UI。
 OpenTracing # 分布式的追踪系统其实不止Jaeger一种，但是它们的核心原理都大相径庭，都是从入侵到代码中埋点，然后像追踪系统上报数据信息，最终我们在追踪系统得到数据，从而实现追踪分析。
 为了兼容统一各追踪系统API，OpenTracing规范诞生了，它与平台无关，与厂商无关。有了它的存在，你可以方便的切换你想使用的追踪系统。
-安装 # Docker # docker run -d --name jaeger \ -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \ -p 5775:5775/udp \ -p 6831:6831/udp \ -p 6832:6832/udp \ -p 5778:5778 \ -p 16686:16686 \ -p 14268:14268 \ -p 14250:14250 \ -p 9411:9411 \ jaegertracing/all-in-one:1.</description></item><item><title/><link>https://blog.poneding.com/devops/nginx/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/nginx/</guid><description>我的博客 / DevOps / nginx
+安装 # Docker # docker run -d --name jaeger \ -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \ -p 5775:5775/udp \ -p 6831:6831/udp \ -p 6832:6832/udp \ -p 5778:5778 \ -p 16686:16686 \ -p 14268:14268 \ -p 14250:14250 \ -p 9411:9411 \ jaegertracing/all-in-one:1.</description></item><item><title/><link>https://blog.poneding.com/devops/nginx/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/nginx/</guid><description>🏠 首页 / DevOps / nginx
 nginx # nginx简介 # 高性能的反向代理工具，负载均衡器；
 nginx配置 # 全局配置 # event配置 # http配置 # 配置反向代理 # 正向代理：
 在国内是

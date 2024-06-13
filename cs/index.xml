@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>我的博客</title><link>https://blog.poneding.com/cs/</link><description>Recent content on 我的博客</description><generator>Hugo</generator><language>cn</language><atom:link href="https://blog.poneding.com/cs/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>https://blog.poneding.com/cs/internet/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/cs/internet/</guid><description>我的博客 / 计算机科学 / 互联网如何运作？
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>🍁 秋河落叶</title><link>https://blog.poneding.com/cs/</link><description>Recent content on 🍁 秋河落叶</description><generator>Hugo</generator><language>cn</language><atom:link href="https://blog.poneding.com/cs/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>https://blog.poneding.com/cs/internet/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/cs/internet/</guid><description>🏠 首页 / 计算机科学 / 互联网如何运作？
 互联网如何运作？ # 本篇文章翻译自： 原文地址
 作为开发人员，深入了解互联网是什么及其工作原理非常重要。它是构建大多数现代软件应用程序的基础。为了构建有效、安全且可扩展的应用程序和服务，您需要深入了解互联网的工作原理以及如何利用其功能和连接性。
 在本文中，我们将介绍互联网的基础知识，包括它的工作原理、一些基本概念、术语和一些用于在互联网上构建应用程序和服务的通用协议。
@@ -15,11 +15,11 @@
 数据包：通过互联网传输的小数据单位。 路由器：在不同网络之间引导数据包的设备。 IP 地址：分配给网络上每个设备的唯一标识符，用于将数据路由到正确的目的地。 域名：用于识别网站的人类可读名称，例如 google.com。 DNS：域名系统负责将域名转换为IP地址。 HTTP：超文本传输​​协议用于在客户端（例如网络浏览器）和服务器（例如网站）之间传输数据。 HTTPS：HTTP 的加密版本，用于在客户端和服务器之间提供安全通信。 SSL/TLS：安全套接字层和传输层安全协议用于通过互联网提供安全通信。 了解这些基本概念和术语对于使用互联网和开发基于互联网的应用程序和服务至关重要。
 协议在互联网中的作用 # 协议在通过互联网进行通信和数据交换方面发挥着至关重要的作用。协议是一组规则和标准，定义设备和系统之间如何交换信息。
 互联网通信中使用许多不同的协议，包括互联网协议 (IP)、传输控制协议 (TCP)、用户数据报协议 (UDP)、域名系统 (DNS) 等。
-IP 负责将数据包路由到正确的目的地，而 TCP 和 UDP 则确保数据包可靠且高效地传输。 DNS 用于将域名转换为 IP 地址，HTTP 用于在客户端和服务器之间传输数据。</description></item><item><title/><link>https://blog.poneding.com/cs/networking/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/cs/networking/</guid><description>我的博客 / 计算机科学 / 网络通信
+IP 负责将数据包路由到正确的目的地，而 TCP 和 UDP 则确保数据包可靠且高效地传输。 DNS 用于将域名转换为 IP 地址，HTTP 用于在客户端和服务器之间传输数据。</description></item><item><title/><link>https://blog.poneding.com/cs/networking/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/cs/networking/</guid><description>🏠 首页 / 计算机科学 / 网络通信
 网络通信 # I/O 模型 # 《UNIX 网络编程》中总结了 5 种 I/O 模型，包括同步和异步 I/O：
 阻塞 I/O (Blocking I/O) 非阻塞 I/O (Nonblocking I/O) I/O 多路复用 (I/O multiplexing) 信号驱动 I/O (Signal driven I/O) 异步 I/O (Asynchronous I/O) 操作系统上的 I/O 是用户空间和内核空间的数据交互。
 « 互联网如何运作？
-» 虚拟内存</description></item><item><title/><link>https://blog.poneding.com/cs/virtual-memory/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/cs/virtual-memory/</guid><description>我的博客 / 计算机科学 / 虚拟内存
+» 虚拟内存</description></item><item><title/><link>https://blog.poneding.com/cs/virtual-memory/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/cs/virtual-memory/</guid><description>🏠 首页 / 计算机科学 / 虚拟内存
 虚拟内存 # 为了更加有效的管理内存并且降低内存出错的概率。
 计算机存储器 # 速度快 容量大 价格便宜 类型，自上向下分别是寄存器，高速缓存，主存（RAM），磁盘。成本与访问速度负相关。
 寄存器的容量：32 位：32x32 bit吗，64 位：64x64 bit
