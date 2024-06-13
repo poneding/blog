@@ -114,7 +114,7 @@ headless: true
 - **🔗 外链**
 ```
 
-### 2.2 配置 giscus 评论
+### 2.3 配置 giscus 评论
 
 拷贝 `hugo-book` 的 `layouts/_default/baseof.html` 文件到 `layouts/_default/baseof.html`，命令操作如下：
 
@@ -153,7 +153,7 @@ cp themes/hugo-book/layouts/_default/baseof.html layouts/_default/baseof.html
 ...
 ```
 
-### 2.3 代码主题自动切换
+### 2.4 代码主题自动切换
 
 生成代码高亮样式文件，命令操作如下：
 
@@ -181,7 +181,7 @@ cp themes/hugo-book/layouts/partials/docs/html-head.html layouts/partials/docs/h
 echo '<link rel="stylesheet" href="/css/syntax.css">' >> layouts/partials/docs/html-head.html
 ```
 
-### 2.4 Logo
+### 2.5 Logo
 
 将 logo.png 图片放到 `static` 目录下。
 
