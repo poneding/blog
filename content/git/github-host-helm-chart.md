@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Git](_index.md) / 使用 GitHub 托管 helm-chart 仓库
+[🏠 首页](../_index.md) / [Git](_index.md) / 使用 GitHub 托管 helm-chart 仓库
 
 # 使用 GitHub 托管 helm-chart 仓库
 

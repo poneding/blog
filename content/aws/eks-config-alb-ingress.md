@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [AWS](_index.md) / EKS配置 ALB Ingress
+[🏠 首页](../_index.md) / [AWS](_index.md) / EKS配置 ALB Ingress
 
 # EKS配置 ALB Ingress
 

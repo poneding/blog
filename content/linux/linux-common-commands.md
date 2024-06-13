@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Linux](_index.md) / Linux常用命令
+[🏠 首页](../_index.md) / [Linux](_index.md) / Linux常用命令
 
 # Linux常用命令
 

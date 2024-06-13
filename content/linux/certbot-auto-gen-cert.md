@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Linux](_index.md) / certbot-auto 生成证书
+[🏠 首页](../_index.md) / [Linux](_index.md) / certbot-auto 生成证书
 
 # certbot-auto 生成证书
 

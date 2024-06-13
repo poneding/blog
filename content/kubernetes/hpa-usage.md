@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / Kubernetes 0-1 实现Pod自动扩缩HPA
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / Kubernetes 0-1 实现Pod自动扩缩HPA
 
 # Kubernetes 0-1 实现Pod自动扩缩HPA
 

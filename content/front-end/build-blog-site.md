@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [前端技术](_index.md) / 搭建博客站点
+[🏠 首页](../_index.md) / [前端技术](_index.md) / 搭建博客站点
 
 # 搭建博客站点
 
@@ -34,7 +34,7 @@ git submodule add https://github.com/alex-shpak/hugo-book themes/hugo-book
 # hugo server --minify --themesDir ../.. --baseURL=http://0.0.0.0:1313/theme/hugo-book/
 
 baseURL: https://blog.poneding.com/
-title: 我的博客
+title: 秋河落叶
 theme: hugo-book
 pluralizeListTitles: false
 defaultContentLanguage: cn
@@ -55,21 +55,8 @@ markup:
     # style: monokai
 
 menu:
-  main:
-    - name: "首页"
-      url: "/"
-      weight: 10
-    - name: "归档"
-      url: "/posts/"
-      weight: 20
-    - name: "标签"
-      url: "/tags/"
-      weight: 30
-    - name: "关于"
-      url: "/about/"
-      weight: 40
   after:
-  - name: "Github"
+  - name: "🔗 GitHub"
     url: "https://github.com/poneding"
     weight: 10
 
@@ -78,6 +65,7 @@ params:
   BookToC: true
   BookFavicon: logo.png
   BookLogo: logo.png
+  BookMenuBundle: /menu
   BookSection: "none"
   BookRepo: https://github.com/poneding/blog
   BookCommitPath: commit
@@ -94,6 +82,37 @@ params:
 
 - `params.BookSection`: 本身指定一个 content 下的文档目录，我们这里设置一个不存在的目录，是为了不在左侧菜单栏展示我们的 N 多的目录树；
 - `markup.highlight.noClasses`: 本身用来确认是否不使用自定义的 CSS 样式，我们这里设置为 `false`，因为我们需要使用自定义的 chorma 的代码高亮样式，跟随浏览器或系统自动切换代码高亮主题；
+
+### 2.2 定制左侧菜单栏
+
+创建 `content/menu/index.md` 文件，并添加如下内容：
+
+```bash
+mkdir -p content/menu
+vim content/menu/index.md
+```
+
+菜单配置内容如下：
+
+```markdown
+---
+headless: true
+---
+
+- [**🏠 首页**](/)
+
+---
+
+- **📌 置顶**
+  - [Golang 编程](/go)
+  - [Kubernetes](/kubernetes)
+  - [Rust 编程](/rust)
+  - [Git](/git)
+
+---
+
+- **🔗 外链**
+```
 
 ### 2.2 配置 giscus 评论
 
@@ -136,6 +155,8 @@ cp themes/hugo-book/layouts/_default/baseof.html layouts/_default/baseof.html
 
 ### 2.3 代码主题自动切换
 
+生成代码高亮样式文件，命令操作如下：
+
 ```bash
 mkdir -p static/css
 
@@ -145,9 +166,19 @@ hugo gen chromastyles --style=monokailight >> static/css/syntax.css
 echo "}" >> static/css/syntax.css
 
 # dark
-echo "@media (prefers-color-scheme: dark) {"  > static/css/syntax.css
-hugo gen chromastyles --style=monokaidark >> static/css/syntax.css
+echo "@media (prefers-color-scheme: dark) {"  >> static/css/syntax.css
+hugo gen chromastyles --style=monokai >> static/css/syntax.css
 echo "}" >> static/css/syntax.css
+```
+
+拷贝 `hugo-book` 的 `layouts/partials/docs/html-head.html` 文件到 `layouts/partials/docs/html-head.html`，命令操作如下：
+
+```bash
+mkdir -p layouts/partials/docs
+cp themes/hugo-book/layouts/partials/docs/html-head.html layouts/partials/docs/html-head.html
+
+# 引入样式文件
+echo '<link rel="stylesheet" href="/css/syntax.css">' >> layouts/partials/docs/html-head.html
 ```
 
 ### 2.4 Logo

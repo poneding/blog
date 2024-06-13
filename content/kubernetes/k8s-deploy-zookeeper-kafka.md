@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / Kubernetes 0-1 K8s部署Zookeeper和Kafka
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / Kubernetes 0-1 K8s部署Zookeeper和Kafka
 
 # Kubernetes 0-1 K8s部署Zookeeper和Kafka
 

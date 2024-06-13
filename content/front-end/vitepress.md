@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [前端技术](_index.md) / VitePress
+[🏠 首页](../_index.md) / [前端技术](_index.md) / VitePress
 
 # VitePress
 

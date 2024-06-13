@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Linux](_index.md) / vim 使用
+[🏠 首页](../_index.md) / [Linux](_index.md) / vim 使用
 
 # vim 使用
 

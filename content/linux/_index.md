@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / Linux
+[🏠 首页](../_index.md) / Linux
 
 # Linux
 

@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Golang 编程](_index.md) / 使用 Go 生成 OpenSSH 兼容的 RSA 密钥对
+[🏠 首页](../_index.md) / [Golang 编程](_index.md) / 使用 Go 生成 OpenSSH 兼容的 RSA 密钥对
 
 # 使用 Go 生成 OpenSSH 兼容的 RSA 密钥对
 

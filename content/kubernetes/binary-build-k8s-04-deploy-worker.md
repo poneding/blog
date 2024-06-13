@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / 二进制搭建 K8s - 4 部署 Node
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / 二进制搭建 K8s - 4 部署 Node
 
 # 二进制搭建 K8s - 4 部署 Node
 

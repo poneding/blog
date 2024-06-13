@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Rust 编程](_index.md) / Rust 入门
+[🏠 首页](../_index.md) / [Rust 编程](_index.md) / Rust 入门
 
 # Rust 入门
 

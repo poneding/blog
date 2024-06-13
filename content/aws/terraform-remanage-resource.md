@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [AWS](_index.md) / Terraform 重新管理资源
+[🏠 首页](../_index.md) / [AWS](_index.md) / Terraform 重新管理资源
 
 # Terraform 重新管理资源
 

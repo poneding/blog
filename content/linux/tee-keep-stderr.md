@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Linux](_index.md) / tee 保存 stderr 到文件
+[🏠 首页](../_index.md) / [Linux](_index.md) / tee 保存 stderr 到文件
 
 # tee 保存 stderr 到文件
 

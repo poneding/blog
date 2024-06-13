@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Git](_index.md) / Github Action 使用最佳实践
+[🏠 首页](../_index.md) / [Git](_index.md) / Github Action 使用最佳实践
 
 # Github Action 使用最佳实践
 

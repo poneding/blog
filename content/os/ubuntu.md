@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [操作系统](_index.md) / Ubuntu
+[🏠 首页](../_index.md) / [操作系统](_index.md) / Ubuntu
 
 # Ubuntu
 

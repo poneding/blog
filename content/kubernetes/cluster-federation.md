@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / 集群联邦
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / 集群联邦
 
 # 集群联邦
 

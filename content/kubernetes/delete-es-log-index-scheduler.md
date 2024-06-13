@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / 定期删除 ElasticSearch 日志索引
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / 定期删除 ElasticSearch 日志索引
 
 # 定期删除 ElasticSearch 日志索引
 

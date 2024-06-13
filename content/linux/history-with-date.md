@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Linux](_index.md) / Linux-history 输出附带日期
+[🏠 首页](../_index.md) / [Linux](_index.md) / Linux-history 输出附带日期
 
 # Linux-history 输出附带日期
 

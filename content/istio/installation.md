@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Istio](_index.md) / 安装 Istio
+[🏠 首页](../_index.md) / [Istio](_index.md) / 安装 Istio
 
 # 安装 Istio
 

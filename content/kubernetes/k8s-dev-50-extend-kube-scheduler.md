@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / Kubernetes 定制开发 50：扩展调度器
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / Kubernetes 定制开发 50：扩展调度器
 
 # Kubernetes 定制开发 50：扩展调度器
 

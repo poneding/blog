@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / local 存储卷实践
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / local 存储卷实践
 
 # local 存储卷实践
 

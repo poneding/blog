@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / 通过 Ingress 进行灰度发布
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / 通过 Ingress 进行灰度发布
 
 # 通过 Ingress 进行灰度发布
 

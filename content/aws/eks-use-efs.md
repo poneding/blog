@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [AWS](_index.md) / EKS-使用EFS
+[🏠 首页](../_index.md) / [AWS](_index.md) / EKS-使用EFS
 
 # EKS-使用EFS
 

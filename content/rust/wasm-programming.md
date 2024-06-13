@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Rust 编程](_index.md) / Rust WASM 编程
+[🏠 首页](../_index.md) / [Rust 编程](_index.md) / Rust WASM 编程
 
 # Rust WASM 编程
 

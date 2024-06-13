@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / Kubernetes Dashboard
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / Kubernetes Dashboard
 
 # Kubernetes Dashboard
 

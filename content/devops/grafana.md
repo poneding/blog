@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [DevOps](_index.md) / Grafana
+[🏠 首页](../_index.md) / [DevOps](_index.md) / Grafana
 
 # Grafana
 

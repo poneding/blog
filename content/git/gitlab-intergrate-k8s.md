@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Git](_index.md) / Gitlab 添加 K8s 集群
+[🏠 首页](../_index.md) / [Git](_index.md) / Gitlab 添加 K8s 集群
 
 # Gitlab 添加 K8s 集群
 

@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Istio](_index.md) / 授权策略 Authorization Policy
+[🏠 首页](../_index.md) / [Istio](_index.md) / 授权策略 Authorization Policy
 
 # 授权策略 Authorization Policy
 

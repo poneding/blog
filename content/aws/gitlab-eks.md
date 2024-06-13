@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [AWS](_index.md) / Gitlab & EKS
+[🏠 首页](../_index.md) / [AWS](_index.md) / Gitlab & EKS
 
 # Gitlab & EKS
 

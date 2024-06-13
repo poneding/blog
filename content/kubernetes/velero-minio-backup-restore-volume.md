@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / Velero + Minio 备份与恢复
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / Velero + Minio 备份与恢复
 
 # Velero + Minio 备份与恢复
 

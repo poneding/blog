@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Linux](_index.md) / shell 基础
+[🏠 首页](../_index.md) / [Linux](_index.md) / shell 基础
 
 # shell 基础
 

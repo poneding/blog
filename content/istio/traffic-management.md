@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Istio](_index.md) / Istio 0-1 流量管理方案
+[🏠 首页](../_index.md) / [Istio](_index.md) / Istio 0-1 流量管理方案
 
 # Istio 0-1 流量管理方案
 

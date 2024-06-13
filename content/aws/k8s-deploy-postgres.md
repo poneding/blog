@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [AWS](_index.md) / K8s 部署 Postgres
+[🏠 首页](../_index.md) / [AWS](_index.md) / K8s 部署 Postgres
 
 # K8s 部署 Postgres
 

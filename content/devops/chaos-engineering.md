@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [DevOps](_index.md) / 混沌工程原则 （PRINCIPLES OF CHAOS ENGINEERING）
+[🏠 首页](../_index.md) / [DevOps](_index.md) / 混沌工程原则 （PRINCIPLES OF CHAOS ENGINEERING）
 
 # 混沌工程原则 （PRINCIPLES OF CHAOS ENGINEERING）
 

@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Golang 编程](_index.md) / go:linkname 指令
+[🏠 首页](../_index.md) / [Golang 编程](_index.md) / go:linkname 指令
 
 # go:linkname 指令
 

@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / Kubernetes 0-1 Kubernetes最佳实践
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / Kubernetes 0-1 Kubernetes最佳实践
 
 # Kubernetes 0-1 Kubernetes最佳实践
 

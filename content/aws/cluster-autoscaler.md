@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [AWS](_index.md) / Cluster AutoScaler
+[🏠 首页](../_index.md) / [AWS](_index.md) / Cluster AutoScaler
 
 # Cluster AutoScaler
 

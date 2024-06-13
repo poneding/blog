@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [CKA](_index.md) / 准备CKA
+[🏠 首页](../_index.md) / [CKA](_index.md) / 准备CKA
 
 # 准备CKA
 

@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Docker](_index.md) / 非 root 账号获取 docker 权限
+[🏠 首页](../_index.md) / [Docker](_index.md) / 非 root 账号获取 docker 权限
 
 # 非 root 账号获取 docker 权限
 

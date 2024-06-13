@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / HTTP 客户端调用 Kubernetes APIServer
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / HTTP 客户端调用 Kubernetes APIServer
 
 # HTTP 客户端调用 Kubernetes APIServer
 

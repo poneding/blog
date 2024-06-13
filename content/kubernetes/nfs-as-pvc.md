@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / 使用 nfs 持久化存储
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / 使用 nfs 持久化存储
 
 # 使用 nfs 持久化存储
 

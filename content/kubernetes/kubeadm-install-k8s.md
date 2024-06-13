@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / kubeadm 安装 k8s (containerd)
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / kubeadm 安装 k8s (containerd)
 
 # kubeadm 安装 k8s (containerd)
 

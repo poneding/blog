@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Golang 编程](_index.md) / gopkg-errors.md
+[🏠 首页](../_index.md) / [Golang 编程](_index.md) / gopkg-errors.md
 
 ---
 title: Go 包 - errors

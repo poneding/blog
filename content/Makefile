@@ -24,4 +24,4 @@ check_mdi:
 mdi_gen: check_mdi
 	@git pull
 	@echo "Generating markdown indices..."
-	@mdi gen -f _index.md --sub-index-file _index.md -t "我的博客" -r --override --nav -v --no-header-link
+	@mdi gen -f _index.md --sub-index-file _index.md -t "🍁 秋河落叶" -r --override --nav -v --no-header-link --home-title "🏠 首页"

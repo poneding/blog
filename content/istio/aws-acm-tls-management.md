@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Istio](_index.md) / 使用 aws-acm 管理 tls 密钥和证书
+[🏠 首页](../_index.md) / [Istio](_index.md) / 使用 aws-acm 管理 tls 密钥和证书
 
 # 使用 aws-acm 管理 tls 密钥和证书
 

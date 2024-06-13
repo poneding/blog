@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Golang 编程](_index.md) / Go 程序 SOLID 设计原则
+[🏠 首页](../_index.md) / [Golang 编程](_index.md) / Go 程序 SOLID 设计原则
 
 # Go 程序 SOLID 设计原则
 

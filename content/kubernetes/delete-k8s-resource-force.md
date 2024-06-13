@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / 强制删除 K8s 资源
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / 强制删除 K8s 资源
 
 # 强制删除 K8s 资源
 

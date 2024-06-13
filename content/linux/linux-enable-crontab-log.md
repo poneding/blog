@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Linux](_index.md) / Linux 启用 crontab 日志
+[🏠 首页](../_index.md) / [Linux](_index.md) / Linux 启用 crontab 日志
 
 # Linux 启用 crontab 日志
 

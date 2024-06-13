@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / kubeadm 安装 Kubernetes (Docker)
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / kubeadm 安装 Kubernetes (Docker)
 
 # kubeadm 安装 Kubernetes (Docker)
 

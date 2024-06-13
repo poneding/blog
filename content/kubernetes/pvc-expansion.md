@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / PVC 扩容
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / PVC 扩容
 
 # PVC 扩容
 

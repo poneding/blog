@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [数据中间件](_index.md) / Redis
+[🏠 首页](../_index.md) / [数据中间件](_index.md) / Redis
 
 # Redis
 

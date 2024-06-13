@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / Gateway API 实践
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / Gateway API 实践
 
 # Gateway API 实践
 

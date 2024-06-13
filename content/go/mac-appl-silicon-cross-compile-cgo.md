@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Golang 编程](_index.md) / Mac M1 交叉编译 CGO
+[🏠 首页](../_index.md) / [Golang 编程](_index.md) / Mac M1 交叉编译 CGO
 
 # Mac M1 交叉编译 CGO
 

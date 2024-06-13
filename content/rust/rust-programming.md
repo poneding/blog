@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Rust 编程](_index.md) / 查看根目录
+[🏠 首页](../_index.md) / [Rust 编程](_index.md) / 查看根目录
 
 Rust 编程
 
@@ -27,7 +27,7 @@ let s: &str = "Hello World!";
 let s1 = s.to_string(); 
 let s1 = String::from(s);
 
- let s2 = &s1[..];
+let s2 = &s1[..];
 let s2 = s1.as_ref();
 ```
 

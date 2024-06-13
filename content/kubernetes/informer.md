@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / Informer
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / Informer
 
 # Informer
 

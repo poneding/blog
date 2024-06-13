@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Linux](_index.md) / shell 命令间隔符
+[🏠 首页](../_index.md) / [Linux](_index.md) / shell 命令间隔符
 
 # shell 命令间隔符
 

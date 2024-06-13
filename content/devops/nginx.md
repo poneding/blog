@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [DevOps](_index.md) / nginx
+[🏠 首页](../_index.md) / [DevOps](_index.md) / nginx
 
 # nginx
 

@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Git](_index.md) / Gitlab 跨版本升级
+[🏠 首页](../_index.md) / [Git](_index.md) / Gitlab 跨版本升级
 
 # Gitlab 跨版本升级
 

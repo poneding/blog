@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Git](_index.md) / 多 GitHub 账号管理
+[🏠 首页](../_index.md) / [Git](_index.md) / 多 GitHub 账号管理
 
 # 多 GitHub 账号管理
 

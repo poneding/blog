@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / KubeVirt 创建 Windows 虚拟机
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / KubeVirt 创建 Windows 虚拟机
 
 # KubeVirt 创建 Windows 虚拟机
 

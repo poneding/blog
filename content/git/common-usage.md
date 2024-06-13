@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Git](_index.md) / Git 常用
+[🏠 首页](../_index.md) / [Git](_index.md) / Git 常用
 
 # Git 常用
 

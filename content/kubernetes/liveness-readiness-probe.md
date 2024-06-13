@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / Kubernetes 0-1 Pod中的livenessProbe和readinessProbe解读
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / Kubernetes 0-1 Pod中的livenessProbe和readinessProbe解读
 
 # Kubernetes 0-1 Pod中的livenessProbe和readinessProbe解读
 

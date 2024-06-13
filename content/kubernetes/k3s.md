@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / K3s
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / K3s
 
 # K3s
 

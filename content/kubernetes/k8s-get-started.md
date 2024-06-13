@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / 简单介绍 K8s
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / 简单介绍 K8s
 
 # 简单介绍 K8s
 

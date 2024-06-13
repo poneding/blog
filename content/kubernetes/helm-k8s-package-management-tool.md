@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / Kubernetes 0-1 Helm Kubernetes 的包管理工具
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / Kubernetes 0-1 Helm Kubernetes 的包管理工具
 
 # Kubernetes 0-1 Helm Kubernetes 的包管理工具
 

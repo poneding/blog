@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / Kubernetes 0-1 尝试理解云原生
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / Kubernetes 0-1 尝试理解云原生
 
 # Kubernetes 0-1 尝试理解云原生
 

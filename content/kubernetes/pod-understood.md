@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / Kubernetes 0-1 了解 Pod
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / Kubernetes 0-1 了解 Pod
 
 # Kubernetes 0-1 了解 Pod
 

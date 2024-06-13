@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Linux](_index.md) / 使用 SSH Tunnel 连接中间件
+[🏠 首页](../_index.md) / [Linux](_index.md) / 使用 SSH Tunnel 连接中间件
 
 # 使用 SSH Tunnel 连接中间件
 

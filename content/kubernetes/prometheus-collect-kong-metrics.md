@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [Kubernetes](_index.md) / Prometheus-监控Kong完整操作
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / Prometheus-监控Kong完整操作
 
 # Prometheus-监控Kong完整操作
 

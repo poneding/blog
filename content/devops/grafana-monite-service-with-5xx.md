@@ -1,4 +1,4 @@
-[我的博客](../_index.md) / [DevOps](_index.md) / 使用grafana监控5xx服务
+[🏠 首页](../_index.md) / [DevOps](_index.md) / 使用grafana监控5xx服务
 
 # 使用grafana监控5xx服务
 
