@@ -9,156 +9,156 @@ etcd 集群，K8s 组件之间通信，为了安全可靠，我们最好启用 H
 etcd 是一个分布式的数据库系统，为了模拟 etcd 的高可用，我们将 etcd 部署在三台虚拟机上，正好就部署在 K8s 集群所使用的三台机器上吧。
 etcd 集群，K8s 组件之间通信，为了安全可靠，我们最好启用 HTTPS 安全机制。K8s 提供了基于 CA 签名的双向数字证书认证方式和简单的基于 HTTP Base 或 Token 的认证方式，其中 CA 证书方式的安全性最高。我们使用 cfssl 为我们的 K8s 集群配置 CA 证书，此外也可以使用 openssl。
 安装 cfssl # 在 Master 机器执行："><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="kubernetes"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Binary Build K8s 02 Deploy Etcd | 我的博客</title>
-<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/binary-build-k8s-02-deploy-etcd/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/binary-build-k8s-02-deploy-etcd/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.ffd7553d42e9860dbcfbc6775c0f6c9895736a50f5383929cc725dc0a9b61715.js integrity="sha256-/9dVPULphg28+8Z3XA9smJVzalD1ODkpzHJdwKm2FxU=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
 <input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
 </label><strong>Binary Build K8s 02 Deploy Etcd</strong>
 <label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#写在前面>写在前面</a></li><li><a href=#安装-cfssl>安装 cfssl</a></li><li><a href=#制作-etcd-证书>制作 etcd 证书</a></li><li><a href=#安装-etcd-集群>安装 etcd 集群</a></li><li><a href=#配置-etcd>配置 etcd</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
 <a href=/kubernetes/>Kubernetes</a> / 二进制搭建 K8s - 2 部署 etcd 集群</p><h1 id=二进制搭建-k8s---2-部署-etcd-集群>二进制搭建 K8s - 2 部署 etcd 集群
 <a class=anchor href=#%e4%ba%8c%e8%bf%9b%e5%88%b6%e6%90%ad%e5%bb%ba-k8s---2-%e9%83%a8%e7%bd%b2-etcd-%e9%9b%86%e7%be%a4>#</a></h1><h2 id=写在前面>写在前面
 <a class=anchor href=#%e5%86%99%e5%9c%a8%e5%89%8d%e9%9d%a2>#</a></h2><p>记录和分享使用二进制搭建 K8s 集群的详细过程，由于操作比较冗长，大概会分四篇写完：</p><ol><li><strong><a href=/kubernetes/binary-build-k8s-01-prepare-nodes/>机器准备</a></strong>：</li><li><strong><a href=/kubernetes/binary-build-k8s-02-deploy-etcd/>部署 etcd 集群</a></strong>：</li><li><strong><a href=/kubernetes/binary-build-k8s-03-deploy-master/>部署 Master</a></strong>：</li><li><strong><a href=/kubernetes/binary-build-k8s-04-deploy-worker/>部署 Node</a></strong>：</li></ol><p>etcd 作为 K8s 的数据库，需要首先安装，为其他组件做服务基础。</p><p>etcd 是一个分布式的数据库系统，为了模拟 etcd 的高可用，我们将 etcd 部署在三台虚拟机上，正好就部署在 K8s 集群所使用的三台机器上吧。</p><p>etcd 集群，K8s 组件之间通信，为了安全可靠，我们最好启用 HTTPS 安全机制。K8s 提供了基于 CA 签名的双向数字证书认证方式和简单的基于 HTTP Base 或 Token 的认证方式，其中 CA 证书方式的安全性最高。我们使用 cfssl 为我们的 K8s 集群配置 CA 证书，此外也可以使用 openssl。</p><h2 id=安装-cfssl>安装 cfssl
-<a class=anchor href=#%e5%ae%89%e8%a3%85-cfssl>#</a></h2><p>在 Master 机器执行：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>cd /root/kubernetes/resources
-</span></span><span style=display:flex><span>cp cfssl_linux-amd64 /usr/bin/cfssl
-</span></span><span style=display:flex><span>cp cfssljson_linux-amd64 /usr/bin/cfssljson
-</span></span><span style=display:flex><span>cp cfssl-certinfo_linux-amd64 /usr/bin/cfssl-certinfo
-</span></span><span style=display:flex><span>chmod +x /usr/bin/cfssl /usr/bin/cfssljson /usr/bin/cfssl-certinfo
-</span></span></code></pre></div><p>在所有机器执行：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>mkdir /etc/etcd/ssl -p
+<a class=anchor href=#%e5%ae%89%e8%a3%85-cfssl>#</a></h2><p>在 Master 机器执行：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl><span class=nb>cd</span> /root/kubernetes/resources
+</span></span><span class=line><span class=cl>cp cfssl_linux-amd64 /usr/bin/cfssl
+</span></span><span class=line><span class=cl>cp cfssljson_linux-amd64 /usr/bin/cfssljson
+</span></span><span class=line><span class=cl>cp cfssl-certinfo_linux-amd64 /usr/bin/cfssl-certinfo
+</span></span><span class=line><span class=cl>chmod +x /usr/bin/cfssl /usr/bin/cfssljson /usr/bin/cfssl-certinfo
+</span></span></code></pre></div><p>在所有机器执行：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>mkdir /etc/etcd/ssl -p
 </span></span></code></pre></div><h2 id=制作-etcd-证书>制作 etcd 证书
-<a class=anchor href=#%e5%88%b6%e4%bd%9c-etcd-%e8%af%81%e4%b9%a6>#</a></h2><p>在 Master 机器执行：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>mkdir /root/kubernetes/resources/cert/etcd -p
-</span></span><span style=display:flex><span>cd /root/kubernetes/resources/cert/etcd
-</span></span></code></pre></div><p>编辑 ca-config.json</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>vim ca-config.json
-</span></span></code></pre></div><p>写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
-</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;signing&#34;</span>: {
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;default&#34;</span>: {
-</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;expiry&#34;</span>: <span style=color:#e6db74>&#34;87600h&#34;</span>
-</span></span><span style=display:flex><span>    },
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;profiles&#34;</span>: {
-</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;etcd&#34;</span>: {
-</span></span><span style=display:flex><span>         <span style=color:#f92672>&#34;expiry&#34;</span>: <span style=color:#e6db74>&#34;87600h&#34;</span>,
-</span></span><span style=display:flex><span>         <span style=color:#f92672>&#34;usages&#34;</span>: [
-</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#34;signing&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#34;key encipherment&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#34;server auth&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#34;client auth&#34;</span>
-</span></span><span style=display:flex><span>        ]
-</span></span><span style=display:flex><span>      }
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>  }
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p>编辑 ca-csr.json：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>vim ca-csr.json
-</span></span></code></pre></div><p>写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;CN&#34;</span>: <span style=color:#e6db74>&#34;etcd ca&#34;</span>,
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;key&#34;</span>: {
-</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;algo&#34;</span>: <span style=color:#e6db74>&#34;rsa&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;size&#34;</span>: <span style=color:#ae81ff>2048</span>
-</span></span><span style=display:flex><span>    },
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;names&#34;</span>: [
-</span></span><span style=display:flex><span>        {
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;C&#34;</span>: <span style=color:#e6db74>&#34;CN&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;L&#34;</span>: <span style=color:#e6db74>&#34;Hunan&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;ST&#34;</span>: <span style=color:#e6db74>&#34;Changsha&#34;</span>
-</span></span><span style=display:flex><span>        }
-</span></span><span style=display:flex><span>    ]
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p>生成 ca 证书和密钥：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>cfssl gencert -initca ca-csr.json | cfssljson -bare ca
-</span></span></code></pre></div><p>编辑 server-csr.json：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim server-csr.json
-</span></span></code></pre></div><p>写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;CN&#34;</span>: <span style=color:#e6db74>&#34;etcd&#34;</span>,
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;hosts&#34;</span>: [
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;192.168.115.131&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;192.168.115.132&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;192.168.115.133&#34;</span>
-</span></span><span style=display:flex><span>        ],
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;key&#34;</span>: {
-</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;algo&#34;</span>: <span style=color:#e6db74>&#34;rsa&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;size&#34;</span>: <span style=color:#ae81ff>2048</span>
-</span></span><span style=display:flex><span>    },
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;names&#34;</span>: [
-</span></span><span style=display:flex><span>        {
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;C&#34;</span>: <span style=color:#e6db74>&#34;CN&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;L&#34;</span>: <span style=color:#e6db74>&#34;Hunan&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;ST&#34;</span>: <span style=color:#e6db74>&#34;Changsha&#34;</span>
-</span></span><span style=display:flex><span>        }
-</span></span><span style=display:flex><span>    ]
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><blockquote><p>hosts 中配置所有 Master 和 Node 的 IP 列表。</p></blockquote><p>生成 etcd 证书和密钥</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>cfssl gencert -ca<span style=color:#f92672>=</span>ca.pem -ca-key<span style=color:#f92672>=</span>ca-key.pem -config<span style=color:#f92672>=</span>ca-config.json -profile<span style=color:#f92672>=</span>etcd server-csr.json | cfssljson -bare server
-</span></span><span style=display:flex><span><span style=color:#75715e># 此时目录下会生成 7 个文件</span>
-</span></span><span style=display:flex><span>ls
-</span></span><span style=display:flex><span>ca-config.json  ca.csr  ca-csr.json  ca-key.pem  ca.pem  server.csr  server-csr.json  server-key.pem  server.pem
-</span></span></code></pre></div><p>拷贝证书</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>cp ca.pem server-key.pem  server.pem /etc/etcd/ssl
-</span></span><span style=display:flex><span>scp ca.pem server-key.pem  server.pem 192.168.115.132:/etc/etcd/ssl
-</span></span><span style=display:flex><span>scp ca.pem server-key.pem  server.pem 192.168.115.133:/etc/etcd/ssl
+<a class=anchor href=#%e5%88%b6%e4%bd%9c-etcd-%e8%af%81%e4%b9%a6>#</a></h2><p>在 Master 机器执行：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>mkdir /root/kubernetes/resources/cert/etcd -p
+</span></span><span class=line><span class=cl><span class=nb>cd</span> /root/kubernetes/resources/cert/etcd
+</span></span></code></pre></div><p>编辑 ca-config.json</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>vim ca-config.json
+</span></span></code></pre></div><p>写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;signing&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;default&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;expiry&#34;</span><span class=p>:</span> <span class=s2>&#34;87600h&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;profiles&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;etcd&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>         <span class=nt>&#34;expiry&#34;</span><span class=p>:</span> <span class=s2>&#34;87600h&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>         <span class=nt>&#34;usages&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;signing&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;key encipherment&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;server auth&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;client auth&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>]</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>编辑 ca-csr.json：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>vim ca-csr.json
+</span></span></code></pre></div><p>写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;CN&#34;</span><span class=p>:</span> <span class=s2>&#34;etcd ca&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;key&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;algo&#34;</span><span class=p>:</span> <span class=s2>&#34;rsa&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;size&#34;</span><span class=p>:</span> <span class=mi>2048</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;names&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;C&#34;</span><span class=p>:</span> <span class=s2>&#34;CN&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;L&#34;</span><span class=p>:</span> <span class=s2>&#34;Hunan&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;ST&#34;</span><span class=p>:</span> <span class=s2>&#34;Changsha&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>生成 ca 证书和密钥：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>cfssl gencert -initca ca-csr.json <span class=p>|</span> cfssljson -bare ca
+</span></span></code></pre></div><p>编辑 server-csr.json：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>vim server-csr.json
+</span></span></code></pre></div><p>写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;CN&#34;</span><span class=p>:</span> <span class=s2>&#34;etcd&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;hosts&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;192.168.115.131&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;192.168.115.132&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;192.168.115.133&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>],</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;key&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;algo&#34;</span><span class=p>:</span> <span class=s2>&#34;rsa&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;size&#34;</span><span class=p>:</span> <span class=mi>2048</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;names&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;C&#34;</span><span class=p>:</span> <span class=s2>&#34;CN&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;L&#34;</span><span class=p>:</span> <span class=s2>&#34;Hunan&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;ST&#34;</span><span class=p>:</span> <span class=s2>&#34;Changsha&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><blockquote><p>hosts 中配置所有 Master 和 Node 的 IP 列表。</p></blockquote><p>生成 etcd 证书和密钥</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>cfssl gencert -ca<span class=o>=</span>ca.pem -ca-key<span class=o>=</span>ca-key.pem -config<span class=o>=</span>ca-config.json -profile<span class=o>=</span>etcd server-csr.json <span class=p>|</span> cfssljson -bare server
+</span></span><span class=line><span class=cl><span class=c1># 此时目录下会生成 7 个文件</span>
+</span></span><span class=line><span class=cl>ls
+</span></span><span class=line><span class=cl>ca-config.json  ca.csr  ca-csr.json  ca-key.pem  ca.pem  server.csr  server-csr.json  server-key.pem  server.pem
+</span></span></code></pre></div><p>拷贝证书</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>cp ca.pem server-key.pem  server.pem /etc/etcd/ssl
+</span></span><span class=line><span class=cl>scp ca.pem server-key.pem  server.pem 192.168.115.132:/etc/etcd/ssl
+</span></span><span class=line><span class=cl>scp ca.pem server-key.pem  server.pem 192.168.115.133:/etc/etcd/ssl
 </span></span></code></pre></div><h2 id=安装-etcd-集群>安装 etcd 集群
-<a class=anchor href=#%e5%ae%89%e8%a3%85-etcd-%e9%9b%86%e7%be%a4>#</a></h2><p>在所有机器执行：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>cd /root/kubernetes/resources
-</span></span><span style=display:flex><span>tar -zxvf /root/kubernetes/resources/etcd-v3.4.9-linux-amd64.tar.gz
-</span></span><span style=display:flex><span>cp ./etcd-v3.4.9-linux-amd64/etcd ./etcd-v3.4.9-linux-amd64/etcdctl /usr/bin
+<a class=anchor href=#%e5%ae%89%e8%a3%85-etcd-%e9%9b%86%e7%be%a4>#</a></h2><p>在所有机器执行：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=nb>cd</span> /root/kubernetes/resources
+</span></span><span class=line><span class=cl>tar -zxvf /root/kubernetes/resources/etcd-v3.4.9-linux-amd64.tar.gz
+</span></span><span class=line><span class=cl>cp ./etcd-v3.4.9-linux-amd64/etcd ./etcd-v3.4.9-linux-amd64/etcdctl /usr/bin
 </span></span></code></pre></div><h2 id=配置-etcd>配置 etcd
-<a class=anchor href=#%e9%85%8d%e7%bd%ae-etcd>#</a></h2><p>这里开始命令需要分别在 Master 和 Node 机器执行，配置 etcd.conf</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim /etc/etcd/etcd.conf
-</span></span></code></pre></div><p>k8s-master01 写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#66d9ef>[Member]</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_NAME</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;etcd01&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_DATA_DIR</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;/var/lib/etcd/default.etcd&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_LISTEN_PEER_URLS</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;https://192.168.115.131:2380&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_LISTEN_CLIENT_URLS</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;https://192.168.115.131:2379,https://127.0.0.1:2379&#34;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>[Clustering]</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_INITIAL_ADVERTISE_PEER_URLS</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;https://192.168.115.131:2380&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_ADVERTISE_CLIENT_URLS</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;https://192.168.115.131:2379&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_INITIAL_CLUSTER</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;etcd01=https://192.168.115.131:2380,etcd02=https://192.168.115.132:2380,etcd03=https://192.168.115.133:2380&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_INITIAL_CLUSTER_TOKEN</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;etcd-cluster&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_INITIAL_CLUSTER_STATE</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;new&#34;</span>
-</span></span></code></pre></div><p>k8s-node01 写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#66d9ef>[Member]</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_NAME</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;etcd02&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_DATA_DIR</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;/var/lib/etcd/default.etcd&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_LISTEN_PEER_URLS</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;https://192.168.115.132:2380&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_LISTEN_CLIENT_URLS</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;https://192.168.115.132:2379,https://127.0.0.1:2379&#34;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>[Clustering]</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_INITIAL_ADVERTISE_PEER_URLS</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;https://192.168.115.132:2380&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_ADVERTISE_CLIENT_URLS</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;https://192.168.115.132:2379&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_INITIAL_CLUSTER</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;etcd01=https://192.168.115.131:2380,etcd02=https://192.168.115.132:2380,etcd03=https://192.168.115.133:2380&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_INITIAL_CLUSTER_TOKEN</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;etcd-cluster&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_INITIAL_CLUSTER_STATE</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;new&#34;</span>
-</span></span></code></pre></div><p>k8s-node02 写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#66d9ef>[Member]</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_NAME</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;etcd03&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_DATA_DIR</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;/var/lib/etcd/default.etcd&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_LISTEN_PEER_URLS</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;https://192.168.115.133:2380&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_LISTEN_CLIENT_URLS</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;https://192.168.115.133:2379,https://127.0.0.1:2379&#34;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>[Clustering]</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_INITIAL_ADVERTISE_PEER_URLS</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;https://192.168.115.133:2380&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_ADVERTISE_CLIENT_URLS</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;https://192.168.115.133:2379&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_INITIAL_CLUSTER</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;etcd01=https://192.168.115.131:2380,etcd02=https://192.168.115.132:2380,etcd03=https://192.168.115.133:2380&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_INITIAL_CLUSTER_TOKEN</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;etcd-cluster&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ETCD_INITIAL_CLUSTER_STATE</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;new&#34;</span>
-</span></span></code></pre></div><p>这里开始在所有机器执行，设置 etcd 服务配置文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>mkdir -p /var/lib/etcd
-</span></span><span style=display:flex><span>vim /usr/lib/systemd/system/etcd.service
-</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#66d9ef>[Unit]</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>Description</span><span style=color:#f92672>=</span><span style=color:#e6db74>Etcd Server</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>After</span><span style=color:#f92672>=</span><span style=color:#e6db74>network.target</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>After</span><span style=color:#f92672>=</span><span style=color:#e6db74>network-online.target</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>Wants</span><span style=color:#f92672>=</span><span style=color:#e6db74>network-online.target</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>[Service]</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>Type</span><span style=color:#f92672>=</span><span style=color:#e6db74>notify</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>EnvironmentFile</span><span style=color:#f92672>=</span><span style=color:#e6db74>/etc/etcd/etcd.conf</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ExecStart</span><span style=color:#f92672>=</span><span style=color:#e6db74>/usr/bin/etcd \
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>        --cert-file=/etc/etcd/ssl/server.pem \
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>        --key-file=/etc/etcd/ssl/server-key.pem \
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>        --peer-cert-file=/etc/etcd/ssl/server.pem \
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>        --peer-key-file=/etc/etcd/ssl/server-key.pem \
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>        --trusted-ca-file=/etc/etcd/ssl/ca.pem \
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>        --peer-trusted-ca-file=/etc/etcd/ssl/ca.pem</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>Restart</span><span style=color:#f92672>=</span><span style=color:#e6db74>on-failure</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>LimitNOFILE</span><span style=color:#f92672>=</span><span style=color:#e6db74>65536</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>[Install]</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>WantedBy</span><span style=color:#f92672>=</span><span style=color:#e6db74>multi-user.target</span>
-</span></span></code></pre></div><blockquote><p>etcd3.4 版本会自动 EnvironmentFile 文件中的环境变量，不需要再 ExecStart 的命令参数重复设置，否则会报：<code>"xxx" is shadowed by corresponding command-line flag</code> 的错误信息。</p></blockquote><p>启动 etcd，并且设置开机自动运行 etcd</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>systemctl daemon-reload
-</span></span><span style=display:flex><span>systemctl start etcd.service
-</span></span><span style=display:flex><span>systemctl enable etcd.service
-</span></span></code></pre></div><p>检查 etcd 集群的健康状态</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>etcdctl endpoint health --cacert<span style=color:#f92672>=</span>/etc/etcd/ssl/ca.pem --cert<span style=color:#f92672>=</span>/etc/etcd/ssl/server.pem --key<span style=color:#f92672>=</span>/etc/etcd/ssl/server-key.pem --endpoints<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;https://192.168.115.131:2379,https://192.168.115.132:2379,https://192.168.115.133:2379&#34;</span>
-</span></span></code></pre></div><p>输出如下，说明 etcd 集群已经部署成功。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-tex data-lang=tex><span style=display:flex><span>https://192.168.115.133:2379 is healthy: successfully committed proposal: took = 15.805605ms
-</span></span><span style=display:flex><span>https://192.168.115.132:2379 is healthy: successfully committed proposal: took = 22.127986ms
-</span></span><span style=display:flex><span>https://192.168.115.131:2379 is healthy: successfully committed proposal: took = 24.829669ms
+<a class=anchor href=#%e9%85%8d%e7%bd%ae-etcd>#</a></h2><p>这里开始命令需要分别在 Master 和 Node 机器执行，配置 etcd.conf</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>vim /etc/etcd/etcd.conf
+</span></span></code></pre></div><p>k8s-master01 写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-ini data-lang=ini><span class=line><span class=cl><span class=k>[Member]</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_NAME</span><span class=o>=</span><span class=s>&#34;etcd01&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_DATA_DIR</span><span class=o>=</span><span class=s>&#34;/var/lib/etcd/default.etcd&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_LISTEN_PEER_URLS</span><span class=o>=</span><span class=s>&#34;https://192.168.115.131:2380&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_LISTEN_CLIENT_URLS</span><span class=o>=</span><span class=s>&#34;https://192.168.115.131:2379,https://127.0.0.1:2379&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>[Clustering]</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_INITIAL_ADVERTISE_PEER_URLS</span><span class=o>=</span><span class=s>&#34;https://192.168.115.131:2380&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_ADVERTISE_CLIENT_URLS</span><span class=o>=</span><span class=s>&#34;https://192.168.115.131:2379&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_INITIAL_CLUSTER</span><span class=o>=</span><span class=s>&#34;etcd01=https://192.168.115.131:2380,etcd02=https://192.168.115.132:2380,etcd03=https://192.168.115.133:2380&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_INITIAL_CLUSTER_TOKEN</span><span class=o>=</span><span class=s>&#34;etcd-cluster&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_INITIAL_CLUSTER_STATE</span><span class=o>=</span><span class=s>&#34;new&#34;</span>
+</span></span></code></pre></div><p>k8s-node01 写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-ini data-lang=ini><span class=line><span class=cl><span class=k>[Member]</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_NAME</span><span class=o>=</span><span class=s>&#34;etcd02&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_DATA_DIR</span><span class=o>=</span><span class=s>&#34;/var/lib/etcd/default.etcd&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_LISTEN_PEER_URLS</span><span class=o>=</span><span class=s>&#34;https://192.168.115.132:2380&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_LISTEN_CLIENT_URLS</span><span class=o>=</span><span class=s>&#34;https://192.168.115.132:2379,https://127.0.0.1:2379&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>[Clustering]</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_INITIAL_ADVERTISE_PEER_URLS</span><span class=o>=</span><span class=s>&#34;https://192.168.115.132:2380&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_ADVERTISE_CLIENT_URLS</span><span class=o>=</span><span class=s>&#34;https://192.168.115.132:2379&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_INITIAL_CLUSTER</span><span class=o>=</span><span class=s>&#34;etcd01=https://192.168.115.131:2380,etcd02=https://192.168.115.132:2380,etcd03=https://192.168.115.133:2380&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_INITIAL_CLUSTER_TOKEN</span><span class=o>=</span><span class=s>&#34;etcd-cluster&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_INITIAL_CLUSTER_STATE</span><span class=o>=</span><span class=s>&#34;new&#34;</span>
+</span></span></code></pre></div><p>k8s-node02 写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-ini data-lang=ini><span class=line><span class=cl><span class=k>[Member]</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_NAME</span><span class=o>=</span><span class=s>&#34;etcd03&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_DATA_DIR</span><span class=o>=</span><span class=s>&#34;/var/lib/etcd/default.etcd&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_LISTEN_PEER_URLS</span><span class=o>=</span><span class=s>&#34;https://192.168.115.133:2380&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_LISTEN_CLIENT_URLS</span><span class=o>=</span><span class=s>&#34;https://192.168.115.133:2379,https://127.0.0.1:2379&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>[Clustering]</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_INITIAL_ADVERTISE_PEER_URLS</span><span class=o>=</span><span class=s>&#34;https://192.168.115.133:2380&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_ADVERTISE_CLIENT_URLS</span><span class=o>=</span><span class=s>&#34;https://192.168.115.133:2379&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_INITIAL_CLUSTER</span><span class=o>=</span><span class=s>&#34;etcd01=https://192.168.115.131:2380,etcd02=https://192.168.115.132:2380,etcd03=https://192.168.115.133:2380&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_INITIAL_CLUSTER_TOKEN</span><span class=o>=</span><span class=s>&#34;etcd-cluster&#34;</span>
+</span></span><span class=line><span class=cl><span class=na>ETCD_INITIAL_CLUSTER_STATE</span><span class=o>=</span><span class=s>&#34;new&#34;</span>
+</span></span></code></pre></div><p>这里开始在所有机器执行，设置 etcd 服务配置文件</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>mkdir -p /var/lib/etcd
+</span></span><span class=line><span class=cl>vim /usr/lib/systemd/system/etcd.service
+</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-ini data-lang=ini><span class=line><span class=cl><span class=k>[Unit]</span>
+</span></span><span class=line><span class=cl><span class=na>Description</span><span class=o>=</span><span class=s>Etcd Server</span>
+</span></span><span class=line><span class=cl><span class=na>After</span><span class=o>=</span><span class=s>network.target</span>
+</span></span><span class=line><span class=cl><span class=na>After</span><span class=o>=</span><span class=s>network-online.target</span>
+</span></span><span class=line><span class=cl><span class=na>Wants</span><span class=o>=</span><span class=s>network-online.target</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>[Service]</span>
+</span></span><span class=line><span class=cl><span class=na>Type</span><span class=o>=</span><span class=s>notify</span>
+</span></span><span class=line><span class=cl><span class=na>EnvironmentFile</span><span class=o>=</span><span class=s>/etc/etcd/etcd.conf</span>
+</span></span><span class=line><span class=cl><span class=na>ExecStart</span><span class=o>=</span><span class=s>/usr/bin/etcd \
+</span></span></span><span class=line><span class=cl><span class=s>        --cert-file=/etc/etcd/ssl/server.pem \
+</span></span></span><span class=line><span class=cl><span class=s>        --key-file=/etc/etcd/ssl/server-key.pem \
+</span></span></span><span class=line><span class=cl><span class=s>        --peer-cert-file=/etc/etcd/ssl/server.pem \
+</span></span></span><span class=line><span class=cl><span class=s>        --peer-key-file=/etc/etcd/ssl/server-key.pem \
+</span></span></span><span class=line><span class=cl><span class=s>        --trusted-ca-file=/etc/etcd/ssl/ca.pem \
+</span></span></span><span class=line><span class=cl><span class=s>        --peer-trusted-ca-file=/etc/etcd/ssl/ca.pem</span>
+</span></span><span class=line><span class=cl><span class=na>Restart</span><span class=o>=</span><span class=s>on-failure</span>
+</span></span><span class=line><span class=cl><span class=na>LimitNOFILE</span><span class=o>=</span><span class=s>65536</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>[Install]</span>
+</span></span><span class=line><span class=cl><span class=na>WantedBy</span><span class=o>=</span><span class=s>multi-user.target</span>
+</span></span></code></pre></div><blockquote><p>etcd3.4 版本会自动 EnvironmentFile 文件中的环境变量，不需要再 ExecStart 的命令参数重复设置，否则会报：<code>"xxx" is shadowed by corresponding command-line flag</code> 的错误信息。</p></blockquote><p>启动 etcd，并且设置开机自动运行 etcd</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>systemctl daemon-reload
+</span></span><span class=line><span class=cl>systemctl start etcd.service
+</span></span><span class=line><span class=cl>systemctl <span class=nb>enable</span> etcd.service
+</span></span></code></pre></div><p>检查 etcd 集群的健康状态</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>etcdctl endpoint health --cacert<span class=o>=</span>/etc/etcd/ssl/ca.pem --cert<span class=o>=</span>/etc/etcd/ssl/server.pem --key<span class=o>=</span>/etc/etcd/ssl/server-key.pem --endpoints<span class=o>=</span><span class=s2>&#34;https://192.168.115.131:2379,https://192.168.115.132:2379,https://192.168.115.133:2379&#34;</span>
+</span></span></code></pre></div><p>输出如下，说明 etcd 集群已经部署成功。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-tex data-lang=tex><span class=line><span class=cl>https://192.168.115.133:2379 is healthy: successfully committed proposal: took = 15.805605ms
+</span></span><span class=line><span class=cl>https://192.168.115.132:2379 is healthy: successfully committed proposal: took = 22.127986ms
+</span></span><span class=line><span class=cl>https://192.168.115.131:2379 is healthy: successfully committed proposal: took = 24.829669ms
 </span></span></code></pre></div><p>第二段落<strong>部署 etcd 集群</strong>愉快结束。</p><hr><p><a href=/kubernetes/binary-build-k8s-01-prepare-nodes/>« 二进制搭建 K8s - 1 机器准备</a></p><p><a href=/kubernetes/binary-build-k8s-03-deploy-master/>» 二进制搭建 K8s - 3 部署 Master</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
 <span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/kubernetes/binary-build-k8s-02-deploy-etcd.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
 <span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#写在前面>写在前面</a></li><li><a href=#安装-cfssl>安装 cfssl</a></li><li><a href=#制作-etcd-证书>制作 etcd 证书</a></li><li><a href=#安装-etcd-集群>安装 etcd 集群</a></li><li><a href=#配置-etcd>配置 etcd</a></li></ul></nav></div></aside></main></body></html>

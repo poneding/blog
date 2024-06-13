@@ -11,7 +11,7 @@ kube-scheduler 是 Kubernetes 自带的一个默认调度器，它会根据 Pod 
 扩展调度器 # 有三种方式可以实现自定义调度器：
 修改 kube-scheduler 源码调度逻辑，然后编译成定制的调度器镜像，然后使用这个镜像部署调度进程 自定义 Pod 控制器，监听 Pod 的 spec.schedulerName 字段，在 Pod 被创建时，为其绑定节点 使用 Scheduler Extender 的方式，这种方式不需要修改默认调度器的配置文件 编译定制调度器镜像 # 克隆 kubernetes 源码，然后修改 kube-scheduler 源码，然后编译成定制的调度器镜像。
 git clone https://github.com/kubernetes/kubernetes.git cd kubernetes # 修改源码 make 编写 Dockerfile："><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="kubernetes"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>K8s Dev 50 Extend Kube Scheduler | 我的博客</title>
-<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/k8s-dev-50-extend-kube-scheduler/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/k8s-dev-50-extend-kube-scheduler/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.ffd7553d42e9860dbcfbc6775c0f6c9895736a50f5383929cc725dc0a9b61715.js integrity="sha256-/9dVPULphg28+8Z3XA9smJVzalD1ODkpzHJdwKm2FxU=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
 <input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
 </label><strong>K8s Dev 50 Extend Kube Scheduler</strong>
 <label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#简介>简介</a></li><li><a href=#扩展调度器>扩展调度器</a><ul><li><a href=#编译定制调度器镜像>编译定制调度器镜像</a></li><li><a href=#自定义调度控制器>自定义调度控制器</a></li><li><a href=#scheduler-extender>Scheduler Extender</a></li></ul></li><li><a href=#参考>参考</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
@@ -19,569 +19,569 @@ git clone https://github.com/kubernetes/kubernetes.git cd kubernetes # 修改源
 <a class=anchor href=#kubernetes-%e5%ae%9a%e5%88%b6%e5%bc%80%e5%8f%91-50%e6%89%a9%e5%b1%95%e8%b0%83%e5%ba%a6%e5%99%a8>#</a></h1><h2 id=简介>简介
 <a class=anchor href=#%e7%ae%80%e4%bb%8b>#</a></h2><p>Kubernetes Scheduler（调度器）是一个控制面进程，负责将 Pods 指派到节点上。调度器基于约束和可用资源为调度队列中每个 Pod 确定其可合法放置的节点。调度器之后对所有合法的节点进行排序，将 Pod 绑定到一个合适的节点。</p><p><code>kube-scheduler</code> 是 Kubernetes 自带的一个默认调度器，它会根据 Pod 的资源需求和节点的资源容量，将 Pod 调度到合适的节点上。</p><p>如果默认调度器不符合你的需求，你可以实现自己的调度器，并且你的调度器可以和默认调度器或其他调度器一起运行在集群中。你可以通过声明 Pod 的 <code>spec.schedulerName</code> 字段来指定要使用的调度器。</p><h2 id=扩展调度器>扩展调度器
 <a class=anchor href=#%e6%89%a9%e5%b1%95%e8%b0%83%e5%ba%a6%e5%99%a8>#</a></h2><p>有三种方式可以实现自定义调度器：</p><ul><li>修改 kube-scheduler 源码调度逻辑，然后编译成定制的调度器镜像，然后使用这个镜像部署调度进程</li><li>自定义 Pod 控制器，监听 Pod 的 spec.schedulerName 字段，在 Pod 被创建时，为其绑定节点</li><li>使用 Scheduler Extender 的方式，这种方式不需要修改默认调度器的配置文件</li></ul><h3 id=编译定制调度器镜像>编译定制调度器镜像
-<a class=anchor href=#%e7%bc%96%e8%af%91%e5%ae%9a%e5%88%b6%e8%b0%83%e5%ba%a6%e5%99%a8%e9%95%9c%e5%83%8f>#</a></h3><p>克隆 kubernetes 源码，然后修改 kube-scheduler 源码，然后编译成定制的调度器镜像。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>git clone https://github.com/kubernetes/kubernetes.git
-</span></span><span style=display:flex><span>cd kubernetes
-</span></span><span style=display:flex><span><span style=color:#75715e># 修改源码</span>
-</span></span><span style=display:flex><span>make
-</span></span></code></pre></div><p>编写 Dockerfile：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-dockerfile data-lang=dockerfile><span style=display:flex><span><span style=color:#66d9ef>FROM</span><span style=color:#e6db74> alpine</span><span style=color:#960050;background-color:#1e0010>
-</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
-</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span><span style=color:#66d9ef>ADD</span> ./_output/local/bin/linux/amd64/kube-scheduler /usr/local/bin/kube-scheduler<span style=color:#960050;background-color:#1e0010>
-</span></span></span></code></pre></div><p>编译并推送镜像：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker build -t poneding/my-kube-scheduler:v1.0 .
-</span></span><span style=display:flex><span>docker push poneding/my-kube-scheduler:v1.0
-</span></span></code></pre></div><p>编写部署清单文件：</p><p><em>deploy-maniest.yaml</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ServiceAccount</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
-</span></span><span style=display:flex><span>---
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRoleBinding</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler-as-kube-scheduler</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>subjects</span>:
-</span></span><span style=display:flex><span>- <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ServiceAccount</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>roleRef</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRole</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>system:kube-scheduler</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>apiGroup</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io</span>
-</span></span><span style=display:flex><span>---
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ConfigMap</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler-config</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>data</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>my-scheduler-config.yaml</span>: |<span style=color:#e6db74>
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>    apiVersion: kubescheduler.config.k8s.io/v1
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>    kind: KubeSchedulerConfiguration
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>    profiles:
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>      - schedulerName: my-scheduler
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>    leaderElection:
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>      leaderElect: false    </span>    
-</span></span><span style=display:flex><span>---
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRoleBinding</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler-as-volume-scheduler</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>subjects</span>:
-</span></span><span style=display:flex><span>- <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ServiceAccount</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>roleRef</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRole</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>system:volume-scheduler</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>apiGroup</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io</span>
-</span></span><span style=display:flex><span>---
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>apps/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Deployment</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>component</span>: <span style=color:#ae81ff>scheduler</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>control-plane</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>matchLabels</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>component</span>: <span style=color:#ae81ff>scheduler</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>control-plane</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>replicas</span>: <span style=color:#ae81ff>1</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>component</span>: <span style=color:#ae81ff>scheduler</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>control-plane</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>serviceAccountName</span>: <span style=color:#ae81ff>my-scheduler</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>containers</span>:
-</span></span><span style=display:flex><span>      - <span style=color:#f92672>command</span>:
-</span></span><span style=display:flex><span>        - <span style=color:#ae81ff>/usr/local/bin/kube-scheduler</span>
-</span></span><span style=display:flex><span>        - --<span style=color:#ae81ff>config=/etc/kubernetes/my-scheduler/my-scheduler-config.yaml</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>image</span>: <span style=color:#ae81ff>poneding/my-kube-scheduler:v1.0</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>livenessProbe</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>httpGet</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/healthz</span>
-</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>: <span style=color:#ae81ff>10259</span>
-</span></span><span style=display:flex><span>            <span style=color:#f92672>scheme</span>: <span style=color:#ae81ff>HTTPS</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>initialDelaySeconds</span>: <span style=color:#ae81ff>15</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>readinessProbe</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>httpGet</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/healthz</span>
-</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>: <span style=color:#ae81ff>10259</span>
-</span></span><span style=display:flex><span>            <span style=color:#f92672>scheme</span>: <span style=color:#ae81ff>HTTPS</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>resources</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>requests</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>cpu</span>: <span style=color:#e6db74>&#39;0.1&#39;</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>securityContext</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>privileged</span>: <span style=color:#66d9ef>false</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>volumeMounts</span>:
-</span></span><span style=display:flex><span>          - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>config-volume</span>
-</span></span><span style=display:flex><span>            <span style=color:#f92672>mountPath</span>: <span style=color:#ae81ff>/etc/kubernetes/my-scheduler</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>hostNetwork</span>: <span style=color:#66d9ef>false</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>hostPID</span>: <span style=color:#66d9ef>false</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>volumes</span>:
-</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>config-volume</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>configMap</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler-config</span>
-</span></span></code></pre></div><p>部署：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl apply -f deploy-maniest.yaml
-</span></span></code></pre></div><p>测试：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl run nginx-by-my-scheduler --image<span style=color:#f92672>=</span>nginx --overrides<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;{&#34;spec&#34;:{&#34;schedulerName&#34;:&#34;my-scheduler&#34;}}&#39;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>kubectl get pod -o wide -w
+<a class=anchor href=#%e7%bc%96%e8%af%91%e5%ae%9a%e5%88%b6%e8%b0%83%e5%ba%a6%e5%99%a8%e9%95%9c%e5%83%8f>#</a></h3><p>克隆 kubernetes 源码，然后修改 kube-scheduler 源码，然后编译成定制的调度器镜像。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git clone https://github.com/kubernetes/kubernetes.git
+</span></span><span class=line><span class=cl><span class=nb>cd</span> kubernetes
+</span></span><span class=line><span class=cl><span class=c1># 修改源码</span>
+</span></span><span class=line><span class=cl>make
+</span></span></code></pre></div><p>编写 Dockerfile：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-dockerfile data-lang=dockerfile><span class=line><span class=cl><span class=k>FROM</span><span class=s> alpine</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>ADD</span> ./_output/local/bin/linux/amd64/kube-scheduler /usr/local/bin/kube-scheduler<span class=err>
+</span></span></span></code></pre></div><p>编译并推送镜像：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>docker build -t poneding/my-kube-scheduler:v1.0 .
+</span></span><span class=line><span class=cl>docker push poneding/my-kube-scheduler:v1.0
+</span></span></code></pre></div><p>编写部署清单文件：</p><p><em>deploy-maniest.yaml</em>：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ServiceAccount</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ClusterRoleBinding</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-as-kube-scheduler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>subjects</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ServiceAccount</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>roleRef</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ClusterRole</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>system:kube-scheduler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>apiGroup</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ConfigMap</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-config</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>data</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>my-scheduler-config.yaml</span><span class=p>:</span><span class=w> </span><span class=p>|</span><span class=sd>
+</span></span></span><span class=line><span class=cl><span class=sd>    apiVersion: kubescheduler.config.k8s.io/v1
+</span></span></span><span class=line><span class=cl><span class=sd>    kind: KubeSchedulerConfiguration
+</span></span></span><span class=line><span class=cl><span class=sd>    profiles:
+</span></span></span><span class=line><span class=cl><span class=sd>      - schedulerName: my-scheduler
+</span></span></span><span class=line><span class=cl><span class=sd>    leaderElection:
+</span></span></span><span class=line><span class=cl><span class=sd>      leaderElect: false    </span><span class=w>    
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ClusterRoleBinding</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-as-volume-scheduler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>subjects</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ServiceAccount</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>roleRef</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ClusterRole</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>system:volume-scheduler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>apiGroup</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>apps/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Deployment</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>component</span><span class=p>:</span><span class=w> </span><span class=l>scheduler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>tier</span><span class=p>:</span><span class=w> </span><span class=l>control-plane</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>selector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>matchLabels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>component</span><span class=p>:</span><span class=w> </span><span class=l>scheduler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>tier</span><span class=p>:</span><span class=w> </span><span class=l>control-plane</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>replicas</span><span class=p>:</span><span class=w> </span><span class=m>1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>template</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>component</span><span class=p>:</span><span class=w> </span><span class=l>scheduler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>tier</span><span class=p>:</span><span class=w> </span><span class=l>control-plane</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>serviceAccountName</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>command</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=l>/usr/local/bin/kube-scheduler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- --<span class=l>config=/etc/kubernetes/my-scheduler/my-scheduler-config.yaml</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>poneding/my-kube-scheduler:v1.0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>livenessProbe</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>httpGet</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>path</span><span class=p>:</span><span class=w> </span><span class=l>/healthz</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=m>10259</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>scheme</span><span class=p>:</span><span class=w> </span><span class=l>HTTPS</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>initialDelaySeconds</span><span class=p>:</span><span class=w> </span><span class=m>15</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>readinessProbe</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>httpGet</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>path</span><span class=p>:</span><span class=w> </span><span class=l>/healthz</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=m>10259</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>scheme</span><span class=p>:</span><span class=w> </span><span class=l>HTTPS</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>resources</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>requests</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>cpu</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;0.1&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>securityContext</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>privileged</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>volumeMounts</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>config-volume</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>mountPath</span><span class=p>:</span><span class=w> </span><span class=l>/etc/kubernetes/my-scheduler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>hostNetwork</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>hostPID</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>volumes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>config-volume</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>configMap</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-config</span><span class=w>
+</span></span></span></code></pre></div><p>部署：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl apply -f deploy-maniest.yaml
+</span></span></code></pre></div><p>测试：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl run nginx-by-my-scheduler --image<span class=o>=</span>nginx --overrides<span class=o>=</span><span class=s1>&#39;{&#34;spec&#34;:{&#34;schedulerName&#34;:&#34;my-scheduler&#34;}}&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>kubectl get pod -o wide -w
 </span></span></code></pre></div><p>如果一切正常，将观察到 Pod 将会被正常调度到节点上。</p><p>使用这种方式来扩展调度器，对开发者来说，需要了解调度器的源码然后修改逻辑，有一定的难度。</p><h3 id=自定义调度控制器>自定义调度控制器
-<a class=anchor href=#%e8%87%aa%e5%ae%9a%e4%b9%89%e8%b0%83%e5%ba%a6%e6%8e%a7%e5%88%b6%e5%99%a8>#</a></h3><p>基于 controller-runtime 包编写一个调度控制器，原理是通过协调 Pod ，选择一个适合的节点，创建 Binding 对象，将 Pod 绑定到指定的节点上。</p><p>创建项目：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>mkdir my-scheduler <span style=color:#f92672>&amp;&amp;</span> cd my-scheduler
-</span></span><span style=display:flex><span>go mod init my-scheduler
-</span></span><span style=display:flex><span>touch main.go
-</span></span></code></pre></div><p>编写 <code>main.go</code> 调度器逻辑（本质是一个 Pod 的协调控制器）：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;context&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;log&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;math/rand&#34;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>corev1</span> <span style=color:#e6db74>&#34;k8s.io/api/core/v1&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;k8s.io/apimachinery/pkg/runtime&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>ctrl</span> <span style=color:#e6db74>&#34;sigs.k8s.io/controller-runtime&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;sigs.k8s.io/controller-runtime/pkg/client&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;sigs.k8s.io/controller-runtime/pkg/event&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;sigs.k8s.io/controller-runtime/pkg/manager&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;sigs.k8s.io/controller-runtime/pkg/predicate&#34;</span>
-</span></span><span style=display:flex><span>)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>mgr</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>ctrl</span>.<span style=color:#a6e22e>NewManager</span>(<span style=color:#a6e22e>ctrl</span>.<span style=color:#a6e22e>GetConfigOrDie</span>(), <span style=color:#a6e22e>manager</span>.<span style=color:#a6e22e>Options</span>{})
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatalf</span>(<span style=color:#e6db74>&#34;new manager err: %s&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>err</span> = (<span style=color:#f92672>&amp;</span><span style=color:#a6e22e>MyScheduler</span>{
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>Client</span>: <span style=color:#a6e22e>mgr</span>.<span style=color:#a6e22e>GetClient</span>(),
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>Scheme</span>: <span style=color:#a6e22e>mgr</span>.<span style=color:#a6e22e>GetScheme</span>(),
-</span></span><span style=display:flex><span>    }).<span style=color:#a6e22e>SetupWithManager</span>(<span style=color:#a6e22e>mgr</span>)
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatalf</span>(<span style=color:#e6db74>&#34;setup scheduler err: %s&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>err</span> = <span style=color:#a6e22e>mgr</span>.<span style=color:#a6e22e>Start</span>(<span style=color:#a6e22e>context</span>.<span style=color:#a6e22e>Background</span>())
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatalf</span>(<span style=color:#e6db74>&#34;start manager err: %s&#34;</span>, <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>mySchedulerName</span> = <span style=color:#e6db74>&#34;my-scheduler&#34;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>MyScheduler</span> <span style=color:#66d9ef>struct</span> {
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Client</span> <span style=color:#a6e22e>client</span>.<span style=color:#a6e22e>Client</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Scheme</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>runtime</span>.<span style=color:#a6e22e>Scheme</span>
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>s</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>MyScheduler</span>) <span style=color:#a6e22e>Reconcile</span>(<span style=color:#a6e22e>ctx</span> <span style=color:#a6e22e>context</span>.<span style=color:#a6e22e>Context</span>, <span style=color:#a6e22e>req</span> <span style=color:#a6e22e>ctrl</span>.<span style=color:#a6e22e>Request</span>) (<span style=color:#a6e22e>ctrl</span>.<span style=color:#a6e22e>Result</span>, <span style=color:#66d9ef>error</span>) {
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>nodes</span> <span style=color:#f92672>:=</span> new(<span style=color:#a6e22e>corev1</span>.<span style=color:#a6e22e>NodeList</span>)
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>s</span>.<span style=color:#a6e22e>Client</span>.<span style=color:#a6e22e>List</span>(<span style=color:#a6e22e>ctx</span>, <span style=color:#a6e22e>nodes</span>)
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>ctrl</span>.<span style=color:#a6e22e>Result</span>{<span style=color:#a6e22e>Requeue</span>: <span style=color:#66d9ef>true</span>}, <span style=color:#a6e22e>err</span>
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#75715e>// 随机选择一个节点
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>targetNode</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>nodes</span>.<span style=color:#a6e22e>Items</span>[<span style=color:#a6e22e>rand</span>.<span style=color:#a6e22e>Intn</span>(len(<span style=color:#a6e22e>nodes</span>.<span style=color:#a6e22e>Items</span>))].<span style=color:#a6e22e>Name</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#75715e>// 创建绑定关系
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>binding</span> <span style=color:#f92672>:=</span> new(<span style=color:#a6e22e>corev1</span>.<span style=color:#a6e22e>Binding</span>)
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>binding</span>.<span style=color:#a6e22e>Name</span> = <span style=color:#a6e22e>req</span>.<span style=color:#a6e22e>Name</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>binding</span>.<span style=color:#a6e22e>Namespace</span> = <span style=color:#a6e22e>req</span>.<span style=color:#a6e22e>Namespace</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>binding</span>.<span style=color:#a6e22e>Target</span> = <span style=color:#a6e22e>corev1</span>.<span style=color:#a6e22e>ObjectReference</span>{
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>Kind</span>:       <span style=color:#e6db74>&#34;Node&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>APIVersion</span>: <span style=color:#e6db74>&#34;v1&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>Name</span>:       <span style=color:#a6e22e>targetNode</span>,
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>err</span> = <span style=color:#a6e22e>s</span>.<span style=color:#a6e22e>Client</span>.<span style=color:#a6e22e>Create</span>(<span style=color:#a6e22e>ctx</span>, <span style=color:#a6e22e>binding</span>)
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>ctrl</span>.<span style=color:#a6e22e>Result</span>{<span style=color:#a6e22e>Requeue</span>: <span style=color:#66d9ef>true</span>}, <span style=color:#a6e22e>err</span>
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>ctrl</span>.<span style=color:#a6e22e>Result</span>{}, <span style=color:#66d9ef>nil</span>
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e>// SetupWithManager sets up the controller with the Manager.
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>s</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>MyScheduler</span>) <span style=color:#a6e22e>SetupWithManager</span>(<span style=color:#a6e22e>mgr</span> <span style=color:#a6e22e>ctrl</span>.<span style=color:#a6e22e>Manager</span>) <span style=color:#66d9ef>error</span> {
-</span></span><span style=display:flex><span>    <span style=color:#75715e>// 过滤目标 Pod
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>filter</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>predicate</span>.<span style=color:#a6e22e>Funcs</span>{
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>CreateFunc</span>: <span style=color:#66d9ef>func</span>(<span style=color:#a6e22e>e</span> <span style=color:#a6e22e>event</span>.<span style=color:#a6e22e>CreateEvent</span>) <span style=color:#66d9ef>bool</span> {
-</span></span><span style=display:flex><span>            <span style=color:#a6e22e>pod</span>, <span style=color:#a6e22e>ok</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>e</span>.<span style=color:#a6e22e>Object</span>.(<span style=color:#f92672>*</span><span style=color:#a6e22e>corev1</span>.<span style=color:#a6e22e>Pod</span>)
-</span></span><span style=display:flex><span>            <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>ok</span> {
-</span></span><span style=display:flex><span>                <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>pod</span>.<span style=color:#a6e22e>Spec</span>.<span style=color:#a6e22e>SchedulerName</span> <span style=color:#f92672>==</span> <span style=color:#a6e22e>mySchedulerName</span> <span style=color:#f92672>&amp;&amp;</span> <span style=color:#a6e22e>pod</span>.<span style=color:#a6e22e>Spec</span>.<span style=color:#a6e22e>NodeName</span> <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;&#34;</span>
-</span></span><span style=display:flex><span>            }
-</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>false</span>
-</span></span><span style=display:flex><span>        },
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>UpdateFunc</span>: <span style=color:#66d9ef>func</span>(<span style=color:#a6e22e>e</span> <span style=color:#a6e22e>event</span>.<span style=color:#a6e22e>UpdateEvent</span>) <span style=color:#66d9ef>bool</span> {
-</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>false</span>
-</span></span><span style=display:flex><span>        },
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>DeleteFunc</span>: <span style=color:#66d9ef>func</span>(<span style=color:#a6e22e>e</span> <span style=color:#a6e22e>event</span>.<span style=color:#a6e22e>DeleteEvent</span>) <span style=color:#66d9ef>bool</span> {
-</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>false</span>
-</span></span><span style=display:flex><span>        },
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>ctrl</span>.<span style=color:#a6e22e>NewControllerManagedBy</span>(<span style=color:#a6e22e>mgr</span>).
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>For</span>(<span style=color:#f92672>&amp;</span><span style=color:#a6e22e>corev1</span>.<span style=color:#a6e22e>Pod</span>{}).
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>WithEventFilter</span>(<span style=color:#a6e22e>filter</span>).
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>Complete</span>(<span style=color:#a6e22e>s</span>)
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p>运行自定义调度器：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>go run main.go
-</span></span></code></pre></div><p>也可以参考前面的部署方式，先制作一个镜像，然后部署到集群中。</p><p>运行一个 Pod，指定调度器为 <code>my-scheduler</code>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl run nginx-by-my-scheduler --image<span style=color:#f92672>=</span>nginx --overrides<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;{&#34;spec&#34;:{&#34;schedulerName&#34;:&#34;my-scheduler&#34;}}&#39;</span>
+<a class=anchor href=#%e8%87%aa%e5%ae%9a%e4%b9%89%e8%b0%83%e5%ba%a6%e6%8e%a7%e5%88%b6%e5%99%a8>#</a></h3><p>基于 controller-runtime 包编写一个调度控制器，原理是通过协调 Pod ，选择一个适合的节点，创建 Binding 对象，将 Pod 绑定到指定的节点上。</p><p>创建项目：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>mkdir my-scheduler <span class=o>&amp;&amp;</span> <span class=nb>cd</span> my-scheduler
+</span></span><span class=line><span class=cl>go mod init my-scheduler
+</span></span><span class=line><span class=cl>touch main.go
+</span></span></code></pre></div><p>编写 <code>main.go</code> 调度器逻辑（本质是一个 Pod 的协调控制器）：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>main</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;context&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;log&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;math/rand&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>corev1</span> <span class=s>&#34;k8s.io/api/core/v1&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;k8s.io/apimachinery/pkg/runtime&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=nx>ctrl</span> <span class=s>&#34;sigs.k8s.io/controller-runtime&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;sigs.k8s.io/controller-runtime/pkg/client&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;sigs.k8s.io/controller-runtime/pkg/event&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;sigs.k8s.io/controller-runtime/pkg/manager&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;sigs.k8s.io/controller-runtime/pkg/predicate&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>mgr</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>ctrl</span><span class=p>.</span><span class=nf>NewManager</span><span class=p>(</span><span class=nx>ctrl</span><span class=p>.</span><span class=nf>GetConfigOrDie</span><span class=p>(),</span> <span class=nx>manager</span><span class=p>.</span><span class=nx>Options</span><span class=p>{})</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>log</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;new manager err: %s&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>.</span><span class=nf>Error</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>err</span> <span class=p>=</span> <span class=p>(</span><span class=o>&amp;</span><span class=nx>MyScheduler</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>Client</span><span class=p>:</span> <span class=nx>mgr</span><span class=p>.</span><span class=nf>GetClient</span><span class=p>(),</span>
+</span></span><span class=line><span class=cl>        <span class=nx>Scheme</span><span class=p>:</span> <span class=nx>mgr</span><span class=p>.</span><span class=nf>GetScheme</span><span class=p>(),</span>
+</span></span><span class=line><span class=cl>    <span class=p>}).</span><span class=nf>SetupWithManager</span><span class=p>(</span><span class=nx>mgr</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>log</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;setup scheduler err: %s&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>.</span><span class=nf>Error</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>err</span> <span class=p>=</span> <span class=nx>mgr</span><span class=p>.</span><span class=nf>Start</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nf>Background</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>log</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;start manager err: %s&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>.</span><span class=nf>Error</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>const</span> <span class=nx>mySchedulerName</span> <span class=p>=</span> <span class=s>&#34;my-scheduler&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>MyScheduler</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Client</span> <span class=nx>client</span><span class=p>.</span><span class=nx>Client</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Scheme</span> <span class=o>*</span><span class=nx>runtime</span><span class=p>.</span><span class=nx>Scheme</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>s</span> <span class=o>*</span><span class=nx>MyScheduler</span><span class=p>)</span> <span class=nf>Reconcile</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>req</span> <span class=nx>ctrl</span><span class=p>.</span><span class=nx>Request</span><span class=p>)</span> <span class=p>(</span><span class=nx>ctrl</span><span class=p>.</span><span class=nx>Result</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>nodes</span> <span class=o>:=</span> <span class=nb>new</span><span class=p>(</span><span class=nx>corev1</span><span class=p>.</span><span class=nx>NodeList</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nx>err</span> <span class=o>:=</span> <span class=nx>s</span><span class=p>.</span><span class=nx>Client</span><span class=p>.</span><span class=nf>List</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span> <span class=nx>nodes</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=nx>ctrl</span><span class=p>.</span><span class=nx>Result</span><span class=p>{</span><span class=nx>Requeue</span><span class=p>:</span> <span class=kc>true</span><span class=p>},</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 随机选择一个节点
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>targetNode</span> <span class=o>:=</span> <span class=nx>nodes</span><span class=p>.</span><span class=nx>Items</span><span class=p>[</span><span class=nx>rand</span><span class=p>.</span><span class=nf>Intn</span><span class=p>(</span><span class=nb>len</span><span class=p>(</span><span class=nx>nodes</span><span class=p>.</span><span class=nx>Items</span><span class=p>))].</span><span class=nx>Name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 创建绑定关系
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>binding</span> <span class=o>:=</span> <span class=nb>new</span><span class=p>(</span><span class=nx>corev1</span><span class=p>.</span><span class=nx>Binding</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nx>binding</span><span class=p>.</span><span class=nx>Name</span> <span class=p>=</span> <span class=nx>req</span><span class=p>.</span><span class=nx>Name</span>
+</span></span><span class=line><span class=cl>    <span class=nx>binding</span><span class=p>.</span><span class=nx>Namespace</span> <span class=p>=</span> <span class=nx>req</span><span class=p>.</span><span class=nx>Namespace</span>
+</span></span><span class=line><span class=cl>    <span class=nx>binding</span><span class=p>.</span><span class=nx>Target</span> <span class=p>=</span> <span class=nx>corev1</span><span class=p>.</span><span class=nx>ObjectReference</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>Kind</span><span class=p>:</span>       <span class=s>&#34;Node&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>APIVersion</span><span class=p>:</span> <span class=s>&#34;v1&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>Name</span><span class=p>:</span>       <span class=nx>targetNode</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>err</span> <span class=p>=</span> <span class=nx>s</span><span class=p>.</span><span class=nx>Client</span><span class=p>.</span><span class=nf>Create</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span> <span class=nx>binding</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=nx>ctrl</span><span class=p>.</span><span class=nx>Result</span><span class=p>{</span><span class=nx>Requeue</span><span class=p>:</span> <span class=kc>true</span><span class=p>},</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>ctrl</span><span class=p>.</span><span class=nx>Result</span><span class=p>{},</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// SetupWithManager sets up the controller with the Manager.
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>func</span> <span class=p>(</span><span class=nx>s</span> <span class=o>*</span><span class=nx>MyScheduler</span><span class=p>)</span> <span class=nf>SetupWithManager</span><span class=p>(</span><span class=nx>mgr</span> <span class=nx>ctrl</span><span class=p>.</span><span class=nx>Manager</span><span class=p>)</span> <span class=kt>error</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 过滤目标 Pod
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>filter</span> <span class=o>:=</span> <span class=nx>predicate</span><span class=p>.</span><span class=nx>Funcs</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>CreateFunc</span><span class=p>:</span> <span class=kd>func</span><span class=p>(</span><span class=nx>e</span> <span class=nx>event</span><span class=p>.</span><span class=nx>CreateEvent</span><span class=p>)</span> <span class=kt>bool</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nx>pod</span><span class=p>,</span> <span class=nx>ok</span> <span class=o>:=</span> <span class=nx>e</span><span class=p>.</span><span class=nx>Object</span><span class=p>.(</span><span class=o>*</span><span class=nx>corev1</span><span class=p>.</span><span class=nx>Pod</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=nx>ok</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=k>return</span> <span class=nx>pod</span><span class=p>.</span><span class=nx>Spec</span><span class=p>.</span><span class=nx>SchedulerName</span> <span class=o>==</span> <span class=nx>mySchedulerName</span> <span class=o>&amp;&amp;</span> <span class=nx>pod</span><span class=p>.</span><span class=nx>Spec</span><span class=p>.</span><span class=nx>NodeName</span> <span class=o>==</span> <span class=s>&#34;&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=nx>UpdateFunc</span><span class=p>:</span> <span class=kd>func</span><span class=p>(</span><span class=nx>e</span> <span class=nx>event</span><span class=p>.</span><span class=nx>UpdateEvent</span><span class=p>)</span> <span class=kt>bool</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=nx>DeleteFunc</span><span class=p>:</span> <span class=kd>func</span><span class=p>(</span><span class=nx>e</span> <span class=nx>event</span><span class=p>.</span><span class=nx>DeleteEvent</span><span class=p>)</span> <span class=kt>bool</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>ctrl</span><span class=p>.</span><span class=nf>NewControllerManagedBy</span><span class=p>(</span><span class=nx>mgr</span><span class=p>).</span>
+</span></span><span class=line><span class=cl>        <span class=nf>For</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>corev1</span><span class=p>.</span><span class=nx>Pod</span><span class=p>{}).</span>
+</span></span><span class=line><span class=cl>        <span class=nf>WithEventFilter</span><span class=p>(</span><span class=nx>filter</span><span class=p>).</span>
+</span></span><span class=line><span class=cl>        <span class=nf>Complete</span><span class=p>(</span><span class=nx>s</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>运行自定义调度器：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>go run main.go
+</span></span></code></pre></div><p>也可以参考前面的部署方式，先制作一个镜像，然后部署到集群中。</p><p>运行一个 Pod，指定调度器为 <code>my-scheduler</code>：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl run nginx-by-my-scheduler --image<span class=o>=</span>nginx --overrides<span class=o>=</span><span class=s1>&#39;{&#34;spec&#34;:{&#34;schedulerName&#34;:&#34;my-scheduler&#34;}}&#39;</span>
 </span></span></code></pre></div><p>一切正常的话，将会观察到 Pod 被正常调度到节点上。</p><h3 id=scheduler-extender>Scheduler Extender
 <a class=anchor href=#scheduler-extender>#</a></h3><p>通过 Scheduler Extender 来扩展 Kubernetes 调度器，它将以 Webhook 的形式运行，并且在调度器框架阶段中进行干扰。</p><table><thead><tr><th>阶段</th><th>描述</th></tr></thead><tbody><tr><td>Filter</td><td>调度框架将调用过滤函数，过滤掉不适合被调度的节点。</td></tr><tr><td>Priority</td><td>调度框架将调用优先级函数，为每个节点计算一个优先级，优先级越高，节点越适合被调度。</td></tr><tr><td>Bind</td><td>调度框架将调用绑定函数，将 Pod 绑定到一个节点上。</td></tr></tbody></table><p>Scheduler Extender 通过 HTTP 请求的方式，将调度框架阶段中的调度决策委托给外部的调度器，然后将调度结果返回给调度框架。我们只需要实现一个 HTTP 服务，然后将其注册到调度器中，就可以实现自定义调度器。在这个 HTTP 服务中，我们可以实现上述阶段中的任意一个或多个阶段的接口，来定制我们的调度需求。</p><p>接口列表：</p><h4 id=filter-接口>Filter 接口
-<a class=anchor href=#filter-%e6%8e%a5%e5%8f%a3>#</a></h4><p>接口方法：POST</p><p>接口请求参数：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>ExtenderArgs</span> <span style=color:#66d9ef>struct</span> {
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Pod</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>v1</span>.<span style=color:#a6e22e>Pod</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Nodes</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>v1</span>.<span style=color:#a6e22e>NodeList</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>NodeNames</span> <span style=color:#f92672>*</span>[]<span style=color:#66d9ef>string</span>
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p>接口请求结果：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>ExtenderFilterResult</span> <span style=color:#66d9ef>struct</span> {
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Nodes</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>v1</span>.<span style=color:#a6e22e>NodeList</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>NodeNames</span> <span style=color:#f92672>*</span>[]<span style=color:#66d9ef>string</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>FailedNodes</span> <span style=color:#a6e22e>FailedNodesMap</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>FailedAndUnresolvableNodes</span> <span style=color:#a6e22e>FailedNodesMap</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Error</span> <span style=color:#66d9ef>string</span>
-</span></span><span style=display:flex><span>}
+<a class=anchor href=#filter-%e6%8e%a5%e5%8f%a3>#</a></h4><p>接口方法：POST</p><p>接口请求参数：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>type</span> <span class=nx>ExtenderArgs</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Pod</span> <span class=o>*</span><span class=nx>v1</span><span class=p>.</span><span class=nx>Pod</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Nodes</span> <span class=o>*</span><span class=nx>v1</span><span class=p>.</span><span class=nx>NodeList</span>
+</span></span><span class=line><span class=cl>    <span class=nx>NodeNames</span> <span class=o>*</span><span class=p>[]</span><span class=kt>string</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>接口请求结果：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>type</span> <span class=nx>ExtenderFilterResult</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Nodes</span> <span class=o>*</span><span class=nx>v1</span><span class=p>.</span><span class=nx>NodeList</span>
+</span></span><span class=line><span class=cl>    <span class=nx>NodeNames</span> <span class=o>*</span><span class=p>[]</span><span class=kt>string</span>
+</span></span><span class=line><span class=cl>    <span class=nx>FailedNodes</span> <span class=nx>FailedNodesMap</span>
+</span></span><span class=line><span class=cl>    <span class=nx>FailedAndUnresolvableNodes</span> <span class=nx>FailedNodesMap</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Error</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
 </span></span></code></pre></div><h4 id=priority-接口>Priority 接口
-<a class=anchor href=#priority-%e6%8e%a5%e5%8f%a3>#</a></h4><p>接口方法：POST</p><p>接口请求参数：和 Filter 接口请求参数一致。</p><p>接口请求结果：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>HostPriorityList</span> []<span style=color:#a6e22e>HostPriority</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>HostPriority</span> <span style=color:#66d9ef>struct</span> {
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Host</span> <span style=color:#66d9ef>string</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Score</span> <span style=color:#66d9ef>int64</span>
-</span></span><span style=display:flex><span>}
+<a class=anchor href=#priority-%e6%8e%a5%e5%8f%a3>#</a></h4><p>接口方法：POST</p><p>接口请求参数：和 Filter 接口请求参数一致。</p><p>接口请求结果：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>type</span> <span class=nx>HostPriorityList</span> <span class=p>[]</span><span class=nx>HostPriority</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>HostPriority</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Host</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Score</span> <span class=kt>int64</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
 </span></span></code></pre></div><h4 id=bind-接口>Bind 接口
-<a class=anchor href=#bind-%e6%8e%a5%e5%8f%a3>#</a></h4><p>接口方法：POST</p><p>接口请求参数：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>ExtenderBindingArgs</span> <span style=color:#66d9ef>struct</span> {
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>PodName</span> <span style=color:#66d9ef>string</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>PodNamespace</span> <span style=color:#66d9ef>string</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>PodUID</span> <span style=color:#a6e22e>types</span>.<span style=color:#a6e22e>UID</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Node</span> <span style=color:#66d9ef>string</span>
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p>接口请求结果：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>ExtenderBindingResult</span> <span style=color:#66d9ef>struct</span> {
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Error</span> <span style=color:#66d9ef>string</span>
-</span></span><span style=display:flex><span>}
+<a class=anchor href=#bind-%e6%8e%a5%e5%8f%a3>#</a></h4><p>接口方法：POST</p><p>接口请求参数：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>type</span> <span class=nx>ExtenderBindingArgs</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>PodName</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl>    <span class=nx>PodNamespace</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl>    <span class=nx>PodUID</span> <span class=nx>types</span><span class=p>.</span><span class=nx>UID</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Node</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>接口请求结果：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>type</span> <span class=nx>ExtenderBindingResult</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Error</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
 </span></span></code></pre></div><h4 id=实现>实现
-<a class=anchor href=#%e5%ae%9e%e7%8e%b0>#</a></h4><p>我们使用 Scheduler Extender 的方式来实现自定义调度器，供参考。</p><p><em>main.go</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;encoding/json&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;log&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;net/http&#34;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>extenderv1</span> <span style=color:#e6db74>&#34;k8s.io/kube-scheduler/extender/v1&#34;</span>
-</span></span><span style=display:flex><span>)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>Filter</span>(<span style=color:#a6e22e>w</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>ResponseWriter</span>, <span style=color:#a6e22e>r</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Request</span>) {
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>r</span>.<span style=color:#a6e22e>Method</span> <span style=color:#f92672>!=</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>MethodPost</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>w</span>.<span style=color:#a6e22e>WriteHeader</span>(<span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>StatusMethodNotAllowed</span>)
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>args</span> <span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>ExtenderArgs</span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>result</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>ExtenderFilterResult</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>json</span>.<span style=color:#a6e22e>NewDecoder</span>(<span style=color:#a6e22e>r</span>.<span style=color:#a6e22e>Body</span>).<span style=color:#a6e22e>Decode</span>(<span style=color:#f92672>&amp;</span><span style=color:#a6e22e>args</span>)
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>result</span> = <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>ExtenderFilterResult</span>{
-</span></span><span style=display:flex><span>            <span style=color:#a6e22e>Error</span>: <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>(),
-</span></span><span style=display:flex><span>        }
-</span></span><span style=display:flex><span>    } <span style=color:#66d9ef>else</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>result</span> = <span style=color:#a6e22e>filter</span>(<span style=color:#a6e22e>args</span>)
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>w</span>.<span style=color:#a6e22e>Header</span>().<span style=color:#a6e22e>Set</span>(<span style=color:#e6db74>&#34;Content-Type&#34;</span>, <span style=color:#e6db74>&#34;application/json&#34;</span>)
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>w</span>.<span style=color:#a6e22e>WriteHeader</span>(<span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>StatusOK</span>)
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>json</span>.<span style=color:#a6e22e>NewEncoder</span>(<span style=color:#a6e22e>w</span>).<span style=color:#a6e22e>Encode</span>(<span style=color:#a6e22e>result</span>); <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;failed to encode result: %v&#34;</span>, <span style=color:#a6e22e>err</span>)
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>Prioritize</span>(<span style=color:#a6e22e>w</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>ResponseWriter</span>, <span style=color:#a6e22e>r</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Request</span>) {
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>r</span>.<span style=color:#a6e22e>Method</span> <span style=color:#f92672>!=</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>MethodPost</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>w</span>.<span style=color:#a6e22e>WriteHeader</span>(<span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>StatusMethodNotAllowed</span>)
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>args</span> <span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>ExtenderArgs</span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>result</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>HostPriorityList</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>json</span>.<span style=color:#a6e22e>NewDecoder</span>(<span style=color:#a6e22e>r</span>.<span style=color:#a6e22e>Body</span>).<span style=color:#a6e22e>Decode</span>(<span style=color:#f92672>&amp;</span><span style=color:#a6e22e>args</span>)
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>result</span> = <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>HostPriorityList</span>{}
-</span></span><span style=display:flex><span>    } <span style=color:#66d9ef>else</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>result</span> = <span style=color:#a6e22e>prioritize</span>(<span style=color:#a6e22e>args</span>)
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>w</span>.<span style=color:#a6e22e>Header</span>().<span style=color:#a6e22e>Set</span>(<span style=color:#e6db74>&#34;Content-Type&#34;</span>, <span style=color:#e6db74>&#34;application/json&#34;</span>)
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>w</span>.<span style=color:#a6e22e>WriteHeader</span>(<span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>StatusOK</span>)
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>json</span>.<span style=color:#a6e22e>NewEncoder</span>(<span style=color:#a6e22e>w</span>).<span style=color:#a6e22e>Encode</span>(<span style=color:#a6e22e>result</span>); <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;failed to encode result: %v&#34;</span>, <span style=color:#a6e22e>err</span>)
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>Bind</span>(<span style=color:#a6e22e>w</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>ResponseWriter</span>, <span style=color:#a6e22e>r</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Request</span>) {
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>r</span>.<span style=color:#a6e22e>Method</span> <span style=color:#f92672>!=</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>MethodPost</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>w</span>.<span style=color:#a6e22e>WriteHeader</span>(<span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>StatusMethodNotAllowed</span>)
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>args</span> <span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>ExtenderBindingArgs</span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>result</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>ExtenderBindingResult</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>json</span>.<span style=color:#a6e22e>NewDecoder</span>(<span style=color:#a6e22e>r</span>.<span style=color:#a6e22e>Body</span>).<span style=color:#a6e22e>Decode</span>(<span style=color:#f92672>&amp;</span><span style=color:#a6e22e>args</span>)
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>result</span> = <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>ExtenderBindingResult</span>{
-</span></span><span style=display:flex><span>            <span style=color:#a6e22e>Error</span>: <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>(),
-</span></span><span style=display:flex><span>        }
-</span></span><span style=display:flex><span>    } <span style=color:#66d9ef>else</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>result</span> = <span style=color:#a6e22e>bind</span>(<span style=color:#a6e22e>args</span>)
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>w</span>.<span style=color:#a6e22e>Header</span>().<span style=color:#a6e22e>Set</span>(<span style=color:#e6db74>&#34;Content-Type&#34;</span>, <span style=color:#e6db74>&#34;application/json&#34;</span>)
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>w</span>.<span style=color:#a6e22e>WriteHeader</span>(<span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>StatusOK</span>)
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>json</span>.<span style=color:#a6e22e>NewEncoder</span>(<span style=color:#a6e22e>w</span>).<span style=color:#a6e22e>Encode</span>(<span style=color:#a6e22e>result</span>); <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;failed to encode result: %v&#34;</span>, <span style=color:#a6e22e>err</span>)
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>HandleFunc</span>(<span style=color:#e6db74>&#34;/filter&#34;</span>, <span style=color:#a6e22e>Filter</span>)
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>HandleFunc</span>(<span style=color:#e6db74>&#34;/priority&#34;</span>, <span style=color:#a6e22e>Prioritize</span>)
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>HandleFunc</span>(<span style=color:#e6db74>&#34;/bind&#34;</span>, <span style=color:#a6e22e>Bind</span>)
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>ListenAndServe</span>(<span style=color:#e6db74>&#34;:8080&#34;</span>, <span style=color:#66d9ef>nil</span>)
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p><em>filter.go</em>：没有具体实现节点过滤逻辑，直接返回所有节点。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;log&#34;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>extenderv1</span> <span style=color:#e6db74>&#34;k8s.io/kube-scheduler/extender/v1&#34;</span>
-</span></span><span style=display:flex><span>)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>filter</span>(<span style=color:#a6e22e>args</span> <span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>ExtenderArgs</span>) <span style=color:#f92672>*</span><span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>ExtenderFilterResult</span> {
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;my-scheduler-extender filter called.&#34;</span>)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>ExtenderFilterResult</span>{
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>Nodes</span>:     <span style=color:#a6e22e>args</span>.<span style=color:#a6e22e>Nodes</span>,
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>NodeNames</span>: <span style=color:#a6e22e>args</span>.<span style=color:#a6e22e>NodeNames</span>,
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p><em>prioritize.go</em>：模拟打分，按照节点顺序给节点累加一个分数。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;log&#34;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>extenderv1</span> <span style=color:#e6db74>&#34;k8s.io/kube-scheduler/extender/v1&#34;</span>
-</span></span><span style=display:flex><span>)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>prioritize</span>(<span style=color:#a6e22e>args</span> <span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>ExtenderArgs</span>) <span style=color:#f92672>*</span><span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>HostPriorityList</span> {
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;my-scheduler-extender prioritize called.&#34;</span>)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>result</span> <span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>HostPriorityList</span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> <span style=color:#a6e22e>i</span>, <span style=color:#a6e22e>node</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>range</span> <span style=color:#a6e22e>args</span>.<span style=color:#a6e22e>Nodes</span>.<span style=color:#a6e22e>Items</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>result</span> = append(<span style=color:#a6e22e>result</span>, <span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>HostPriority</span>{
-</span></span><span style=display:flex><span>            <span style=color:#a6e22e>Host</span>:  <span style=color:#a6e22e>node</span>.<span style=color:#a6e22e>Name</span>,
-</span></span><span style=display:flex><span>            <span style=color:#a6e22e>Score</span>: int64(<span style=color:#a6e22e>i</span>),
-</span></span><span style=display:flex><span>        })
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>result</span>
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p><em>bind.go</em>：没有具体实现绑定逻辑，直接返回成功。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;context&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;log&#34;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>corev1</span> <span style=color:#e6db74>&#34;k8s.io/api/core/v1&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;k8s.io/client-go/kubernetes/scheme&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;k8s.io/client-go/rest&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>extenderv1</span> <span style=color:#e6db74>&#34;k8s.io/kube-scheduler/extender/v1&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>ctrl</span> <span style=color:#e6db74>&#34;sigs.k8s.io/controller-runtime&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;sigs.k8s.io/controller-runtime/pkg/client&#34;</span>
-</span></span><span style=display:flex><span>)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>var</span> <span style=color:#a6e22e>kconfig</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>rest</span>.<span style=color:#a6e22e>Config</span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>var</span> <span style=color:#a6e22e>kruntimeclient</span> <span style=color:#a6e22e>client</span>.<span style=color:#a6e22e>Client</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>init</span>() {
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>kconfig</span> = <span style=color:#a6e22e>ctrl</span>.<span style=color:#a6e22e>GetConfigOrDie</span>()
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>err</span> <span style=color:#66d9ef>error</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>kruntimeclient</span>, <span style=color:#a6e22e>err</span> = <span style=color:#a6e22e>client</span>.<span style=color:#a6e22e>New</span>(<span style=color:#a6e22e>kconfig</span>, <span style=color:#a6e22e>client</span>.<span style=color:#a6e22e>Options</span>{
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>Scheme</span>: <span style=color:#a6e22e>scheme</span>.<span style=color:#a6e22e>Scheme</span>,
-</span></span><span style=display:flex><span>    })
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatalf</span>(<span style=color:#e6db74>&#34;failed to create k8s runtime client: %v&#34;</span>, <span style=color:#a6e22e>err</span>)
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>bind</span>(<span style=color:#a6e22e>args</span> <span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>ExtenderBindingArgs</span>) <span style=color:#f92672>*</span><span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>ExtenderBindingResult</span> {
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;my-scheduler-extender bind called.&#34;</span>)
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Printf</span>(<span style=color:#e6db74>&#34;pod %s/%s is bind to %s&#34;</span>, <span style=color:#a6e22e>args</span>.<span style=color:#a6e22e>PodNamespace</span>, <span style=color:#a6e22e>args</span>.<span style=color:#a6e22e>PodName</span>, <span style=color:#a6e22e>args</span>.<span style=color:#a6e22e>Node</span>)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#75715e>// 创建绑定关系
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>binding</span> <span style=color:#f92672>:=</span> new(<span style=color:#a6e22e>corev1</span>.<span style=color:#a6e22e>Binding</span>)
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>binding</span>.<span style=color:#a6e22e>Name</span> = <span style=color:#a6e22e>args</span>.<span style=color:#a6e22e>PodName</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>binding</span>.<span style=color:#a6e22e>Namespace</span> = <span style=color:#a6e22e>args</span>.<span style=color:#a6e22e>PodNamespace</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>binding</span>.<span style=color:#a6e22e>Target</span> = <span style=color:#a6e22e>corev1</span>.<span style=color:#a6e22e>ObjectReference</span>{
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>Kind</span>:       <span style=color:#e6db74>&#34;Node&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>APIVersion</span>: <span style=color:#e6db74>&#34;v1&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>Name</span>:       <span style=color:#a6e22e>args</span>.<span style=color:#a6e22e>Node</span>,
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>result</span> <span style=color:#f92672>:=</span> new(<span style=color:#a6e22e>extenderv1</span>.<span style=color:#a6e22e>ExtenderBindingResult</span>)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>kruntimeclient</span>.<span style=color:#a6e22e>Create</span>(<span style=color:#a6e22e>context</span>.<span style=color:#a6e22e>Background</span>(), <span style=color:#a6e22e>binding</span>)
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>result</span>.<span style=color:#a6e22e>Error</span> = <span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>()
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>result</span>
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p>编译成二进制文件：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>GOOS<span style=color:#f92672>=</span>linux GOARCH<span style=color:#f92672>=</span>amd64 go build -o my-scheduler-extender
-</span></span></code></pre></div><p>编写 Dockerfile：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-dockerfile data-lang=dockerfile><span style=display:flex><span><span style=color:#66d9ef>FROM</span><span style=color:#e6db74> alpine</span><span style=color:#960050;background-color:#1e0010>
-</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span><span style=color:#66d9ef>ARG</span> TARGETOS TARGETARCH<span style=color:#960050;background-color:#1e0010>
-</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span><span style=color:#66d9ef>ADD</span> ./bin/$TARGETOS/$TARGETARCH/my-scheduler-extender /my-scheduler-extender<span style=color:#960050;background-color:#1e0010>
-</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span><span style=color:#66d9ef>ENTRYPOINT</span> [<span style=color:#e6db74>&#34;/my-scheduler-extender&#34;</span>]<span style=color:#960050;background-color:#1e0010>
-</span></span></span></code></pre></div><p>编译并推送镜像：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>GOOS<span style=color:#f92672>=</span>linux GOARCH<span style=color:#f92672>=</span>amd64 CGO_ENABLED<span style=color:#f92672>=</span><span style=color:#ae81ff>0</span> go build -o bin/linux/amd64/my-scheduler-extender
-</span></span><span style=display:flex><span>GOOS<span style=color:#f92672>=</span>linux GOARCH<span style=color:#f92672>=</span>arm64 CGO_ENABLED<span style=color:#f92672>=</span><span style=color:#ae81ff>0</span> go build -o bin/linux/arm64/my-scheduler-extender
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>docker buildx build --push --platform linux/amd64,linux/arm64 -t poneding/my-kube-scheduler-extender:v1.0 .
-</span></span></code></pre></div><p>编写部署清单文件，部署清单中包括额外的调度器（参考上述编译定制调度器镜像的方式）和我们开发的 Scheduler Extender：</p><blockquote><p>注意：为了简化部署清单，给了 my-scheduler-extender 和 my-scheduler-with-extender 容器 cluster-admin 权限，实际上不需要这么高的权限。</p></blockquote><p><em>deploy-manifests.yaml</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ServiceAccount</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler-with-extender</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
-</span></span><span style=display:flex><span>---
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRoleBinding</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler-with-extender</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>subjects</span>:
-</span></span><span style=display:flex><span>- <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ServiceAccount</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler-with-extender</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>roleRef</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRole</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cluster-admin</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>apiGroup</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io</span>
-</span></span><span style=display:flex><span>---
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ConfigMap</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler-with-extender-config</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>data</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>my-scheduler-with-extender-config.yaml</span>: |<span style=color:#e6db74>
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>    apiVersion: kubescheduler.config.k8s.io/v1
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>    kind: KubeSchedulerConfiguration
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>    profiles:
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>      - schedulerName: my-scheduler-with-extender
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>    leaderElection:
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>      leaderElect: false
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>    extenders:
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>    - urlPrefix: &#34;http://my-scheduler-extender.kube-system.svc:8080&#34;
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>      enableHTTPS: false
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>      filterVerb: &#34;filter&#34;
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>      prioritizeVerb: &#34;prioritize&#34;
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>      bindVerb: &#34;bind&#34;
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>      weight: 1
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>      nodeCacheCapable: false</span>    
-</span></span><span style=display:flex><span>---
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>apps/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Deployment</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>component</span>: <span style=color:#ae81ff>my-scheduler-with-extender</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>control-plane</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler-with-extender</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>matchLabels</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>component</span>: <span style=color:#ae81ff>my-scheduler-with-extender</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>control-plane</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>replicas</span>: <span style=color:#ae81ff>1</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>component</span>: <span style=color:#ae81ff>my-scheduler-with-extender</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>control-plane</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>serviceAccountName</span>: <span style=color:#ae81ff>my-scheduler-with-extender</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>containers</span>:
-</span></span><span style=display:flex><span>      - <span style=color:#f92672>command</span>:
-</span></span><span style=display:flex><span>        - <span style=color:#ae81ff>kube-scheduler</span>
-</span></span><span style=display:flex><span>        - --<span style=color:#ae81ff>config=/etc/kubernetes/my-scheduler-with-extender/my-scheduler-with-extender-config.yaml</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>image</span>: <span style=color:#ae81ff>registry.k8s.io/kube-scheduler:v1.29.0</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>livenessProbe</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>httpGet</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/healthz</span>
-</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>: <span style=color:#ae81ff>10259</span>
-</span></span><span style=display:flex><span>            <span style=color:#f92672>scheme</span>: <span style=color:#ae81ff>HTTPS</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>initialDelaySeconds</span>: <span style=color:#ae81ff>15</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler-with-extender</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>readinessProbe</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>httpGet</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/healthz</span>
-</span></span><span style=display:flex><span>            <span style=color:#f92672>port</span>: <span style=color:#ae81ff>10259</span>
-</span></span><span style=display:flex><span>            <span style=color:#f92672>scheme</span>: <span style=color:#ae81ff>HTTPS</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>resources</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>requests</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>cpu</span>: <span style=color:#e6db74>&#39;0.1&#39;</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>securityContext</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>privileged</span>: <span style=color:#66d9ef>false</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>volumeMounts</span>:
-</span></span><span style=display:flex><span>          - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>config-volume</span>
-</span></span><span style=display:flex><span>            <span style=color:#f92672>mountPath</span>: <span style=color:#ae81ff>/etc/kubernetes/my-scheduler-with-extender</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>hostNetwork</span>: <span style=color:#66d9ef>false</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>hostPID</span>: <span style=color:#66d9ef>false</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>volumes</span>:
-</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>config-volume</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>configMap</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler-with-extender-config</span>
-</span></span><span style=display:flex><span>---
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>apps/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Deployment</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>component</span>: <span style=color:#ae81ff>my-scheduler-extender</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>control-plane</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler-extender</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>matchLabels</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>component</span>: <span style=color:#ae81ff>my-scheduler-extender</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>control-plane</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>replicas</span>: <span style=color:#ae81ff>1</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>component</span>: <span style=color:#ae81ff>my-scheduler-extender</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>control-plane</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>serviceAccountName</span>: <span style=color:#ae81ff>my-scheduler-with-extender</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>containers</span>:
-</span></span><span style=display:flex><span>      - <span style=color:#f92672>image</span>: <span style=color:#ae81ff>poneding/my-kube-scheduler-extender:v1.0</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler-extender</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>imagePullPolicy</span>: <span style=color:#ae81ff>Always</span>
-</span></span><span style=display:flex><span>---
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Service</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-scheduler-extender</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>component</span>: <span style=color:#ae81ff>my-scheduler-extender</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>control-plane</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>ports</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>port</span>: <span style=color:#ae81ff>8080</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>targetPort</span>: <span style=color:#ae81ff>8080</span>
-</span></span></code></pre></div><p>部署：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl apply -f deploy-manifests.yaml
-</span></span></code></pre></div><p>运行一个测试 Pod，查看 my-scheduler-extender 容器的日志：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl run nginx-by-my-scheduler-extender --image<span style=color:#f92672>=</span>nginx --overrides<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;{&#34;spec&#34;:{&#34;schedulerName&#34;:&#34;my-scheduler-with-extender&#34;}}&#39;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 查看 my-scheduler-extender 日志</span>
-</span></span><span style=display:flex><span>kubectl logs deploy/my-scheduler-extender -n kube-system -f
+<a class=anchor href=#%e5%ae%9e%e7%8e%b0>#</a></h4><p>我们使用 Scheduler Extender 的方式来实现自定义调度器，供参考。</p><p><em>main.go</em>：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>main</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;encoding/json&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;log&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;net/http&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>extenderv1</span> <span class=s>&#34;k8s.io/kube-scheduler/extender/v1&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>Filter</span><span class=p>(</span><span class=nx>w</span> <span class=nx>http</span><span class=p>.</span><span class=nx>ResponseWriter</span><span class=p>,</span> <span class=nx>r</span> <span class=o>*</span><span class=nx>http</span><span class=p>.</span><span class=nx>Request</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>r</span><span class=p>.</span><span class=nx>Method</span> <span class=o>!=</span> <span class=nx>http</span><span class=p>.</span><span class=nx>MethodPost</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>w</span><span class=p>.</span><span class=nf>WriteHeader</span><span class=p>(</span><span class=nx>http</span><span class=p>.</span><span class=nx>StatusMethodNotAllowed</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nx>args</span> <span class=nx>extenderv1</span><span class=p>.</span><span class=nx>ExtenderArgs</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nx>result</span> <span class=o>*</span><span class=nx>extenderv1</span><span class=p>.</span><span class=nx>ExtenderFilterResult</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>err</span> <span class=o>:=</span> <span class=nx>json</span><span class=p>.</span><span class=nf>NewDecoder</span><span class=p>(</span><span class=nx>r</span><span class=p>.</span><span class=nx>Body</span><span class=p>).</span><span class=nf>Decode</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>args</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>result</span> <span class=p>=</span> <span class=o>&amp;</span><span class=nx>extenderv1</span><span class=p>.</span><span class=nx>ExtenderFilterResult</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nx>Error</span><span class=p>:</span> <span class=nx>err</span><span class=p>.</span><span class=nf>Error</span><span class=p>(),</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>result</span> <span class=p>=</span> <span class=nf>filter</span><span class=p>(</span><span class=nx>args</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>w</span><span class=p>.</span><span class=nf>Header</span><span class=p>().</span><span class=nf>Set</span><span class=p>(</span><span class=s>&#34;Content-Type&#34;</span><span class=p>,</span> <span class=s>&#34;application/json&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nx>w</span><span class=p>.</span><span class=nf>WriteHeader</span><span class=p>(</span><span class=nx>http</span><span class=p>.</span><span class=nx>StatusOK</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>json</span><span class=p>.</span><span class=nf>NewEncoder</span><span class=p>(</span><span class=nx>w</span><span class=p>).</span><span class=nf>Encode</span><span class=p>(</span><span class=nx>result</span><span class=p>);</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>log</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;failed to encode result: %v&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>Prioritize</span><span class=p>(</span><span class=nx>w</span> <span class=nx>http</span><span class=p>.</span><span class=nx>ResponseWriter</span><span class=p>,</span> <span class=nx>r</span> <span class=o>*</span><span class=nx>http</span><span class=p>.</span><span class=nx>Request</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>r</span><span class=p>.</span><span class=nx>Method</span> <span class=o>!=</span> <span class=nx>http</span><span class=p>.</span><span class=nx>MethodPost</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>w</span><span class=p>.</span><span class=nf>WriteHeader</span><span class=p>(</span><span class=nx>http</span><span class=p>.</span><span class=nx>StatusMethodNotAllowed</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nx>args</span> <span class=nx>extenderv1</span><span class=p>.</span><span class=nx>ExtenderArgs</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nx>result</span> <span class=o>*</span><span class=nx>extenderv1</span><span class=p>.</span><span class=nx>HostPriorityList</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>err</span> <span class=o>:=</span> <span class=nx>json</span><span class=p>.</span><span class=nf>NewDecoder</span><span class=p>(</span><span class=nx>r</span><span class=p>.</span><span class=nx>Body</span><span class=p>).</span><span class=nf>Decode</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>args</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>result</span> <span class=p>=</span> <span class=o>&amp;</span><span class=nx>extenderv1</span><span class=p>.</span><span class=nx>HostPriorityList</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>result</span> <span class=p>=</span> <span class=nf>prioritize</span><span class=p>(</span><span class=nx>args</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>w</span><span class=p>.</span><span class=nf>Header</span><span class=p>().</span><span class=nf>Set</span><span class=p>(</span><span class=s>&#34;Content-Type&#34;</span><span class=p>,</span> <span class=s>&#34;application/json&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nx>w</span><span class=p>.</span><span class=nf>WriteHeader</span><span class=p>(</span><span class=nx>http</span><span class=p>.</span><span class=nx>StatusOK</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>json</span><span class=p>.</span><span class=nf>NewEncoder</span><span class=p>(</span><span class=nx>w</span><span class=p>).</span><span class=nf>Encode</span><span class=p>(</span><span class=nx>result</span><span class=p>);</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>log</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;failed to encode result: %v&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>Bind</span><span class=p>(</span><span class=nx>w</span> <span class=nx>http</span><span class=p>.</span><span class=nx>ResponseWriter</span><span class=p>,</span> <span class=nx>r</span> <span class=o>*</span><span class=nx>http</span><span class=p>.</span><span class=nx>Request</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>r</span><span class=p>.</span><span class=nx>Method</span> <span class=o>!=</span> <span class=nx>http</span><span class=p>.</span><span class=nx>MethodPost</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>w</span><span class=p>.</span><span class=nf>WriteHeader</span><span class=p>(</span><span class=nx>http</span><span class=p>.</span><span class=nx>StatusMethodNotAllowed</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nx>args</span> <span class=nx>extenderv1</span><span class=p>.</span><span class=nx>ExtenderBindingArgs</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nx>result</span> <span class=o>*</span><span class=nx>extenderv1</span><span class=p>.</span><span class=nx>ExtenderBindingResult</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>err</span> <span class=o>:=</span> <span class=nx>json</span><span class=p>.</span><span class=nf>NewDecoder</span><span class=p>(</span><span class=nx>r</span><span class=p>.</span><span class=nx>Body</span><span class=p>).</span><span class=nf>Decode</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>args</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>result</span> <span class=p>=</span> <span class=o>&amp;</span><span class=nx>extenderv1</span><span class=p>.</span><span class=nx>ExtenderBindingResult</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nx>Error</span><span class=p>:</span> <span class=nx>err</span><span class=p>.</span><span class=nf>Error</span><span class=p>(),</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>result</span> <span class=p>=</span> <span class=nf>bind</span><span class=p>(</span><span class=nx>args</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>w</span><span class=p>.</span><span class=nf>Header</span><span class=p>().</span><span class=nf>Set</span><span class=p>(</span><span class=s>&#34;Content-Type&#34;</span><span class=p>,</span> <span class=s>&#34;application/json&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nx>w</span><span class=p>.</span><span class=nf>WriteHeader</span><span class=p>(</span><span class=nx>http</span><span class=p>.</span><span class=nx>StatusOK</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>json</span><span class=p>.</span><span class=nf>NewEncoder</span><span class=p>(</span><span class=nx>w</span><span class=p>).</span><span class=nf>Encode</span><span class=p>(</span><span class=nx>result</span><span class=p>);</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>log</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;failed to encode result: %v&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>http</span><span class=p>.</span><span class=nf>HandleFunc</span><span class=p>(</span><span class=s>&#34;/filter&#34;</span><span class=p>,</span> <span class=nx>Filter</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nx>http</span><span class=p>.</span><span class=nf>HandleFunc</span><span class=p>(</span><span class=s>&#34;/priority&#34;</span><span class=p>,</span> <span class=nx>Prioritize</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nx>http</span><span class=p>.</span><span class=nf>HandleFunc</span><span class=p>(</span><span class=s>&#34;/bind&#34;</span><span class=p>,</span> <span class=nx>Bind</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nx>http</span><span class=p>.</span><span class=nf>ListenAndServe</span><span class=p>(</span><span class=s>&#34;:8080&#34;</span><span class=p>,</span> <span class=kc>nil</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p><em>filter.go</em>：没有具体实现节点过滤逻辑，直接返回所有节点。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>main</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;log&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>extenderv1</span> <span class=s>&#34;k8s.io/kube-scheduler/extender/v1&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>filter</span><span class=p>(</span><span class=nx>args</span> <span class=nx>extenderv1</span><span class=p>.</span><span class=nx>ExtenderArgs</span><span class=p>)</span> <span class=o>*</span><span class=nx>extenderv1</span><span class=p>.</span><span class=nx>ExtenderFilterResult</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>log</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;my-scheduler-extender filter called.&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=o>&amp;</span><span class=nx>extenderv1</span><span class=p>.</span><span class=nx>ExtenderFilterResult</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>Nodes</span><span class=p>:</span>     <span class=nx>args</span><span class=p>.</span><span class=nx>Nodes</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>NodeNames</span><span class=p>:</span> <span class=nx>args</span><span class=p>.</span><span class=nx>NodeNames</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p><em>prioritize.go</em>：模拟打分，按照节点顺序给节点累加一个分数。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>main</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;log&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>extenderv1</span> <span class=s>&#34;k8s.io/kube-scheduler/extender/v1&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>prioritize</span><span class=p>(</span><span class=nx>args</span> <span class=nx>extenderv1</span><span class=p>.</span><span class=nx>ExtenderArgs</span><span class=p>)</span> <span class=o>*</span><span class=nx>extenderv1</span><span class=p>.</span><span class=nx>HostPriorityList</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>log</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;my-scheduler-extender prioritize called.&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nx>result</span> <span class=nx>extenderv1</span><span class=p>.</span><span class=nx>HostPriorityList</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=nx>i</span><span class=p>,</span> <span class=nx>node</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>args</span><span class=p>.</span><span class=nx>Nodes</span><span class=p>.</span><span class=nx>Items</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>result</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>result</span><span class=p>,</span> <span class=nx>extenderv1</span><span class=p>.</span><span class=nx>HostPriority</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nx>Host</span><span class=p>:</span>  <span class=nx>node</span><span class=p>.</span><span class=nx>Name</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nx>Score</span><span class=p>:</span> <span class=nb>int64</span><span class=p>(</span><span class=nx>i</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>        <span class=p>})</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=o>&amp;</span><span class=nx>result</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p><em>bind.go</em>：没有具体实现绑定逻辑，直接返回成功。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>main</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;context&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;log&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>corev1</span> <span class=s>&#34;k8s.io/api/core/v1&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;k8s.io/client-go/kubernetes/scheme&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;k8s.io/client-go/rest&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=nx>extenderv1</span> <span class=s>&#34;k8s.io/kube-scheduler/extender/v1&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=nx>ctrl</span> <span class=s>&#34;sigs.k8s.io/controller-runtime&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;sigs.k8s.io/controller-runtime/pkg/client&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>kconfig</span> <span class=o>*</span><span class=nx>rest</span><span class=p>.</span><span class=nx>Config</span>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>kruntimeclient</span> <span class=nx>client</span><span class=p>.</span><span class=nx>Client</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>init</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>kconfig</span> <span class=p>=</span> <span class=nx>ctrl</span><span class=p>.</span><span class=nf>GetConfigOrDie</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nx>err</span> <span class=kt>error</span>
+</span></span><span class=line><span class=cl>    <span class=nx>kruntimeclient</span><span class=p>,</span> <span class=nx>err</span> <span class=p>=</span> <span class=nx>client</span><span class=p>.</span><span class=nf>New</span><span class=p>(</span><span class=nx>kconfig</span><span class=p>,</span> <span class=nx>client</span><span class=p>.</span><span class=nx>Options</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>Scheme</span><span class=p>:</span> <span class=nx>scheme</span><span class=p>.</span><span class=nx>Scheme</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>})</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>log</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;failed to create k8s runtime client: %v&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>bind</span><span class=p>(</span><span class=nx>args</span> <span class=nx>extenderv1</span><span class=p>.</span><span class=nx>ExtenderBindingArgs</span><span class=p>)</span> <span class=o>*</span><span class=nx>extenderv1</span><span class=p>.</span><span class=nx>ExtenderBindingResult</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>log</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;my-scheduler-extender bind called.&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nx>log</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;pod %s/%s is bind to %s&#34;</span><span class=p>,</span> <span class=nx>args</span><span class=p>.</span><span class=nx>PodNamespace</span><span class=p>,</span> <span class=nx>args</span><span class=p>.</span><span class=nx>PodName</span><span class=p>,</span> <span class=nx>args</span><span class=p>.</span><span class=nx>Node</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 创建绑定关系
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>binding</span> <span class=o>:=</span> <span class=nb>new</span><span class=p>(</span><span class=nx>corev1</span><span class=p>.</span><span class=nx>Binding</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nx>binding</span><span class=p>.</span><span class=nx>Name</span> <span class=p>=</span> <span class=nx>args</span><span class=p>.</span><span class=nx>PodName</span>
+</span></span><span class=line><span class=cl>    <span class=nx>binding</span><span class=p>.</span><span class=nx>Namespace</span> <span class=p>=</span> <span class=nx>args</span><span class=p>.</span><span class=nx>PodNamespace</span>
+</span></span><span class=line><span class=cl>    <span class=nx>binding</span><span class=p>.</span><span class=nx>Target</span> <span class=p>=</span> <span class=nx>corev1</span><span class=p>.</span><span class=nx>ObjectReference</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>Kind</span><span class=p>:</span>       <span class=s>&#34;Node&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>APIVersion</span><span class=p>:</span> <span class=s>&#34;v1&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nx>Name</span><span class=p>:</span>       <span class=nx>args</span><span class=p>.</span><span class=nx>Node</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>result</span> <span class=o>:=</span> <span class=nb>new</span><span class=p>(</span><span class=nx>extenderv1</span><span class=p>.</span><span class=nx>ExtenderBindingResult</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>err</span> <span class=o>:=</span> <span class=nx>kruntimeclient</span><span class=p>.</span><span class=nf>Create</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nf>Background</span><span class=p>(),</span> <span class=nx>binding</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>result</span><span class=p>.</span><span class=nx>Error</span> <span class=p>=</span> <span class=nx>err</span><span class=p>.</span><span class=nf>Error</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>result</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>编译成二进制文件：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nv>GOOS</span><span class=o>=</span>linux <span class=nv>GOARCH</span><span class=o>=</span>amd64 go build -o my-scheduler-extender
+</span></span></code></pre></div><p>编写 Dockerfile：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-dockerfile data-lang=dockerfile><span class=line><span class=cl><span class=k>FROM</span><span class=s> alpine</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>ARG</span> TARGETOS TARGETARCH<span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>ADD</span> ./bin/<span class=nv>$TARGETOS</span>/<span class=nv>$TARGETARCH</span>/my-scheduler-extender /my-scheduler-extender<span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>ENTRYPOINT</span> <span class=p>[</span><span class=s2>&#34;/my-scheduler-extender&#34;</span><span class=p>]</span><span class=err>
+</span></span></span></code></pre></div><p>编译并推送镜像：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nv>GOOS</span><span class=o>=</span>linux <span class=nv>GOARCH</span><span class=o>=</span>amd64 <span class=nv>CGO_ENABLED</span><span class=o>=</span><span class=m>0</span> go build -o bin/linux/amd64/my-scheduler-extender
+</span></span><span class=line><span class=cl><span class=nv>GOOS</span><span class=o>=</span>linux <span class=nv>GOARCH</span><span class=o>=</span>arm64 <span class=nv>CGO_ENABLED</span><span class=o>=</span><span class=m>0</span> go build -o bin/linux/arm64/my-scheduler-extender
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>docker buildx build --push --platform linux/amd64,linux/arm64 -t poneding/my-kube-scheduler-extender:v1.0 .
+</span></span></code></pre></div><p>编写部署清单文件，部署清单中包括额外的调度器（参考上述编译定制调度器镜像的方式）和我们开发的 Scheduler Extender：</p><blockquote><p>注意：为了简化部署清单，给了 my-scheduler-extender 和 my-scheduler-with-extender 容器 cluster-admin 权限，实际上不需要这么高的权限。</p></blockquote><p><em>deploy-manifests.yaml</em>：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ServiceAccount</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-with-extender</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ClusterRoleBinding</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-with-extender</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>subjects</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ServiceAccount</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-with-extender</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>roleRef</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ClusterRole</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cluster-admin</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>apiGroup</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ConfigMap</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-with-extender-config</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>data</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>my-scheduler-with-extender-config.yaml</span><span class=p>:</span><span class=w> </span><span class=p>|</span><span class=sd>
+</span></span></span><span class=line><span class=cl><span class=sd>    apiVersion: kubescheduler.config.k8s.io/v1
+</span></span></span><span class=line><span class=cl><span class=sd>    kind: KubeSchedulerConfiguration
+</span></span></span><span class=line><span class=cl><span class=sd>    profiles:
+</span></span></span><span class=line><span class=cl><span class=sd>      - schedulerName: my-scheduler-with-extender
+</span></span></span><span class=line><span class=cl><span class=sd>    leaderElection:
+</span></span></span><span class=line><span class=cl><span class=sd>      leaderElect: false
+</span></span></span><span class=line><span class=cl><span class=sd>    extenders:
+</span></span></span><span class=line><span class=cl><span class=sd>    - urlPrefix: &#34;http://my-scheduler-extender.kube-system.svc:8080&#34;
+</span></span></span><span class=line><span class=cl><span class=sd>      enableHTTPS: false
+</span></span></span><span class=line><span class=cl><span class=sd>      filterVerb: &#34;filter&#34;
+</span></span></span><span class=line><span class=cl><span class=sd>      prioritizeVerb: &#34;prioritize&#34;
+</span></span></span><span class=line><span class=cl><span class=sd>      bindVerb: &#34;bind&#34;
+</span></span></span><span class=line><span class=cl><span class=sd>      weight: 1
+</span></span></span><span class=line><span class=cl><span class=sd>      nodeCacheCapable: false</span><span class=w>    
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>apps/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Deployment</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>component</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-with-extender</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>tier</span><span class=p>:</span><span class=w> </span><span class=l>control-plane</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-with-extender</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>selector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>matchLabels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>component</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-with-extender</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>tier</span><span class=p>:</span><span class=w> </span><span class=l>control-plane</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>replicas</span><span class=p>:</span><span class=w> </span><span class=m>1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>template</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>component</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-with-extender</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>tier</span><span class=p>:</span><span class=w> </span><span class=l>control-plane</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>serviceAccountName</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-with-extender</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>command</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=l>kube-scheduler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- --<span class=l>config=/etc/kubernetes/my-scheduler-with-extender/my-scheduler-with-extender-config.yaml</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>registry.k8s.io/kube-scheduler:v1.29.0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>livenessProbe</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>httpGet</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>path</span><span class=p>:</span><span class=w> </span><span class=l>/healthz</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=m>10259</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>scheme</span><span class=p>:</span><span class=w> </span><span class=l>HTTPS</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>initialDelaySeconds</span><span class=p>:</span><span class=w> </span><span class=m>15</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-with-extender</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>readinessProbe</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>httpGet</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>path</span><span class=p>:</span><span class=w> </span><span class=l>/healthz</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=m>10259</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>scheme</span><span class=p>:</span><span class=w> </span><span class=l>HTTPS</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>resources</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>requests</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>cpu</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;0.1&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>securityContext</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>privileged</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>volumeMounts</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>config-volume</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>mountPath</span><span class=p>:</span><span class=w> </span><span class=l>/etc/kubernetes/my-scheduler-with-extender</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>hostNetwork</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>hostPID</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>volumes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>config-volume</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>configMap</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-with-extender-config</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>apps/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Deployment</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>component</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-extender</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>tier</span><span class=p>:</span><span class=w> </span><span class=l>control-plane</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-extender</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>selector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>matchLabels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>component</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-extender</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>tier</span><span class=p>:</span><span class=w> </span><span class=l>control-plane</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>replicas</span><span class=p>:</span><span class=w> </span><span class=m>1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>template</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>component</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-extender</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>tier</span><span class=p>:</span><span class=w> </span><span class=l>control-plane</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>serviceAccountName</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-with-extender</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>poneding/my-kube-scheduler-extender:v1.0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-extender</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>imagePullPolicy</span><span class=p>:</span><span class=w> </span><span class=l>Always</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Service</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-extender</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>selector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>component</span><span class=p>:</span><span class=w> </span><span class=l>my-scheduler-extender</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>tier</span><span class=p>:</span><span class=w> </span><span class=l>control-plane</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=m>8080</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>targetPort</span><span class=p>:</span><span class=w> </span><span class=m>8080</span><span class=w>
+</span></span></span></code></pre></div><p>部署：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl apply -f deploy-manifests.yaml
+</span></span></code></pre></div><p>运行一个测试 Pod，查看 my-scheduler-extender 容器的日志：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl run nginx-by-my-scheduler-extender --image<span class=o>=</span>nginx --overrides<span class=o>=</span><span class=s1>&#39;{&#34;spec&#34;:{&#34;schedulerName&#34;:&#34;my-scheduler-with-extender&#34;}}&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 查看 my-scheduler-extender 日志</span>
+</span></span><span class=line><span class=cl>kubectl logs deploy/my-scheduler-extender -n kube-system -f
 </span></span></code></pre></div><p>代码传送门：
 <a href=https://github.com/poneding/programming-kubernetes/tree/master/advanced/my-scheduler-extender>my-scheduler-extender</a></p><h2 id=参考>参考
 <a class=anchor href=#%e5%8f%82%e8%80%83>#</a></h2><ul><li><a href=https://kubernetes.io/zh-cn/docs/reference/scheduling/config/>调度器配置</a></li><li><a href=https://github.com/kubernetes/enhancements/blob/master/keps/sig-scheduling/1819-scheduler-extender/README.md>Kubernetes Extender</a></li><li><a href=https://developer.ibm.com/articles/creating-a-custom-kube-scheduler>Create a custom Kubernetes scheduler</a></li></ul><hr><p><a href=/kubernetes/k8s-dev-02-crd/>« Kubernetes 定制开发 02：CRD</a></p><p><a href=/kubernetes/k8s-get-started/>» 简单介绍 K8s</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>

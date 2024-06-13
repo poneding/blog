@@ -3,81 +3,81 @@ pprof # pprof 是性能调试工具，可以生成类似火焰图、堆栈图，
 package main import ( "fmt" "math/rand" "net/http" "time" _ "net/http/pprof" ) // 吃内存 type Eater struct { Name string Buffer [][]int } var e Eater func main() { e = Eater{Name: "eater"} http.HandleFunc("/go", goHandler) http.ListenAndServe(":8080", nil) // 如果不使用默认的 mux（http.DefaultServeMux），可以使用如下方式集成 pprof // mux := http.NewServeMux() // mux.HandleFunc("/go", goHandler) // mux.HandleFunc("/debug/pprof/", pprof.Index) // mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline) // mux.HandleFunc("/debug/pprof/profile", pprof.Profile) // mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol) // mux.'><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/go/pprof/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content='我的博客 / Golang 编程 / pprof
 pprof # pprof 是性能调试工具，可以生成类似火焰图、堆栈图，内存分析图等。
 package main import ( "fmt" "math/rand" "net/http" "time" _ "net/http/pprof" ) // 吃内存 type Eater struct { Name string Buffer [][]int } var e Eater func main() { e = Eater{Name: "eater"} http.HandleFunc("/go", goHandler) http.ListenAndServe(":8080", nil) // 如果不使用默认的 mux（http.DefaultServeMux），可以使用如下方式集成 pprof // mux := http.NewServeMux() // mux.HandleFunc("/go", goHandler) // mux.HandleFunc("/debug/pprof/", pprof.Index) // mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline) // mux.HandleFunc("/debug/pprof/profile", pprof.Profile) // mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol) // mux.'><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="go"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Pprof | 我的博客</title>
-<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/go/pprof/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/go/pprof/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.ffd7553d42e9860dbcfbc6775c0f6c9895736a50f5383929cc725dc0a9b61715.js integrity="sha256-/9dVPULphg28+8Z3XA9smJVzalD1ODkpzHJdwKm2FxU=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
 <input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
 </label><strong>Pprof</strong>
 <label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
 <a href=/go/>Golang 编程</a> / pprof</p><h1 id=pprof>pprof
-<a class=anchor href=#pprof>#</a></h1><p><code>pprof</code> 是性能调试工具，可以生成类似火焰图、堆栈图，内存分析图等。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-golang data-lang=golang><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
-</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;fmt&#34;</span>
-</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;math/rand&#34;</span>
-</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;net/http&#34;</span>
-</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;time&#34;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span> <span style=color:#a6e22e>_</span> <span style=color:#e6db74>&#34;net/http/pprof&#34;</span>
-</span></span><span style=display:flex><span>)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e>// 吃内存
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Eater</span> <span style=color:#66d9ef>struct</span> {
-</span></span><span style=display:flex><span> <span style=color:#a6e22e>Name</span>   <span style=color:#66d9ef>string</span>
-</span></span><span style=display:flex><span> <span style=color:#a6e22e>Buffer</span> [][]<span style=color:#66d9ef>int</span>
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>var</span> <span style=color:#a6e22e>e</span> <span style=color:#a6e22e>Eater</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
-</span></span><span style=display:flex><span> <span style=color:#a6e22e>e</span> = <span style=color:#a6e22e>Eater</span>{<span style=color:#a6e22e>Name</span>: <span style=color:#e6db74>&#34;eater&#34;</span>}
-</span></span><span style=display:flex><span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>HandleFunc</span>(<span style=color:#e6db74>&#34;/go&#34;</span>, <span style=color:#a6e22e>goHandler</span>)
-</span></span><span style=display:flex><span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>ListenAndServe</span>(<span style=color:#e6db74>&#34;:8080&#34;</span>, <span style=color:#66d9ef>nil</span>)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span> <span style=color:#75715e>// 如果不使用默认的 mux（http.DefaultServeMux），可以使用如下方式集成 pprof
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// mux := http.NewServeMux()
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// mux.HandleFunc(&#34;/go&#34;, goHandler)
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// mux.HandleFunc(&#34;/debug/pprof/&#34;, pprof.Index)
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// mux.HandleFunc(&#34;/debug/pprof/cmdline&#34;, pprof.Cmdline)
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// mux.HandleFunc(&#34;/debug/pprof/profile&#34;, pprof.Profile)
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// mux.HandleFunc(&#34;/debug/pprof/symbol&#34;, pprof.Symbol)
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// mux.HandleFunc(&#34;/debug/pprof/trace&#34;, pprof.Trace)
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#75715e>// http.ListenAndServe(&#34;:8080&#34;, mux)
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span> <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#a6e22e>e</span>.<span style=color:#a6e22e>Name</span>)
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e>// 模拟创建 goroutine，内存没有及时回收
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>goHandler</span>(<span style=color:#a6e22e>w</span> <span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>ResponseWriter</span>, <span style=color:#a6e22e>r</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>http</span>.<span style=color:#a6e22e>Request</span>) {
-</span></span><span style=display:flex><span> <span style=color:#66d9ef>for</span> <span style=color:#a6e22e>i</span> <span style=color:#f92672>:=</span> <span style=color:#ae81ff>0</span>; <span style=color:#a6e22e>i</span> &lt; <span style=color:#ae81ff>10</span>; <span style=color:#a6e22e>i</span><span style=color:#f92672>++</span> {
-</span></span><span style=display:flex><span>  <span style=color:#66d9ef>go</span> <span style=color:#66d9ef>func</span>() {
-</span></span><span style=display:flex><span>   <span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Sleep</span>(<span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Hour</span>)
-</span></span><span style=display:flex><span>  }()
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>  <span style=color:#a6e22e>e</span>.<span style=color:#a6e22e>EatMem</span>()
-</span></span><span style=display:flex><span> }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span> <span style=color:#a6e22e>w</span>.<span style=color:#a6e22e>Write</span>([]byte(<span style=color:#e6db74>&#34;ok&#34;</span>))
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> (<span style=color:#a6e22e>e</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>Eater</span>) <span style=color:#a6e22e>EatMem</span>() {
-</span></span><span style=display:flex><span> <span style=color:#a6e22e>e</span>.<span style=color:#a6e22e>Buffer</span> = append(<span style=color:#a6e22e>e</span>.<span style=color:#a6e22e>Buffer</span>, <span style=color:#a6e22e>generateWithCap</span>(<span style=color:#ae81ff>1024</span><span style=color:#f92672>*</span><span style=color:#ae81ff>1024</span>))
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>generateWithCap</span>(<span style=color:#a6e22e>n</span> <span style=color:#66d9ef>int</span>) []<span style=color:#66d9ef>int</span> {
-</span></span><span style=display:flex><span> <span style=color:#a6e22e>rand</span>.<span style=color:#a6e22e>Seed</span>(<span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Now</span>().<span style=color:#a6e22e>UnixNano</span>())
-</span></span><span style=display:flex><span> <span style=color:#a6e22e>nums</span> <span style=color:#f92672>:=</span> make([]<span style=color:#66d9ef>int</span>, <span style=color:#ae81ff>0</span>, <span style=color:#a6e22e>n</span>)
-</span></span><span style=display:flex><span> <span style=color:#66d9ef>for</span> <span style=color:#a6e22e>i</span> <span style=color:#f92672>:=</span> <span style=color:#ae81ff>0</span>; <span style=color:#a6e22e>i</span> &lt; <span style=color:#a6e22e>n</span>; <span style=color:#a6e22e>i</span><span style=color:#f92672>++</span> {
-</span></span><span style=display:flex><span>  <span style=color:#a6e22e>nums</span> = append(<span style=color:#a6e22e>nums</span>, <span style=color:#a6e22e>rand</span>.<span style=color:#a6e22e>Int</span>())
-</span></span><span style=display:flex><span> }
-</span></span><span style=display:flex><span> <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>nums</span>
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p>运行：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>go run main.go
-</span></span></code></pre></div><p>访问 <code>http://localhost:8080/go</code> 模拟业务。</p><p>访问 <code>http://localhost:8080/debug/pprof/</code> 分析程序性能。</p><p>图形方式分析：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 查看cpu</span>
-</span></span><span style=display:flex><span>go tool pprof -http<span style=color:#f92672>=</span>:6060 http://127.0.0.1:8080/debug/pprof/profile
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 查看heap</span>
-</span></span><span style=display:flex><span>go tool pprof -http<span style=color:#f92672>=</span>:6060 http://127.0.0.1:8080/debug/pprof/heap
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 查看goroutine</span>
-</span></span><span style=display:flex><span>go tool pprof -http<span style=color:#f92672>=</span>:6060 http://127.0.0.1:8080/debug/pprof/goroutine
+<a class=anchor href=#pprof>#</a></h1><p><code>pprof</code> 是性能调试工具，可以生成类似火焰图、堆栈图，内存分析图等。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-golang data-lang=golang><span class=line><span class=cl><span class=kn>package</span> <span class=nx>main</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl> <span class=s>&#34;fmt&#34;</span>
+</span></span><span class=line><span class=cl> <span class=s>&#34;math/rand&#34;</span>
+</span></span><span class=line><span class=cl> <span class=s>&#34;net/http&#34;</span>
+</span></span><span class=line><span class=cl> <span class=s>&#34;time&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=nx>_</span> <span class=s>&#34;net/http/pprof&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 吃内存
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>type</span> <span class=nx>Eater</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl> <span class=nx>Name</span>   <span class=kt>string</span>
+</span></span><span class=line><span class=cl> <span class=nx>Buffer</span> <span class=p>[][]</span><span class=kt>int</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>e</span> <span class=nx>Eater</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl> <span class=nx>e</span> <span class=p>=</span> <span class=nx>Eater</span><span class=p>{</span><span class=nx>Name</span><span class=p>:</span> <span class=s>&#34;eater&#34;</span><span class=p>}</span>
+</span></span><span class=line><span class=cl> <span class=nx>http</span><span class=p>.</span><span class=nf>HandleFunc</span><span class=p>(</span><span class=s>&#34;/go&#34;</span><span class=p>,</span> <span class=nx>goHandler</span><span class=p>)</span>
+</span></span><span class=line><span class=cl> <span class=nx>http</span><span class=p>.</span><span class=nf>ListenAndServe</span><span class=p>(</span><span class=s>&#34;:8080&#34;</span><span class=p>,</span> <span class=kc>nil</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=c1>// 如果不使用默认的 mux（http.DefaultServeMux），可以使用如下方式集成 pprof
+</span></span></span><span class=line><span class=cl><span class=c1></span> <span class=c1>// mux := http.NewServeMux()
+</span></span></span><span class=line><span class=cl><span class=c1></span> <span class=c1>// mux.HandleFunc(&#34;/go&#34;, goHandler)
+</span></span></span><span class=line><span class=cl><span class=c1></span> <span class=c1>// mux.HandleFunc(&#34;/debug/pprof/&#34;, pprof.Index)
+</span></span></span><span class=line><span class=cl><span class=c1></span> <span class=c1>// mux.HandleFunc(&#34;/debug/pprof/cmdline&#34;, pprof.Cmdline)
+</span></span></span><span class=line><span class=cl><span class=c1></span> <span class=c1>// mux.HandleFunc(&#34;/debug/pprof/profile&#34;, pprof.Profile)
+</span></span></span><span class=line><span class=cl><span class=c1></span> <span class=c1>// mux.HandleFunc(&#34;/debug/pprof/symbol&#34;, pprof.Symbol)
+</span></span></span><span class=line><span class=cl><span class=c1></span> <span class=c1>// mux.HandleFunc(&#34;/debug/pprof/trace&#34;, pprof.Trace)
+</span></span></span><span class=line><span class=cl><span class=c1></span> <span class=c1>// http.ListenAndServe(&#34;:8080&#34;, mux)
+</span></span></span><span class=line><span class=cl><span class=c1></span> <span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>e</span><span class=p>.</span><span class=nx>Name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 模拟创建 goroutine，内存没有及时回收
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>func</span> <span class=nf>goHandler</span><span class=p>(</span><span class=nx>w</span> <span class=nx>http</span><span class=p>.</span><span class=nx>ResponseWriter</span><span class=p>,</span> <span class=nx>r</span> <span class=o>*</span><span class=nx>http</span><span class=p>.</span><span class=nx>Request</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl> <span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span> <span class=p>&lt;</span> <span class=mi>10</span><span class=p>;</span> <span class=nx>i</span><span class=o>++</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>go</span> <span class=kd>func</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>   <span class=nx>time</span><span class=p>.</span><span class=nf>Sleep</span><span class=p>(</span><span class=nx>time</span><span class=p>.</span><span class=nx>Hour</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>  <span class=p>}()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nx>e</span><span class=p>.</span><span class=nf>EatMem</span><span class=p>()</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=nx>w</span><span class=p>.</span><span class=nf>Write</span><span class=p>([]</span><span class=nb>byte</span><span class=p>(</span><span class=s>&#34;ok&#34;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>e</span> <span class=o>*</span><span class=nx>Eater</span><span class=p>)</span> <span class=nf>EatMem</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl> <span class=nx>e</span><span class=p>.</span><span class=nx>Buffer</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>e</span><span class=p>.</span><span class=nx>Buffer</span><span class=p>,</span> <span class=nf>generateWithCap</span><span class=p>(</span><span class=mi>1024</span><span class=o>*</span><span class=mi>1024</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>generateWithCap</span><span class=p>(</span><span class=nx>n</span> <span class=kt>int</span><span class=p>)</span> <span class=p>[]</span><span class=kt>int</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl> <span class=nx>rand</span><span class=p>.</span><span class=nf>Seed</span><span class=p>(</span><span class=nx>time</span><span class=p>.</span><span class=nf>Now</span><span class=p>().</span><span class=nf>UnixNano</span><span class=p>())</span>
+</span></span><span class=line><span class=cl> <span class=nx>nums</span> <span class=o>:=</span> <span class=nb>make</span><span class=p>([]</span><span class=kt>int</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=nx>n</span><span class=p>)</span>
+</span></span><span class=line><span class=cl> <span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span> <span class=p>&lt;</span> <span class=nx>n</span><span class=p>;</span> <span class=nx>i</span><span class=o>++</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>nums</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>nums</span><span class=p>,</span> <span class=nx>rand</span><span class=p>.</span><span class=nf>Int</span><span class=p>())</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl> <span class=k>return</span> <span class=nx>nums</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>运行：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>go run main.go
+</span></span></code></pre></div><p>访问 <code>http://localhost:8080/go</code> 模拟业务。</p><p>访问 <code>http://localhost:8080/debug/pprof/</code> 分析程序性能。</p><p>图形方式分析：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 查看cpu</span>
+</span></span><span class=line><span class=cl>go tool pprof -http<span class=o>=</span>:6060 http://127.0.0.1:8080/debug/pprof/profile
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 查看heap</span>
+</span></span><span class=line><span class=cl>go tool pprof -http<span class=o>=</span>:6060 http://127.0.0.1:8080/debug/pprof/heap
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 查看goroutine</span>
+</span></span><span class=line><span class=cl>go tool pprof -http<span class=o>=</span>:6060 http://127.0.0.1:8080/debug/pprof/goroutine
 </span></span></code></pre></div><blockquote><p>需要提前安装工具 <code>Graphviz</code></p></blockquote><p><strong>内存使用</strong>：</p><p><img src=https://fs.poneding.com/images/image-20220419181438327.png alt=image-20220419181438327></p><p><strong>goroutine 使用</strong>：</p><p><img src=https://fs.poneding.com/images/image-20220419181358767.png alt=image-20220419181358767></p><hr><p><a href=/go/mac-appl-silicon-cross-compile-cgo/>« Mac M1 交叉编译 CGO</a></p><p><a href=/go/ssh-keygen-with-go/>» 使用 Go 生成 OpenSSH 兼容的 RSA 密钥对</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
 <span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/go/pprof.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
 <span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents></nav></div></aside></main></body></html>

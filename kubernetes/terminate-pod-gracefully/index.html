@@ -5,85 +5,85 @@ $ kubectl explain pod.spec.containers.lifecycle.preStop KIND: Pod VERSION: v1 RE
 Kubernetes 0-1 使用preStop优雅终止Pod # Kubernetes允许Pod终止之前，执行自定义逻辑。
 字段定义 # 字段定义：pod.spec.containers.lifecycle.preStop
 $ kubectl explain pod.spec.containers.lifecycle.preStop KIND: Pod VERSION: v1 RESOURCE: preStop <Object> DESCRIPTION: PreStop is called immediately before a container is terminated due to an API request or management event such as liveness/startup probe failure, preemption, resource contention, etc. The handler is not called if the container crashes or exits. The reason for termination is passed to the handler."><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="kubernetes"><meta property="article:modified_time" content="2024-06-13T00:13:45+08:00"><title>Terminate Pod Gracefully | 我的博客</title>
-<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/terminate-pod-gracefully/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/terminate-pod-gracefully/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.ffd7553d42e9860dbcfbc6775c0f6c9895736a50f5383929cc725dc0a9b61715.js integrity="sha256-/9dVPULphg28+8Z3XA9smJVzalD1ODkpzHJdwKm2FxU=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
 <input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
 </label><strong>Terminate Pod Gracefully</strong>
 <label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#字段定义>字段定义</a></li><li><a href=#示例>示例</a></li><li><a href=#使用场景>使用场景</a></li><li><a href=#结束语>结束语</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
 <a href=/kubernetes/>Kubernetes</a> / Kubernetes 0-1 使用preStop优雅终止Pod</p><h1 id=kubernetes-0-1-使用prestop优雅终止pod>Kubernetes 0-1 使用preStop优雅终止Pod
 <a class=anchor href=#kubernetes-0-1-%e4%bd%bf%e7%94%a8prestop%e4%bc%98%e9%9b%85%e7%bb%88%e6%ad%a2pod>#</a></h1><p><img src=https://fs.poneding.com/images/kubernetes.png alt=image></p><p>Kubernetes允许Pod终止之前，执行自定义逻辑。</p><h2 id=字段定义>字段定义
-<a class=anchor href=#%e5%ad%97%e6%ae%b5%e5%ae%9a%e4%b9%89>#</a></h2><p>字段定义：<code>pod.spec.containers.lifecycle.preStop</code></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ kubectl explain pod.spec.containers.lifecycle.preStop
-</span></span><span style=display:flex><span>KIND:     Pod
-</span></span><span style=display:flex><span>VERSION:  v1
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>RESOURCE: preStop &lt;Object&gt;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>DESCRIPTION:
-</span></span><span style=display:flex><span>     PreStop is called immediately before a container is terminated due to an
-</span></span><span style=display:flex><span>     API request or management event such as liveness/startup probe failure,
-</span></span><span style=display:flex><span>     preemption, resource contention, etc. The handler is not called <span style=color:#66d9ef>if</span> the
-</span></span><span style=display:flex><span>     container crashes or exits. The reason <span style=color:#66d9ef>for</span> termination is passed to the
-</span></span><span style=display:flex><span>     handler. The Pod<span style=color:#e6db74>&#39;s termination grace period countdown begins before the
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>     PreStop hooked is executed. Regardless of the outcome of the handler, the
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>     container will eventually terminate within the Pod&#39;</span>s termination grace
-</span></span><span style=display:flex><span>     period. Other management of the container blocks <span style=color:#66d9ef>until</span> the hook completes
-</span></span><span style=display:flex><span>     or <span style=color:#66d9ef>until</span> the termination grace period is reached. More info:
-</span></span><span style=display:flex><span>     https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>     Handler defines a specific action that should be taken
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>FIELDS:
-</span></span><span style=display:flex><span>   exec &lt;Object&gt;
-</span></span><span style=display:flex><span>     One and only one of the following should be specified. Exec specifies the
-</span></span><span style=display:flex><span>     action to take.
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>   httpGet      &lt;Object&gt;
-</span></span><span style=display:flex><span>     HTTPGet specifies the http request to perform.
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>   tcpSocket    &lt;Object&gt;
-</span></span><span style=display:flex><span>     TCPSocket specifies an action involving a TCP port. TCP hooks not yet
-</span></span><span style=display:flex><span>     supported
+<a class=anchor href=#%e5%ad%97%e6%ae%b5%e5%ae%9a%e4%b9%89>#</a></h2><p>字段定义：<code>pod.spec.containers.lifecycle.preStop</code></p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>$ kubectl explain pod.spec.containers.lifecycle.preStop
+</span></span><span class=line><span class=cl>KIND:     Pod
+</span></span><span class=line><span class=cl>VERSION:  v1
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>RESOURCE: preStop &lt;Object&gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>DESCRIPTION:
+</span></span><span class=line><span class=cl>     PreStop is called immediately before a container is terminated due to an
+</span></span><span class=line><span class=cl>     API request or management event such as liveness/startup probe failure,
+</span></span><span class=line><span class=cl>     preemption, resource contention, etc. The handler is not called <span class=k>if</span> the
+</span></span><span class=line><span class=cl>     container crashes or exits. The reason <span class=k>for</span> termination is passed to the
+</span></span><span class=line><span class=cl>     handler. The Pod<span class=s1>&#39;s termination grace period countdown begins before the
+</span></span></span><span class=line><span class=cl><span class=s1>     PreStop hooked is executed. Regardless of the outcome of the handler, the
+</span></span></span><span class=line><span class=cl><span class=s1>     container will eventually terminate within the Pod&#39;</span>s termination grace
+</span></span><span class=line><span class=cl>     period. Other management of the container blocks <span class=k>until</span> the hook completes
+</span></span><span class=line><span class=cl>     or <span class=k>until</span> the termination grace period is reached. More info:
+</span></span><span class=line><span class=cl>     https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>     Handler defines a specific action that should be taken
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>FIELDS:
+</span></span><span class=line><span class=cl>   <span class=nb>exec</span> &lt;Object&gt;
+</span></span><span class=line><span class=cl>     One and only one of the following should be specified. Exec specifies the
+</span></span><span class=line><span class=cl>     action to take.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>   httpGet      &lt;Object&gt;
+</span></span><span class=line><span class=cl>     HTTPGet specifies the http request to perform.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>   tcpSocket    &lt;Object&gt;
+</span></span><span class=line><span class=cl>     TCPSocket specifies an action involving a TCP port. TCP hooks not yet
+</span></span><span class=line><span class=cl>     supported
 </span></span></code></pre></div><p>有三种preStop方式：</p><ul><li><strong>exec</strong>：</li><li><strong>httpGet</strong>：</li><li><strong>tcpSocket</strong>：</li></ul><h2 id=示例>示例
-<a class=anchor href=#%e7%a4%ba%e4%be%8b>#</a></h2><p>使用最简单的<strong>exec</strong>作示例，详细查看一下exec下需要定义的字段：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ kubectl explain pod.spec.containers.lifecycle.preStop.exec
-</span></span><span style=display:flex><span>KIND:     Pod
-</span></span><span style=display:flex><span>VERSION:  v1
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>RESOURCE: exec &lt;Object&gt;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>DESCRIPTION:
-</span></span><span style=display:flex><span>...
-</span></span><span style=display:flex><span>FIELDS:
-</span></span><span style=display:flex><span>   command      &lt;<span style=color:#f92672>[]</span>string&gt;
-</span></span><span style=display:flex><span>     Command is the command line to execute inside the container, the working
-</span></span><span style=display:flex><span>     directory <span style=color:#66d9ef>for</span> the command is root <span style=color:#f92672>(</span><span style=color:#e6db74>&#39;/&#39;</span><span style=color:#f92672>)</span> in the container<span style=color:#e6db74>&#39;s filesystem. The
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>     command is simply exec&#39;</span>d, it is not run inside a shell, so traditional
-</span></span><span style=display:flex><span>     shell instructions <span style=color:#f92672>(</span><span style=color:#e6db74>&#39;|&#39;</span>, etc<span style=color:#f92672>)</span> won<span style=color:#960050;background-color:#1e0010>&#39;</span>t work. To use a shell, you need to
-</span></span><span style=display:flex><span>     explicitly call out to that shell. Exit status of <span style=color:#ae81ff>0</span> is treated as
-</span></span><span style=display:flex><span>     live/healthy and non-zero is unhealthy.
-</span></span></code></pre></div><p>接下来按照字段释义，直接定义一个Pod：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ kubectl apply -f pod.yaml
-</span></span><span style=display:flex><span><span style=color:#75715e># pod.yaml文件内容：</span>
-</span></span><span style=display:flex><span>apiVersion: v1
-</span></span><span style=display:flex><span>kind: Pod
-</span></span><span style=display:flex><span>metadata:
-</span></span><span style=display:flex><span>  name: busybox
-</span></span><span style=display:flex><span>  namespace: default
-</span></span><span style=display:flex><span>spec:
-</span></span><span style=display:flex><span>  containers:
-</span></span><span style=display:flex><span>    - name: busybox
-</span></span><span style=display:flex><span>      image: busybox
-</span></span><span style=display:flex><span>      command: <span style=color:#f92672>[</span><span style=color:#e6db74>&#34;/bin/sh&#34;</span>, <span style=color:#e6db74>&#34;-c&#34;</span>, <span style=color:#e6db74>&#34;sleep 10m&#34;</span><span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>      lifecycle:
-</span></span><span style=display:flex><span>        preStop:
-</span></span><span style=display:flex><span>          exec:
-</span></span><span style=display:flex><span>            command:
-</span></span><span style=display:flex><span>              <span style=color:#f92672>[</span>
-</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#34;/bin/sh&#34;</span>,
-</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#34;-c&#34;</span>,
-</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#34;echo this pod is stopping. &gt; /stop.log &amp;&amp; sleep 10s&#34;</span>,
-</span></span><span style=display:flex><span>              <span style=color:#f92672>]</span>
-</span></span></code></pre></div><p>删除pod：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl delete pod busybox
-</span></span></code></pre></div><p>在新终端窗口（因为删除pod会占用终端窗口）获取pod内文件内容，需要在pod完全删除之前（10s内，也可以将该值设置稍长一点）：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ kubectl exec busybox -c busybox -- cat /stop.log
-</span></span><span style=display:flex><span><span style=color:#75715e># 可以得到日志内容</span>
-</span></span><span style=display:flex><span>this pod is stopping.
+<a class=anchor href=#%e7%a4%ba%e4%be%8b>#</a></h2><p>使用最简单的<strong>exec</strong>作示例，详细查看一下exec下需要定义的字段：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>$ kubectl explain pod.spec.containers.lifecycle.preStop.exec
+</span></span><span class=line><span class=cl>KIND:     Pod
+</span></span><span class=line><span class=cl>VERSION:  v1
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>RESOURCE: <span class=nb>exec</span> &lt;Object&gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>DESCRIPTION:
+</span></span><span class=line><span class=cl>...
+</span></span><span class=line><span class=cl>FIELDS:
+</span></span><span class=line><span class=cl>   <span class=nb>command</span>      &lt;<span class=o>[]</span>string&gt;
+</span></span><span class=line><span class=cl>     Command is the <span class=nb>command</span> line to execute inside the container, the working
+</span></span><span class=line><span class=cl>     directory <span class=k>for</span> the <span class=nb>command</span> is root <span class=o>(</span><span class=s1>&#39;/&#39;</span><span class=o>)</span> in the container<span class=s1>&#39;s filesystem. The
+</span></span></span><span class=line><span class=cl><span class=s1>     command is simply exec&#39;</span>d, it is not run inside a shell, so traditional
+</span></span><span class=line><span class=cl>     shell instructions <span class=o>(</span><span class=s1>&#39;|&#39;</span>, etc<span class=o>)</span> won<span class=err>&#39;</span>t work. To use a shell, you need to
+</span></span><span class=line><span class=cl>     explicitly call out to that shell. Exit status of <span class=m>0</span> is treated as
+</span></span><span class=line><span class=cl>     live/healthy and non-zero is unhealthy.
+</span></span></code></pre></div><p>接下来按照字段释义，直接定义一个Pod：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>$ kubectl apply -f pod.yaml
+</span></span><span class=line><span class=cl><span class=c1># pod.yaml文件内容：</span>
+</span></span><span class=line><span class=cl>apiVersion: v1
+</span></span><span class=line><span class=cl>kind: Pod
+</span></span><span class=line><span class=cl>metadata:
+</span></span><span class=line><span class=cl>  name: busybox
+</span></span><span class=line><span class=cl>  namespace: default
+</span></span><span class=line><span class=cl>spec:
+</span></span><span class=line><span class=cl>  containers:
+</span></span><span class=line><span class=cl>    - name: busybox
+</span></span><span class=line><span class=cl>      image: busybox
+</span></span><span class=line><span class=cl>      command: <span class=o>[</span><span class=s2>&#34;/bin/sh&#34;</span>, <span class=s2>&#34;-c&#34;</span>, <span class=s2>&#34;sleep 10m&#34;</span><span class=o>]</span>
+</span></span><span class=line><span class=cl>      lifecycle:
+</span></span><span class=line><span class=cl>        preStop:
+</span></span><span class=line><span class=cl>          exec:
+</span></span><span class=line><span class=cl>            command:
+</span></span><span class=line><span class=cl>              <span class=o>[</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;/bin/sh&#34;</span>,
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;-c&#34;</span>,
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;echo this pod is stopping. &gt; /stop.log &amp;&amp; sleep 10s&#34;</span>,
+</span></span><span class=line><span class=cl>              <span class=o>]</span>
+</span></span></code></pre></div><p>删除pod：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl delete pod busybox
+</span></span></code></pre></div><p>在新终端窗口（因为删除pod会占用终端窗口）获取pod内文件内容，需要在pod完全删除之前（10s内，也可以将该值设置稍长一点）：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>$ kubectl <span class=nb>exec</span> busybox -c busybox -- cat /stop.log
+</span></span><span class=line><span class=cl><span class=c1># 可以得到日志内容</span>
+</span></span><span class=line><span class=cl>this pod is stopping.
 </span></span></code></pre></div><p>这说明，preStop确实生效了。</p><h2 id=使用场景>使用场景
 <a class=anchor href=#%e4%bd%bf%e7%94%a8%e5%9c%ba%e6%99%af>#</a></h2><ul><li>你的请求已经到达了当前Pod，硬终止会导致请求失败，我们希望已经到达了当前Pod的请求处理完成再将其停止掉，尽可能避免请求失败；</li><li>Pod已经本身已经注册到了服务中心，我们希望在Pod停止之前，主动向服务注册中心通知下线；</li></ul><h2 id=结束语>结束语
 <a class=anchor href=#%e7%bb%93%e6%9d%9f%e8%af%ad>#</a></h2><p>与preStop相对应，有一个postStart的概念，在容器创建成功后执行，可用于初始化资源，准备环境等；</p><p>如果preStop与postStart执行失败，将会杀死容器。所以作为钩子函数，应该尽量保证它们是轻量的；</p><p>Pod的终止过程：</p><p>删除Pod => Pod被标记为Terminating状态 => Service移除该Pod的endpoint => kubelet甄别Terminating状态的pod，执行pod的preStop钩子 => 如果执行preStop超时（grace period） ，kubelet发送SIGTERM并等待2秒 => &mldr;</p><p><img src=https://fs.poneding.com/images/gzh.png alt=gzh></p><hr><p><a href=/kubernetes/telepresence/>« Telepresence</a></p><p><a href=/kubernetes/terraform/>» Terraform</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/3ab2ea879ea4c44eeb874b37c0dc446941b7cedb title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>

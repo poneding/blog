@@ -3,268 +3,268 @@ Kubevirt 实践 # 简介 # Kubevirt 是 Redhat 开源的以容器方式运行虚
 安装 # 部署 K8s 资源 # 最新版本 export KUBEVIRT_VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq -r ."><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/kubernetes/kubevirt-practice/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / Kubernetes / Kubevirt 实践
 Kubevirt 实践 # 简介 # Kubevirt 是 Redhat 开源的以容器方式运行虚拟机的项目，以 k8s add-on 方式，利用 k8s CRD 为增加资源类型 VirtualMachineInstance（VMI）， 使用容器的 image registry 去创建虚拟机并提供 VM 生命周期管理。 CRD 的方式使得 kubevirt 对虚拟机的管理不局限于 pod 管理接口，但是也无法使用 pod 的 RS DS Deployment 等管理能力，也意味着 kubevirt 如果想要利用 pod 管理能力，要自主去实现，目前 kubevirt 实现了类似 RS 的功能。 kubevirt 目前支持的 runtime 是 docker 和 runc。
 安装 # 部署 K8s 资源 # 最新版本 export KUBEVIRT_VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq -r ."><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="kubernetes"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Kubevirt Practice | 我的博客</title>
-<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/kubevirt-practice/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/kubevirt-practice/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.ffd7553d42e9860dbcfbc6775c0f6c9895736a50f5383929cc725dc0a9b61715.js integrity="sha256-/9dVPULphg28+8Z3XA9smJVzalD1ODkpzHJdwKm2FxU=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
 <input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
 </label><strong>Kubevirt Practice</strong>
 <label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#简介>简介</a></li><li><a href=#安装>安装</a></li><li><a href=#概念>概念</a></li><li><a href=#创建虚拟机>创建虚拟机</a></li><li><a href=#运行虚拟机>运行虚拟机</a></li><li><a href=#访问虚拟机>访问虚拟机</a></li><li><a href=#关闭虚拟机>关闭虚拟机</a></li><li><a href=#磁盘访问>磁盘访问</a><ul><li><a href=#lun>lun</a></li><li><a href=#disk>disk</a></li><li><a href=#cdrom>cdrom</a></li></ul></li><li><a href=#排错>排错</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
 <a href=/kubernetes/>Kubernetes</a> / Kubevirt 实践</p><h1 id=kubevirt-实践>Kubevirt 实践
 <a class=anchor href=#kubevirt-%e5%ae%9e%e8%b7%b5>#</a></h1><h2 id=简介>简介
 <a class=anchor href=#%e7%ae%80%e4%bb%8b>#</a></h2><p><code>Kubevirt</code> 是 Redhat 开源的以容器方式运行虚拟机的项目，以 k8s add-on 方式，利用 k8s CRD 为增加资源类型 <code>VirtualMachineInstance</code>（VMI）， 使用容器的 image registry 去创建虚拟机并提供 VM 生命周期管理。 CRD 的方式使得 kubevirt 对虚拟机的管理不局限于 pod 管理接口，但是也无法使用 pod 的 RS DS Deployment 等管理能力，也意味着 kubevirt 如果想要利用 pod 管理能力，要自主去实现，目前 kubevirt 实现了类似 RS 的功能。 kubevirt 目前支持的 runtime 是 docker 和 runc。</p><h2 id=安装>安装
-<a class=anchor href=#%e5%ae%89%e8%a3%85>#</a></h2><ol><li>部署 K8s 资源</li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 最新版本</span>
-</span></span><span style=display:flex><span>export KUBEVIRT_VERSION<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>curl -s https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq -r .tag_name<span style=color:#66d9ef>)</span>
-</span></span><span style=display:flex><span>echo $KUBEVIRT_VERSION
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 安装 CRD</span>
-</span></span><span style=display:flex><span>kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/<span style=color:#e6db74>${</span>KUBEVIRT_VERSION<span style=color:#e6db74>}</span>/kubevirt-cr.yaml
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 安装控制器</span>
-</span></span><span style=display:flex><span>kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/<span style=color:#e6db74>${</span>KUBEVIRT_VERSION<span style=color:#e6db74>}</span>/kubevirt-operator.yaml
-</span></span></code></pre></div><ol start=2><li>安装 virtctl 工具</li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>wget -O virtctl https://github.com/kubevirt/kubevirt/releases/download/<span style=color:#e6db74>${</span>KUBEVIRT_VERSION<span style=color:#e6db74>}</span>/virtctl-<span style=color:#e6db74>${</span>KUBEVIRT_VERSION<span style=color:#e6db74>}</span>-linux-amd64
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>chmod +x virtctl
-</span></span><span style=display:flex><span>mv virtctl /usr/local/bin
-</span></span></code></pre></div><ol start=3><li>检查资源状态</li></ol><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 需要等待所有 Pod 处于 Running 状态</span>
-</span></span><span style=display:flex><span>kubectl get pods -n kubevirt
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 需要等待 kubevirt 处于 Deployed 状态</span>
-</span></span><span style=display:flex><span>kubectl -n kubevirt get kubevirt
-</span></span></code></pre></div><ol start=4><li>卸载</li></ol><p>卸载首先需要删除 CRD，然后卸载控制器。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 0、获取当前 Kubevirt 版本</span>
-</span></span><span style=display:flex><span>export KUBEVIRT_VERSION<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>kubectl get kubevirts.kubevirt.io -n kubevirt kubevirt -o<span style=color:#f92672>=</span>jsonpath<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;{.status.observedKubeVirtVersion}&#39;</span><span style=color:#66d9ef>)</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 1、删除 CRD</span>
-</span></span><span style=display:flex><span>kubectl delete -f https://github.com/kubevirt/kubevirt/releases/download/<span style=color:#e6db74>${</span>KUBEVIRT_VERSION<span style=color:#e6db74>}</span>/kubevirt-cr.yaml
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 2、卸载控制器</span>
-</span></span><span style=display:flex><span>kubectl delete -f kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/<span style=color:#e6db74>${</span>KUBEVIRT_VERSION<span style=color:#e6db74>}</span>/kubevirt-operator.yaml
+<a class=anchor href=#%e5%ae%89%e8%a3%85>#</a></h2><ol><li>部署 K8s 资源</li></ol><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 最新版本</span>
+</span></span><span class=line><span class=cl><span class=nb>export</span> <span class=nv>KUBEVIRT_VERSION</span><span class=o>=</span><span class=k>$(</span>curl -s https://api.github.com/repos/kubevirt/kubevirt/releases/latest <span class=p>|</span> jq -r .tag_name<span class=k>)</span>
+</span></span><span class=line><span class=cl><span class=nb>echo</span> <span class=nv>$KUBEVIRT_VERSION</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 安装 CRD</span>
+</span></span><span class=line><span class=cl>kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/<span class=si>${</span><span class=nv>KUBEVIRT_VERSION</span><span class=si>}</span>/kubevirt-cr.yaml
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 安装控制器</span>
+</span></span><span class=line><span class=cl>kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/<span class=si>${</span><span class=nv>KUBEVIRT_VERSION</span><span class=si>}</span>/kubevirt-operator.yaml
+</span></span></code></pre></div><ol start=2><li>安装 virtctl 工具</li></ol><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>wget -O virtctl https://github.com/kubevirt/kubevirt/releases/download/<span class=si>${</span><span class=nv>KUBEVIRT_VERSION</span><span class=si>}</span>/virtctl-<span class=si>${</span><span class=nv>KUBEVIRT_VERSION</span><span class=si>}</span>-linux-amd64
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>chmod +x virtctl
+</span></span><span class=line><span class=cl>mv virtctl /usr/local/bin
+</span></span></code></pre></div><ol start=3><li>检查资源状态</li></ol><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 需要等待所有 Pod 处于 Running 状态</span>
+</span></span><span class=line><span class=cl>kubectl get pods -n kubevirt
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 需要等待 kubevirt 处于 Deployed 状态</span>
+</span></span><span class=line><span class=cl>kubectl -n kubevirt get kubevirt
+</span></span></code></pre></div><ol start=4><li>卸载</li></ol><p>卸载首先需要删除 CRD，然后卸载控制器。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 0、获取当前 Kubevirt 版本</span>
+</span></span><span class=line><span class=cl><span class=nb>export</span> <span class=nv>KUBEVIRT_VERSION</span><span class=o>=</span><span class=k>$(</span>kubectl get kubevirts.kubevirt.io -n kubevirt kubevirt -o<span class=o>=</span><span class=nv>jsonpath</span><span class=o>=</span><span class=s1>&#39;{.status.observedKubeVirtVersion}&#39;</span><span class=k>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 1、删除 CRD</span>
+</span></span><span class=line><span class=cl>kubectl delete -f https://github.com/kubevirt/kubevirt/releases/download/<span class=si>${</span><span class=nv>KUBEVIRT_VERSION</span><span class=si>}</span>/kubevirt-cr.yaml
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 2、卸载控制器</span>
+</span></span><span class=line><span class=cl>kubectl delete -f kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/<span class=si>${</span><span class=nv>KUBEVIRT_VERSION</span><span class=si>}</span>/kubevirt-operator.yaml
 </span></span></code></pre></div><h2 id=概念>概念
 <a class=anchor href=#%e6%a6%82%e5%bf%b5>#</a></h2><ul><li>虚拟机（VirtualMachine）</li><li>虚拟机实例（VirtualMachineInstance）</li></ul><h2 id=创建虚拟机>创建虚拟机
-<a class=anchor href=#%e5%88%9b%e5%bb%ba%e8%99%9a%e6%8b%9f%e6%9c%ba>#</a></h2><p>现在你可以像创建其他任何 K8s 资源一样，声明虚拟机资源然后创建了，如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>kubevirt.io/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>VirtualMachine</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>testvm</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>running</span>: <span style=color:#66d9ef>false</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>kubevirt.io/size</span>: <span style=color:#ae81ff>small</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>kubevirt.io/domain</span>: <span style=color:#ae81ff>testvm</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>domain</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>devices</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>disks</span>:
-</span></span><span style=display:flex><span>            - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>containerdisk</span>
-</span></span><span style=display:flex><span>              <span style=color:#f92672>disk</span>:
-</span></span><span style=display:flex><span>                <span style=color:#f92672>bus</span>: <span style=color:#ae81ff>virtio</span>
-</span></span><span style=display:flex><span>            - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cloudinitdisk</span>
-</span></span><span style=display:flex><span>              <span style=color:#f92672>disk</span>:
-</span></span><span style=display:flex><span>                <span style=color:#f92672>bus</span>: <span style=color:#ae81ff>virtio</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>interfaces</span>:
-</span></span><span style=display:flex><span>          - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>default</span>
-</span></span><span style=display:flex><span>            <span style=color:#f92672>masquerade</span>: {}
-</span></span><span style=display:flex><span>        <span style=color:#f92672>resources</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>requests</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>memory</span>: <span style=color:#ae81ff>64M</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>networks</span>:
-</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>default</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>pod</span>: {}
-</span></span><span style=display:flex><span>      <span style=color:#f92672>volumes</span>:
-</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>containerdisk</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>containerDisk</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>image</span>: <span style=color:#ae81ff>quay.io/kubevirt/cirros-container-disk-demo</span>
-</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cloudinitdisk</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>cloudInitNoCloud</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>userDataBase64</span>: <span style=color:#ae81ff>SGkuXG4=</span>
-</span></span></code></pre></div><p>创建虚拟机：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl apply -f testvm.yaml
-</span></span></code></pre></div><p>查看虚拟机状态，虚拟机应该处于未运行的状态：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># kubectl get vms</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>kubectl get vms -o yaml testvm | grep -E <span style=color:#e6db74>&#39;running:.*|$&#39;</span>
+<a class=anchor href=#%e5%88%9b%e5%bb%ba%e8%99%9a%e6%8b%9f%e6%9c%ba>#</a></h2><p>现在你可以像创建其他任何 K8s 资源一样，声明虚拟机资源然后创建了，如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>kubevirt.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>VirtualMachine</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>testvm</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>running</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>template</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>kubevirt.io/size</span><span class=p>:</span><span class=w> </span><span class=l>small</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>kubevirt.io/domain</span><span class=p>:</span><span class=w> </span><span class=l>testvm</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>domain</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>devices</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>disks</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>containerdisk</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>disk</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=nt>bus</span><span class=p>:</span><span class=w> </span><span class=l>virtio</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cloudinitdisk</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>disk</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=nt>bus</span><span class=p>:</span><span class=w> </span><span class=l>virtio</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>interfaces</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>default</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>masquerade</span><span class=p>:</span><span class=w> </span>{}<span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>resources</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>requests</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>memory</span><span class=p>:</span><span class=w> </span><span class=l>64M</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>networks</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>default</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>pod</span><span class=p>:</span><span class=w> </span>{}<span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>volumes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>containerdisk</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>containerDisk</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>quay.io/kubevirt/cirros-container-disk-demo</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cloudinitdisk</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>cloudInitNoCloud</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>userDataBase64</span><span class=p>:</span><span class=w> </span><span class=l>SGkuXG4=</span><span class=w>
+</span></span></span></code></pre></div><p>创建虚拟机：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl apply -f testvm.yaml
+</span></span></code></pre></div><p>查看虚拟机状态，虚拟机应该处于未运行的状态：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># kubectl get vms</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>kubectl get vms -o yaml testvm <span class=p>|</span> grep -E <span class=s1>&#39;running:.*|$&#39;</span>
 </span></span></code></pre></div><h2 id=运行虚拟机>运行虚拟机
-<a class=anchor href=#%e8%bf%90%e8%a1%8c%e8%99%9a%e6%8b%9f%e6%9c%ba>#</a></h2><p>使用 <code>virtctl start</code> 命令运行虚拟机：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>virtual start testvm
-</span></span></code></pre></div><blockquote><p>注意：</p><p>如果遇到 <code>virtctl start testvm dial tcp 127.0.0.1:8080: connect: connection refused</code>问题，通过 <code>kubectl proxy --port 8080</code> 在本地代理 K8s apiserver 服务。</p></blockquote><p>等待片刻，再次查看虚拟机状态，虚拟机应该处于未运行的状态：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl get vms -o yaml testvm | grep -E <span style=color:#e6db74>&#39;running:.*|$&#39;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>kubectl get vmis
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>kubectl get vms 
+<a class=anchor href=#%e8%bf%90%e8%a1%8c%e8%99%9a%e6%8b%9f%e6%9c%ba>#</a></h2><p>使用 <code>virtctl start</code> 命令运行虚拟机：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>virtual start testvm
+</span></span></code></pre></div><blockquote><p>注意：</p><p>如果遇到 <code>virtctl start testvm dial tcp 127.0.0.1:8080: connect: connection refused</code>问题，通过 <code>kubectl proxy --port 8080</code> 在本地代理 K8s apiserver 服务。</p></blockquote><p>等待片刻，再次查看虚拟机状态，虚拟机应该处于未运行的状态：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl get vms -o yaml testvm <span class=p>|</span> grep -E <span class=s1>&#39;running:.*|$&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>kubectl get vmis
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>kubectl get vms 
 </span></span></code></pre></div><h2 id=访问虚拟机>访问虚拟机
-<a class=anchor href=#%e8%ae%bf%e9%97%ae%e8%99%9a%e6%8b%9f%e6%9c%ba>#</a></h2><p>使用 <code>virtual console</code> 命令访问虚拟机：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>virtual console testvm
+<a class=anchor href=#%e8%ae%bf%e9%97%ae%e8%99%9a%e6%8b%9f%e6%9c%ba>#</a></h2><p>使用 <code>virtual console</code> 命令访问虚拟机：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>virtual console testvm
 </span></span></code></pre></div><blockquote><p>注意：</p><ul><li>使用镜像 <code>quay.io/kubevirt/cirros-container-disk-demo</code> 创建的虚拟机，默认账号密码：<code>cirros/gocubsgo</code>；</li><li>使用 <code>ctrl+]</code> 退出。</li></ul></blockquote><h2 id=关闭虚拟机>关闭虚拟机
-<a class=anchor href=#%e5%85%b3%e9%97%ad%e8%99%9a%e6%8b%9f%e6%9c%ba>#</a></h2><p>使用 <code>virtual stop</code> 命令访问虚拟机：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>virtual stop testvm
-</span></span></code></pre></div><p>删除虚拟机：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl delete vms testvm
+<a class=anchor href=#%e5%85%b3%e9%97%ad%e8%99%9a%e6%8b%9f%e6%9c%ba>#</a></h2><p>使用 <code>virtual stop</code> 命令访问虚拟机：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>virtual stop testvm
+</span></span></code></pre></div><p>删除虚拟机：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl delete vms testvm
 </span></span></code></pre></div><h2 id=磁盘访问>磁盘访问
 <a class=anchor href=#%e7%a3%81%e7%9b%98%e8%ae%bf%e9%97%ae>#</a></h2><h3 id=lun>lun
-<a class=anchor href=#lun>#</a></h3><p>将卷以 lun 的方式公开给虚拟机。</p><p><em>pvc</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>PersistentVolumeClaim</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>lun-pvc</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>default</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>accessModes</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>ReadWriteOnce</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>resources</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>requests</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>storage</span>: <span style=color:#ae81ff>1Gi</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>storageClassName</span>: <span style=color:#ae81ff>longhorn</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>volumeMode</span>: <span style=color:#ae81ff>Filesystem</span>
-</span></span></code></pre></div><p><em>vm</em>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>kubevirt.io/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>VirtualMachine</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>testvm</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>running</span>: <span style=color:#66d9ef>false</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>kubevirt.io/size</span>: <span style=color:#ae81ff>small</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>kubevirt.io/domain</span>: <span style=color:#ae81ff>testvm</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>domain</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>devices</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>disks</span>:
-</span></span><span style=display:flex><span>            - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>containerdisk</span>
-</span></span><span style=display:flex><span>              <span style=color:#f92672>disk</span>:
-</span></span><span style=display:flex><span>                <span style=color:#f92672>bus</span>: <span style=color:#ae81ff>virtio</span>
-</span></span><span style=display:flex><span>            - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cloudinitdisk</span>
-</span></span><span style=display:flex><span>              <span style=color:#f92672>disk</span>:
-</span></span><span style=display:flex><span>                <span style=color:#f92672>bus</span>: <span style=color:#ae81ff>virtio</span>
-</span></span><span style=display:flex><span>            - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>lundisk</span>
-</span></span><span style=display:flex><span>              <span style=color:#f92672>lun</span>: {}
-</span></span><span style=display:flex><span>          <span style=color:#f92672>interfaces</span>:
-</span></span><span style=display:flex><span>          - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>default</span>
-</span></span><span style=display:flex><span>            <span style=color:#f92672>masquerade</span>: {}
-</span></span><span style=display:flex><span>        <span style=color:#f92672>resources</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>requests</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>memory</span>: <span style=color:#ae81ff>64M</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>networks</span>:
-</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>default</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>pod</span>: {}
-</span></span><span style=display:flex><span>      <span style=color:#f92672>volumes</span>:
-</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>containerdisk</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>containerDisk</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>image</span>: <span style=color:#ae81ff>quay.io/kubevirt/cirros-container-disk-demo</span>
-</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cloudinitdisk</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>cloudInitNoCloud</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>userDataBase64</span>: <span style=color:#ae81ff>SGkuXG4=</span>
-</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>lundisk</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>persistentVolumeClaim</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>claimName</span>: <span style=color:#ae81ff>lun-pvc</span>
-</span></span></code></pre></div><h3 id=disk>disk
-<a class=anchor href=#disk>#</a></h3><p><em>pvc</em>:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>PersistentVolumeClaim</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>disk-pvc</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>default</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>accessModes</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>ReadWriteOnce</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>resources</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>requests</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>storage</span>: <span style=color:#ae81ff>1Gi</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>storageClassName</span>: <span style=color:#ae81ff>longhorn</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>volumeMode</span>: <span style=color:#ae81ff>Filesystem</span>
-</span></span></code></pre></div><p><em>vm</em>:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>kubevirt.io/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>VirtualMachine</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>testvm</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>running</span>: <span style=color:#66d9ef>false</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>kubevirt.io/size</span>: <span style=color:#ae81ff>small</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>kubevirt.io/domain</span>: <span style=color:#ae81ff>testvm</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>domain</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>devices</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>disks</span>:
-</span></span><span style=display:flex><span>            - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>containerdisk</span>
-</span></span><span style=display:flex><span>              <span style=color:#f92672>disk</span>:
-</span></span><span style=display:flex><span>                <span style=color:#f92672>bus</span>: <span style=color:#ae81ff>virtio</span>
-</span></span><span style=display:flex><span>            - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cloudinitdisk</span>
-</span></span><span style=display:flex><span>              <span style=color:#f92672>disk</span>:
-</span></span><span style=display:flex><span>                <span style=color:#f92672>bus</span>: <span style=color:#ae81ff>virtio</span>
-</span></span><span style=display:flex><span>            - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>disk-pvc</span>
-</span></span><span style=display:flex><span>              <span style=color:#f92672>disk</span>: 
-</span></span><span style=display:flex><span>                <span style=color:#f92672>bus</span>: <span style=color:#ae81ff>virtio</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>interfaces</span>:
-</span></span><span style=display:flex><span>          - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>default</span>
-</span></span><span style=display:flex><span>            <span style=color:#f92672>masquerade</span>: {}
-</span></span><span style=display:flex><span>        <span style=color:#f92672>resources</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>requests</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>memory</span>: <span style=color:#ae81ff>64M</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>networks</span>:
-</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>default</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>pod</span>: {}
-</span></span><span style=display:flex><span>      <span style=color:#f92672>volumes</span>:
-</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>containerdisk</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>containerDisk</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>image</span>: <span style=color:#ae81ff>quay.io/kubevirt/cirros-container-disk-demo</span>
-</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cloudinitdisk</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>cloudInitNoCloud</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>userDataBase64</span>: <span style=color:#ae81ff>SGkuXG4=</span>
-</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>disk-pvc</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>persistentVolumeClaim</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>claimName</span>: <span style=color:#ae81ff>disk-pvc</span>
-</span></span></code></pre></div><h3 id=cdrom>cdrom
-<a class=anchor href=#cdrom>#</a></h3><p>将卷以 cdrom 驱动器的方式公开给虚拟机。默认情况下只读，可以通过 <code>readonly: false</code> 设置为可写。</p><p><em>pvc</em>:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>PersistentVolumeClaim</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cdrom-pvc</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>default</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>accessModes</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>ReadWriteOnce</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>resources</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>requests</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>storage</span>: <span style=color:#ae81ff>1Gi</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>storageClassName</span>: <span style=color:#ae81ff>longhorn</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>volumeMode</span>: <span style=color:#ae81ff>Filesystem</span>
-</span></span></code></pre></div><p><em>vm</em>:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>kubevirt.io/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>VirtualMachine</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>testvm</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>running</span>: <span style=color:#66d9ef>false</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>kubevirt.io/size</span>: <span style=color:#ae81ff>small</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>kubevirt.io/domain</span>: <span style=color:#ae81ff>testvm</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>domain</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>devices</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>disks</span>:
-</span></span><span style=display:flex><span>            - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>containerdisk</span>
-</span></span><span style=display:flex><span>              <span style=color:#f92672>disk</span>:
-</span></span><span style=display:flex><span>                <span style=color:#f92672>bus</span>: <span style=color:#ae81ff>virtio</span>
-</span></span><span style=display:flex><span>            - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cloudinitdisk</span>
-</span></span><span style=display:flex><span>              <span style=color:#f92672>disk</span>:
-</span></span><span style=display:flex><span>                <span style=color:#f92672>bus</span>: <span style=color:#ae81ff>virtio</span>
-</span></span><span style=display:flex><span>            - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>disk-pvc</span>
-</span></span><span style=display:flex><span>              <span style=color:#f92672>cdrom</span>:
-</span></span><span style=display:flex><span>                <span style=color:#f92672>readonly</span>: <span style=color:#66d9ef>false</span>
-</span></span><span style=display:flex><span>                <span style=color:#f92672>bus</span>: <span style=color:#ae81ff>sata</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>interfaces</span>:
-</span></span><span style=display:flex><span>          - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>default</span>
-</span></span><span style=display:flex><span>            <span style=color:#f92672>masquerade</span>: {}
-</span></span><span style=display:flex><span>        <span style=color:#f92672>resources</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>requests</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>memory</span>: <span style=color:#ae81ff>64M</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>networks</span>:
-</span></span><span style=display:flex><span>      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>default</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>pod</span>: {}
-</span></span><span style=display:flex><span>      <span style=color:#f92672>volumes</span>:
-</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>containerdisk</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>containerDisk</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>image</span>: <span style=color:#ae81ff>quay.io/kubevirt/cirros-container-disk-demo</span>
-</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cloudinitdisk</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>cloudInitNoCloud</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>userDataBase64</span>: <span style=color:#ae81ff>SGkuXG4=</span>
-</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cdrom-pvc</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>persistentVolumeClaim</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>claimName</span>: <span style=color:#ae81ff>cdrom-pvc</span>
-</span></span></code></pre></div><h2 id=排错>排错
-<a class=anchor href=#%e6%8e%92%e9%94%99>#</a></h2><ol><li>使用 virtctl 工具运行虚拟机时，遇到 <code>virtctl start testvm dial tcp 127.0.0.1:8080: connect: connection refused</code> 错误：</li></ol><p>解决方法：本地代理 K8s apiserver 服务。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl proxy --port <span style=color:#ae81ff>8080</span>
+<a class=anchor href=#lun>#</a></h3><p>将卷以 lun 的方式公开给虚拟机。</p><p><em>pvc</em>：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>PersistentVolumeClaim</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>lun-pvc</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>default</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>accessModes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>ReadWriteOnce</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>resources</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>requests</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>storage</span><span class=p>:</span><span class=w> </span><span class=l>1Gi</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>storageClassName</span><span class=p>:</span><span class=w> </span><span class=l>longhorn</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>volumeMode</span><span class=p>:</span><span class=w> </span><span class=l>Filesystem</span><span class=w>
+</span></span></span></code></pre></div><p><em>vm</em>：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>kubevirt.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>VirtualMachine</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>testvm</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>running</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>template</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>kubevirt.io/size</span><span class=p>:</span><span class=w> </span><span class=l>small</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>kubevirt.io/domain</span><span class=p>:</span><span class=w> </span><span class=l>testvm</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>domain</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>devices</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>disks</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>containerdisk</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>disk</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=nt>bus</span><span class=p>:</span><span class=w> </span><span class=l>virtio</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cloudinitdisk</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>disk</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=nt>bus</span><span class=p>:</span><span class=w> </span><span class=l>virtio</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>lundisk</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>lun</span><span class=p>:</span><span class=w> </span>{}<span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>interfaces</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>default</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>masquerade</span><span class=p>:</span><span class=w> </span>{}<span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>resources</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>requests</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>memory</span><span class=p>:</span><span class=w> </span><span class=l>64M</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>networks</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>default</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>pod</span><span class=p>:</span><span class=w> </span>{}<span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>volumes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>containerdisk</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>containerDisk</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>quay.io/kubevirt/cirros-container-disk-demo</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cloudinitdisk</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>cloudInitNoCloud</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>userDataBase64</span><span class=p>:</span><span class=w> </span><span class=l>SGkuXG4=</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>lundisk</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>persistentVolumeClaim</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>claimName</span><span class=p>:</span><span class=w> </span><span class=l>lun-pvc</span><span class=w>
+</span></span></span></code></pre></div><h3 id=disk>disk
+<a class=anchor href=#disk>#</a></h3><p><em>pvc</em>:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>PersistentVolumeClaim</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>disk-pvc</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>default</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>accessModes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>ReadWriteOnce</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>resources</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>requests</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>storage</span><span class=p>:</span><span class=w> </span><span class=l>1Gi</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>storageClassName</span><span class=p>:</span><span class=w> </span><span class=l>longhorn</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>volumeMode</span><span class=p>:</span><span class=w> </span><span class=l>Filesystem</span><span class=w>
+</span></span></span></code></pre></div><p><em>vm</em>:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>kubevirt.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>VirtualMachine</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>testvm</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>running</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>template</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>kubevirt.io/size</span><span class=p>:</span><span class=w> </span><span class=l>small</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>kubevirt.io/domain</span><span class=p>:</span><span class=w> </span><span class=l>testvm</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>domain</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>devices</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>disks</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>containerdisk</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>disk</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=nt>bus</span><span class=p>:</span><span class=w> </span><span class=l>virtio</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cloudinitdisk</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>disk</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=nt>bus</span><span class=p>:</span><span class=w> </span><span class=l>virtio</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>disk-pvc</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>disk</span><span class=p>:</span><span class=w> 
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=nt>bus</span><span class=p>:</span><span class=w> </span><span class=l>virtio</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>interfaces</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>default</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>masquerade</span><span class=p>:</span><span class=w> </span>{}<span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>resources</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>requests</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>memory</span><span class=p>:</span><span class=w> </span><span class=l>64M</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>networks</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>default</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>pod</span><span class=p>:</span><span class=w> </span>{}<span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>volumes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>containerdisk</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>containerDisk</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>quay.io/kubevirt/cirros-container-disk-demo</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cloudinitdisk</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>cloudInitNoCloud</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>userDataBase64</span><span class=p>:</span><span class=w> </span><span class=l>SGkuXG4=</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>disk-pvc</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>persistentVolumeClaim</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>claimName</span><span class=p>:</span><span class=w> </span><span class=l>disk-pvc</span><span class=w>
+</span></span></span></code></pre></div><h3 id=cdrom>cdrom
+<a class=anchor href=#cdrom>#</a></h3><p>将卷以 cdrom 驱动器的方式公开给虚拟机。默认情况下只读，可以通过 <code>readonly: false</code> 设置为可写。</p><p><em>pvc</em>:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>PersistentVolumeClaim</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cdrom-pvc</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>default</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>accessModes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>ReadWriteOnce</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>resources</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>requests</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>storage</span><span class=p>:</span><span class=w> </span><span class=l>1Gi</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>storageClassName</span><span class=p>:</span><span class=w> </span><span class=l>longhorn</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>volumeMode</span><span class=p>:</span><span class=w> </span><span class=l>Filesystem</span><span class=w>
+</span></span></span></code></pre></div><p><em>vm</em>:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>kubevirt.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>VirtualMachine</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>testvm</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>running</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>template</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>kubevirt.io/size</span><span class=p>:</span><span class=w> </span><span class=l>small</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>kubevirt.io/domain</span><span class=p>:</span><span class=w> </span><span class=l>testvm</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>domain</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>devices</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>disks</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>containerdisk</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>disk</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=nt>bus</span><span class=p>:</span><span class=w> </span><span class=l>virtio</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cloudinitdisk</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>disk</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=nt>bus</span><span class=p>:</span><span class=w> </span><span class=l>virtio</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>disk-pvc</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>cdrom</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=nt>readonly</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=nt>bus</span><span class=p>:</span><span class=w> </span><span class=l>sata</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>interfaces</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>default</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>masquerade</span><span class=p>:</span><span class=w> </span>{}<span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>resources</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>requests</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>memory</span><span class=p>:</span><span class=w> </span><span class=l>64M</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>networks</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>default</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>pod</span><span class=p>:</span><span class=w> </span>{}<span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>volumes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>containerdisk</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>containerDisk</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>quay.io/kubevirt/cirros-container-disk-demo</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cloudinitdisk</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>cloudInitNoCloud</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>userDataBase64</span><span class=p>:</span><span class=w> </span><span class=l>SGkuXG4=</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cdrom-pvc</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>persistentVolumeClaim</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>claimName</span><span class=p>:</span><span class=w> </span><span class=l>cdrom-pvc</span><span class=w>
+</span></span></span></code></pre></div><h2 id=排错>排错
+<a class=anchor href=#%e6%8e%92%e9%94%99>#</a></h2><ol><li>使用 virtctl 工具运行虚拟机时，遇到 <code>virtctl start testvm dial tcp 127.0.0.1:8080: connect: connection refused</code> 错误：</li></ol><p>解决方法：本地代理 K8s apiserver 服务。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl proxy --port <span class=m>8080</span>
 </span></span></code></pre></div><hr><p><a href=/kubernetes/kubevirt-create-windows-vm/>« KubeVirt 创建 Windows 虚拟机</a></p><p><a href=/kubernetes/kustomize/>» Kustomize</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
 <span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/kubernetes/kubevirt-practice.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
 <span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#简介>简介</a></li><li><a href=#安装>安装</a></li><li><a href=#概念>概念</a></li><li><a href=#创建虚拟机>创建虚拟机</a></li><li><a href=#运行虚拟机>运行虚拟机</a></li><li><a href=#访问虚拟机>访问虚拟机</a></li><li><a href=#关闭虚拟机>关闭虚拟机</a></li><li><a href=#磁盘访问>磁盘访问</a><ul><li><a href=#lun>lun</a></li><li><a href=#disk>disk</a></li><li><a href=#cdrom>cdrom</a></li></ul></li><li><a href=#排错>排错</a></li></ul></nav></div></aside></main></body></html>

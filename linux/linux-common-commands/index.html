@@ -1,232 +1,232 @@
 <!doctype html><html lang=cn dir=ltr><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="我的博客 / Linux / Linux常用命令
 Linux常用命令 # 1.文件和目录相关 # cd .. 切换到上一级目录 cd ../.. 切换到上两级目录 cd [dir] 进入 dir 目录 cd 进入个人的主目录 cd ~[username] 进入个人的主目录 cd - 进入上次目录 pwd 查看目录路径 ls 查看当前目录下的目录和文件（不包含隐藏目录或文件） ls -a 查看当前目录下的所有目录和文件 ls -F 查看当前目录下的文件 （不包含目录和隐藏文件） ls -l 查看文件和目录的详细资料 ls *[0-9]* 查看包含字符的文件和目录 mkdir dir1 创建目录 mkdir dir1 dir2 mkdir -p dir1/dir1/dir1 创建一个目录树 rm -f file1 删除文件 rmdir dir1 删除空 rm -rf dir1 删除包含内容的目录 rm -rf dir1 dir2 删除多个目录 mv dir1 dir2 重命名或移动一个目录（看 dir2 是否存在） cp file1 file2 复制文件 cp dir/* ."><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/linux/linux-common-commands/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / Linux / Linux常用命令
 Linux常用命令 # 1.文件和目录相关 # cd .. 切换到上一级目录 cd ../.. 切换到上两级目录 cd [dir] 进入 dir 目录 cd 进入个人的主目录 cd ~[username] 进入个人的主目录 cd - 进入上次目录 pwd 查看目录路径 ls 查看当前目录下的目录和文件（不包含隐藏目录或文件） ls -a 查看当前目录下的所有目录和文件 ls -F 查看当前目录下的文件 （不包含目录和隐藏文件） ls -l 查看文件和目录的详细资料 ls *[0-9]* 查看包含字符的文件和目录 mkdir dir1 创建目录 mkdir dir1 dir2 mkdir -p dir1/dir1/dir1 创建一个目录树 rm -f file1 删除文件 rmdir dir1 删除空 rm -rf dir1 删除包含内容的目录 rm -rf dir1 dir2 删除多个目录 mv dir1 dir2 重命名或移动一个目录（看 dir2 是否存在） cp file1 file2 复制文件 cp dir/* ."><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="linux"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Linux Common Commands | 我的博客</title>
-<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/linux/linux-common-commands/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/linux/linux-common-commands/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.ffd7553d42e9860dbcfbc6775c0f6c9895736a50f5383929cc725dc0a9b61715.js integrity="sha256-/9dVPULphg28+8Z3XA9smJVzalD1ODkpzHJdwKm2FxU=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
 <input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
 </label><strong>Linux Common Commands</strong>
 <label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#1文件和目录相关>1.文件和目录相关</a></li><li><a href=#2系统>2.系统</a></li><li><a href=#3技巧>3.技巧</a></li><li><a href=#apt>apt</a></li><li><a href=#centos>CentOS</a></li><li><a href=#kitematic>Kitematic</a></li><li><a href=#sed替换文本>sed替换文本</a></li><li><a href=#修改命令行文件路径显示>修改命令行文件路径显示</a></li><li><a href=#网络命名空间>网络命名空间</a></li><li><a href=#清理工作>清理工作</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
 <a href=/linux/>Linux</a> / Linux常用命令</p><h1 id=linux常用命令>Linux常用命令
 <a class=anchor href=#linux%e5%b8%b8%e7%94%a8%e5%91%bd%e4%bb%a4>#</a></h1><h2 id=1文件和目录相关>1.文件和目录相关
-<a class=anchor href=#1%e6%96%87%e4%bb%b6%e5%92%8c%e7%9b%ae%e5%bd%95%e7%9b%b8%e5%85%b3>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-powershell data-lang=powershell><span style=display:flex><span>cd ..  切换到上一级目录
-</span></span><span style=display:flex><span>cd ../.. 切换到上两级目录
-</span></span><span style=display:flex><span>cd [<span style=color:#66d9ef>dir</span>]  进入 dir 目录
-</span></span><span style=display:flex><span>cd   进入个人的主目录
-</span></span><span style=display:flex><span>cd ~[<span style=color:#66d9ef>username</span>] 进入个人的主目录
-</span></span><span style=display:flex><span>cd -  进入上次目录
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>pwd  查看目录路径 
-</span></span><span style=display:flex><span>ls  查看当前目录下的目录和文件<span style=color:#960050;background-color:#1e0010>（</span>不包含隐藏目录或文件<span style=color:#960050;background-color:#1e0010>）</span>
-</span></span><span style=display:flex><span>ls -a 查看当前目录下的所有目录和文件
-</span></span><span style=display:flex><span>ls <span style=color:#f92672>-F</span> 查看当前目录下的文件 <span style=color:#960050;background-color:#1e0010>（</span>不包含目录和隐藏文件<span style=color:#960050;background-color:#1e0010>）</span>
-</span></span><span style=display:flex><span>ls -l 查看文件和目录的详细资料 
-</span></span><span style=display:flex><span>ls *[<span style=color:#ae81ff>0</span>-<span style=color:#ae81ff>9</span>]* 查看包含字符的文件和目录
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>mkdir dir1 创建目录
-</span></span><span style=display:flex><span>mkdir dir1 dir2 
-</span></span><span style=display:flex><span>mkdir -p dir1/dir1/dir1  创建一个目录树
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>rm <span style=color:#f92672>-f</span> file1 删除文件
-</span></span><span style=display:flex><span>rmdir dir1 删除空
-</span></span><span style=display:flex><span>rm -rf dir1 删除包含内容的目录
-</span></span><span style=display:flex><span>rm -rf dir1 dir2 删除多个目录
-</span></span><span style=display:flex><span>mv dir1 dir2 重命名或移动一个目录<span style=color:#960050;background-color:#1e0010>（</span>看 dir2 是否存在<span style=color:#960050;background-color:#1e0010>）</span>
-</span></span><span style=display:flex><span>cp file1 file2  复制文件
-</span></span><span style=display:flex><span>cp dir/* . 复制某目录下所有内容到当前目录
-</span></span><span style=display:flex><span>cp -a dir1/dir2 .  复制目录下所有内容到当前目录
-</span></span><span style=display:flex><span>cp -a dir1 dir2  复制一个目录
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>ln -s dir1|file1 link1 创建文件或目录 link 的软件链接
-</span></span><span style=display:flex><span>ln dir1|file1 link1  创建文件或目录 link 的物理链接<span style=color:#960050;background-color:#1e0010>，</span>也叫硬链接
-</span></span><span style=display:flex><span>[
-</span></span><span style=display:flex><span> 软链接和物理链接的区别<span style=color:#960050;background-color:#1e0010>：</span>
-</span></span><span style=display:flex><span> <span style=color:#ae81ff>1</span>. 软链接可以用于目录和文件<span style=color:#960050;background-color:#1e0010>，</span>物理链接只能用于文件<span style=color:#960050;background-color:#1e0010>；</span>
-</span></span><span style=display:flex><span> <span style=color:#ae81ff>2</span>. 源文件删除后<span style=color:#960050;background-color:#1e0010>，</span>物理链接仍然可以打开访问(更像复制)<span style=color:#960050;background-color:#1e0010>，</span>软链接则已经损坏
-</span></span><span style=display:flex><span>]
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>find /home/[<span style=color:#66d9ef>user</span>] -name  某目录下搜索文件
-</span></span><span style=display:flex><span>find ~ -iname <span style=color:#e6db74>&#39;*test*&#39;</span>  <span style=color:#75715e># iname 忽略大小写</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>zip file1.zip file1 file2 dir1  将文件和目录压缩成 zip 文件<span style=color:#960050;background-color:#1e0010>（</span>dir 不包含内容<span style=color:#960050;background-color:#1e0010>）</span>
-</span></span><span style=display:flex><span>zip -r file1.zip file1 file2 dir1 将文件和目录压缩成 zip 文件<span style=color:#960050;background-color:#1e0010>（</span>dir 包含内容<span style=color:#960050;background-color:#1e0010>）</span>
-</span></span><span style=display:flex><span>unzip file1.zip  解压 zip 文件
-</span></span><span style=display:flex><span>tar -zxvf ***.tar.gz
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>cat file1  查看一个文件
-</span></span><span style=display:flex><span>tac file1   从最后一行开始反向查看一个文件的内容 
-</span></span><span style=display:flex><span>more file1   查看一个长文件的内容 
-</span></span><span style=display:flex><span>less file1   类似于 <span style=color:#e6db74>&#39;more&#39;</span> 命令<span style=color:#960050;background-color:#1e0010>，</span>但是它允许在文件中和正向操作一样的反向操作 
-</span></span><span style=display:flex><span>head <span style=color:#ae81ff>-2</span> file1  查看一个文件的前两行 
-</span></span><span style=display:flex><span>tail <span style=color:#ae81ff>-2</span> file1  查看一个文件的最后两行 
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>grep hello file1 查询关键字 <span style=color:#960050;background-color:#1e0010>‘</span>hello<span style=color:#960050;background-color:#1e0010>’</span>
-</span></span><span style=display:flex><span>dump -0aj <span style=color:#f92672>-f</span> /tmp/home0.bak /home 制作一个 <span style=color:#e6db74>&#39;/home&#39;</span> 目录的完整备份 
-</span></span><span style=display:flex><span>dump -1aj <span style=color:#f92672>-f</span> /tmp/home0.bak /home 制作一个 <span style=color:#e6db74>&#39;/home&#39;</span> 目录的交互式备份 
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>vi file1 //编辑文件
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># lsof (https://www.cnblogs.com/sparkbj/p/7161669.html)</span>
-</span></span><span style=display:flex><span>lsof <span style=color:#75715e># 列出所有打开的文件</span>
-</span></span><span style=display:flex><span>lsof /path/file <span style=color:#75715e># 查看谁在使用某个文件</span>
-</span></span><span style=display:flex><span>losf -u username <span style=color:#75715e># 查看某用户打开的文件</span>
+<a class=anchor href=#1%e6%96%87%e4%bb%b6%e5%92%8c%e7%9b%ae%e5%bd%95%e7%9b%b8%e5%85%b3>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=nb>cd </span><span class=p>..</span>  <span class=n>切换到上一级目录</span>
+</span></span><span class=line><span class=cl><span class=nb>cd </span><span class=p>../..</span> <span class=n>切换到上两级目录</span>
+</span></span><span class=line><span class=cl><span class=nb>cd </span><span class=p>[</span><span class=no>dir</span><span class=p>]</span>  <span class=n>进入</span> <span class=nb>dir </span><span class=n>目录</span>
+</span></span><span class=line><span class=cl><span class=nb>cd </span>  <span class=n>进入个人的主目录</span>
+</span></span><span class=line><span class=cl><span class=nb>cd </span><span class=p>~[</span><span class=no>username</span><span class=p>]</span> <span class=n>进入个人的主目录</span>
+</span></span><span class=line><span class=cl><span class=nb>cd </span><span class=p>-</span>  <span class=n>进入上次目录</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nb>pwd </span> <span class=n>查看目录路径</span> 
+</span></span><span class=line><span class=cl><span class=nb>ls </span> <span class=n>查看当前目录下的目录和文件</span><span class=err>（</span><span class=n>不包含隐藏目录或文件</span><span class=err>）</span>
+</span></span><span class=line><span class=cl><span class=nb>ls </span><span class=n>-a</span> <span class=n>查看当前目录下的所有目录和文件</span>
+</span></span><span class=line><span class=cl><span class=nb>ls </span><span class=o>-F</span> <span class=n>查看当前目录下的文件</span> <span class=err>（</span><span class=n>不包含目录和隐藏文件</span><span class=err>）</span>
+</span></span><span class=line><span class=cl><span class=nb>ls </span><span class=n>-l</span> <span class=n>查看文件和目录的详细资料</span> 
+</span></span><span class=line><span class=cl><span class=nb>ls </span><span class=p>*[</span><span class=mf>0</span><span class=p>-</span><span class=mf>9</span><span class=p>]*</span> <span class=n>查看包含字符的文件和目录</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>mkdir</span> <span class=n>dir1</span> <span class=n>创建目录</span>
+</span></span><span class=line><span class=cl><span class=n>mkdir</span> <span class=n>dir1</span> <span class=n>dir2</span> 
+</span></span><span class=line><span class=cl><span class=n>mkdir</span> <span class=n>-p</span> <span class=n>dir1</span><span class=p>/</span><span class=n>dir1</span><span class=p>/</span><span class=n>dir1</span>  <span class=n>创建一个目录树</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nb>rm </span><span class=o>-f</span> <span class=n>file1</span> <span class=n>删除文件</span>
+</span></span><span class=line><span class=cl><span class=nb>rmdir </span><span class=n>dir1</span> <span class=n>删除空</span>
+</span></span><span class=line><span class=cl><span class=nb>rm </span><span class=n>-rf</span> <span class=n>dir1</span> <span class=n>删除包含内容的目录</span>
+</span></span><span class=line><span class=cl><span class=nb>rm </span><span class=n>-rf</span> <span class=n>dir1</span> <span class=n>dir2</span> <span class=n>删除多个目录</span>
+</span></span><span class=line><span class=cl><span class=nb>mv </span><span class=n>dir1</span> <span class=n>dir2</span> <span class=n>重命名或移动一个目录</span><span class=err>（</span><span class=n>看</span> <span class=n>dir2</span> <span class=n>是否存在</span><span class=err>）</span>
+</span></span><span class=line><span class=cl><span class=nb>cp </span><span class=n>file1</span> <span class=n>file2</span>  <span class=n>复制文件</span>
+</span></span><span class=line><span class=cl><span class=nb>cp </span><span class=n>dir</span><span class=p>/*</span> <span class=p>.</span> <span class=n>复制某目录下所有内容到当前目录</span>
+</span></span><span class=line><span class=cl><span class=nb>cp </span><span class=n>-a</span> <span class=n>dir1</span><span class=p>/</span><span class=n>dir2</span> <span class=p>.</span>  <span class=n>复制目录下所有内容到当前目录</span>
+</span></span><span class=line><span class=cl><span class=nb>cp </span><span class=n>-a</span> <span class=n>dir1</span> <span class=n>dir2</span>  <span class=n>复制一个目录</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>ln</span> <span class=n>-s</span> <span class=n>dir1</span><span class=p>|</span><span class=n>file1</span> <span class=n>link1</span> <span class=n>创建文件或目录</span> <span class=n>link</span> <span class=n>的软件链接</span>
+</span></span><span class=line><span class=cl><span class=n>ln</span> <span class=n>dir1</span><span class=p>|</span><span class=n>file1</span> <span class=n>link1</span>  <span class=n>创建文件或目录</span> <span class=n>link</span> <span class=n>的物理链接</span><span class=err>，</span><span class=n>也叫硬链接</span>
+</span></span><span class=line><span class=cl><span class=p>[</span>
+</span></span><span class=line><span class=cl> <span class=n>软链接和物理链接的区别</span><span class=err>：</span>
+</span></span><span class=line><span class=cl> <span class=mf>1</span><span class=p>.</span> <span class=n>软链接可以用于目录和文件</span><span class=err>，</span><span class=n>物理链接只能用于文件</span><span class=err>；</span>
+</span></span><span class=line><span class=cl> <span class=mf>2</span><span class=p>.</span> <span class=n>源文件删除后</span><span class=err>，</span><span class=n>物理链接仍然可以打开访问</span><span class=p>(</span><span class=n>更像复制</span><span class=p>)</span><span class=err>，</span><span class=n>软链接则已经损坏</span>
+</span></span><span class=line><span class=cl><span class=p>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>find</span> <span class=p>/</span><span class=n>home</span><span class=p>/[</span><span class=no>user</span><span class=p>]</span> <span class=n>-name</span>  <span class=n>某目录下搜索文件</span>
+</span></span><span class=line><span class=cl><span class=n>find</span> <span class=p>~</span> <span class=n>-iname</span> <span class=s1>&#39;*test*&#39;</span>  <span class=c># iname 忽略大小写</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>zip</span> <span class=n>file1</span><span class=p>.</span><span class=py>zip</span> <span class=n>file1</span> <span class=n>file2</span> <span class=n>dir1</span>  <span class=n>将文件和目录压缩成</span> <span class=n>zip</span> <span class=n>文件</span><span class=err>（</span><span class=nb>dir </span><span class=n>不包含内容</span><span class=err>）</span>
+</span></span><span class=line><span class=cl><span class=n>zip</span> <span class=n>-r</span> <span class=n>file1</span><span class=p>.</span><span class=py>zip</span> <span class=n>file1</span> <span class=n>file2</span> <span class=n>dir1</span> <span class=n>将文件和目录压缩成</span> <span class=n>zip</span> <span class=n>文件</span><span class=err>（</span><span class=nb>dir </span><span class=n>包含内容</span><span class=err>）</span>
+</span></span><span class=line><span class=cl><span class=n>unzip</span> <span class=n>file1</span><span class=p>.</span><span class=py>zip</span>  <span class=n>解压</span> <span class=n>zip</span> <span class=n>文件</span>
+</span></span><span class=line><span class=cl><span class=n>tar</span> <span class=n>-zxvf</span> <span class=p>***.</span><span class=n>tar</span><span class=p>.</span><span class=py>gz</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nb>cat </span><span class=n>file1</span>  <span class=n>查看一个文件</span>
+</span></span><span class=line><span class=cl><span class=n>tac</span> <span class=n>file1</span>   <span class=n>从最后一行开始反向查看一个文件的内容</span> 
+</span></span><span class=line><span class=cl><span class=n>more</span> <span class=n>file1</span>   <span class=n>查看一个长文件的内容</span> 
+</span></span><span class=line><span class=cl><span class=n>less</span> <span class=n>file1</span>   <span class=n>类似于</span> <span class=s1>&#39;more&#39;</span> <span class=n>命令</span><span class=err>，</span><span class=n>但是它允许在文件中和正向操作一样的反向操作</span> 
+</span></span><span class=line><span class=cl><span class=n>head</span> <span class=mf>-2</span> <span class=n>file1</span>  <span class=n>查看一个文件的前两行</span> 
+</span></span><span class=line><span class=cl><span class=n>tail</span> <span class=mf>-2</span> <span class=n>file1</span>  <span class=n>查看一个文件的最后两行</span> 
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>grep</span> <span class=n>hello</span> <span class=n>file1</span> <span class=n>查询关键字</span> <span class=err>‘</span><span class=n>hello</span><span class=err>’</span>
+</span></span><span class=line><span class=cl><span class=n>dump</span> <span class=p>-</span><span class=n>0aj</span> <span class=o>-f</span> <span class=p>/</span><span class=n>tmp</span><span class=p>/</span><span class=n>home0</span><span class=p>.</span><span class=py>bak</span> <span class=p>/</span><span class=n>home</span> <span class=n>制作一个</span> <span class=s1>&#39;/home&#39;</span> <span class=n>目录的完整备份</span> 
+</span></span><span class=line><span class=cl><span class=n>dump</span> <span class=p>-</span><span class=n>1aj</span> <span class=o>-f</span> <span class=p>/</span><span class=n>tmp</span><span class=p>/</span><span class=n>home0</span><span class=p>.</span><span class=py>bak</span> <span class=p>/</span><span class=n>home</span> <span class=n>制作一个</span> <span class=s1>&#39;/home&#39;</span> <span class=n>目录的交互式备份</span> 
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>vi</span> <span class=n>file1</span> <span class=p>//</span><span class=n>编辑文件</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c># lsof (https://www.cnblogs.com/sparkbj/p/7161669.html)</span>
+</span></span><span class=line><span class=cl><span class=n>lsof</span> <span class=c># 列出所有打开的文件</span>
+</span></span><span class=line><span class=cl><span class=n>lsof</span> <span class=p>/</span><span class=n>path</span><span class=p>/</span><span class=n>file</span> <span class=c># 查看谁在使用某个文件</span>
+</span></span><span class=line><span class=cl><span class=n>losf</span> <span class=n>-u</span> <span class=n>username</span> <span class=c># 查看某用户打开的文件</span>
 </span></span></code></pre></div><h2 id=2系统>2.系统
-<a class=anchor href=#2%e7%b3%bb%e7%bb%9f>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-powershell data-lang=powershell><span style=display:flex><span>date 显示当前时间 
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>shutdown -h now  关闭系统
-</span></span><span style=display:flex><span>reboot 重启
-</span></span><span style=display:flex><span>logout 注销
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>groupadd group_name  创建一个新用户组 
-</span></span><span style=display:flex><span>groupdel group_name  删除一个用户组 
-</span></span><span style=display:flex><span>groupmod -n new_group_name old_group_name  重命名一个用户组 
-</span></span><span style=display:flex><span>useradd -c <span style=color:#e6db74>&#34;Name Surname &#34;</span> -g admin -d /home/user1 -s /bin/bash user1  创建一个属于 <span style=color:#e6db74>&#34;admin&#34;</span> 用户组的用户 
-</span></span><span style=display:flex><span>usermod -a -G sudo dp 将用户添加到sudo组
-</span></span><span style=display:flex><span>useradd user1  创建一个新用户 
-</span></span><span style=display:flex><span>userdel -r user1  删除一个用户 ( <span style=color:#e6db74>&#39;-r&#39;</span> 排除主目录) 
-</span></span><span style=display:flex><span>usermod -c <span style=color:#e6db74>&#34;User FTP&#34;</span> -g system -d /ftp/user1 -s /bin/nologin user1  修改用户属性 
-</span></span><span style=display:flex><span>passwd  修改密码 
-</span></span><span style=display:flex><span>passwd user1  修改一个用户的口令 (只允许root执行) 
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 以下两个命令可用于查看user属于哪个组</span>
-</span></span><span style=display:flex><span>id user1
-</span></span><span style=display:flex><span>groups user1
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># screen</span>
-</span></span><span style=display:flex><span>screen -dmS dp
-</span></span><span style=display:flex><span>screen -ls
-</span></span><span style=display:flex><span>screen -rd dp
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 查看linux系统</span>
-</span></span><span style=display:flex><span>cat /proc/version
-</span></span><span style=display:flex><span>uname -a
-</span></span><span style=display:flex><span>lsb_release -a (首选)
+<a class=anchor href=#2%e7%b3%bb%e7%bb%9f>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=n>date</span> <span class=n>显示当前时间</span> 
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>shutdown</span> <span class=n>-h</span> <span class=n>now</span>  <span class=n>关闭系统</span>
+</span></span><span class=line><span class=cl><span class=n>reboot</span> <span class=n>重启</span>
+</span></span><span class=line><span class=cl><span class=n>logout</span> <span class=n>注销</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>groupadd</span> <span class=n>group_name</span>  <span class=n>创建一个新用户组</span> 
+</span></span><span class=line><span class=cl><span class=n>groupdel</span> <span class=n>group_name</span>  <span class=n>删除一个用户组</span> 
+</span></span><span class=line><span class=cl><span class=n>groupmod</span> <span class=n>-n</span> <span class=n>new_group_name</span> <span class=n>old_group_name</span>  <span class=n>重命名一个用户组</span> 
+</span></span><span class=line><span class=cl><span class=n>useradd</span> <span class=n>-c</span> <span class=s2>&#34;Name Surname &#34;</span> <span class=n>-g</span> <span class=n>admin</span> <span class=n>-d</span> <span class=p>/</span><span class=n>home</span><span class=p>/</span><span class=n>user1</span> <span class=n>-s</span> <span class=p>/</span><span class=n>bin</span><span class=p>/</span><span class=n>bash</span> <span class=n>user1</span>  <span class=n>创建一个属于</span> <span class=s2>&#34;admin&#34;</span> <span class=n>用户组的用户</span> 
+</span></span><span class=line><span class=cl><span class=n>usermod</span> <span class=n>-a</span> <span class=n>-G</span> <span class=n>sudo</span> <span class=n>dp</span> <span class=n>将用户添加到sudo组</span>
+</span></span><span class=line><span class=cl><span class=n>useradd</span> <span class=n>user1</span>  <span class=n>创建一个新用户</span> 
+</span></span><span class=line><span class=cl><span class=n>userdel</span> <span class=n>-r</span> <span class=n>user1</span>  <span class=n>删除一个用户</span> <span class=p>(</span> <span class=s1>&#39;-r&#39;</span> <span class=n>排除主目录</span><span class=p>)</span> 
+</span></span><span class=line><span class=cl><span class=n>usermod</span> <span class=n>-c</span> <span class=s2>&#34;User FTP&#34;</span> <span class=n>-g</span> <span class=n>system</span> <span class=n>-d</span> <span class=p>/</span><span class=n>ftp</span><span class=p>/</span><span class=n>user1</span> <span class=n>-s</span> <span class=p>/</span><span class=n>bin</span><span class=p>/</span><span class=n>nologin</span> <span class=n>user1</span>  <span class=n>修改用户属性</span> 
+</span></span><span class=line><span class=cl><span class=n>passwd</span>  <span class=n>修改密码</span> 
+</span></span><span class=line><span class=cl><span class=n>passwd</span> <span class=n>user1</span>  <span class=n>修改一个用户的口令</span> <span class=p>(</span><span class=n>只允许root执行</span><span class=p>)</span> 
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c># 以下两个命令可用于查看user属于哪个组</span>
+</span></span><span class=line><span class=cl><span class=n>id</span> <span class=n>user1</span>
+</span></span><span class=line><span class=cl><span class=n>groups</span> <span class=n>user1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c># screen</span>
+</span></span><span class=line><span class=cl><span class=n>screen</span> <span class=n>-dmS</span> <span class=n>dp</span>
+</span></span><span class=line><span class=cl><span class=n>screen</span> <span class=n>-ls</span>
+</span></span><span class=line><span class=cl><span class=n>screen</span> <span class=n>-rd</span> <span class=n>dp</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c># 查看linux系统</span>
+</span></span><span class=line><span class=cl><span class=nb>cat </span><span class=p>/</span><span class=n>proc</span><span class=p>/</span><span class=n>version</span>
+</span></span><span class=line><span class=cl><span class=n>uname</span> <span class=n>-a</span>
+</span></span><span class=line><span class=cl><span class=n>lsb_release</span> <span class=n>-a</span> <span class=p>(</span><span class=n>首选</span><span class=p>)</span>
 </span></span></code></pre></div><h2 id=3技巧>3.技巧
-<a class=anchor href=#3%e6%8a%80%e5%b7%a7>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span><span style=color:#75715e># 上行命令的最后一个参数 !$</span>
-</span></span><span style=display:flex><span>$ mv /path/to/wrongfile /some/other/place
-</span></span><span style=display:flex><span>mv: cannot stat <span style=color:#e6db74>&#39;/path/to/wrongfile&#39;</span>: No such file or directory
-</span></span><span style=display:flex><span>$ mv /path/to/rightfile !$
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 上行命令的第 n 个参数，0,1,2,..,n !:n</span>
-</span></span><span style=display:flex><span>$ tar -cvf afolder afolder.tar <span style=color:#75715e># 写反参数</span>
-</span></span><span style=display:flex><span>tar: failed to open
-</span></span><span style=display:flex><span>$ !:0 !:1 !:3 !:2
-</span></span><span style=display:flex><span>tar -cvf afolder.tar afolder
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 上行命令参数范围 </span>
-</span></span><span style=display:flex><span>$ grep <span style=color:#e6db74>&#39;(ping|pong)&#39;</span> afile <span style=color:#75715e># 写错 egrep</span>
-</span></span><span style=display:flex><span><span style=color:#75715e># Linux 下 grep 显示前后几行信息</span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 标准 unix/linux 下的 grep 通过下面參数控制上下文</span>
-</span></span><span style=display:flex><span>grep -C <span style=color:#ae81ff>5</span> foo file 显示 file 文件里匹配 foo 字串那行以及上下 <span style=color:#ae81ff>5</span> 行
-</span></span><span style=display:flex><span>grep -B <span style=color:#ae81ff>5</span> foo file 显示 foo 及前 <span style=color:#ae81ff>5</span> 行
-</span></span><span style=display:flex><span>grep -A <span style=color:#ae81ff>5</span> foo file 显示 foo 及后 <span style=color:#ae81ff>5</span> 行
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>$ egrep !:1-$
-</span></span><span style=display:flex><span>egrep <span style=color:#e6db74>&#39;(ping|pong)&#39;</span> afile
-</span></span><span style=display:flex><span>ping
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 前一个命令结果过滤</span>
-</span></span><span style=display:flex><span>$ ps -ef | grep nginx
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 查看端口</span>
-</span></span><span style=display:flex><span>lsof -i:<span style=color:#f92672>[</span>port<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>netstat -tunlp |grep <span style=color:#f92672>[</span>port<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 远程</span>
-</span></span><span style=display:flex><span>sudo ssh -i xxx.pem ubuntu@192.168.1.1 
-</span></span><span style=display:flex><span><span style=color:#75715e># 远程直接进入某目录</span>
-</span></span><span style=display:flex><span>sudo ssh -i xxx.pem ubuntu@192.168.1.1 -t <span style=color:#e6db74>&#39;/some/path; bash --login&#39;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># linux 系统间文件复制</span>
-</span></span><span style=display:flex><span>sudo scp -i ~/dp/k8s.dp.io/.ssh/id_rsa /home/ubuntu/hello.txt admin@bastion-k8s-dp-com-qcojf8-1198362181.ap-southeast-1.elb.amazonaws.com:~/
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># shell 文件出错即退出</span>
-</span></span><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env bash</span>
-</span></span><span style=display:flex><span>set -e -o pipefail
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 查看系统是 32 位还是 64 位</span>
-</span></span><span style=display:flex><span>uname -a
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 退出 telnet</span>
-</span></span><span style=display:flex><span>ctrl+<span style=color:#f92672>]</span>，然后输入 quit
-</span></span><span style=display:flex><span><span style=color:#75715e># base64 编码&amp;反编码</span>
-</span></span><span style=display:flex><span>echo -n <span style=color:#e6db74>&#34;JayChou&#34;</span> | base64
-</span></span><span style=display:flex><span>echo -n SmF5Q2hvdQ<span style=color:#f92672>==</span> | base64 --decode
+<a class=anchor href=#3%e6%8a%80%e5%b7%a7>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=c1># 上行命令的最后一个参数 !$</span>
+</span></span><span class=line><span class=cl>$ mv /path/to/wrongfile /some/other/place
+</span></span><span class=line><span class=cl>mv: cannot stat <span class=s1>&#39;/path/to/wrongfile&#39;</span>: No such file or directory
+</span></span><span class=line><span class=cl>$ mv /path/to/rightfile !$
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 上行命令的第 n 个参数，0,1,2,..,n !:n</span>
+</span></span><span class=line><span class=cl>$ tar -cvf afolder afolder.tar <span class=c1># 写反参数</span>
+</span></span><span class=line><span class=cl>tar: failed to open
+</span></span><span class=line><span class=cl>$ !:0 !:1 !:3 !:2
+</span></span><span class=line><span class=cl>tar -cvf afolder.tar afolder
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 上行命令参数范围 </span>
+</span></span><span class=line><span class=cl>$ grep <span class=s1>&#39;(ping|pong)&#39;</span> afile <span class=c1># 写错 egrep</span>
+</span></span><span class=line><span class=cl><span class=c1># Linux 下 grep 显示前后几行信息</span>
+</span></span><span class=line><span class=cl><span class=c1># 标准 unix/linux 下的 grep 通过下面參数控制上下文</span>
+</span></span><span class=line><span class=cl>grep -C <span class=m>5</span> foo file 显示 file 文件里匹配 foo 字串那行以及上下 <span class=m>5</span> 行
+</span></span><span class=line><span class=cl>grep -B <span class=m>5</span> foo file 显示 foo 及前 <span class=m>5</span> 行
+</span></span><span class=line><span class=cl>grep -A <span class=m>5</span> foo file 显示 foo 及后 <span class=m>5</span> 行
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>$ egrep !:1-$
+</span></span><span class=line><span class=cl>egrep <span class=s1>&#39;(ping|pong)&#39;</span> afile
+</span></span><span class=line><span class=cl>ping
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 前一个命令结果过滤</span>
+</span></span><span class=line><span class=cl>$ ps -ef <span class=p>|</span> grep nginx
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 查看端口</span>
+</span></span><span class=line><span class=cl>lsof -i:<span class=o>[</span>port<span class=o>]</span>
+</span></span><span class=line><span class=cl>netstat -tunlp <span class=p>|</span>grep <span class=o>[</span>port<span class=o>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 远程</span>
+</span></span><span class=line><span class=cl>sudo ssh -i xxx.pem ubuntu@192.168.1.1 
+</span></span><span class=line><span class=cl><span class=c1># 远程直接进入某目录</span>
+</span></span><span class=line><span class=cl>sudo ssh -i xxx.pem ubuntu@192.168.1.1 -t <span class=s1>&#39;/some/path; bash --login&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># linux 系统间文件复制</span>
+</span></span><span class=line><span class=cl>sudo scp -i ~/dp/k8s.dp.io/.ssh/id_rsa /home/ubuntu/hello.txt admin@bastion-k8s-dp-com-qcojf8-1198362181.ap-southeast-1.elb.amazonaws.com:~/
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># shell 文件出错即退出</span>
+</span></span><span class=line><span class=cl><span class=c1>#!/usr/bin/env bash</span>
+</span></span><span class=line><span class=cl><span class=nb>set</span> -e -o pipefail
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 查看系统是 32 位还是 64 位</span>
+</span></span><span class=line><span class=cl>uname -a
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 退出 telnet</span>
+</span></span><span class=line><span class=cl>ctrl+<span class=o>]</span>，然后输入 quit
+</span></span><span class=line><span class=cl><span class=c1># base64 编码&amp;反编码</span>
+</span></span><span class=line><span class=cl><span class=nb>echo</span> -n <span class=s2>&#34;JayChou&#34;</span> <span class=p>|</span> base64
+</span></span><span class=line><span class=cl><span class=nb>echo</span> -n <span class=nv>SmF5Q2hvdQ</span><span class=o>==</span> <span class=p>|</span> base64 --decode
 </span></span></code></pre></div><h2 id=apt>apt
-<a class=anchor href=#apt>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>apt upgrade
-</span></span><span style=display:flex><span>apt update <span style=color:#f92672>[</span>-y<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>apt install <span style=color:#f92672>[</span>pkg<span style=color:#f92672>]</span> <span style=color:#f92672>[</span>-y<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>apt remove/autoremove <span style=color:#f92672>[</span>pkg<span style=color:#f92672>]</span> <span style=color:#f92672>[</span>-y<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>apt purge
+<a class=anchor href=#apt>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>apt upgrade
+</span></span><span class=line><span class=cl>apt update <span class=o>[</span>-y<span class=o>]</span>
+</span></span><span class=line><span class=cl>apt install <span class=o>[</span>pkg<span class=o>]</span> <span class=o>[</span>-y<span class=o>]</span>
+</span></span><span class=line><span class=cl>apt remove/autoremove <span class=o>[</span>pkg<span class=o>]</span> <span class=o>[</span>-y<span class=o>]</span>
+</span></span><span class=line><span class=cl>apt purge
 </span></span></code></pre></div><h2 id=centos>CentOS
-<a class=anchor href=#centos>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>sudo dhclient
-</span></span><span style=display:flex><span>sudo yum update -y
-</span></span><span style=display:flex><span>su root
-</span></span><span style=display:flex><span>vi /etc/sudoers
-</span></span><span style=display:flex><span><span style=color:#75715e># root ALL=(ALL) ALL 后添加</span>
-</span></span><span style=display:flex><span>xxx  ALL<span style=color:#f92672>=(</span>ALL<span style=color:#f92672>)</span>   ALL
-</span></span><span style=display:flex><span><span style=color:#75715e># 或者</span>
-</span></span><span style=display:flex><span>xxx  ALL<span style=color:#f92672>=(</span>ALL<span style=color:#f92672>)</span>   NOPASSWD: ALL  （不用密码）
-</span></span><span style=display:flex><span><span style=color:#75715e># wq!退出</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>ip addr
-</span></span><span style=display:flex><span>cd /etc/sysconfig/network-scripts/
-</span></span><span style=display:flex><span>ls
-</span></span><span style=display:flex><span>sudo vi ifcfg-ens33 <span style=color:#75715e># ONBOOT=no 改成yes</span>
-</span></span><span style=display:flex><span>sudo ifup ens33
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 查看文件大小</span>
-</span></span><span style=display:flex><span>ls -ll
-</span></span><span style=display:flex><span>ls -lh
-</span></span><span style=display:flex><span><span style=color:#75715e># 查看目录大小</span>
-</span></span><span style=display:flex><span>du -sh ＊
-</span></span><span style=display:flex><span>du -sh /path/*
+<a class=anchor href=#centos>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>sudo dhclient
+</span></span><span class=line><span class=cl>sudo yum update -y
+</span></span><span class=line><span class=cl>su root
+</span></span><span class=line><span class=cl>vi /etc/sudoers
+</span></span><span class=line><span class=cl><span class=c1># root ALL=(ALL) ALL 后添加</span>
+</span></span><span class=line><span class=cl>xxx  <span class=nv>ALL</span><span class=o>=(</span>ALL<span class=o>)</span>   ALL
+</span></span><span class=line><span class=cl><span class=c1># 或者</span>
+</span></span><span class=line><span class=cl>xxx  <span class=nv>ALL</span><span class=o>=(</span>ALL<span class=o>)</span>   NOPASSWD: ALL  （不用密码）
+</span></span><span class=line><span class=cl><span class=c1># wq!退出</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>ip addr
+</span></span><span class=line><span class=cl><span class=nb>cd</span> /etc/sysconfig/network-scripts/
+</span></span><span class=line><span class=cl>ls
+</span></span><span class=line><span class=cl>sudo vi ifcfg-ens33 <span class=c1># ONBOOT=no 改成yes</span>
+</span></span><span class=line><span class=cl>sudo ifup ens33
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 查看文件大小</span>
+</span></span><span class=line><span class=cl>ls -ll
+</span></span><span class=line><span class=cl>ls -lh
+</span></span><span class=line><span class=cl><span class=c1># 查看目录大小</span>
+</span></span><span class=line><span class=cl>du -sh ＊
+</span></span><span class=line><span class=cl>du -sh /path/*
 </span></span></code></pre></div><ul><li><p><strong>虚拟机镜像文件</strong>：</p><p>CentOS7</p><p>下载地址：
 <a href=http://mirrors.aliyun.com/centos/7/isos/x86_64/CentOS-7-x86_64-DVD-2003.iso>http://mirrors.aliyun.com/centos/7/isos/x86_64/CentOS-7-x86_64-DVD-2003.iso</a></p></li></ul><h2 id=kitematic>Kitematic
 <a class=anchor href=#kitematic>#</a></h2><p>Download:
-<a href=https://github.com/docker/kitematic/releases>https://github.com/docker/kitematic/releases</a></p><p>install on ubutnu:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>sudo dpkg -i Kitematic-0.17.11_amd64.deb
-</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>sudo groupadd docker
-</span></span><span style=display:flex><span>sudo usermod -aG docker $USER
+<a href=https://github.com/docker/kitematic/releases>https://github.com/docker/kitematic/releases</a></p><p>install on ubutnu:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>sudo dpkg -i Kitematic-0.17.11_amd64.deb
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>sudo groupadd docker
+</span></span><span class=line><span class=cl>sudo usermod -aG docker <span class=nv>$USER</span>
 </span></span></code></pre></div><p>reboot ubutnu, then using Kitematic.</p><h2 id=sed替换文本>sed替换文本
-<a class=anchor href=#sed%e6%9b%bf%e6%8d%a2%e6%96%87%e6%9c%ac>#</a></h2><p>比如 <code>hello.txt</code> 文本中内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-txt data-lang=txt><span style=display:flex><span>hello, Name!
-</span></span></code></pre></div><p>现使用真实 Name 替换掉 <code>#Name#</code>。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>export Name<span style=color:#f92672>=</span>JayChou
-</span></span><span style=display:flex><span>sed -i <span style=color:#e6db74>&#34;s/Name/</span>$Name<span style=color:#e6db74>/g&#34;</span> hello.txt
-</span></span></code></pre></div><p>但是如果替换的文本中包含 <code>/</code> 的话，那么上面这个命令会失败：<code>sed: -e expression #1, char 12: unknown option to</code></p><p>例如</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>export Name<span style=color:#f92672>=</span>Jay/Chou
-</span></span><span style=display:flex><span>sed -i <span style=color:#e6db74>&#34;s/Name/</span>$Name<span style=color:#e6db74>/g&#34;</span> hello.txt
-</span></span></code></pre></div><p>这里为了保留被替换文本的 <code>/</code>，有两种方法</p><ol><li><p>在被替换文本中使用转义符号：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>export Name<span style=color:#f92672>=</span>Jay<span style=color:#ae81ff>\/</span>Chou
-</span></span><span style=display:flex><span>sed -i <span style=color:#e6db74>&#34;s/Name/</span>$Name<span style=color:#e6db74>/g&#34;</span> hello.txt
-</span></span></code></pre></div></li><li><p>使用 <code>#</code> 代替 <code>/</code> 作为 sed 中替换与被替换字符的分割符：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>export Name<span style=color:#f92672>=</span>Jay/Chou
-</span></span><span style=display:flex><span>sed -i <span style=color:#e6db74>&#34;s#Name#</span>$Name<span style=color:#e6db74>#g&#34;</span> hello.txt
+<a class=anchor href=#sed%e6%9b%bf%e6%8d%a2%e6%96%87%e6%9c%ac>#</a></h2><p>比如 <code>hello.txt</code> 文本中内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-txt data-lang=txt><span class=line><span class=cl>hello, Name!
+</span></span></code></pre></div><p>现使用真实 Name 替换掉 <code>#Name#</code>。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nb>export</span> <span class=nv>Name</span><span class=o>=</span>JayChou
+</span></span><span class=line><span class=cl>sed -i <span class=s2>&#34;s/Name/</span><span class=nv>$Name</span><span class=s2>/g&#34;</span> hello.txt
+</span></span></code></pre></div><p>但是如果替换的文本中包含 <code>/</code> 的话，那么上面这个命令会失败：<code>sed: -e expression #1, char 12: unknown option to</code></p><p>例如</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nb>export</span> <span class=nv>Name</span><span class=o>=</span>Jay/Chou
+</span></span><span class=line><span class=cl>sed -i <span class=s2>&#34;s/Name/</span><span class=nv>$Name</span><span class=s2>/g&#34;</span> hello.txt
+</span></span></code></pre></div><p>这里为了保留被替换文本的 <code>/</code>，有两种方法</p><ol><li><p>在被替换文本中使用转义符号：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nb>export</span> <span class=nv>Name</span><span class=o>=</span>Jay<span class=se>\/</span>Chou
+</span></span><span class=line><span class=cl>sed -i <span class=s2>&#34;s/Name/</span><span class=nv>$Name</span><span class=s2>/g&#34;</span> hello.txt
+</span></span></code></pre></div></li><li><p>使用 <code>#</code> 代替 <code>/</code> 作为 sed 中替换与被替换字符的分割符：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nb>export</span> <span class=nv>Name</span><span class=o>=</span>Jay/Chou
+</span></span><span class=line><span class=cl>sed -i <span class=s2>&#34;s#Name#</span><span class=nv>$Name</span><span class=s2>#g&#34;</span> hello.txt
 </span></span></code></pre></div></li></ol><h2 id=修改命令行文件路径显示>修改命令行文件路径显示
-<a class=anchor href=#%e4%bf%ae%e6%94%b9%e5%91%bd%e4%bb%a4%e8%a1%8c%e6%96%87%e4%bb%b6%e8%b7%af%e5%be%84%e6%98%be%e7%a4%ba>#</a></h2><p>文件路径太长，命令行很难看，只显示当前目录：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>vim ~/.bashrc
-</span></span><span style=display:flex><span><span style=color:#75715e># 将下行的w改成W</span>
-</span></span><span style=display:flex><span>PS1<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;${debian_chroot:+($debian_chroot)}\u@\h:\W\$&#39;</span>
+<a class=anchor href=#%e4%bf%ae%e6%94%b9%e5%91%bd%e4%bb%a4%e8%a1%8c%e6%96%87%e4%bb%b6%e8%b7%af%e5%be%84%e6%98%be%e7%a4%ba>#</a></h2><p>文件路径太长，命令行很难看，只显示当前目录：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>vim ~/.bashrc
+</span></span><span class=line><span class=cl><span class=c1># 将下行的w改成W</span>
+</span></span><span class=line><span class=cl><span class=nv>PS1</span><span class=o>=</span><span class=s1>&#39;${debian_chroot:+($debian_chroot)}\u@\h:\W\$&#39;</span>
 </span></span></code></pre></div><h2 id=网络命名空间>网络命名空间
-<a class=anchor href=#%e7%bd%91%e7%bb%9c%e5%91%bd%e5%90%8d%e7%a9%ba%e9%97%b4>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>sudo ip netns add newnetns
-</span></span><span style=display:flex><span>sudo ip netns exec newnetns bash
-</span></span><span style=display:flex><span><span style=color:#75715e># 进入命名空间后 使用exit退出</span>
-</span></span><span style=display:flex><span>sudo ip netns exec newnetns bash -rcfile &lt;<span style=color:#f92672>(</span>echo <span style=color:#e6db74>&#34;PS1=\&#34;greenland&gt; \&#34;&#34;</span><span style=color:#f92672>)</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>sudo ip netns delete newnetns
+<a class=anchor href=#%e7%bd%91%e7%bb%9c%e5%91%bd%e5%90%8d%e7%a9%ba%e9%97%b4>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo ip netns add newnetns
+</span></span><span class=line><span class=cl>sudo ip netns <span class=nb>exec</span> newnetns bash
+</span></span><span class=line><span class=cl><span class=c1># 进入命名空间后 使用exit退出</span>
+</span></span><span class=line><span class=cl>sudo ip netns <span class=nb>exec</span> newnetns bash -rcfile &lt;<span class=o>(</span><span class=nb>echo</span> <span class=s2>&#34;PS1=\&#34;greenland&gt; \&#34;&#34;</span><span class=o>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>sudo ip netns delete newnetns
 </span></span></code></pre></div><h2 id=清理工作>清理工作
-<a class=anchor href=#%e6%b8%85%e7%90%86%e5%b7%a5%e4%bd%9c>#</a></h2><p>一、删除缓存</p><p>1，非常有用的清理命令：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>sudo apt-get autoclean        清理旧版本的软件缓存
-</span></span><span style=display:flex><span>sudo apt-get clean          清理所有软件缓存
-</span></span><span style=display:flex><span>sudo apt-get autoremove       删除系统不再使用的孤立软件
-</span></span></code></pre></div><p>这三个命令主要清理升级缓存以及无用包的。</p><p>2，清理 opera firefox 的缓存文件：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>ls ~/.opera/cache4
-</span></span><span style=display:flex><span>ls ~/.mozilla/firefox/*.default/Cache
+<a class=anchor href=#%e6%b8%85%e7%90%86%e5%b7%a5%e4%bd%9c>#</a></h2><p>一、删除缓存</p><p>1，非常有用的清理命令：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo apt-get autoclean        清理旧版本的软件缓存
+</span></span><span class=line><span class=cl>sudo apt-get clean          清理所有软件缓存
+</span></span><span class=line><span class=cl>sudo apt-get autoremove       删除系统不再使用的孤立软件
+</span></span></code></pre></div><p>这三个命令主要清理升级缓存以及无用包的。</p><p>2，清理 opera firefox 的缓存文件：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ls ~/.opera/cache4
+</span></span><span class=line><span class=cl>ls ~/.mozilla/firefox/*.default/Cache
 </span></span></code></pre></div><p>3，清理 Linux 下孤立的包：
-终端命令下我们可以用：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>sudo apt-get install deborphan -y
+终端命令下我们可以用：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo apt-get install deborphan -y
 </span></span></code></pre></div><p>4，卸载：tracker
 这个东西一般我只要安装 ubuntu 就会第一删掉 tracker 他不仅会产生大量的 cache 文件而且还会影响开机速度。再软件中心删除。</p><p>附录：
 包管理的临时文件目录:
 包在
 /var/cache/apt/archives
 没有下载完的在
-/var/cache/apt/archives/partial</p><p>二、删除软件</p><p>ubuntu 软件的删除一般用“ubuntu 软件中心”或“新立得”就能搞定，但有时用命令似乎更快更好～～</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>sudo apt-get remove --purge 软件名
-</span></span><span style=display:flex><span>sudo apt-get autoremove                            删除系统不再使用的孤立软件
-</span></span><span style=display:flex><span>sudo apt-get autoclean                              清理旧版本的软件缓存
-</span></span><span style=display:flex><span>dpkg -l |grep ^rc|awk <span style=color:#e6db74>&#39;{print $2}&#39;</span> |sudo xargs dpkg -P       清除残余的配置文件
-</span></span></code></pre></div><p>保证干净。</p><p>三、删除多余内核</p><p>1，首先要使用这个命令查看当前 Ubuntu 系统使用的内核</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>uname -a
-</span></span></code></pre></div><p>2，再查看所有内核</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>dpkg --get-selections|grep linux
-</span></span></code></pre></div><p>3，最后小心翼翼地删除吧</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>sudo apt-get remove linux-image-2.6.32-22-generic
+/var/cache/apt/archives/partial</p><p>二、删除软件</p><p>ubuntu 软件的删除一般用“ubuntu 软件中心”或“新立得”就能搞定，但有时用命令似乎更快更好～～</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo apt-get remove --purge 软件名
+</span></span><span class=line><span class=cl>sudo apt-get autoremove                            删除系统不再使用的孤立软件
+</span></span><span class=line><span class=cl>sudo apt-get autoclean                              清理旧版本的软件缓存
+</span></span><span class=line><span class=cl>dpkg -l <span class=p>|</span>grep ^rc<span class=p>|</span>awk <span class=s1>&#39;{print $2}&#39;</span> <span class=p>|</span>sudo xargs dpkg -P       清除残余的配置文件
+</span></span></code></pre></div><p>保证干净。</p><p>三、删除多余内核</p><p>1，首先要使用这个命令查看当前 Ubuntu 系统使用的内核</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>uname -a
+</span></span></code></pre></div><p>2，再查看所有内核</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>dpkg --get-selections<span class=p>|</span>grep linux
+</span></span></code></pre></div><p>3，最后小心翼翼地删除吧</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo apt-get remove linux-image-2.6.32-22-generic
 </span></span></code></pre></div><p>ps：linux-image-xxxxxx-generic 就是要删除的内核版本
 还有
 linux-headers-xxxxxx

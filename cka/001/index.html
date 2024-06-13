@@ -3,7 +3,7 @@
 Deployment StatefulSet DaemonSet Create a new ServiceAccount named cicd-token in the existing namespace app-team1. Limited to namespace app-team1, bind the new ClusterRole deployment-clusterrole to the new ServiceAccount cicd-token. kubectl create ns app-team1 kubectl create serviceaccount cicd-token -n app-team1 kubectl create clusterrole deployment-clusterrole --verb=create --resource=deployment,statefulset,daemonset #limted to the namespace app-team1。需要限制的是namespace级别，clusterrolebinding为设置全局，rolebinding正确 kubectl create rolebinding cicd-clusterrole -n app-team1 --clusterrole=deployment-clusterrole --serviceaccount=app-team1:cicd-token 02 Task - 英文 # Set the node named ek8s-node-1 as unavaliable and reschedule all the pods running on it."><meta name=theme-color media="(prefers-color-scheme: light)" content="#ffffff"><meta name=theme-color media="(prefers-color-scheme: dark)" content="#343a40"><meta name=color-scheme content="light dark"><meta property="og:url" content="https://blog.poneding.com/cka/001/"><meta property="og:site_name" content="我的博客"><meta property="og:title" content="我的博客"><meta property="og:description" content="我的博客 / CKA / 001
 001 # 01 Task - 英文 # Create a new ClusterRole named deployment-clusterrole that only allows the creation of the following resource types:
 Deployment StatefulSet DaemonSet Create a new ServiceAccount named cicd-token in the existing namespace app-team1. Limited to namespace app-team1, bind the new ClusterRole deployment-clusterrole to the new ServiceAccount cicd-token. kubectl create ns app-team1 kubectl create serviceaccount cicd-token -n app-team1 kubectl create clusterrole deployment-clusterrole --verb=create --resource=deployment,statefulset,daemonset #limted to the namespace app-team1。需要限制的是namespace级别，clusterrolebinding为设置全局，rolebinding正确 kubectl create rolebinding cicd-clusterrole -n app-team1 --clusterrole=deployment-clusterrole --serviceaccount=app-team1:cicd-token 02 Task - 英文 # Set the node named ek8s-node-1 as unavaliable and reschedule all the pods running on it."><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="cka"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>1st | 我的博客</title>
-<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/cka/001/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/cka/001/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.ffd7553d42e9860dbcfbc6775c0f6c9895736a50f5383929cc725dc0a9b61715.js integrity="sha256-/9dVPULphg28+8Z3XA9smJVzalD1ODkpzHJdwKm2FxU=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
 <input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
 </label><strong>1st</strong>
 <label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#01-task---英文>01 Task - 英文</a></li><li><a href=#02-task---英文>02 Task - 英文</a></li><li><a href=#03-task---英文>03 Task - 英文</a></li><li><a href=#04-task---中文>04 Task - 中文</a></li><li><a href=#05-task---英文>05 Task - 英文</a></li><li><a href=#06-task---英文>06 Task - 英文</a></li><li><a href=#07-task---英文>07 Task - 英文</a></li><li><a href=#08-task---英文>08 Task - 英文</a></li><li><a href=#09-task---英文>09 Task - 英文</a></li><li><a href=#10-task---英文>10 Task - 英文</a></li><li><a href=#11-task---英文>11 Task - 英文</a></li><li><a href=#12-task---英文>12 Task - 英文</a></li><li><a href=#13-task---英文>13 Task - 英文</a></li><li><a href=#14-task---英文>14 Task - 英文</a></li><li><a href=#15-task---英文>15 Task - 英文</a></li><li><a href=#16-task---英文>16 Task - 英文</a></li><li><a href=#17-task---英文>17 Task - 英文</a></li><li><a href=#19-task---英文>19 Task - 英文</a></li><li><a href=#静态pod创建方法与注意点>静态Pod创建方法与注意点</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
@@ -11,235 +11,235 @@ Deployment StatefulSet DaemonSet Create a new ServiceAccount named cicd-token in
 <a class=anchor href=#001>#</a></h1><h2 id=01-task---英文>01 Task - 英文
 <a class=anchor href=#01-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Create a new ClusterRole named deployment-clusterrole that only allows the creation of the following resource types:</p><ul><li>Deployment</li><li>StatefulSet</li><li>DaemonSet
 Create a new ServiceAccount named cicd-token in the existing namespace app-team1.
-Limited to namespace app-team1, bind the new ClusterRole deployment-clusterrole to the new ServiceAccount cicd-token.</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl create ns app-team1
-</span></span><span style=display:flex><span>kubectl create serviceaccount cicd-token -n app-team1
-</span></span><span style=display:flex><span>kubectl create clusterrole deployment-clusterrole --verb<span style=color:#f92672>=</span>create --resource<span style=color:#f92672>=</span>deployment,statefulset,daemonset
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e>#limted to the namespace app-team1。需要限制的是namespace级别，clusterrolebinding为设置全局，rolebinding正确</span>
-</span></span><span style=display:flex><span>kubectl create rolebinding cicd-clusterrole -n app-team1 --clusterrole<span style=color:#f92672>=</span>deployment-clusterrole --serviceaccount<span style=color:#f92672>=</span>app-team1:cicd-token
+Limited to namespace app-team1, bind the new ClusterRole deployment-clusterrole to the new ServiceAccount cicd-token.</li></ul><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl create ns app-team1
+</span></span><span class=line><span class=cl>kubectl create serviceaccount cicd-token -n app-team1
+</span></span><span class=line><span class=cl>kubectl create clusterrole deployment-clusterrole --verb<span class=o>=</span>create --resource<span class=o>=</span>deployment,statefulset,daemonset
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>#limted to the namespace app-team1。需要限制的是namespace级别，clusterrolebinding为设置全局，rolebinding正确</span>
+</span></span><span class=line><span class=cl>kubectl create rolebinding cicd-clusterrole -n app-team1 --clusterrole<span class=o>=</span>deployment-clusterrole --serviceaccount<span class=o>=</span>app-team1:cicd-token
 </span></span></code></pre></div><h2 id=02-task---英文>02 Task - 英文
-<a class=anchor href=#02-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Set the node named ek8s-node-1 as unavaliable and reschedule all the pods running on it.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl cordon ek8s-node-1
-</span></span><span style=display:flex><span>kubectl drain ek8s-node-1 --delete-local-data --ignore-daemonsets --force
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>//删除所有pod（包括daemonset管理的pod），则需要--ignore-daemonsets或--ignore-daemonsets<span style=color:#f92672>=</span>true
+<a class=anchor href=#02-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Set the node named ek8s-node-1 as unavaliable and reschedule all the pods running on it.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl cordon ek8s-node-1
+</span></span><span class=line><span class=cl>kubectl drain ek8s-node-1 --delete-local-data --ignore-daemonsets --force
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>//删除所有pod（包括daemonset管理的pod），则需要--ignore-daemonsets或--ignore-daemonsets<span class=o>=</span><span class=nb>true</span>
 </span></span></code></pre></div><h2 id=03-task---英文>03 Task - 英文
 <a class=anchor href=#03-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Given an existing Kubernetes cluster running version 1.18.8，upgrade all of Kubernetes control plane and node components <strong>on the master node only</strong> to version 1.19.0。</p><p>You are also expected to upgrade kubelet and kubectl on the master node。</p><blockquote><p>Be sure to drain the master node
 before upgrading it and uncordon it after the upgrade.
-Do not upgrade the worker nodes,etcd,the container manager,the CNI plugin,the DNS service or any other addons.</p></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>apt update
-</span></span><span style=display:flex><span>apt-cache policy kubeadm
-</span></span><span style=display:flex><span>apt-get update <span style=color:#f92672>&amp;&amp;</span> apt-get install -y --allow-change-held-packages kubeadm<span style=color:#f92672>=</span>1.19.0
-</span></span><span style=display:flex><span>kubeadm version <span style=color:#75715e>#检查kubeadm版本</span>
-</span></span><span style=display:flex><span>kubectl drain master --ignore-daemonsets --delete-local-data --force <span style=color:#75715e>#腾空控制平面节点</span>
-</span></span><span style=display:flex><span>sudo kubeadm upgrade plan <span style=color:#75715e># 命令查看可升级的版本信息</span>
-</span></span><span style=display:flex><span>sudo kubeadm upgrade apply v1.19.0 --etcd-upgrade<span style=color:#f92672>=</span>false <span style=color:#75715e>#查看版本信息时，排除etcd从3.4.3-0升到3.4.7-0</span>
-</span></span><span style=display:flex><span>kubectl uncordon master
-</span></span><span style=display:flex><span>sudo kubeadm upgrade node <span style=color:#75715e>#升级其他控制面节点</span>
-</span></span><span style=display:flex><span>apt-get update <span style=color:#f92672>&amp;&amp;</span> apt-get install -y --allow-change-held-packages kubelet<span style=color:#f92672>=</span>1.19.0 kubectl<span style=color:#f92672>=</span>1.19.0
-</span></span><span style=display:flex><span><span style=color:#75715e>#升级其他控制面节点</span>
-</span></span><span style=display:flex><span>sudo systemctl daemon-reload
-</span></span><span style=display:flex><span>sudo systemctl restart kubelet
+Do not upgrade the worker nodes,etcd,the container manager,the CNI plugin,the DNS service or any other addons.</p></blockquote><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>apt update
+</span></span><span class=line><span class=cl>apt-cache policy kubeadm
+</span></span><span class=line><span class=cl>apt-get update <span class=o>&amp;&amp;</span> apt-get install -y --allow-change-held-packages <span class=nv>kubeadm</span><span class=o>=</span>1.19.0
+</span></span><span class=line><span class=cl>kubeadm version <span class=c1>#检查kubeadm版本</span>
+</span></span><span class=line><span class=cl>kubectl drain master --ignore-daemonsets --delete-local-data --force <span class=c1>#腾空控制平面节点</span>
+</span></span><span class=line><span class=cl>sudo kubeadm upgrade plan <span class=c1># 命令查看可升级的版本信息</span>
+</span></span><span class=line><span class=cl>sudo kubeadm upgrade apply v1.19.0 --etcd-upgrade<span class=o>=</span><span class=nb>false</span> <span class=c1>#查看版本信息时，排除etcd从3.4.3-0升到3.4.7-0</span>
+</span></span><span class=line><span class=cl>kubectl uncordon master
+</span></span><span class=line><span class=cl>sudo kubeadm upgrade node <span class=c1>#升级其他控制面节点</span>
+</span></span><span class=line><span class=cl>apt-get update <span class=o>&amp;&amp;</span> apt-get install -y --allow-change-held-packages <span class=nv>kubelet</span><span class=o>=</span>1.19.0 <span class=nv>kubectl</span><span class=o>=</span>1.19.0
+</span></span><span class=line><span class=cl><span class=c1>#升级其他控制面节点</span>
+</span></span><span class=line><span class=cl>sudo systemctl daemon-reload
+</span></span><span class=line><span class=cl>sudo systemctl restart kubelet
 </span></span></code></pre></div><h2 id=04-task---中文>04 Task - 中文
 <a class=anchor href=#04-task---%e4%b8%ad%e6%96%87>#</a></h2><p>首先，为运行在
-<a href=https://127.0.0.1:2379>https://127.0.0.1:2379</a> 上的现有etcd 实例创建快照并将快照保存到/data/backup/etcd-snapshot.db。</p><blockquote><p>为给定实例创建快照预计能在几秒钟内完成。如果该操作似乎挂起，则命令可能有问题。用ctrl+c 来取消操作，然后重试。</p></blockquote><p>然后还原位于/var/data/etcd-snapshot-previous.db的现有先前快照。</p><blockquote><p>提供了以下TLS证书和密钥，以通过etcdctl连接到服务器。</p><ul><li>ca证书：/opt/KUIN00601/ca.crt</li><li>客户端证书：/opt/KUIN00601/etcd-client.crt</li><li>客户端密钥：/opt/KUIN00601/etcd-client.key</li></ul></blockquote><p>一定要把这参数用熟练，如果考试时有问题，不要急，多试试！！！</p><blockquote><p>一旦正确配置了 etcd，只有具有有效证书的客户端才能访问它。要让 Kubernetes API 服务器访问，可以使用参数 &ndash;etcd-certfile=k8sclient.cert,–etcd-keyfile=k8sclient.key 和 &ndash;etcd-cafile=ca.cert 配置它。</p></blockquote><p>我记得我考试进用的是：–certfile=/opt/KUIN00601/etcd-client.crt &ndash;keyfile=/opt/KUIN00601/etcd-client.key &ndash;cafile=/opt/KUIN00601/ca.crt</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>ETCDCTL_API<span style=color:#f92672>=</span><span style=color:#ae81ff>3</span> etcdctl --endpoint<span style=color:#f92672>=</span>https://127.0.0.1:2379 --certfile<span style=color:#f92672>=</span>/opt/KUIN00601/etcd-client.crt --keyfile<span style=color:#f92672>=</span>/opt/KUIN00601/etcd-client.key --cafile<span style=color:#f92672>=</span>/opt/KUIN00601/ca.crt snapshot save /data/backup/etcd-snapshot.db
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>ETCDCTL_API<span style=color:#f92672>=</span><span style=color:#ae81ff>3</span> etcdctl --endpoint<span style=color:#f92672>=</span>https://127.0.0.1:2379 --cert-file<span style=color:#f92672>=</span>/opt/KUIN00601/etcd-client.crt --key-file<span style=color:#f92672>=</span>/opt/KUIN00601/etcd-client.key --ca-file<span style=color:#f92672>=</span>/opt/KUIN00601/ca.crt snapshot restore /var/data/etcd-snapshot-previous.db
+<a href=https://127.0.0.1:2379>https://127.0.0.1:2379</a> 上的现有etcd 实例创建快照并将快照保存到/data/backup/etcd-snapshot.db。</p><blockquote><p>为给定实例创建快照预计能在几秒钟内完成。如果该操作似乎挂起，则命令可能有问题。用ctrl+c 来取消操作，然后重试。</p></blockquote><p>然后还原位于/var/data/etcd-snapshot-previous.db的现有先前快照。</p><blockquote><p>提供了以下TLS证书和密钥，以通过etcdctl连接到服务器。</p><ul><li>ca证书：/opt/KUIN00601/ca.crt</li><li>客户端证书：/opt/KUIN00601/etcd-client.crt</li><li>客户端密钥：/opt/KUIN00601/etcd-client.key</li></ul></blockquote><p>一定要把这参数用熟练，如果考试时有问题，不要急，多试试！！！</p><blockquote><p>一旦正确配置了 etcd，只有具有有效证书的客户端才能访问它。要让 Kubernetes API 服务器访问，可以使用参数 &ndash;etcd-certfile=k8sclient.cert,–etcd-keyfile=k8sclient.key 和 &ndash;etcd-cafile=ca.cert 配置它。</p></blockquote><p>我记得我考试进用的是：–certfile=/opt/KUIN00601/etcd-client.crt &ndash;keyfile=/opt/KUIN00601/etcd-client.key &ndash;cafile=/opt/KUIN00601/ca.crt</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nv>ETCDCTL_API</span><span class=o>=</span><span class=m>3</span> etcdctl --endpoint<span class=o>=</span>https://127.0.0.1:2379 --certfile<span class=o>=</span>/opt/KUIN00601/etcd-client.crt --keyfile<span class=o>=</span>/opt/KUIN00601/etcd-client.key --cafile<span class=o>=</span>/opt/KUIN00601/ca.crt snapshot save /data/backup/etcd-snapshot.db
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nv>ETCDCTL_API</span><span class=o>=</span><span class=m>3</span> etcdctl --endpoint<span class=o>=</span>https://127.0.0.1:2379 --cert-file<span class=o>=</span>/opt/KUIN00601/etcd-client.crt --key-file<span class=o>=</span>/opt/KUIN00601/etcd-client.key --ca-file<span class=o>=</span>/opt/KUIN00601/ca.crt snapshot restore /var/data/etcd-snapshot-previous.db
 </span></span></code></pre></div><h2 id=05-task---英文>05 Task - 英文
 <a class=anchor href=#05-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Create a new <strong>NetworkPolicy</strong> named <strong>allow-port-from-namespace</strong> to allow Pods in the existing namespace <strong>internal</strong> to connect to port <strong>8080</strong> of other Pods in the same namespace.
-Ensure that the new NetworkPolicy:</p><ul><li>does <strong>not</strong> allow access to Pods not listening on port <strong>8080</strong>.</li><li>does <strong>not</strong> allow access from Pods not in namespace <strong>internal</strong>.</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#network.yaml</span>
-</span></span><span style=display:flex><span>apiVersion: networking.k8s.io/v1
-</span></span><span style=display:flex><span>kind: NetworkPolicy
-</span></span><span style=display:flex><span>metadata:
-</span></span><span style=display:flex><span>  name: allow-port-from-namespace
-</span></span><span style=display:flex><span>  namespace: internal
-</span></span><span style=display:flex><span>spec:
-</span></span><span style=display:flex><span>  podSelector: 
-</span></span><span style=display:flex><span>    matchLabels: <span style=color:#f92672>{}</span>
-</span></span><span style=display:flex><span>  policyTypes:
-</span></span><span style=display:flex><span>  - Ingress
-</span></span><span style=display:flex><span>  ingress:
-</span></span><span style=display:flex><span>  - from: 
-</span></span><span style=display:flex><span>    - podSelector: <span style=color:#f92672>{}</span> 
-</span></span><span style=display:flex><span>  ports: 
-</span></span><span style=display:flex><span>  - protocol: TCP 
-</span></span><span style=display:flex><span>    port: <span style=color:#ae81ff>8080</span>
-</span></span><span style=display:flex><span><span style=color:#75715e>#spec.podSelector限定了这个namespace里的pod可以访问</span>
-</span></span><span style=display:flex><span>kubectl create -f network.yaml
+Ensure that the new NetworkPolicy:</p><ul><li>does <strong>not</strong> allow access to Pods not listening on port <strong>8080</strong>.</li><li>does <strong>not</strong> allow access from Pods not in namespace <strong>internal</strong>.</li></ul><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1>#network.yaml</span>
+</span></span><span class=line><span class=cl>apiVersion: networking.k8s.io/v1
+</span></span><span class=line><span class=cl>kind: NetworkPolicy
+</span></span><span class=line><span class=cl>metadata:
+</span></span><span class=line><span class=cl>  name: allow-port-from-namespace
+</span></span><span class=line><span class=cl>  namespace: internal
+</span></span><span class=line><span class=cl>spec:
+</span></span><span class=line><span class=cl>  podSelector: 
+</span></span><span class=line><span class=cl>    matchLabels: <span class=o>{}</span>
+</span></span><span class=line><span class=cl>  policyTypes:
+</span></span><span class=line><span class=cl>  - Ingress
+</span></span><span class=line><span class=cl>  ingress:
+</span></span><span class=line><span class=cl>  - from: 
+</span></span><span class=line><span class=cl>    - podSelector: <span class=o>{}</span> 
+</span></span><span class=line><span class=cl>  ports: 
+</span></span><span class=line><span class=cl>  - protocol: TCP 
+</span></span><span class=line><span class=cl>    port: <span class=m>8080</span>
+</span></span><span class=line><span class=cl><span class=c1>#spec.podSelector限定了这个namespace里的pod可以访问</span>
+</span></span><span class=line><span class=cl>kubectl create -f network.yaml
 </span></span></code></pre></div><h2 id=06-task---英文>06 Task - 英文
-<a class=anchor href=#06-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Reconfigure the existing deployment <strong>front-end</strong> and add a port specifiction named <strong>http</strong> exposing port <strong>80/tcp</strong> of the existing container <strong>nginx</strong>.</p><p>Create a new service named <strong>front-end-svc</strong> exposing the container prot <strong>http</strong>.</p><p>Configure the new service to also expose the individual Pods via a NodePort on the nodes on which they are scheduled.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl get deploy front-end
-</span></span><span style=display:flex><span>kubectl edit deploy front-end -o yaml
-</span></span><span style=display:flex><span><span style=color:#75715e>#port specification named http</span>
-</span></span><span style=display:flex><span><span style=color:#75715e>#service.yaml</span>
-</span></span><span style=display:flex><span>apiVersion: v1
-</span></span><span style=display:flex><span>kind: Service
-</span></span><span style=display:flex><span>metadata:
-</span></span><span style=display:flex><span>  name: front-end-svc
-</span></span><span style=display:flex><span>  labels: app: nginx
-</span></span><span style=display:flex><span>spec:
-</span></span><span style=display:flex><span>  ports:
-</span></span><span style=display:flex><span>  - port: <span style=color:#ae81ff>80</span> protocol: tcp name: http
-</span></span><span style=display:flex><span>  selector: app: nginx
-</span></span><span style=display:flex><span>  type: NodePort  
-</span></span><span style=display:flex><span><span style=color:#75715e>#</span>
-</span></span><span style=display:flex><span>kubectl create -f service.yaml
-</span></span><span style=display:flex><span><span style=color:#75715e>#</span>
-</span></span><span style=display:flex><span>kubectl get svc
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e>#或者一条命令搞定,注意会遗漏port specification named http</span>
-</span></span><span style=display:flex><span>kubectl expose deployment front-end --name<span style=color:#f92672>=</span>front-end-svc --port<span style=color:#f92672>=</span><span style=color:#ae81ff>80</span> --tarport<span style=color:#f92672>=</span><span style=color:#ae81ff>80</span> --type<span style=color:#f92672>=</span>NodePort
+<a class=anchor href=#06-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Reconfigure the existing deployment <strong>front-end</strong> and add a port specifiction named <strong>http</strong> exposing port <strong>80/tcp</strong> of the existing container <strong>nginx</strong>.</p><p>Create a new service named <strong>front-end-svc</strong> exposing the container prot <strong>http</strong>.</p><p>Configure the new service to also expose the individual Pods via a NodePort on the nodes on which they are scheduled.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl get deploy front-end
+</span></span><span class=line><span class=cl>kubectl edit deploy front-end -o yaml
+</span></span><span class=line><span class=cl><span class=c1>#port specification named http</span>
+</span></span><span class=line><span class=cl><span class=c1>#service.yaml</span>
+</span></span><span class=line><span class=cl>apiVersion: v1
+</span></span><span class=line><span class=cl>kind: Service
+</span></span><span class=line><span class=cl>metadata:
+</span></span><span class=line><span class=cl>  name: front-end-svc
+</span></span><span class=line><span class=cl>  labels: app: nginx
+</span></span><span class=line><span class=cl>spec:
+</span></span><span class=line><span class=cl>  ports:
+</span></span><span class=line><span class=cl>  - port: <span class=m>80</span> protocol: tcp name: http
+</span></span><span class=line><span class=cl>  selector: app: nginx
+</span></span><span class=line><span class=cl>  type: NodePort  
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl>kubectl create -f service.yaml
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl>kubectl get svc
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>#或者一条命令搞定,注意会遗漏port specification named http</span>
+</span></span><span class=line><span class=cl>kubectl expose deployment front-end --name<span class=o>=</span>front-end-svc --port<span class=o>=</span><span class=m>80</span> --tarport<span class=o>=</span><span class=m>80</span> --type<span class=o>=</span>NodePort
 </span></span></code></pre></div><h2 id=07-task---英文>07 Task - 英文
 <a class=anchor href=#07-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Create a new nginx Ingress resource as follows:</p><ul><li>Name: <strong>ping</strong>：</li><li>Namespace: <strong>ing-internal</strong>：</li><li>Exposing service <strong>hi</strong> on path <strong>/hi</strong> using service port <strong>5678</strong>：</li></ul><blockquote><p>The avaliability of service <strong>hi</strong> can be checked using the following command,which should return <strong>hi</strong>:
-curl -kL /hi</p></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>vi ingress.yaml
-</span></span><span style=display:flex><span><span style=color:#75715e>#</span>
-</span></span><span style=display:flex><span>apiVersion: networking.k8s.io/v1
-</span></span><span style=display:flex><span>kind: Ingress
-</span></span><span style=display:flex><span>metadata:
-</span></span><span style=display:flex><span>  name: ping
-</span></span><span style=display:flex><span>  namespace: ing-internal
-</span></span><span style=display:flex><span>spec:
-</span></span><span style=display:flex><span>  rules:
-</span></span><span style=display:flex><span>  - http: paths: - path: /hi pathType: Prefix backend: service: name: hi port: number: <span style=color:#ae81ff>5678</span>
-</span></span><span style=display:flex><span><span style=color:#75715e># </span>
-</span></span><span style=display:flex><span>kubectl create -f ingress.yaml
+curl -kL /hi</p></blockquote><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>vi ingress.yaml
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl>apiVersion: networking.k8s.io/v1
+</span></span><span class=line><span class=cl>kind: Ingress
+</span></span><span class=line><span class=cl>metadata:
+</span></span><span class=line><span class=cl>  name: ping
+</span></span><span class=line><span class=cl>  namespace: ing-internal
+</span></span><span class=line><span class=cl>spec:
+</span></span><span class=line><span class=cl>  rules:
+</span></span><span class=line><span class=cl>  - http: paths: - path: /hi pathType: Prefix backend: service: name: hi port: number: <span class=m>5678</span>
+</span></span><span class=line><span class=cl><span class=c1># </span>
+</span></span><span class=line><span class=cl>kubectl create -f ingress.yaml
 </span></span></code></pre></div><h2 id=08-task---英文>08 Task - 英文
-<a class=anchor href=#08-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Scale the deployment <strong>presentation</strong> to <strong>3</strong> pods.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl get deployment
-</span></span><span style=display:flex><span>kubectl scale deployment.apps/presentation --replicas<span style=color:#f92672>=</span><span style=color:#ae81ff>3</span>
+<a class=anchor href=#08-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Scale the deployment <strong>presentation</strong> to <strong>3</strong> pods.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl get deployment
+</span></span><span class=line><span class=cl>kubectl scale deployment.apps/presentation --replicas<span class=o>=</span><span class=m>3</span>
 </span></span></code></pre></div><h2 id=09-task---英文>09 Task - 英文
-<a class=anchor href=#09-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Task</p><p>Schedule a pod as follows:</p><ul><li>name: <strong>nginx-kusc00401</strong>：</li><li>Image: <strong>nginx</strong>：</li><li>Node selector: <strong>disk-spinning</strong>：</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#yaml</span>
-</span></span><span style=display:flex><span>apiVersion: v1
-</span></span><span style=display:flex><span>kind: Pod
-</span></span><span style=display:flex><span>metadata:
-</span></span><span style=display:flex><span>  name: nginx-kusc00401
-</span></span><span style=display:flex><span>spec:
-</span></span><span style=display:flex><span>  containers:
-</span></span><span style=display:flex><span>  - name: nginx image: nginx imagePullPolicy: IfNotPresent
-</span></span><span style=display:flex><span>  nodeSelector: disk: spinning
-</span></span><span style=display:flex><span><span style=color:#75715e># </span>
-</span></span><span style=display:flex><span>kubectl create -f node-select.yaml 
+<a class=anchor href=#09-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Task</p><p>Schedule a pod as follows:</p><ul><li>name: <strong>nginx-kusc00401</strong>：</li><li>Image: <strong>nginx</strong>：</li><li>Node selector: <strong>disk-spinning</strong>：</li></ul><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1>#yaml</span>
+</span></span><span class=line><span class=cl>apiVersion: v1
+</span></span><span class=line><span class=cl>kind: Pod
+</span></span><span class=line><span class=cl>metadata:
+</span></span><span class=line><span class=cl>  name: nginx-kusc00401
+</span></span><span class=line><span class=cl>spec:
+</span></span><span class=line><span class=cl>  containers:
+</span></span><span class=line><span class=cl>  - name: nginx image: nginx imagePullPolicy: IfNotPresent
+</span></span><span class=line><span class=cl>  nodeSelector: disk: spinning
+</span></span><span class=line><span class=cl><span class=c1># </span>
+</span></span><span class=line><span class=cl>kubectl create -f node-select.yaml 
 </span></span></code></pre></div><h2 id=10-task---英文>10 Task - 英文
 <a class=anchor href=#10-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Task
-Check to see how many nodes are ready (not including nodes tainted <strong>NoSchedule</strong>)and write the number to <strong>/opt/KUSC00402/kusc00402.txt.</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl describe nodes | grep ready|wc -l
-</span></span><span style=display:flex><span>kubectl describe nodes | grep -i taint | grep -i noschedule |wc -l
-</span></span><span style=display:flex><span>echo <span style=color:#ae81ff>3</span> &gt; /opt/KUSC00402/kusc00402.txt
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 查询集群Ready节点数量</span>
-</span></span><span style=display:flex><span>kubectl get node | grep -i ready |wc -l
-</span></span><span style=display:flex><span><span style=color:#75715e># 找出节点taints、noSchedule</span>
-</span></span><span style=display:flex><span>kubectl describe nodes | grep -i taints | grep -i noschedule |wc -l
-</span></span><span style=display:flex><span><span style=color:#75715e>#将得到的减数，写入到文件</span>
-</span></span><span style=display:flex><span>echo <span style=color:#ae81ff>2</span> &gt; /opt/KUSC00402/kusc00402.txt
+Check to see how many nodes are ready (not including nodes tainted <strong>NoSchedule</strong>)and write the number to <strong>/opt/KUSC00402/kusc00402.txt.</strong>：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl describe nodes <span class=p>|</span> grep ready<span class=p>|</span>wc -l
+</span></span><span class=line><span class=cl>kubectl describe nodes <span class=p>|</span> grep -i taint <span class=p>|</span> grep -i noschedule <span class=p>|</span>wc -l
+</span></span><span class=line><span class=cl><span class=nb>echo</span> <span class=m>3</span> &gt; /opt/KUSC00402/kusc00402.txt
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 查询集群Ready节点数量</span>
+</span></span><span class=line><span class=cl>kubectl get node <span class=p>|</span> grep -i ready <span class=p>|</span>wc -l
+</span></span><span class=line><span class=cl><span class=c1># 找出节点taints、noSchedule</span>
+</span></span><span class=line><span class=cl>kubectl describe nodes <span class=p>|</span> grep -i taints <span class=p>|</span> grep -i noschedule <span class=p>|</span>wc -l
+</span></span><span class=line><span class=cl><span class=c1>#将得到的减数，写入到文件</span>
+</span></span><span class=line><span class=cl><span class=nb>echo</span> <span class=m>2</span> &gt; /opt/KUSC00402/kusc00402.txt
 </span></span></code></pre></div><h2 id=11-task---英文>11 Task - 英文
 <a class=anchor href=#11-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Create a pod named <strong>kucc8</strong> with a single app container for each of the following images running inside (there may be between 1 and 4 images specified):
-<strong>nginx + redis + memcached + consul .</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl run kucc8 --image<span style=color:#f92672>=</span>nginx --dry-run -o yaml &gt; kucc8.yaml
-</span></span><span style=display:flex><span><span style=color:#75715e># vi kucc8.yaml</span>
-</span></span><span style=display:flex><span>apiVersion: v1
-</span></span><span style=display:flex><span>kind: Pod
-</span></span><span style=display:flex><span>metadata:
-</span></span><span style=display:flex><span>  creationTimestamp: null
-</span></span><span style=display:flex><span>  name: kucc8
-</span></span><span style=display:flex><span>spec:
-</span></span><span style=display:flex><span>  containers:
-</span></span><span style=display:flex><span>  - image: nginx name: nginx
-</span></span><span style=display:flex><span>  - image: redis name: redis
-</span></span><span style=display:flex><span>  - image: memcached name: memcached
-</span></span><span style=display:flex><span>  - image: consul name: consul
-</span></span><span style=display:flex><span><span style=color:#75715e># </span>
-</span></span><span style=display:flex><span>kubectl create -f kucc8.yaml
-</span></span><span style=display:flex><span><span style=color:#75715e>#12.07</span>
+<strong>nginx + redis + memcached + consul .</strong>：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl run kucc8 --image<span class=o>=</span>nginx --dry-run -o yaml &gt; kucc8.yaml
+</span></span><span class=line><span class=cl><span class=c1># vi kucc8.yaml</span>
+</span></span><span class=line><span class=cl>apiVersion: v1
+</span></span><span class=line><span class=cl>kind: Pod
+</span></span><span class=line><span class=cl>metadata:
+</span></span><span class=line><span class=cl>  creationTimestamp: null
+</span></span><span class=line><span class=cl>  name: kucc8
+</span></span><span class=line><span class=cl>spec:
+</span></span><span class=line><span class=cl>  containers:
+</span></span><span class=line><span class=cl>  - image: nginx name: nginx
+</span></span><span class=line><span class=cl>  - image: redis name: redis
+</span></span><span class=line><span class=cl>  - image: memcached name: memcached
+</span></span><span class=line><span class=cl>  - image: consul name: consul
+</span></span><span class=line><span class=cl><span class=c1># </span>
+</span></span><span class=line><span class=cl>kubectl create -f kucc8.yaml
+</span></span><span class=line><span class=cl><span class=c1>#12.07</span>
 </span></span></code></pre></div><h2 id=12-task---英文>12 Task - 英文
 <a class=anchor href=#12-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Task
-Create a persistent volume whit name <strong>app-config</strong>, of capacity <strong>1Gi</strong> and access mode ReadOnlyMany . the type of volume is <strong>hostPath</strong> and its location is <strong>/srv/app-config .</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#vi pv.yaml</span>
-</span></span><span style=display:flex><span>apiVersion: v1
-</span></span><span style=display:flex><span>kind: PersistentVolume
-</span></span><span style=display:flex><span>metadata:
-</span></span><span style=display:flex><span>  name: app-config
-</span></span><span style=display:flex><span>spec:
-</span></span><span style=display:flex><span>  capacity: storage: 1Gi
-</span></span><span style=display:flex><span>  accessModes: - ReadOnlyMany
-</span></span><span style=display:flex><span>  hostPath: path: /srv/app-config
-</span></span><span style=display:flex><span><span style=color:#75715e>#</span>
-</span></span><span style=display:flex><span>kubectl create -f pv.yaml
+Create a persistent volume whit name <strong>app-config</strong>, of capacity <strong>1Gi</strong> and access mode ReadOnlyMany . the type of volume is <strong>hostPath</strong> and its location is <strong>/srv/app-config .</strong>：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1>#vi pv.yaml</span>
+</span></span><span class=line><span class=cl>apiVersion: v1
+</span></span><span class=line><span class=cl>kind: PersistentVolume
+</span></span><span class=line><span class=cl>metadata:
+</span></span><span class=line><span class=cl>  name: app-config
+</span></span><span class=line><span class=cl>spec:
+</span></span><span class=line><span class=cl>  capacity: storage: 1Gi
+</span></span><span class=line><span class=cl>  accessModes: - ReadOnlyMany
+</span></span><span class=line><span class=cl>  hostPath: path: /srv/app-config
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl>kubectl create -f pv.yaml
 </span></span></code></pre></div><h2 id=13-task---英文>13 Task - 英文
 <a class=anchor href=#13-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Task
-Create a new <strong>PersistentVolumeClaim</strong>:</p><ul><li>Name: <strong>pv-volume</strong>：</li><li>Class: <strong>csi-hostpath-sc</strong>：</li><li>Capacity: <strong>10Mi</strong>：</li></ul><p>Create a new Pod which mounts the <strong>PersistentVolumeClaim</strong> as a volume:</p><ul><li>Name: <strong>web-server</strong>：</li><li>Image: <strong>nginx</strong>：</li><li>Mount path: <strong>/usr/share/nginx/html</strong>：</li></ul><p>Configure the new Pod to have <strong>ReadWriteOnce</strong> access on the volume.</p><p>Finally,using <strong>kubectl edit</strong> or <strong>Kubectl patch</strong> expand the <strong>PersistentVolumeClaim</strong> to a capacity of <strong>70Mi</strong> and record that change.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>vi pvc.yaml
-</span></span><span style=display:flex><span><span style=color:#75715e>#使用指定storageclass创建一个pvc</span>
-</span></span><span style=display:flex><span>apiVersion: v1
-</span></span><span style=display:flex><span>kind: PersistentVolumeClaim
-</span></span><span style=display:flex><span>metadata:
-</span></span><span style=display:flex><span>  name: pv-volume
-</span></span><span style=display:flex><span>spec:
-</span></span><span style=display:flex><span>  accessModes: - ReadWriteOnce
-</span></span><span style=display:flex><span>  volumeMode: Filesystem resources: requests: storage: 10Mi
-</span></span><span style=display:flex><span>  storageClassName: csi-hostpath-sc
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># vi pod-pvc.yaml</span>
-</span></span><span style=display:flex><span>apiVersion: v1
-</span></span><span style=display:flex><span>kind: Pod
-</span></span><span style=display:flex><span>metadata:
-</span></span><span style=display:flex><span>  name: web-server
-</span></span><span style=display:flex><span>spec:
-</span></span><span style=display:flex><span>  containers: - name: web-server image: nginx volumeMounts: - mountPath: <span style=color:#e6db74>&#34;/usr/share/nginx/html&#34;</span> name: my-volume
-</span></span><span style=display:flex><span>  volumes: - name: my-volume persistentVolumeClaim: claimName: pv-volume
-</span></span><span style=display:flex><span><span style=color:#75715e># craete </span>
-</span></span><span style=display:flex><span>kubectl create -f pod-pvc.yaml
-</span></span><span style=display:flex><span><span style=color:#75715e>#edit 修改容量</span>
-</span></span><span style=display:flex><span>kubectl edit pvc pv-volume --record
+Create a new <strong>PersistentVolumeClaim</strong>:</p><ul><li>Name: <strong>pv-volume</strong>：</li><li>Class: <strong>csi-hostpath-sc</strong>：</li><li>Capacity: <strong>10Mi</strong>：</li></ul><p>Create a new Pod which mounts the <strong>PersistentVolumeClaim</strong> as a volume:</p><ul><li>Name: <strong>web-server</strong>：</li><li>Image: <strong>nginx</strong>：</li><li>Mount path: <strong>/usr/share/nginx/html</strong>：</li></ul><p>Configure the new Pod to have <strong>ReadWriteOnce</strong> access on the volume.</p><p>Finally,using <strong>kubectl edit</strong> or <strong>Kubectl patch</strong> expand the <strong>PersistentVolumeClaim</strong> to a capacity of <strong>70Mi</strong> and record that change.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>vi pvc.yaml
+</span></span><span class=line><span class=cl><span class=c1>#使用指定storageclass创建一个pvc</span>
+</span></span><span class=line><span class=cl>apiVersion: v1
+</span></span><span class=line><span class=cl>kind: PersistentVolumeClaim
+</span></span><span class=line><span class=cl>metadata:
+</span></span><span class=line><span class=cl>  name: pv-volume
+</span></span><span class=line><span class=cl>spec:
+</span></span><span class=line><span class=cl>  accessModes: - ReadWriteOnce
+</span></span><span class=line><span class=cl>  volumeMode: Filesystem resources: requests: storage: 10Mi
+</span></span><span class=line><span class=cl>  storageClassName: csi-hostpath-sc
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># vi pod-pvc.yaml</span>
+</span></span><span class=line><span class=cl>apiVersion: v1
+</span></span><span class=line><span class=cl>kind: Pod
+</span></span><span class=line><span class=cl>metadata:
+</span></span><span class=line><span class=cl>  name: web-server
+</span></span><span class=line><span class=cl>spec:
+</span></span><span class=line><span class=cl>  containers: - name: web-server image: nginx volumeMounts: - mountPath: <span class=s2>&#34;/usr/share/nginx/html&#34;</span> name: my-volume
+</span></span><span class=line><span class=cl>  volumes: - name: my-volume persistentVolumeClaim: claimName: pv-volume
+</span></span><span class=line><span class=cl><span class=c1># craete </span>
+</span></span><span class=line><span class=cl>kubectl create -f pod-pvc.yaml
+</span></span><span class=line><span class=cl><span class=c1>#edit 修改容量</span>
+</span></span><span class=line><span class=cl>kubectl edit pvc pv-volume --record
 </span></span></code></pre></div><h2 id=14-task---英文>14 Task - 英文
 <a class=anchor href=#14-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Task
-Monitor the logs of pod <strong>bar</strong> and:</p><ul><li>Extract log lines corresponding to error <strong>unable-to-access-website</strong>：</li><li>Write them to <strong>/opt/KUTR00101/bar</strong>：</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl logs bar | grep <span style=color:#e6db74>&#39;unable-to-access-website&#39;</span> &gt; /opt/KUTR00101/bar
-</span></span><span style=display:flex><span>cat /opt/KUTR00101/bar
+Monitor the logs of pod <strong>bar</strong> and:</p><ul><li>Extract log lines corresponding to error <strong>unable-to-access-website</strong>：</li><li>Write them to <strong>/opt/KUTR00101/bar</strong>：</li></ul><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl logs bar <span class=p>|</span> grep <span class=s1>&#39;unable-to-access-website&#39;</span> &gt; /opt/KUTR00101/bar
+</span></span><span class=line><span class=cl>cat /opt/KUTR00101/bar
 </span></span></code></pre></div><h2 id=15-task---英文>15 Task - 英文
 <a class=anchor href=#15-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Context
 Without changing its existing containers,an existing Pod needs to be integrated into Kubernetes’s build-in logging architecture (e.g. kubectl logs). Adding a streaming sidecar container is a good and common way to accomplish this requirement.</p><p>Task
-Add a <strong>busybox</strong> sidecar container to the existing Pod <strong>big-corp-app</strong>. The new sidecar container has to run the following command:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>/bin/sh -c tail -n+1 -f /var/log/big-corp-app.log
+Add a <strong>busybox</strong> sidecar container to the existing Pod <strong>big-corp-app</strong>. The new sidecar container has to run the following command:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>/bin/sh -c tail -n+1 -f /var/log/big-corp-app.log
 </span></span></code></pre></div><p>Use a volume mount named <strong>logs</strong> to make the file <strong>/var/log/big-corp-app.log</strong> available to the sidecar container.</p><blockquote><p>Don’t modify the existing container.
-Don’t modify the path of the log file,both containers must access it at <strong>/var/log/big-corp-app.log</strong>.</p></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#</span>
-</span></span><span style=display:flex><span>kubectl get pod big-corp-app -o yaml 
-</span></span><span style=display:flex><span><span style=color:#75715e>#</span>
-</span></span><span style=display:flex><span>apiVersion: v1
-</span></span><span style=display:flex><span>kind: Pod
-</span></span><span style=display:flex><span>metadata:
-</span></span><span style=display:flex><span>  name: big-corp-app
-</span></span><span style=display:flex><span>spec:
-</span></span><span style=display:flex><span>  containers:
-</span></span><span style=display:flex><span>  - name: big-corp-app image: busybox args: - /bin/sh - -c - &gt; i<span style=color:#f92672>=</span>0; <span style=color:#66d9ef>while</span> true; <span style=color:#66d9ef>do</span> echo <span style=color:#e6db74>&#34;</span><span style=color:#66d9ef>$(</span>date<span style=color:#66d9ef>)</span><span style=color:#e6db74> INFO </span>$i<span style=color:#e6db74>&#34;</span> &gt;&gt; /var/log/big-corp-app.log; i<span style=color:#f92672>=</span><span style=color:#66d9ef>$((</span>i+1<span style=color:#66d9ef>))</span>; sleep 1; <span style=color:#66d9ef>done</span> volumeMounts: - name: logs mountPath: /var/log
-</span></span><span style=display:flex><span>  - name: count-log-1 image: busybox args: <span style=color:#f92672>[</span>/bin/sh, -c, <span style=color:#e6db74>&#39;tail -n+1 -f /var/log/big-corp-app.log&#39;</span><span style=color:#f92672>]</span> volumeMounts: - name: logs mountPath: /var/log
-</span></span><span style=display:flex><span>  volumes:
-</span></span><span style=display:flex><span>  - name: logs emptyDir: <span style=color:#f92672>{}</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e>#验证：</span>
-</span></span><span style=display:flex><span>kubectl logs big-corp-app -c count-log-1
+Don’t modify the path of the log file,both containers must access it at <strong>/var/log/big-corp-app.log</strong>.</p></blockquote><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl>kubectl get pod big-corp-app -o yaml 
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl>apiVersion: v1
+</span></span><span class=line><span class=cl>kind: Pod
+</span></span><span class=line><span class=cl>metadata:
+</span></span><span class=line><span class=cl>  name: big-corp-app
+</span></span><span class=line><span class=cl>spec:
+</span></span><span class=line><span class=cl>  containers:
+</span></span><span class=line><span class=cl>  - name: big-corp-app image: busybox args: - /bin/sh - -c - &gt; <span class=nv>i</span><span class=o>=</span>0<span class=p>;</span> <span class=k>while</span> true<span class=p>;</span> <span class=k>do</span> <span class=nb>echo</span> <span class=s2>&#34;</span><span class=k>$(</span>date<span class=k>)</span><span class=s2> INFO </span><span class=nv>$i</span><span class=s2>&#34;</span> &gt;&gt; /var/log/big-corp-app.log<span class=p>;</span> <span class=nv>i</span><span class=o>=</span><span class=k>$((</span>i+1<span class=k>))</span><span class=p>;</span> sleep 1<span class=p>;</span> <span class=k>done</span> volumeMounts: - name: logs mountPath: /var/log
+</span></span><span class=line><span class=cl>  - name: count-log-1 image: busybox args: <span class=o>[</span>/bin/sh, -c, <span class=s1>&#39;tail -n+1 -f /var/log/big-corp-app.log&#39;</span><span class=o>]</span> volumeMounts: - name: logs mountPath: /var/log
+</span></span><span class=line><span class=cl>  volumes:
+</span></span><span class=line><span class=cl>  - name: logs emptyDir: <span class=o>{}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>#验证：</span>
+</span></span><span class=line><span class=cl>kubectl logs big-corp-app -c count-log-1
 </span></span></code></pre></div><h2 id=16-task---英文>16 Task - 英文
-<a class=anchor href=#16-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Form the pod label <strong>name-cpu-loader</strong>,find pods running high CPU workloads and write the name of the pod consuming most CPU to the file <strong>/opt/KUTR00401/KURT00401.txt</strong>(which alredy exists).</p><p>查看Pod标签为name=cpu-user-loader 的CPU使用率并且把cpu使用率最高的pod名称写入/opt/KUTR00401/KUTR00401.txt文件里</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl top pods -l name<span style=color:#f92672>=</span>name-cpu-loader --sort-by<span style=color:#f92672>=</span>cpu
-</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;排名第一的pod名称&#39;</span> &gt;&gt;/opt/KUTR00401/KUTR00401.txt
+<a class=anchor href=#16-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Form the pod label <strong>name-cpu-loader</strong>,find pods running high CPU workloads and write the name of the pod consuming most CPU to the file <strong>/opt/KUTR00401/KURT00401.txt</strong>(which alredy exists).</p><p>查看Pod标签为name=cpu-user-loader 的CPU使用率并且把cpu使用率最高的pod名称写入/opt/KUTR00401/KUTR00401.txt文件里</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl top pods -l <span class=nv>name</span><span class=o>=</span>name-cpu-loader --sort-by<span class=o>=</span>cpu
+</span></span><span class=line><span class=cl><span class=nb>echo</span> <span class=s1>&#39;排名第一的pod名称&#39;</span> &gt;&gt;/opt/KUTR00401/KUTR00401.txt
 </span></span></code></pre></div><h2 id=17-task---英文>17 Task - 英文
 <a class=anchor href=#17-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Task
 A Kubernetes worker node,named <strong>wk8s-node-0</strong> is in state <strong>NotReady</strong> .
-Investigate why this is the case,and perform any appropriate steps to bring the node to a <strong>Ready</strong> state,ensuring that any changes are made permanent.</p><blockquote><p>Yon can <strong>ssh</strong> to teh failed node using:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>ssh wk8s-node-o
-</span></span></code></pre></div><p>You can assume elevated privileges on the node with the following command:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>sudo -i
-</span></span></code></pre></div></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#名为wk8s-node-1 的节点处于NotReady状态，将其恢复成Ready状态，并且设置为开机自启</span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 连接到NotReady节点</span>
-</span></span><span style=display:flex><span>ssh wk8s-node-0
-</span></span><span style=display:flex><span><span style=color:#75715e>#获取权限</span>
-</span></span><span style=display:flex><span>sudo -i
-</span></span><span style=display:flex><span><span style=color:#75715e># 查看服务是否运行正常</span>
-</span></span><span style=display:flex><span>systemctl status kubelet 
-</span></span><span style=display:flex><span><span style=color:#75715e>#如果服务非正常运行进行恢复</span>
-</span></span><span style=display:flex><span>systemctl start kubelet
-</span></span><span style=display:flex><span><span style=color:#75715e>#设置开机自启</span>
-</span></span><span style=display:flex><span>systemctl enable kubelet 
+Investigate why this is the case,and perform any appropriate steps to bring the node to a <strong>Ready</strong> state,ensuring that any changes are made permanent.</p><blockquote><p>Yon can <strong>ssh</strong> to teh failed node using:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ssh wk8s-node-o
+</span></span></code></pre></div><p>You can assume elevated privileges on the node with the following command:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo -i
+</span></span></code></pre></div></blockquote><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1>#名为wk8s-node-1 的节点处于NotReady状态，将其恢复成Ready状态，并且设置为开机自启</span>
+</span></span><span class=line><span class=cl><span class=c1># 连接到NotReady节点</span>
+</span></span><span class=line><span class=cl>ssh wk8s-node-0
+</span></span><span class=line><span class=cl><span class=c1>#获取权限</span>
+</span></span><span class=line><span class=cl>sudo -i
+</span></span><span class=line><span class=cl><span class=c1># 查看服务是否运行正常</span>
+</span></span><span class=line><span class=cl>systemctl status kubelet 
+</span></span><span class=line><span class=cl><span class=c1>#如果服务非正常运行进行恢复</span>
+</span></span><span class=line><span class=cl>systemctl start kubelet
+</span></span><span class=line><span class=cl><span class=c1>#设置开机自启</span>
+</span></span><span class=line><span class=cl>systemctl <span class=nb>enable</span> kubelet 
 </span></span></code></pre></div><h2 id=19-task---英文>19 Task - 英文
 <a class=anchor href=#19-task---%e8%8b%b1%e6%96%87>#</a></h2><p>Set configuration context $ kubectl config use-context wk8s</p><p>configure the kubelet systemed managed service, on the node labelled with name=wk8s-node-1,to launch a pod containing a single container of image nginx named myservice automatically.</p><p>Any spec file requried should be placed in the /etc/kuberneteds/mainfests directory on the node</p><p>Hints:</p><p>You can ssh to the failed node using $ ssh wk8s-node-0</p><p>You can assume elevated privileges on the node with the following command $ sudo -i</p><h2 id=静态pod创建方法与注意点>静态Pod创建方法与注意点
-<a class=anchor href=#%e9%9d%99%e6%80%81pod%e5%88%9b%e5%bb%ba%e6%96%b9%e6%b3%95%e4%b8%8e%e6%b3%a8%e6%84%8f%e7%82%b9>#</a></h2><p>Set configuration context $ kubectl config use-context wk8s</p><p>configure the kubelet systemed managed service, on the node labelled with name=wk8s-node-1,to launch a pod containing a single container of image nginx named myservice automatically.</p><p>Any spec file requried should be placed in the /etc/kuberneteds/mainfests directory on the node</p><p>Hints:</p><p>You can ssh to the failed node using $ ssh wk8s-node-0</p><p>You can assume elevated privileges on the node with the following command $ sudo -i</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl config use-context wk8s
-</span></span><span style=display:flex><span>kubectl get node -l<span style=color:#f92672>=</span>name<span style=color:#f92672>=</span>wk8s-node-0 -o wide
-</span></span><span style=display:flex><span><span style=color:#75715e># or</span>
-</span></span><span style=display:flex><span>kubectl get node -l name<span style=color:#f92672>=</span>wk8s-node-0 -o wide
-</span></span><span style=display:flex><span>sudo wk8s-node-0
-</span></span><span style=display:flex><span>sudo -i
-</span></span><span style=display:flex><span>systemctl status kubelet -l |grep config <span style=color:#75715e>#找到--config配置的文件路径</span>
-</span></span><span style=display:flex><span>cat /var/lib/kubelet/config.yaml |grep staticPodPath <span style=color:#75715e># 得到/etc/kubernetes/manifests</span>
-</span></span><span style=display:flex><span>cd /etc/kubernetes/manifests
-</span></span><span style=display:flex><span>kubectl run myservice --image<span style=color:#f92672>=</span>nginx --dry-run<span style=color:#f92672>=</span>client -o yaml &gt; myservice.yaml
-</span></span><span style=display:flex><span>kubectl get pod -A|grep myservice <span style=color:#75715e>#可以得到静态Pod </span>
+<a class=anchor href=#%e9%9d%99%e6%80%81pod%e5%88%9b%e5%bb%ba%e6%96%b9%e6%b3%95%e4%b8%8e%e6%b3%a8%e6%84%8f%e7%82%b9>#</a></h2><p>Set configuration context $ kubectl config use-context wk8s</p><p>configure the kubelet systemed managed service, on the node labelled with name=wk8s-node-1,to launch a pod containing a single container of image nginx named myservice automatically.</p><p>Any spec file requried should be placed in the /etc/kuberneteds/mainfests directory on the node</p><p>Hints:</p><p>You can ssh to the failed node using $ ssh wk8s-node-0</p><p>You can assume elevated privileges on the node with the following command $ sudo -i</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl config use-context wk8s
+</span></span><span class=line><span class=cl>kubectl get node -l<span class=o>=</span><span class=nv>name</span><span class=o>=</span>wk8s-node-0 -o wide
+</span></span><span class=line><span class=cl><span class=c1># or</span>
+</span></span><span class=line><span class=cl>kubectl get node -l <span class=nv>name</span><span class=o>=</span>wk8s-node-0 -o wide
+</span></span><span class=line><span class=cl>sudo wk8s-node-0
+</span></span><span class=line><span class=cl>sudo -i
+</span></span><span class=line><span class=cl>systemctl status kubelet -l <span class=p>|</span>grep config <span class=c1>#找到--config配置的文件路径</span>
+</span></span><span class=line><span class=cl>cat /var/lib/kubelet/config.yaml <span class=p>|</span>grep staticPodPath <span class=c1># 得到/etc/kubernetes/manifests</span>
+</span></span><span class=line><span class=cl><span class=nb>cd</span> /etc/kubernetes/manifests
+</span></span><span class=line><span class=cl>kubectl run myservice --image<span class=o>=</span>nginx --dry-run<span class=o>=</span>client -o yaml &gt; myservice.yaml
+</span></span><span class=line><span class=cl>kubectl get pod -A<span class=p>|</span>grep myservice <span class=c1>#可以得到静态Pod </span>
 </span></span></code></pre></div><hr><p><a href=/cka/prepare-cka/>» 准备CKA</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
 <span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/cka/001.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
 <span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#01-task---英文>01 Task - 英文</a></li><li><a href=#02-task---英文>02 Task - 英文</a></li><li><a href=#03-task---英文>03 Task - 英文</a></li><li><a href=#04-task---中文>04 Task - 中文</a></li><li><a href=#05-task---英文>05 Task - 英文</a></li><li><a href=#06-task---英文>06 Task - 英文</a></li><li><a href=#07-task---英文>07 Task - 英文</a></li><li><a href=#08-task---英文>08 Task - 英文</a></li><li><a href=#09-task---英文>09 Task - 英文</a></li><li><a href=#10-task---英文>10 Task - 英文</a></li><li><a href=#11-task---英文>11 Task - 英文</a></li><li><a href=#12-task---英文>12 Task - 英文</a></li><li><a href=#13-task---英文>13 Task - 英文</a></li><li><a href=#14-task---英文>14 Task - 英文</a></li><li><a href=#15-task---英文>15 Task - 英文</a></li><li><a href=#16-task---英文>16 Task - 英文</a></li><li><a href=#17-task---英文>17 Task - 英文</a></li><li><a href=#19-task---英文>19 Task - 英文</a></li><li><a href=#静态pod创建方法与注意点>静态Pod创建方法与注意点</a></li></ul></nav></div></aside></main></body></html>

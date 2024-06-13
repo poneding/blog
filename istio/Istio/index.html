@@ -15,7 +15,7 @@ Service Mesh 是一个基础设施层，用于处理服务间通信。云原生�
 服务发现 负载均衡 故障恢复 指标和监控 A/B 测试 金丝雀发布 速率控制 访问控制 端到端认证 istioctl # 管理 istio 的命令行工具。
 安装 # curl -L https://istio.io/downloadIstio | sh - cp istio-x.x.x /usr/local cd istio-x.x.x export PATH=$PWD/bin:$PATH Istio 的绝大多数治理能力都是在 Sidecar 而非应用程序中实现，因此是非侵入的； Istio 的调用链埋点逻辑也是在 Sidecar 代理中完成，对应用程序非侵入，但应用程序需做适当的修改，即配合在请求头上传递生成的 Trace 相关信息。 关键功能：
 流量管理 可观察性 策略执行 服务身份和安全 平台支持 集成和定制 架构 # 数据面板 # Envoy # Envoy 是用 C++ 开发的高性能代理，用于协调服务网格中所有服务的入站和出站流量。Envoy 代理是唯一与数据平面流量交互的 Istio 组件。"><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="istio"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Istio | 我的博客</title>
-<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/istio/Istio/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/istio/Istio/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.ffd7553d42e9860dbcfbc6775c0f6c9895736a50f5383929cc725dc0a9b61715.js integrity="sha256-/9dVPULphg28+8Z3XA9smJVzalD1ODkpzHJdwKm2FxU=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
 <input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
 </label><strong>Istio</strong>
 <label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#简介>简介</a></li><li><a href=#istioctl>istioctl</a></li><li><a href=#安装>安装</a></li><li><a href=#架构>架构</a><ul><li><a href=#数据面板>数据面板</a></li><li><a href=#控制面板>控制面板</a></li></ul></li><li><a href=#流量管理>流量管理</a><ul><li><a href=#虚拟服务virtual-service>虚拟服务（Virtual Service）</a></li><li><a href=#目标规则destination-rule>目标规则（Destination Rule）</a></li><li><a href=#网关gateway>网关（Gateway）</a></li><li><a href=#服务入口service-entry>服务入口（Service Entry）</a></li><li><a href=#sidecar>Sidecar</a></li><li><a href=#网络弹性和测试>网络弹性和测试</a></li></ul></li><li><a href=#记录>记录</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
@@ -23,12 +23,12 @@ Service Mesh 是一个基础设施层，用于处理服务间通信。云原生�
 <a class=anchor href=#istio>#</a></h1><h2 id=简介>简介
 <a class=anchor href=#%e7%ae%80%e4%bb%8b>#</a></h2><p>Istio，是一种服务网格的平台。在微服务系统中起着连接，保护，控制和观察服务的作用。它可以降低微服务部署的复杂程度，减轻开发团队压力，无缝接入现有分布式应用程序，可以集成日志，遥测，和策略系统的 API 接口。</p><p><strong>服务网格</strong>：</p><p>Service Mesh 是一个基础设施层，用于处理服务间通信。云原生应用有着复杂的服务拓扑，Service Mesh 保证请求可以在这些拓扑中可靠地穿梭。在实际应用当中，Service Mesh 通常是由一系列轻量级的网络代理组成的，它们与应用程序部署在一起，但应用程序不需要知道它们的存在。</p><p>用来描述组成应用程序的微服务网络以及它们之间的交互。</p><p>实现需求包括：</p><ul><li>服务发现</li><li>负载均衡</li><li>故障恢复</li><li>指标和监控</li><li>A/B 测试</li><li>金丝雀发布</li><li>速率控制</li><li>访问控制</li><li>端到端认证</li></ul><h2 id=istioctl>istioctl
 <a class=anchor href=#istioctl>#</a></h2><p>管理 istio 的命令行工具。</p><h2 id=安装>安装
-<a class=anchor href=#%e5%ae%89%e8%a3%85>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>curl -L https://istio.io/downloadIstio | sh -
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>cp istio-x.x.x /usr/local
-</span></span><span style=display:flex><span>cd istio-x.x.x
-</span></span><span style=display:flex><span> 
-</span></span><span style=display:flex><span>export PATH<span style=color:#f92672>=</span>$PWD/bin:$PATH
+<a class=anchor href=#%e5%ae%89%e8%a3%85>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>curl -L https://istio.io/downloadIstio <span class=p>|</span> sh -
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>cp istio-x.x.x /usr/local
+</span></span><span class=line><span class=cl><span class=nb>cd</span> istio-x.x.x
+</span></span><span class=line><span class=cl> 
+</span></span><span class=line><span class=cl><span class=nb>export</span> <span class=nv>PATH</span><span class=o>=</span><span class=nv>$PWD</span>/bin:<span class=nv>$PATH</span>
 </span></span></code></pre></div><ul><li>Istio 的绝大多数治理能力都是在 Sidecar 而非应用程序中实现，因此是非侵入的；</li><li>Istio 的调用链埋点逻辑也是在 Sidecar 代理中完成，对应用程序非侵入，但应用程序需做适当的修改，即配合在请求头上传递生成的 Trace 相关信息。</li></ul><p>关键功能：</p><ul><li>流量管理</li><li>可观察性</li><li>策略执行</li><li>服务身份和安全</li><li>平台支持</li><li>集成和定制</li></ul><h2 id=架构>架构
 <a class=anchor href=#%e6%9e%b6%e6%9e%84>#</a></h2><p><img src=https://fs.poneding.com/images/arch.svg alt="Istio 应用的整体架构"></p><h3 id=数据面板>数据面板
 <a class=anchor href=#%e6%95%b0%e6%8d%ae%e9%9d%a2%e6%9d%bf>#</a></h3><h4 id=envoy>Envoy
@@ -39,220 +39,220 @@ Service Mesh 是一个基础设施层，用于处理服务间通信。云原生�
 <a class=anchor href=#galley>#</a></h4><p>是 Istio 的配置验证、提取、处理和分发组件。它负责将其余的 Istio 组件与从底层平台（例如 Kubernetes）获取用户配置的细节隔离开来。</p><h4 id=mixer>Mixer
 <a class=anchor href=#mixer>#</a></h4><h2 id=流量管理>流量管理
 <a class=anchor href=#%e6%b5%81%e9%87%8f%e7%ae%a1%e7%90%86>#</a></h2><p>服务注册中心，服务发现系统，默认轮询策略 负载均衡池</p><h3 id=虚拟服务virtual-service>虚拟服务（Virtual Service）
-<a class=anchor href=#%e8%99%9a%e6%8b%9f%e6%9c%8d%e5%8a%a1virtual-service>#</a></h3><p>虚拟服务让您配置如何在服务网格内将请求路由到服务，这基于 Istio 和平台提供的基本的连通性和服务发现能力。</p><p><strong>示例</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.istio.io/v1alpha3</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>VirtualService</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>reviews</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>reviews</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>gateway</span>:
-</span></span><span style=display:flex><span>  
-</span></span><span style=display:flex><span>  <span style=color:#f92672>http</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>match</span>:
-</span></span><span style=display:flex><span>    - <span style=color:#f92672>headers</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>end-user</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>exact</span>: <span style=color:#ae81ff>jason</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>route</span>:
-</span></span><span style=display:flex><span>    - <span style=color:#f92672>destination</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>host</span>: <span style=color:#ae81ff>reviews</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>subset</span>: <span style=color:#ae81ff>v2</span>
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>route</span>:
-</span></span><span style=display:flex><span>    - <span style=color:#f92672>destination</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>host</span>: <span style=color:#ae81ff>reviews</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>subset</span>: <span style=color:#ae81ff>v3</span>
-</span></span></code></pre></div><h4 id=路由规则>路由规则
-<a class=anchor href=#%e8%b7%af%e7%94%b1%e8%a7%84%e5%88%99>#</a></h4><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#f92672>match</span>:
-</span></span><span style=display:flex><span>   - <span style=color:#f92672>headers</span>:
-</span></span><span style=display:flex><span>       <span style=color:#f92672>end-user</span>:
-</span></span><span style=display:flex><span>         <span style=color:#f92672>exact</span>: <span style=color:#ae81ff>jason</span>
-</span></span><span style=display:flex><span>- <span style=color:#f92672>match</span>:
-</span></span><span style=display:flex><span>   - <span style=color:#f92672>uri</span>:
-</span></span><span style=display:flex><span>       <span style=color:#f92672>prefix</span>: <span style=color:#ae81ff>/reviews         </span>
-</span></span></code></pre></div><blockquote><p>路由规则的优先级：从上往下，满足规则即流向路由目标</p></blockquote><h4 id=destination>Destination
-<a class=anchor href=#destination>#</a></h4><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>route</span>:
-</span></span><span style=display:flex><span>- <span style=color:#f92672>destination</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>host</span>: <span style=color:#ae81ff>reviews</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>subset</span>: <span style=color:#ae81ff>v1</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>weight</span>: <span style=color:#ae81ff>90</span>
-</span></span><span style=display:flex><span>- <span style=color:#f92672>destination</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>host</span>: <span style=color:#ae81ff>reviews</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>subset</span>: <span style=color:#ae81ff>v2</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>weight</span>: <span style=color:#ae81ff>10</span>
-</span></span></code></pre></div><h3 id=目标规则destination-rule>目标规则（Destination Rule）
-<a class=anchor href=#%e7%9b%ae%e6%a0%87%e8%a7%84%e5%88%99destination-rule>#</a></h3><p>Deployment => Pod => Service => DestinationRule => VirtualService=> Gateway</p><p>负载均衡的子集</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.istio.io/v1alpha3</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>DestinationRule</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-destination-rule</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>host</span>: <span style=color:#ae81ff>my-svc</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>trafficPolicy</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>loadBalancer</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>simple</span>: <span style=color:#ae81ff>RANDOM</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>subsets</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>v1</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v1</span>
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>v2</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v2</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>trafficPolicy</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>loadBalancer</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>simple</span>: <span style=color:#ae81ff>ROUND_ROBIN</span>
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>v3</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v3</span>
-</span></span></code></pre></div><blockquote><p>子集基于一个或多个 labels</p><p><code>subsets.trafficPolicy.loadBalancer.simple</code> 指定访问 Service 后端的 endpoint 的流量策略。RANDOM：随机，ROUND_ROBIN：轮询。</p></blockquote><h3 id=网关gateway>网关（Gateway）
-<a class=anchor href=#%e7%bd%91%e5%85%b3gateway>#</a></h3><p>为网格来管理入站和出站流量，可以让您指定要进入或离开网格的流量。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.istio.io/v1alpha3</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Gateway</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>ext-host-gwy</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>my-gateway-controller</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>servers</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>port</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>number</span>: <span style=color:#ae81ff>443</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>https</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>protocol</span>: <span style=color:#ae81ff>HTTPS</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>hosts</span>:
-</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>ext-host.example.com</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>tls</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>mode</span>: <span style=color:#ae81ff>SIMPLE</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>serverCertificate</span>: <span style=color:#ae81ff>/tmp/tls.crt</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>privateKey</span>: <span style=color:#ae81ff>/tmp/tls.key</span>
-</span></span></code></pre></div><blockquote><p>将指定 host 的流量流入网格，然后将网关绑定到 VirtualService 上进行路由规则的指定。</p></blockquote><h3 id=服务入口service-entry>服务入口（Service Entry）
-<a class=anchor href=#%e6%9c%8d%e5%8a%a1%e5%85%a5%e5%8f%a3service-entry>#</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.istio.io/v1alpha3</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ServiceEntry</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>svc-entry</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>ext-svc.example.com</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>ports</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>number</span>: <span style=color:#ae81ff>443</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>https</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>protocol</span>: <span style=color:#ae81ff>HTTPS</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>location</span>: <span style=color:#ae81ff>MESH_EXTERNAL</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>resolution</span>: <span style=color:#ae81ff>DNS</span>
-</span></span></code></pre></div><h3 id=sidecar>Sidecar
+<a class=anchor href=#%e8%99%9a%e6%8b%9f%e6%9c%8d%e5%8a%a1virtual-service>#</a></h3><p>虚拟服务让您配置如何在服务网格内将请求路由到服务，这基于 Istio 和平台提供的基本的连通性和服务发现能力。</p><p><strong>示例</strong>：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>networking.istio.io/v1alpha3</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>VirtualService</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>reviews</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>hosts</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>reviews</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>gateway</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>http</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>match</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>headers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>end-user</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>exact</span><span class=p>:</span><span class=w> </span><span class=l>jason</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>route</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>destination</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>host</span><span class=p>:</span><span class=w> </span><span class=l>reviews</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>subset</span><span class=p>:</span><span class=w> </span><span class=l>v2</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>route</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>destination</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>host</span><span class=p>:</span><span class=w> </span><span class=l>reviews</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>subset</span><span class=p>:</span><span class=w> </span><span class=l>v3</span><span class=w>
+</span></span></span></code></pre></div><h4 id=路由规则>路由规则
+<a class=anchor href=#%e8%b7%af%e7%94%b1%e8%a7%84%e5%88%99>#</a></h4><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl>- <span class=nt>match</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>   </span>- <span class=nt>headers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>       </span><span class=nt>end-user</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>         </span><span class=nt>exact</span><span class=p>:</span><span class=w> </span><span class=l>jason</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>match</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>   </span>- <span class=nt>uri</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>       </span><span class=nt>prefix</span><span class=p>:</span><span class=w> </span><span class=l>/reviews         </span><span class=w>
+</span></span></span></code></pre></div><blockquote><p>路由规则的优先级：从上往下，满足规则即流向路由目标</p></blockquote><h4 id=destination>Destination
+<a class=anchor href=#destination>#</a></h4><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>route</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>destination</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>host</span><span class=p>:</span><span class=w> </span><span class=l>reviews</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>subset</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>weight</span><span class=p>:</span><span class=w> </span><span class=m>90</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>destination</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>host</span><span class=p>:</span><span class=w> </span><span class=l>reviews</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>subset</span><span class=p>:</span><span class=w> </span><span class=l>v2</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>weight</span><span class=p>:</span><span class=w> </span><span class=m>10</span><span class=w>
+</span></span></span></code></pre></div><h3 id=目标规则destination-rule>目标规则（Destination Rule）
+<a class=anchor href=#%e7%9b%ae%e6%a0%87%e8%a7%84%e5%88%99destination-rule>#</a></h3><p>Deployment => Pod => Service => DestinationRule => VirtualService=> Gateway</p><p>负载均衡的子集</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>networking.istio.io/v1alpha3</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>DestinationRule</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-destination-rule</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>host</span><span class=p>:</span><span class=w> </span><span class=l>my-svc</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>trafficPolicy</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>loadBalancer</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>simple</span><span class=p>:</span><span class=w> </span><span class=l>RANDOM</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>subsets</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>version</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>v2</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>version</span><span class=p>:</span><span class=w> </span><span class=l>v2</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>trafficPolicy</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>loadBalancer</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>simple</span><span class=p>:</span><span class=w> </span><span class=l>ROUND_ROBIN</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>v3</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>version</span><span class=p>:</span><span class=w> </span><span class=l>v3</span><span class=w>
+</span></span></span></code></pre></div><blockquote><p>子集基于一个或多个 labels</p><p><code>subsets.trafficPolicy.loadBalancer.simple</code> 指定访问 Service 后端的 endpoint 的流量策略。RANDOM：随机，ROUND_ROBIN：轮询。</p></blockquote><h3 id=网关gateway>网关（Gateway）
+<a class=anchor href=#%e7%bd%91%e5%85%b3gateway>#</a></h3><p>为网格来管理入站和出站流量，可以让您指定要进入或离开网格的流量。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>networking.istio.io/v1alpha3</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Gateway</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>ext-host-gwy</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>selector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>my-gateway-controller</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>servers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>port</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>number</span><span class=p>:</span><span class=w> </span><span class=m>443</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>https</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>protocol</span><span class=p>:</span><span class=w> </span><span class=l>HTTPS</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>hosts</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>ext-host.example.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>tls</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>mode</span><span class=p>:</span><span class=w> </span><span class=l>SIMPLE</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>serverCertificate</span><span class=p>:</span><span class=w> </span><span class=l>/tmp/tls.crt</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>privateKey</span><span class=p>:</span><span class=w> </span><span class=l>/tmp/tls.key</span><span class=w>
+</span></span></span></code></pre></div><blockquote><p>将指定 host 的流量流入网格，然后将网关绑定到 VirtualService 上进行路由规则的指定。</p></blockquote><h3 id=服务入口service-entry>服务入口（Service Entry）
+<a class=anchor href=#%e6%9c%8d%e5%8a%a1%e5%85%a5%e5%8f%a3service-entry>#</a></h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>networking.istio.io/v1alpha3</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ServiceEntry</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>svc-entry</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>hosts</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>ext-svc.example.com</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>number</span><span class=p>:</span><span class=w> </span><span class=m>443</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>https</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>protocol</span><span class=p>:</span><span class=w> </span><span class=l>HTTPS</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>location</span><span class=p>:</span><span class=w> </span><span class=l>MESH_EXTERNAL</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>resolution</span><span class=p>:</span><span class=w> </span><span class=l>DNS</span><span class=w>
+</span></span></span></code></pre></div><h3 id=sidecar>Sidecar
 <a class=anchor href=#sidecar>#</a></h3><h3 id=网络弹性和测试>网络弹性和测试
 <a class=anchor href=#%e7%bd%91%e7%bb%9c%e5%bc%b9%e6%80%a7%e5%92%8c%e6%b5%8b%e8%af%95>#</a></h3><h4 id=超时>超时
-<a class=anchor href=#%e8%b6%85%e6%97%b6>#</a></h4><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.istio.io/v1alpha3</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>VirtualService</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>ratings</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>ratings</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>http</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>route</span>:
-</span></span><span style=display:flex><span>    - <span style=color:#f92672>destination</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>host</span>: <span style=color:#ae81ff>ratings</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>subset</span>: <span style=color:#ae81ff>v1</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>timeout</span>: <span style=color:#ae81ff>10s</span>
-</span></span></code></pre></div><blockquote><p>下面的示例是一个虚拟服务，它对 ratings 服务的 v1 子集的调用指定 10 秒超时。</p></blockquote><h4 id=重试>重试
-<a class=anchor href=#%e9%87%8d%e8%af%95>#</a></h4><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.istio.io/v1alpha3</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>VirtualService</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>ratings</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>ratings</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>http</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>route</span>:
-</span></span><span style=display:flex><span>    - <span style=color:#f92672>destination</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>host</span>: <span style=color:#ae81ff>ratings</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>subset</span>: <span style=color:#ae81ff>v1</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>retries</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>attempts</span>: <span style=color:#ae81ff>3</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>perTryTimeout</span>: <span style=color:#ae81ff>2s</span>
-</span></span></code></pre></div><blockquote><p>下面的示例配置了在初始调用失败后最多重试 3 次来连接到服务子集，每个重试都有 2 秒的超时。</p></blockquote><h4 id=熔断>熔断
-<a class=anchor href=#%e7%86%94%e6%96%ad>#</a></h4><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.istio.io/v1alpha3</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>DestinationRule</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>reviews</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>host</span>: <span style=color:#ae81ff>reviews</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>subsets</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>v1</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v1</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>trafficPolicy</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>connectionPool</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>tcp</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>maxConnections</span>: <span style=color:#ae81ff>100</span>
-</span></span></code></pre></div><blockquote><p>到达目标主机的请求超过预设值，则触发熔断，停止请求连接到该主机。</p></blockquote><h4 id=故障注入混沌工程>故障注入（混沌工程）
-<a class=anchor href=#%e6%95%85%e9%9a%9c%e6%b3%a8%e5%85%a5%e6%b7%b7%e6%b2%8c%e5%b7%a5%e7%a8%8b>#</a></h4><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.istio.io/v1alpha3</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>VirtualService</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>ratings</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>ratings</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>http</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>fault</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>delay</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>percentage</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>value</span>: <span style=color:#ae81ff>50</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>fixedDelay</span>: <span style=color:#ae81ff>5s      </span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>route</span>:
-</span></span><span style=display:flex><span>    - <span style=color:#f92672>destination</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>host</span>: <span style=color:#ae81ff>ratings</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>subset</span>: <span style=color:#ae81ff>v1        </span>
-</span></span></code></pre></div><blockquote><p>下面的虚拟服务为百分之五十的访问 <code>ratings</code> 服务的请求配置了一个 5 秒的延迟。</p></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.istio.io/v1alpha3</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>VirtualService</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>ratings</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>hosts</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>ratings</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>http</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>fault</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>abort</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>httpStatus</span>: <span style=color:#ae81ff>500</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>percentage</span>:
-</span></span><span style=display:flex><span>          <span style=color:#f92672>value</span>: <span style=color:#ae81ff>100</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>route</span>:
-</span></span><span style=display:flex><span>    - <span style=color:#f92672>destination</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>host</span>: <span style=color:#ae81ff>ratings</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>subset</span>: <span style=color:#ae81ff>v1</span>
-</span></span></code></pre></div><blockquote><p>下面的虚拟服务为所有访问 <code>ratings</code> 服务的请求配置了一个中止响应。</p></blockquote><h4 id=流量转移>流量转移
+<a class=anchor href=#%e8%b6%85%e6%97%b6>#</a></h4><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>networking.istio.io/v1alpha3</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>VirtualService</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>ratings</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>hosts</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>ratings</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>http</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>route</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>destination</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>host</span><span class=p>:</span><span class=w> </span><span class=l>ratings</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>subset</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>timeout</span><span class=p>:</span><span class=w> </span><span class=l>10s</span><span class=w>
+</span></span></span></code></pre></div><blockquote><p>下面的示例是一个虚拟服务，它对 ratings 服务的 v1 子集的调用指定 10 秒超时。</p></blockquote><h4 id=重试>重试
+<a class=anchor href=#%e9%87%8d%e8%af%95>#</a></h4><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>networking.istio.io/v1alpha3</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>VirtualService</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>ratings</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>hosts</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>ratings</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>http</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>route</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>destination</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>host</span><span class=p>:</span><span class=w> </span><span class=l>ratings</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>subset</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>retries</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>attempts</span><span class=p>:</span><span class=w> </span><span class=m>3</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>perTryTimeout</span><span class=p>:</span><span class=w> </span><span class=l>2s</span><span class=w>
+</span></span></span></code></pre></div><blockquote><p>下面的示例配置了在初始调用失败后最多重试 3 次来连接到服务子集，每个重试都有 2 秒的超时。</p></blockquote><h4 id=熔断>熔断
+<a class=anchor href=#%e7%86%94%e6%96%ad>#</a></h4><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>networking.istio.io/v1alpha3</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>DestinationRule</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>reviews</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>host</span><span class=p>:</span><span class=w> </span><span class=l>reviews</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>subsets</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>version</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>trafficPolicy</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>connectionPool</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>tcp</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>maxConnections</span><span class=p>:</span><span class=w> </span><span class=m>100</span><span class=w>
+</span></span></span></code></pre></div><blockquote><p>到达目标主机的请求超过预设值，则触发熔断，停止请求连接到该主机。</p></blockquote><h4 id=故障注入混沌工程>故障注入（混沌工程）
+<a class=anchor href=#%e6%95%85%e9%9a%9c%e6%b3%a8%e5%85%a5%e6%b7%b7%e6%b2%8c%e5%b7%a5%e7%a8%8b>#</a></h4><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>networking.istio.io/v1alpha3</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>VirtualService</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>ratings</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>hosts</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>ratings</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>http</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>fault</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>delay</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>percentage</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>value</span><span class=p>:</span><span class=w> </span><span class=m>50</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>fixedDelay</span><span class=p>:</span><span class=w> </span><span class=l>5s      </span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>route</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>destination</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>host</span><span class=p>:</span><span class=w> </span><span class=l>ratings</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>subset</span><span class=p>:</span><span class=w> </span><span class=l>v1        </span><span class=w>
+</span></span></span></code></pre></div><blockquote><p>下面的虚拟服务为百分之五十的访问 <code>ratings</code> 服务的请求配置了一个 5 秒的延迟。</p></blockquote><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>networking.istio.io/v1alpha3</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>VirtualService</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>ratings</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>hosts</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>ratings</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>http</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>fault</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>abort</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>httpStatus</span><span class=p>:</span><span class=w> </span><span class=m>500</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>percentage</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>value</span><span class=p>:</span><span class=w> </span><span class=m>100</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>route</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>destination</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>host</span><span class=p>:</span><span class=w> </span><span class=l>ratings</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>subset</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span></code></pre></div><blockquote><p>下面的虚拟服务为所有访问 <code>ratings</code> 服务的请求配置了一个中止响应。</p></blockquote><h4 id=流量转移>流量转移
 <a class=anchor href=#%e6%b5%81%e9%87%8f%e8%bd%ac%e7%a7%bb>#</a></h4><p>逐步调整百分比的流量，完成由部分路由到完全路由的迁移升级。</p><p>如：v1 80% + v2 20% => v2 100%</p><h2 id=记录>记录
-<a class=anchor href=#%e8%ae%b0%e5%bd%95>#</a></h2><p>管理 ingressgateway https 连接使用AWS的 TLS 密钥和证书。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Service</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>istio-ingressgateway</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>istio-system</span>
-</span></span><span style=display:flex><span>  <span style=color:#ae81ff>...</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>annotations</span>:
-</span></span><span style=display:flex><span>    <span style=color:#ae81ff>...</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>service.beta.kubernetes.io/aws-load-balancer-backend-protocol</span>: <span style=color:#ae81ff>tcp</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>service.beta.kubernetes.io/aws-load-balancer-ssl-cert</span>: &gt;-<span style=color:#e6db74>
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>      arn:aws:acm:ap-southeast-1:314566904004:certificate/379dd055-44a7-42b6-a303-84938146b304</span>      
-</span></span><span style=display:flex><span>    <span style=color:#f92672>service.beta.kubernetes.io/aws-load-balancer-ssl-ports</span>: <span style=color:#ae81ff>https</span>
-</span></span></code></pre></div><p><strong>Gateway</strong>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.istio.io/v1alpha3</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Gateway</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>demo-gateway</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>istio</span>: <span style=color:#ae81ff>ingressgateway</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>servers</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>port</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>number</span>: <span style=color:#ae81ff>80</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>http</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>protocol</span>: <span style=color:#ae81ff>HTTP</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>hosts</span>:
-</span></span><span style=display:flex><span>    - <span style=color:#e6db74>&#34;*&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>tls</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>httpsRedirect</span>: <span style=color:#66d9ef>true</span> <span style=color:#75715e># sends 301 redirect for http requests</span>
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>port</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>number</span>: <span style=color:#ae81ff>443</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>https-443</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>protocol</span>: <span style=color:#ae81ff>HTTP</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>hosts</span>:
-</span></span><span style=display:flex><span>    - <span style=color:#e6db74>&#34;*&#34;</span>
-</span></span></code></pre></div><hr><p><a href=/istio/aws-acm-tls-management/>» 使用 aws-acm 管理 tls 密钥和证书</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
+<a class=anchor href=#%e8%ae%b0%e5%bd%95>#</a></h2><p>管理 ingressgateway https 连接使用AWS的 TLS 密钥和证书。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Service</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>istio-ingressgateway</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>istio-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=l>...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>annotations</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=l>...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>service.beta.kubernetes.io/aws-load-balancer-backend-protocol</span><span class=p>:</span><span class=w> </span><span class=l>tcp</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>service.beta.kubernetes.io/aws-load-balancer-ssl-cert</span><span class=p>:</span><span class=w> </span><span class=p>&gt;-</span><span class=sd>
+</span></span></span><span class=line><span class=cl><span class=sd>      arn:aws:acm:ap-southeast-1:314566904004:certificate/379dd055-44a7-42b6-a303-84938146b304</span><span class=w>      
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>service.beta.kubernetes.io/aws-load-balancer-ssl-ports</span><span class=p>:</span><span class=w> </span><span class=l>https</span><span class=w>
+</span></span></span></code></pre></div><p><strong>Gateway</strong>：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>networking.istio.io/v1alpha3</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Gateway</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>demo-gateway</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>selector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>istio</span><span class=p>:</span><span class=w> </span><span class=l>ingressgateway</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>servers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>port</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>number</span><span class=p>:</span><span class=w> </span><span class=m>80</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>http</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>protocol</span><span class=p>:</span><span class=w> </span><span class=l>HTTP</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>hosts</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=s2>&#34;*&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>tls</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>httpsRedirect</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w> </span><span class=c># sends 301 redirect for http requests</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>port</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>number</span><span class=p>:</span><span class=w> </span><span class=m>443</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>https-443</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>protocol</span><span class=p>:</span><span class=w> </span><span class=l>HTTP</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>hosts</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=s2>&#34;*&#34;</span><span class=w>
+</span></span></span></code></pre></div><hr><p><a href=/istio/aws-acm-tls-management/>» 使用 aws-acm 管理 tls 密钥和证书</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
 <span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/istio/Istio.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
 <span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#简介>简介</a></li><li><a href=#istioctl>istioctl</a></li><li><a href=#安装>安装</a></li><li><a href=#架构>架构</a><ul><li><a href=#数据面板>数据面板</a></li><li><a href=#控制面板>控制面板</a></li></ul></li><li><a href=#流量管理>流量管理</a><ul><li><a href=#虚拟服务virtual-service>虚拟服务（Virtual Service）</a></li><li><a href=#目标规则destination-rule>目标规则（Destination Rule）</a></li><li><a href=#网关gateway>网关（Gateway）</a></li><li><a href=#服务入口service-entry>服务入口（Service Entry）</a></li><li><a href=#sidecar>Sidecar</a></li><li><a href=#网络弹性和测试>网络弹性和测试</a></li></ul></li><li><a href=#记录>记录</a></li></ul></nav></div></aside></main></body></html>

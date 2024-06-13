@@ -17,7 +17,7 @@ client-go不仅被k8s项目本身使用（如kubectl），还在基于k8s的二�
 client-go库抽象封装了与k8s reset api的交互，便于开发者基于k8s做二次开发。利用client-go操作k8s资源的流程基本如下：
 通过kubeconfig信息构造Config实例，该实例记录了集群证书，k8s apiserver地址等信息； 根据Config实例携带的信息构建特定的客户端（clientset，dynamicset等）； 利用客户端向k8s apiserver发起请求，操作k8s资源。 以下是使用 client-go 获取 pod 的代码清单：
 func main() { var kubernetes *string if home := homeDir(); home != "" { kubeconfig := flag.String( "kubeconfig", filePath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file", ) } else { kubeconfig := flag.'><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="reading"><title>云原生应用开发： Operator原理与实践 | 我的博客</title>
-<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/reading/%E4%BA%91%E5%8E%9F%E7%94%9F%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91Operator%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/reading/%E4%BA%91%E5%8E%9F%E7%94%9F%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91Operator%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.ffd7553d42e9860dbcfbc6775c0f6c9895736a50f5383929cc725dc0a9b61715.js integrity="sha256-/9dVPULphg28+8Z3XA9smJVzalD1ODkpzHJdwKm2FxU=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
 <input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
 </label><strong>云原生应用开发： Operator原理与实践</strong>
 <label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#2-operator原理>2. Operator原理</a><ul><li><a href=#22-client-go原理>2.2 client-go原理</a></li></ul></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
@@ -25,105 +25,105 @@ func main() { var kubernetes *string if home := homeDir(); home != "" { kubeconf
 <a class=anchor href=#%e4%ba%91%e5%8e%9f%e7%94%9f%e5%ba%94%e7%94%a8%e5%bc%80%e5%8f%91operator%e5%8e%9f%e7%90%86%e4%b8%8e%e5%ae%9e%e8%b7%b5>#</a></h1><h2 id=2-operator原理>2. Operator原理
 <a class=anchor href=#2-operator%e5%8e%9f%e7%90%86>#</a></h2><h3 id=22-client-go原理>2.2 client-go原理
 <a class=anchor href=#22-client-go%e5%8e%9f%e7%90%86>#</a></h3><p>client-go主要用在Kubernetes的Controller中，包括内置Controller（如kube-controller-manager）和CRD控制器；</p><p>实现对各类K8s API资源的增删改查操作；</p><p>包含Reflector，Informer，Indexr等组件。</p><h4 id=221-client-go介绍>2.2.1 client-go介绍
-<a class=anchor href=#221-client-go%e4%bb%8b%e7%bb%8d>#</a></h4><p>是操作k8s集群资源的编程式交互客户端，利用对kube-apiserver的交互访问，实现对各类K8s API资源的增删改查操作；</p><p>client-go不仅被k8s项目本身使用（如kubectl），还在基于k8s的二次开发中被外部用户广泛使用：自定义控制器，Operator等。</p><p><strong>使用</strong>：</p><p>client-go库抽象封装了与k8s reset api的交互，便于开发者基于k8s做二次开发。利用client-go操作k8s资源的流程基本如下：</p><ol><li>通过kubeconfig信息构造Config实例，该实例记录了集群证书，k8s apiserver地址等信息；</li><li>根据Config实例携带的信息构建特定的客户端（clientset，dynamicset等）；</li><li>利用客户端向k8s apiserver发起请求，操作k8s资源。</li></ol><p>以下是使用 client-go 获取 pod 的代码清单：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-golang data-lang=golang><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>kubernetes</span> <span style=color:#f92672>*</span><span style=color:#66d9ef>string</span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>home</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>homeDir</span>(); <span style=color:#a6e22e>home</span> <span style=color:#f92672>!=</span> <span style=color:#e6db74>&#34;&#34;</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>kubeconfig</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>flag</span>.<span style=color:#a6e22e>String</span>(
-</span></span><span style=display:flex><span>         <span style=color:#e6db74>&#34;kubeconfig&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#a6e22e>filePath</span>.<span style=color:#a6e22e>Join</span>(<span style=color:#a6e22e>home</span>, <span style=color:#e6db74>&#34;.kube&#34;</span>, <span style=color:#e6db74>&#34;config&#34;</span>),
-</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#34;(optional) absolute path to the kubeconfig file&#34;</span>,
-</span></span><span style=display:flex><span>        )
-</span></span><span style=display:flex><span>    } <span style=color:#66d9ef>else</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>kubeconfig</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>flag</span>.<span style=color:#a6e22e>String</span>(<span style=color:#e6db74>&#34;kubeconfig&#34;</span>, <span style=color:#e6db74>&#34;&#34;</span>, <span style=color:#e6db74>&#34;absolute path to the kubeconfig file&#34;</span>)
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>flag</span>.<span style=color:#a6e22e>Parse</span>()
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>    <span style=color:#75715e>// use the current context in kubeconfig
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>config</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>clientcmd</span>.<span style=color:#a6e22e>BuildConfigFromFlags</span>(<span style=color:#e6db74>&#34;&#34;</span>, <span style=color:#f92672>*</span><span style=color:#a6e22e>kubeconfig</span>)
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>        panic(<span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>    <span style=color:#75715e>// create the clientset
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>clientset</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>kubernetes</span>.<span style=color:#a6e22e>NewForConfig</span>(<span style=color:#a6e22e>config</span>)
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>        panic(<span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>pods</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>clientset</span>.<span style=color:#a6e22e>CoreV1</span>().<span style=color:#a6e22e>Pods</span>(<span style=color:#e6db74>&#34;&#34;</span>).<span style=color:#a6e22e>List</span>(<span style=color:#a6e22e>context</span>.<span style=color:#a6e22e>TODO</span>(), <span style=color:#a6e22e>metav1</span>.<span style=color:#a6e22e>ListOptions</span>{})
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>            panic(<span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>)
-</span></span><span style=display:flex><span>        }
-</span></span><span style=display:flex><span>        
-</span></span><span style=display:flex><span>        <span style=color:#75715e>// ...
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    }
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>homeDir</span>() <span style=color:#66d9ef>string</span> {
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>h</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>os</span>.<span style=color:#a6e22e>Getenv</span>(<span style=color:#e6db74>&#34;HOME&#34;</span>); <span style=color:#a6e22e>h</span> <span style=color:#f92672>!=</span> <span style=color:#e6db74>&#34;&#34;</span> {
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>h</span>
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>os</span>.<span style=color:#a6e22e>Getenv</span>(<span style=color:#e6db74>&#34;USERPROFILE&#34;</span>) <span style=color:#75715e>// windows
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>}
+<a class=anchor href=#221-client-go%e4%bb%8b%e7%bb%8d>#</a></h4><p>是操作k8s集群资源的编程式交互客户端，利用对kube-apiserver的交互访问，实现对各类K8s API资源的增删改查操作；</p><p>client-go不仅被k8s项目本身使用（如kubectl），还在基于k8s的二次开发中被外部用户广泛使用：自定义控制器，Operator等。</p><p><strong>使用</strong>：</p><p>client-go库抽象封装了与k8s reset api的交互，便于开发者基于k8s做二次开发。利用client-go操作k8s资源的流程基本如下：</p><ol><li>通过kubeconfig信息构造Config实例，该实例记录了集群证书，k8s apiserver地址等信息；</li><li>根据Config实例携带的信息构建特定的客户端（clientset，dynamicset等）；</li><li>利用客户端向k8s apiserver发起请求，操作k8s资源。</li></ol><p>以下是使用 client-go 获取 pod 的代码清单：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-golang data-lang=golang><span class=line><span class=cl><span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nx>kubernetes</span> <span class=o>*</span><span class=kt>string</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>home</span> <span class=o>:=</span> <span class=nf>homeDir</span><span class=p>();</span> <span class=nx>home</span> <span class=o>!=</span> <span class=s>&#34;&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>kubeconfig</span> <span class=o>:=</span> <span class=nx>flag</span><span class=p>.</span><span class=nf>String</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>         <span class=s>&#34;kubeconfig&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nx>filePath</span><span class=p>.</span><span class=nf>Join</span><span class=p>(</span><span class=nx>home</span><span class=p>,</span> <span class=s>&#34;.kube&#34;</span><span class=p>,</span> <span class=s>&#34;config&#34;</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>            <span class=s>&#34;(optional) absolute path to the kubeconfig file&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>kubeconfig</span> <span class=o>:=</span> <span class=nx>flag</span><span class=p>.</span><span class=nf>String</span><span class=p>(</span><span class=s>&#34;kubeconfig&#34;</span><span class=p>,</span> <span class=s>&#34;&#34;</span><span class=p>,</span> <span class=s>&#34;absolute path to the kubeconfig file&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=nx>flag</span><span class=p>.</span><span class=nf>Parse</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// use the current context in kubeconfig
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>config</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>clientcmd</span><span class=p>.</span><span class=nf>BuildConfigFromFlags</span><span class=p>(</span><span class=s>&#34;&#34;</span><span class=p>,</span> <span class=o>*</span><span class=nx>kubeconfig</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nb>panic</span><span class=p>(</span><span class=nx>err</span><span class=p>.</span><span class=nf>Error</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// create the clientset
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>clientset</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>kubernetes</span><span class=p>.</span><span class=nf>NewForConfig</span><span class=p>(</span><span class=nx>config</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nb>panic</span><span class=p>(</span><span class=nx>err</span><span class=p>.</span><span class=nf>Error</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>pods</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>clientset</span><span class=p>.</span><span class=nf>CoreV1</span><span class=p>().</span><span class=nf>Pods</span><span class=p>(</span><span class=s>&#34;&#34;</span><span class=p>).</span><span class=nf>List</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nf>TODO</span><span class=p>(),</span> <span class=nx>metav1</span><span class=p>.</span><span class=nx>ListOptions</span><span class=p>{})</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nb>panic</span><span class=p>(</span><span class=nx>err</span><span class=p>.</span><span class=nx>Error</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=c1>// ...
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>homeDir</span><span class=p>()</span> <span class=kt>string</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>h</span> <span class=o>:=</span> <span class=nx>os</span><span class=p>.</span><span class=nf>Getenv</span><span class=p>(</span><span class=s>&#34;HOME&#34;</span><span class=p>);</span> <span class=nx>h</span> <span class=o>!=</span> <span class=s>&#34;&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=nx>h</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>os</span><span class=p>.</span><span class=nf>Getenv</span><span class=p>(</span><span class=s>&#34;USERPROFILE&#34;</span><span class=p>)</span> <span class=c1>// windows
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
 </span></span></code></pre></div><h4 id=222-client-go-主体结构>2.2.2 client-go 主体结构
 <a class=anchor href=#222-client-go-%e4%b8%bb%e4%bd%93%e7%bb%93%e6%9e%84>#</a></h4><p>client-go 支持 4 种与 k8s apiserver 交互的客户端：</p><h5 id=restclient>RESTClient
-<a class=anchor href=#restclient>#</a></h5><p>最基础的客户端，主要对 HTTP 请求进行封装，支持 JSON 和 Protobuf 格式数据；</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
-</span></span><span style=display:flex><span> <span style=color:#e6db74>&#34;context&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;fmt&#34;</span>
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>corev1</span> <span style=color:#e6db74>&#34;k8s.io/api/core/v1&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>metav1</span> <span style=color:#e6db74>&#34;k8s.io/apimachinery/pkg/apis/meta/v1&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;k8s.io/client-go/kubernetes/scheme&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;k8s.io/client-go/reset&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;k8s.io/client-go/tools/clientcmd&#34;</span>
-</span></span><span style=display:flex><span>)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
-</span></span><span style=display:flex><span>    <span style=color:#75715e>// 加载配置文件，生成config对象
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>config</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>clientcmd</span>.<span style=color:#a6e22e>BuildConfigFromFlags</span>(<span style=color:#e6db74>&#34;&#34;</span>, <span style=color:#e6db74>&#34;/root/.kube/config&#34;</span>)
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>        panic(<span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>    <span style=color:#75715e>// 配置API路径和请求的GV
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>config</span>.<span style=color:#a6e22e>APIPath</span> = <span style=color:#e6db74>&#34;api&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>config</span>.<span style=color:#a6e22e>GroupVersion</span> = <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>corev1</span>.<span style=color:#a6e22e>SchemeGroupVersion</span>
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>    <span style=color:#75715e>// 配置数据的编解码器
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>config</span>.<span style=color:#a6e22e>NegotiatedSerializer</span> = <span style=color:#a6e22e>scheme</span>.<span style=color:#a6e22e>Codecs</span>
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>    <span style=color:#75715e>// 实例化RESTClient对象
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>restclient</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>rest</span>.<span style=color:#a6e22e>RESTClientFor</span>(<span style=color:#a6e22e>config</span>)
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>        panic(<span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>())
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>result</span> <span style=color:#f92672>:=</span> <span style=color:#f92672>&amp;</span><span style=color:#a6e22e>corev1</span>.<span style=color:#a6e22e>PodList</span>{}
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>err</span> = <span style=color:#a6e22e>restclient</span>.<span style=color:#a6e22e>Get</span>().
-</span></span><span style=display:flex><span>     <span style=color:#a6e22e>Namespace</span>(<span style=color:#e6db74>&#34;default&#34;</span>).
-</span></span><span style=display:flex><span>     <span style=color:#a6e22e>Resource</span>(<span style=color:#e6db74>&#34;pods&#34;</span>).
-</span></span><span style=display:flex><span>     <span style=color:#a6e22e>VersionedParams</span>(<span style=color:#f92672>&amp;</span><span style=color:#a6e22e>metav1</span>.<span style=color:#a6e22e>ListOptions</span>{<span style=color:#a6e22e>Limit</span>: <span style=color:#ae81ff>100</span>}, <span style=color:#a6e22e>scheme</span>.<span style=color:#a6e22e>ParameterCodec</span>).
-</span></span><span style=display:flex><span>     <span style=color:#a6e22e>Do</span>(<span style=color:#a6e22e>context</span>.<span style=color:#a6e22e>TODO</span>()).<span style=color:#a6e22e>Into</span>(<span style=color:#a6e22e>result</span>)
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
-</span></span><span style=display:flex><span>        panic(<span style=color:#a6e22e>err</span>.<span style=color:#a6e22e>Error</span>)
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>d</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>range</span> <span style=color:#a6e22e>result</span>.<span style=color:#a6e22e>Items</span> {
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Printf</span>(
-</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#34;NAMESPACE: %v \t NAME: %v \t STATUS: %v\n&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#a6e22e>d</span>.<span style=color:#a6e22e>Namespace</span>,
-</span></span><span style=display:flex><span>            <span style=color:#a6e22e>d</span>.<span style=color:#a6e22e>Name</span>,
-</span></span><span style=display:flex><span>            <span style=color:#a6e22e>d</span>.<span style=color:#a6e22e>Status</span>.<span style=color:#a6e22e>Phase</span>,
-</span></span><span style=display:flex><span>        )
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>}
+<a class=anchor href=#restclient>#</a></h5><p>最基础的客户端，主要对 HTTP 请求进行封装，支持 JSON 和 Protobuf 格式数据；</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>main</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl> <span class=s>&#34;context&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;fmt&#34;</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=nx>corev1</span> <span class=s>&#34;k8s.io/api/core/v1&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=nx>metav1</span> <span class=s>&#34;k8s.io/apimachinery/pkg/apis/meta/v1&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;k8s.io/client-go/kubernetes/scheme&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;k8s.io/client-go/reset&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;k8s.io/client-go/tools/clientcmd&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 加载配置文件，生成config对象
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>config</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>clientcmd</span><span class=p>.</span><span class=nf>BuildConfigFromFlags</span><span class=p>(</span><span class=s>&#34;&#34;</span><span class=p>,</span> <span class=s>&#34;/root/.kube/config&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nb>panic</span><span class=p>(</span><span class=nx>err</span><span class=p>.</span><span class=nf>Error</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// 配置API路径和请求的GV
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>config</span><span class=p>.</span><span class=nx>APIPath</span> <span class=p>=</span> <span class=s>&#34;api&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=nx>config</span><span class=p>.</span><span class=nx>GroupVersion</span> <span class=p>=</span> <span class=o>&amp;</span><span class=nx>corev1</span><span class=p>.</span><span class=nx>SchemeGroupVersion</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// 配置数据的编解码器
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>config</span><span class=p>.</span><span class=nx>NegotiatedSerializer</span> <span class=p>=</span> <span class=nx>scheme</span><span class=p>.</span><span class=nx>Codecs</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>// 实例化RESTClient对象
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>restclient</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>rest</span><span class=p>.</span><span class=nf>RESTClientFor</span><span class=p>(</span><span class=nx>config</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nb>panic</span><span class=p>(</span><span class=nx>err</span><span class=p>.</span><span class=nf>Error</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>result</span> <span class=o>:=</span> <span class=o>&amp;</span><span class=nx>corev1</span><span class=p>.</span><span class=nx>PodList</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=nx>err</span> <span class=p>=</span> <span class=nx>restclient</span><span class=p>.</span><span class=nf>Get</span><span class=p>().</span>
+</span></span><span class=line><span class=cl>     <span class=nf>Namespace</span><span class=p>(</span><span class=s>&#34;default&#34;</span><span class=p>).</span>
+</span></span><span class=line><span class=cl>     <span class=nf>Resource</span><span class=p>(</span><span class=s>&#34;pods&#34;</span><span class=p>).</span>
+</span></span><span class=line><span class=cl>     <span class=nf>VersionedParams</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>metav1</span><span class=p>.</span><span class=nx>ListOptions</span><span class=p>{</span><span class=nx>Limit</span><span class=p>:</span> <span class=mi>100</span><span class=p>},</span> <span class=nx>scheme</span><span class=p>.</span><span class=nx>ParameterCodec</span><span class=p>).</span>
+</span></span><span class=line><span class=cl>     <span class=nf>Do</span><span class=p>(</span><span class=nx>context</span><span class=p>.</span><span class=nf>TODO</span><span class=p>()).</span><span class=nf>Into</span><span class=p>(</span><span class=nx>result</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nb>panic</span><span class=p>(</span><span class=nx>err</span><span class=p>.</span><span class=nx>Error</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>d</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>result</span><span class=p>.</span><span class=nx>Items</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>            <span class=s>&#34;NAMESPACE: %v \t NAME: %v \t STATUS: %v\n&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nx>d</span><span class=p>.</span><span class=nx>Namespace</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nx>d</span><span class=p>.</span><span class=nx>Name</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nx>d</span><span class=p>.</span><span class=nx>Status</span><span class=p>.</span><span class=nx>Phase</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
 </span></span></code></pre></div><h5 id=clientset>Clientset
-<a class=anchor href=#clientset>#</a></h5><p>k8s 自身内置资源的客户端集合，仅能操作已知类型的内置资源，如 Pod，Service 等；</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+<a class=anchor href=#clientset>#</a></h5><p>k8s 自身内置资源的客户端集合，仅能操作已知类型的内置资源，如 Pod，Service 等；</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>main</span>
 </span></span></code></pre></div><h5 id=dynamicclient>DynamicClient
-<a class=anchor href=#dynamicclient>#</a></h5><p>动态客户端，可以对任意k8s资源执行通用操作，包括CRD。</p><p>通过动态指定GVR操作任意k8s资源，以 <code>map[string]interface{}</code> 结构存储 k8s apiserver 的返回数据，再利用反射机制在运行时进行数据绑定。这种松耦合的方式意味着更高的灵活性，但与此同时，也无法获取强数据类型检查和验证的好处。</p><p>理解DynamicClient，你可能需要对这 <code>Object.runtime</code> 接口和 <code>Unstructured</code> 结构体有所了解：</p><ul><li>Object.runtime：k8s中所有资源都实现了该接口，包括 <code>DeepCopyObject</code> 和 <code>GetObjectKind</code> 方法：</li><li>Unstructured：包含</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go></code></pre></div><h5 id=discoveryclient>DiscoveryClient
+<a class=anchor href=#dynamicclient>#</a></h5><p>动态客户端，可以对任意k8s资源执行通用操作，包括CRD。</p><p>通过动态指定GVR操作任意k8s资源，以 <code>map[string]interface{}</code> 结构存储 k8s apiserver 的返回数据，再利用反射机制在运行时进行数据绑定。这种松耦合的方式意味着更高的灵活性，但与此同时，也无法获取强数据类型检查和验证的好处。</p><p>理解DynamicClient，你可能需要对这 <code>Object.runtime</code> 接口和 <code>Unstructured</code> 结构体有所了解：</p><ul><li>Object.runtime：k8s中所有资源都实现了该接口，包括 <code>DeepCopyObject</code> 和 <code>GetObjectKind</code> 方法：</li><li>Unstructured：包含</li></ul><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go></code></pre></div><h5 id=discoveryclient>DiscoveryClient
 <a class=anchor href=#discoveryclient>#</a></h5><p>发现客户端，发现apiserver支持的资源组，资源版本和资源信息（GVR），使用<code>kubectl api-versions</code>可以获取支持的资源；</p><hr><p><a href=/reading/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E6%9C%AC%E7%AE%97%E6%B3%95%E4%B9%A6/>» 我的第一本算法书</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/reading/%e4%ba%91%e5%8e%9f%e7%94%9f%e5%ba%94%e7%94%a8%e5%bc%80%e5%8f%91%ef%bc%9aOperator%e5%8e%9f%e7%90%86%e4%b8%8e%e5%ae%9e%e8%b7%b5.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
 <span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#2-operator原理>2. Operator原理</a><ul><li><a href=#22-client-go原理>2.2 client-go原理</a></li></ul></li></ul></nav></div></aside></main></body></html>

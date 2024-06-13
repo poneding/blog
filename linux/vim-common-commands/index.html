@@ -19,91 +19,91 @@ ecs+:set ignorecase：设置默认忽略大小写敏感
 ecs+:set smartcase：如果查找字符中存在大写则自动大小写敏感
 查找当前字符：
 光标移动 # h：向左 j：向下 k：向上 l：向右 替换 # :s/jay/dp/g 替换当前行中所有匹配 jay => dp :1,$s/jay/dp/g 替换所有 :1,5s/jay/dp/g 替换 1 到 5 行 翻页 # ctrl+f：下一页 ctrl+d：下半页 ctrl+b：上一页 ctrl+u：上半页 行操作 # dG：删除当前行到尾行"><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="linux"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Vim Common Commands | 我的博客</title>
-<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/linux/vim-common-commands/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/linux/vim-common-commands/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.ffd7553d42e9860dbcfbc6775c0f6c9895736a50f5383929cc725dc0a9b61715.js integrity="sha256-/9dVPULphg28+8Z3XA9smJVzalD1ODkpzHJdwKm2FxU=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
 <input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
 </label><strong>Vim Common Commands</strong>
 <label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#设置>设置</a></li><li><a href=#vim删除所有行>vim删除所有行</a><ul><li><a href=#撤销>撤销</a></li><li><a href=#查找>查找</a></li><li><a href=#光标移动>光标移动</a></li><li><a href=#替换>替换</a></li><li><a href=#翻页>翻页</a></li><li><a href=#行操作>行操作</a></li><li><a href=#退出>退出</a></li></ul></li><li><a href=#查找-1>查找</a><ul><li><a href=#大小写敏感查找>大小写敏感查找</a></li><li><a href=#大小写敏感配置>大小写敏感配置</a></li><li><a href=#查找当前单词>查找当前单词</a></li><li><a href=#其他设置>其他设置</a></li></ul></li><li><a href=#查找与替换>查找与替换</a><ul><li><a href=#作用范围>作用范围</a></li><li><a href=#替换标志>替换标志</a></li></ul></li><li><a href=#高亮设置>高亮设置</a><ul><li><a href=#高亮颜色设置>高亮颜色设置</a></li><li><a href=#禁用启用高亮>禁用/启用高亮</a></li></ul></li><li><a href=#参考阅读>参考阅读</a></li><li><a href=#写入保存退出>写入、保存、退出</a></li><li><a href=#光标移动-1>光标移动</a></li><li><a href=#翻页-1>翻页</a></li><li><a href=#查找与替换-1>查找与替换</a></li><li><a href=#复制粘贴删除>复制、粘贴、删除</a></li><li><a href=#插入>插入</a></li><li><a href=#撤销重做>撤销重做</a></li><li><a href=#替换-1>替换</a></li><li><a href=#大小写>大小写</a></li><li><a href=#多窗口操作>多窗口操作</a></li><li><a href=#多文件编辑>多文件编辑</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
 <a href=/linux/>Linux</a> / vim 使用</p><h1 id=vim-使用>vim 使用
 <a class=anchor href=#vim-%e4%bd%bf%e7%94%a8>#</a></h1><h2 id=设置>设置
-<a class=anchor href=#%e8%ae%be%e7%bd%ae>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>vim /etc/vim/vimrc
-</span></span></code></pre></div><p>或者当前环境设置</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>:set paste
-</span></span><span style=display:flex><span>:set nopaste
-</span></span><span style=display:flex><span>:set number
-</span></span><span style=display:flex><span>:set nonumber
-</span></span><span style=display:flex><span>:set hlsearch
-</span></span><span style=display:flex><span>:set nohlsearch
-</span></span><span style=display:flex><span>:set cursorline
-</span></span><span style=display:flex><span>:set nocursorline
+<a class=anchor href=#%e8%ae%be%e7%bd%ae>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>vim /etc/vim/vimrc
+</span></span></code></pre></div><p>或者当前环境设置</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>:set paste
+</span></span><span class=line><span class=cl>:set nopaste
+</span></span><span class=line><span class=cl>:set number
+</span></span><span class=line><span class=cl>:set nonumber
+</span></span><span class=line><span class=cl>:set hlsearch
+</span></span><span class=line><span class=cl>:set nohlsearch
+</span></span><span class=line><span class=cl>:set cursorline
+</span></span><span class=line><span class=cl>:set nocursorline
 </span></span></code></pre></div><h2 id=vim删除所有行>vim删除所有行
-<a class=anchor href=#vim%e5%88%a0%e9%99%a4%e6%89%80%e6%9c%89%e8%a1%8c>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>ggdG
+<a class=anchor href=#vim%e5%88%a0%e9%99%a4%e6%89%80%e6%9c%89%e8%a1%8c>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ggdG
 </span></span></code></pre></div><h3 id=撤销>撤销
-<a class=anchor href=#%e6%92%a4%e9%94%80>#</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>u
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>ctrl+r
+<a class=anchor href=#%e6%92%a4%e9%94%80>#</a></h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>u
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>ctrl+r
 </span></span></code></pre></div><h3 id=查找>查找
 <a class=anchor href=#%e6%9f%a5%e6%89%be>#</a></h3><p><strong>大小写问题</strong>：</p><p>默认大小写敏感。</p><p>大小写不敏感：/hello\c</p><p>大小写敏感：/hello\C</p><p>设置大小写敏感：</p><p>ecs+:set ignorecase：设置默认忽略大小写敏感</p><p>ecs+:set smartcase：如果查找字符中存在大写则自动大小写敏感</p><p><strong>查找当前字符</strong>：</p><h3 id=光标移动>光标移动
 <a class=anchor href=#%e5%85%89%e6%a0%87%e7%a7%bb%e5%8a%a8>#</a></h3><ul><li>h：向左</li><li>j：向下</li><li>k：向上</li><li>l：向右</li></ul><h3 id=替换>替换
 <a class=anchor href=#%e6%9b%bf%e6%8d%a2>#</a></h3><ul><li>:s/jay/dp/g 替换当前行中所有匹配 jay => dp</li><li>:1,$s/jay/dp/g 替换所有</li><li>:1,5s/jay/dp/g 替换 1 到 5 行</li></ul><h3 id=翻页>翻页
 <a class=anchor href=#%e7%bf%bb%e9%a1%b5>#</a></h3><ul><li>ctrl+f：下一页</li><li>ctrl+d：下半页</li><li>ctrl+b：上一页</li><li>ctrl+u：上半页</li></ul><h3 id=行操作>行操作
 <a class=anchor href=#%e8%a1%8c%e6%93%8d%e4%bd%9c>#</a></h3><ul><li><p>dG：删除当前行到尾行</p></li><li><p>dd：删除当前行</p></li><li><p>yy：复制当前行</p></li><li><p>p：粘贴行</p></li><li><p>ddp：下一行</p></li></ul><h3 id=退出>退出
-<a class=anchor href=#%e9%80%80%e5%87%ba>#</a></h3><p>如果你没有 sudo 权限打开了文件，但是你已经编写了很多内容，怎么保存推出呢：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>:w ! sudo tee %
-</span></span></code></pre></div><p>保存到另外一个文件：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>:w otherfile <span style=color:#75715e># 会生成新文件，修改内容体现在新文件中，原文件不变</span>
+<a class=anchor href=#%e9%80%80%e5%87%ba>#</a></h3><p>如果你没有 sudo 权限打开了文件，但是你已经编写了很多内容，怎么保存推出呢：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>:w ! sudo tee %
+</span></span></code></pre></div><p>保存到另外一个文件：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>:w otherfile <span class=c1># 会生成新文件，修改内容体现在新文件中，原文件不变</span>
 </span></span></code></pre></div><h2 id=查找-1>查找
 <a class=anchor href=#%e6%9f%a5%e6%89%be-1>#</a></h2><p>在 normal 模式下按下 <code>/</code> 即可进入查找模式，输入要查找的字符串并按下回车。 Vim 会跳转到第一个匹配。按下 <code>n</code> 查找下一个，按下 <code>N</code> 查找上一个。</p><p>Vim 查找支持正则表达式，例如 <code>/vim$</code> 匹配行尾的 <code>"vim"</code>。 需要查找特殊字符需要转义，例如 <code>/vim\$</code> 匹配 <code>"vim$"</code>。</p><blockquote><p>注意查找回车应当用 <code>\n</code>，而替换为回车应当用 <code>\r</code>（相当于 <code>&lt;CR></code>）。</p></blockquote><h3 id=大小写敏感查找>大小写敏感查找
-<a class=anchor href=#%e5%a4%a7%e5%b0%8f%e5%86%99%e6%95%8f%e6%84%9f%e6%9f%a5%e6%89%be>#</a></h3><p>在查找模式中加入 <code>\c</code> 表示大小写不敏感查找，<code>\C</code> 表示大小写敏感查找。例如：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>/foo<span style=color:#ae81ff>\c</span>
+<a class=anchor href=#%e5%a4%a7%e5%b0%8f%e5%86%99%e6%95%8f%e6%84%9f%e6%9f%a5%e6%89%be>#</a></h3><p>在查找模式中加入 <code>\c</code> 表示大小写不敏感查找，<code>\C</code> 表示大小写敏感查找。例如：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>/foo<span class=se>\c</span>
 </span></span></code></pre></div><p>将会查找所有的 <code>"foo"</code>,<code>"FOO"</code>,<code>"Foo"</code> 等字符串。</p><h3 id=大小写敏感配置>大小写敏感配置
-<a class=anchor href=#%e5%a4%a7%e5%b0%8f%e5%86%99%e6%95%8f%e6%84%9f%e9%85%8d%e7%bd%ae>#</a></h3><p>Vim 默认采用大小写敏感的查找，为了方便我们常常将其配置为大小写不敏感：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span><span style=color:#e6db74>&#34; 设置默认进行大小写不敏感查找
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>set ignorecase
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>&#34;</span> 如果有一个大写字母，则切换到大小写敏感查找
-</span></span><span style=display:flex><span>set smartcase 
+<a class=anchor href=#%e5%a4%a7%e5%b0%8f%e5%86%99%e6%95%8f%e6%84%9f%e9%85%8d%e7%bd%ae>#</a></h3><p>Vim 默认采用大小写敏感的查找，为了方便我们常常将其配置为大小写不敏感：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=s2>&#34; 设置默认进行大小写不敏感查找
+</span></span></span><span class=line><span class=cl><span class=s2>set ignorecase
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;</span> 如果有一个大写字母，则切换到大小写敏感查找
+</span></span><span class=line><span class=cl><span class=nb>set</span> smartcase 
 </span></span></code></pre></div><blockquote><p>将上述设置粘贴到你的 <code>~/.vimrc</code>，重新打开 Vim 即可生效。</p></blockquote><h3 id=查找当前单词>查找当前单词
 <a class=anchor href=#%e6%9f%a5%e6%89%be%e5%bd%93%e5%89%8d%e5%8d%95%e8%af%8d>#</a></h3><p>在 normal 模式下按下 <code>*</code> 即可查找光标所在单词（word）， 要求每次出现的前后为空白字符或标点符号。例如当前为 <code>foo</code>， 可以匹配 <code>foo bar</code> 中的 <code>foo</code>，但不可匹配 <code>foobar</code> 中的 <code>foo</code>。 这在查找函数名、变量名时非常有用。</p><p>按下 <code>g*</code> 即可查找光标所在单词的字符序列，每次出现前后字符无要求。 即 <code>foo bar</code> 和 <code>foobar</code> 中的 <code>foo</code> 均可被匹配到。</p><h3 id=其他设置>其他设置
 <a class=anchor href=#%e5%85%b6%e4%bb%96%e8%ae%be%e7%bd%ae>#</a></h3><p><code>:set incsearch</code> 可以在敲键的同时搜索，按下回车把移动光标移动到匹配的词； 按下 Esc 取消搜索。</p><p><code>:set wrapscan</code> 用来设置到文件尾部后是否重新从文件头开始搜索。</p><h2 id=查找与替换>查找与替换
-<a class=anchor href=#%e6%9f%a5%e6%89%be%e4%b8%8e%e6%9b%bf%e6%8d%a2>#</a></h2><p><code>:s</code>（substitute）命令用来查找和替换字符串。语法如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>:<span style=color:#f92672>{</span>作用范围<span style=color:#f92672>}</span>s/<span style=color:#f92672>{</span>目标<span style=color:#f92672>}</span>/<span style=color:#f92672>{</span>替换<span style=color:#f92672>}</span>/<span style=color:#f92672>{</span>替换标志<span style=color:#f92672>}</span>
+<a class=anchor href=#%e6%9f%a5%e6%89%be%e4%b8%8e%e6%9b%bf%e6%8d%a2>#</a></h2><p><code>:s</code>（substitute）命令用来查找和替换字符串。语法如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>:<span class=o>{</span>作用范围<span class=o>}</span>s/<span class=o>{</span>目标<span class=o>}</span>/<span class=o>{</span>替换<span class=o>}</span>/<span class=o>{</span>替换标志<span class=o>}</span>
 </span></span></code></pre></div><p>例如 <code>:%s/foo/bar/g</code> 会在全局范围(<code>%</code>)查找 <code>foo</code> 并替换为 <code>bar</code>，所有出现都会被替换（<code>g</code>）。</p><h3 id=作用范围>作用范围
-<a class=anchor href=#%e4%bd%9c%e7%94%a8%e8%8c%83%e5%9b%b4>#</a></h3><p>作用范围分为当前行、全文、选区等等。</p><p>当前行：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>:s/foo/bar/g
-</span></span></code></pre></div><p>全文：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>:%s/foo/bar/g
-</span></span></code></pre></div><p>选区，在 Visual 模式下选择区域后输入<code>:</code>，Vim 即可自动补全为 <code>:'&lt;,'></code>。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>:<span style=color:#e6db74>&#39;&lt;,&#39;</span>&gt;s/foo/bar/g
-</span></span></code></pre></div><p>2-11行：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>:5,12s/foo/bar/g
-</span></span></code></pre></div><p>当前行 <code>.</code> 与接下来两行 <code>+2</code>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>:.,+2s/foo/bar/g
+<a class=anchor href=#%e4%bd%9c%e7%94%a8%e8%8c%83%e5%9b%b4>#</a></h3><p>作用范围分为当前行、全文、选区等等。</p><p>当前行：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>:s/foo/bar/g
+</span></span></code></pre></div><p>全文：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>:%s/foo/bar/g
+</span></span></code></pre></div><p>选区，在 Visual 模式下选择区域后输入<code>:</code>，Vim 即可自动补全为 <code>:'&lt;,'></code>。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>:<span class=s1>&#39;&lt;,&#39;</span>&gt;s/foo/bar/g
+</span></span></code></pre></div><p>2-11行：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>:5,12s/foo/bar/g
+</span></span></code></pre></div><p>当前行 <code>.</code> 与接下来两行 <code>+2</code>：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>:.,+2s/foo/bar/g
 </span></span></code></pre></div><h3 id=替换标志>替换标志
-<a class=anchor href=#%e6%9b%bf%e6%8d%a2%e6%a0%87%e5%bf%97>#</a></h3><p>上文中命令结尾的 <code>g</code> 即是替换标志之一，表示全局 <code>global</code> 替换（即替换目标的所有出现）。 还有很多其他有用的替换标志：</p><p>空替换标志表示只替换从光标位置开始，目标的第一次出现：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>:%s/foo/bar
-</span></span></code></pre></div><p><code>i</code> 表示大小写不敏感查找，<code>I</code> 表示大小写敏感：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>:%s/foo/bar/i
-</span></span><span style=display:flex><span><span style=color:#75715e># 等效于模式中的\c（不敏感）或\C（敏感）</span>
-</span></span><span style=display:flex><span>:%s/foo<span style=color:#ae81ff>\c</span>/bar
-</span></span></code></pre></div><p><code>c</code> 表示需要确认，例如全局查找 <code>"foo"</code> 替换为 <code>"bar"</code> 并且需要确认：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>:%s/foo/bar/gc
-</span></span></code></pre></div><p>回车后Vim会将光标移动到每一次 <code>"foo"</code> 出现的位置，并提示</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>replace with bar <span style=color:#f92672>(</span>y/n/a/q/l/^E/^Y<span style=color:#f92672>)</span>?
+<a class=anchor href=#%e6%9b%bf%e6%8d%a2%e6%a0%87%e5%bf%97>#</a></h3><p>上文中命令结尾的 <code>g</code> 即是替换标志之一，表示全局 <code>global</code> 替换（即替换目标的所有出现）。 还有很多其他有用的替换标志：</p><p>空替换标志表示只替换从光标位置开始，目标的第一次出现：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>:%s/foo/bar
+</span></span></code></pre></div><p><code>i</code> 表示大小写不敏感查找，<code>I</code> 表示大小写敏感：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>:%s/foo/bar/i
+</span></span><span class=line><span class=cl><span class=c1># 等效于模式中的\c（不敏感）或\C（敏感）</span>
+</span></span><span class=line><span class=cl>:%s/foo<span class=se>\c</span>/bar
+</span></span></code></pre></div><p><code>c</code> 表示需要确认，例如全局查找 <code>"foo"</code> 替换为 <code>"bar"</code> 并且需要确认：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>:%s/foo/bar/gc
+</span></span></code></pre></div><p>回车后Vim会将光标移动到每一次 <code>"foo"</code> 出现的位置，并提示</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>replace with bar <span class=o>(</span>y/n/a/q/l/^E/^Y<span class=o>)</span>?
 </span></span></code></pre></div><p>按下 <code>y</code> 表示替换，<code>n</code> 表示不替换，<code>a</code> 表示替换所有，<code>q</code> 表示退出查找模式， <code>l</code> 表示替换当前位置并退出。<code>^E</code> 与 <code>^Y</code> 是光标移动快捷键，参考：
 <a href=https://harttle.land/2015/11/07/vim-cursor.html>Vim中如何快速进行光标移动</a>。</p><h2 id=高亮设置>高亮设置
 <a class=anchor href=#%e9%ab%98%e4%ba%ae%e8%ae%be%e7%bd%ae>#</a></h2><h3 id=高亮颜色设置>高亮颜色设置
-<a class=anchor href=#%e9%ab%98%e4%ba%ae%e9%a2%9c%e8%89%b2%e8%ae%be%e7%bd%ae>#</a></h3><p>如果你像我一样觉得高亮的颜色不太舒服，可以在 <code>~/.vimrc</code> 中进行设置：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>highlight Search ctermbg<span style=color:#f92672>=</span>yellow ctermfg<span style=color:#f92672>=</span>black 
-</span></span><span style=display:flex><span>highlight IncSearch ctermbg<span style=color:#f92672>=</span>black ctermfg<span style=color:#f92672>=</span>yellow 
-</span></span><span style=display:flex><span>highlight MatchParen cterm<span style=color:#f92672>=</span>underline ctermbg<span style=color:#f92672>=</span>NONE ctermfg<span style=color:#f92672>=</span>NONE
+<a class=anchor href=#%e9%ab%98%e4%ba%ae%e9%a2%9c%e8%89%b2%e8%ae%be%e7%bd%ae>#</a></h3><p>如果你像我一样觉得高亮的颜色不太舒服，可以在 <code>~/.vimrc</code> 中进行设置：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>highlight Search <span class=nv>ctermbg</span><span class=o>=</span>yellow <span class=nv>ctermfg</span><span class=o>=</span>black 
+</span></span><span class=line><span class=cl>highlight IncSearch <span class=nv>ctermbg</span><span class=o>=</span>black <span class=nv>ctermfg</span><span class=o>=</span>yellow 
+</span></span><span class=line><span class=cl>highlight MatchParen <span class=nv>cterm</span><span class=o>=</span>underline <span class=nv>ctermbg</span><span class=o>=</span>NONE <span class=nv>ctermfg</span><span class=o>=</span>NONE
 </span></span></code></pre></div><p>上述配置指定 Search 结果的前景色（foreground）为黑色，背景色（background）为灰色； 渐进搜索的前景色为黑色，背景色为黄色；光标处的字符加下划线。</p><blockquote><p>更多的CTERM颜色可以查阅：
 <a href=http://vim.wikia.com/wiki/Xterm256_color_names_for_console_Vim>http://vim.wikia.com/wiki/Xterm256_color_names_for_console_Vim</a></p></blockquote><h3 id=禁用启用高亮>禁用/启用高亮
-<a class=anchor href=#%e7%a6%81%e7%94%a8%e5%90%af%e7%94%a8%e9%ab%98%e4%ba%ae>#</a></h3><p>有木有觉得每次查找替换后 Vim 仍然高亮着搜索结果？ 可以手动让它停止高亮，在 normal 模式下输入：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>:nohighlight
-</span></span><span style=display:flex><span><span style=color:#e6db74>&#34; 等效于
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>:nohl
+<a class=anchor href=#%e7%a6%81%e7%94%a8%e5%90%af%e7%94%a8%e9%ab%98%e4%ba%ae>#</a></h3><p>有木有觉得每次查找替换后 Vim 仍然高亮着搜索结果？ 可以手动让它停止高亮，在 normal 模式下输入：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>:nohighlight
+</span></span><span class=line><span class=cl><span class=s2>&#34; 等效于
+</span></span></span><span class=line><span class=cl><span class=s2>:nohl
 </span></span></span></code></pre></div><p>其实上述命令禁用了所有高亮，只禁用搜索高亮的命令是 <code>:set nohlsearch</code>。 下次搜索时需要 <code>:set hlsearch</code> 再次启动搜索高亮。</p><h4 id=延时禁用>延时禁用
-<a class=anchor href=#%e5%bb%b6%e6%97%b6%e7%a6%81%e7%94%a8>#</a></h4><p>怎么能够让 Vim 查找/替换后一段时间自动取消高亮，发生查找时自动开启呢？</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span><span style=color:#e6db74>&#34; 当光标一段时间保持不动了，就禁用高亮
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>autocmd cursorhold * set nohlsearch
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>&#34;</span> 当输入查找命令时，再启用高亮
-</span></span><span style=display:flex><span>noremap n :set hlsearch&lt;cr&gt;n
-</span></span><span style=display:flex><span>noremap N :set hlsearch&lt;cr&gt;N
-</span></span><span style=display:flex><span>noremap / :set hlsearch&lt;cr&gt;/
-</span></span><span style=display:flex><span>noremap ? :set hlsearch&lt;cr&gt;?
-</span></span><span style=display:flex><span>noremap * *:set hlsearch&lt;cr&gt;
+<a class=anchor href=#%e5%bb%b6%e6%97%b6%e7%a6%81%e7%94%a8>#</a></h4><p>怎么能够让 Vim 查找/替换后一段时间自动取消高亮，发生查找时自动开启呢？</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=s2>&#34; 当光标一段时间保持不动了，就禁用高亮
+</span></span></span><span class=line><span class=cl><span class=s2>autocmd cursorhold * set nohlsearch
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;</span> 当输入查找命令时，再启用高亮
+</span></span><span class=line><span class=cl>noremap n :set hlsearch&lt;cr&gt;n
+</span></span><span class=line><span class=cl>noremap N :set hlsearch&lt;cr&gt;N
+</span></span><span class=line><span class=cl>noremap / :set hlsearch&lt;cr&gt;/
+</span></span><span class=line><span class=cl>noremap ? :set hlsearch&lt;cr&gt;?
+</span></span><span class=line><span class=cl>noremap * *:set hlsearch&lt;cr&gt;
 </span></span></code></pre></div><blockquote><p>将上述配置粘贴到 <code>~/.vimrc</code>，重新打开 vim 即可生效。</p></blockquote><h4 id=一键禁用>一键禁用
-<a class=anchor href=#%e4%b8%80%e9%94%ae%e7%a6%81%e7%94%a8>#</a></h4><p>如果延时禁用搜索高亮仍然不够舒服，可以设置快捷键来一键禁用/开启搜索高亮：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>noremap n :set hlsearch&lt;cr&gt;n
-</span></span><span style=display:flex><span>noremap N :set hlsearch&lt;cr&gt;N
-</span></span><span style=display:flex><span>noremap / :set hlsearch&lt;cr&gt;/
-</span></span><span style=display:flex><span>noremap ? :set hlsearch&lt;cr&gt;?
-</span></span><span style=display:flex><span>noremap * *:set hlsearch&lt;cr&gt;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>nnoremap &lt;c-h&gt; :call DisableHighlight<span style=color:#f92672>()</span>&lt;cr&gt;
-</span></span><span style=display:flex><span><span style=color:#66d9ef>function</span>! DisableHighlight<span style=color:#f92672>()</span>
-</span></span><span style=display:flex><span>    set nohlsearch
-</span></span><span style=display:flex><span>endfunc
+<a class=anchor href=#%e4%b8%80%e9%94%ae%e7%a6%81%e7%94%a8>#</a></h4><p>如果延时禁用搜索高亮仍然不够舒服，可以设置快捷键来一键禁用/开启搜索高亮：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>noremap n :set hlsearch&lt;cr&gt;n
+</span></span><span class=line><span class=cl>noremap N :set hlsearch&lt;cr&gt;N
+</span></span><span class=line><span class=cl>noremap / :set hlsearch&lt;cr&gt;/
+</span></span><span class=line><span class=cl>noremap ? :set hlsearch&lt;cr&gt;?
+</span></span><span class=line><span class=cl>noremap * *:set hlsearch&lt;cr&gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>nnoremap &lt;c-h&gt; :call DisableHighlight<span class=o>()</span>&lt;cr&gt;
+</span></span><span class=line><span class=cl><span class=k>function</span>! DisableHighlight<span class=o>()</span>
+</span></span><span class=line><span class=cl>    <span class=nb>set</span> nohlsearch
+</span></span><span class=line><span class=cl>endfunc
 </span></span></code></pre></div><p>希望关闭高亮时只需要按下 <code>Ctrl+H</code>，当发生下次搜索时又会自动启用。</p><h2 id=参考阅读>参考阅读
 <a class=anchor href=#%e5%8f%82%e8%80%83%e9%98%85%e8%af%bb>#</a></h2><ul><li>XTERM 256色：
 <a href=http://vim.wikia.com/wiki/Xterm256_color_names_for_console_Vim>http://vim.wikia.com/wiki/Xterm256_color_names_for_console_Vim</a></li><li>Vim Wikia - 查找与替换：
@@ -112,171 +112,171 @@ ecs+:set smartcase：如果查找字符中存在大写则自动大小写敏感
 <a href=http://creativecommons.org/licenses/by/4.0/>知识共享署名 4.0 国际许可协议</a>（CC-BY 4.0）进行许可，转载注明来源即可：
 <a href=https://harttle.land/2016/08/08/vim-search-in-file.html%e3%80%82%e5%ad%a6%e8%af%86%e7%b2%97%e6%b5%85%e5%86%99%e4%bd%9c%e4%bb%93%e4%bf%83%ef%bc%8c%e5%a6%82%e6%9c%89%e9%94%99%e8%af%af%e8%be%9b%e8%8b%a6%e8%af%84%e8%ae%ba%e6%88%96>https://harttle.land/2016/08/08/vim-search-in-file.html。学识粗浅写作仓促，如有错误辛苦评论或</a>
 <a href=mailto:yangjvn@126.com>邮件</a> 指出。</p><h2 id=写入保存退出>写入、保存、退出
-<a class=anchor href=#%e5%86%99%e5%85%a5%e4%bf%9d%e5%ad%98%e9%80%80%e5%87%ba>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>:q<span style=color:#f92672>[</span>uit<span style=color:#f92672>]</span>                 <span style=color:#e6db74>&#34; 退出
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>:q!                     &#34;</span> 强制退出
-</span></span><span style=display:flex><span>:w<span style=color:#f92672>[</span>rite<span style=color:#f92672>]</span>                <span style=color:#e6db74>&#34; 保存
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>:w!                     &#34;</span> 强制保存，能不能保存成功取决于用户对文件的权限
-</span></span><span style=display:flex><span>:w ! sudo tee %         <span style=color:#e6db74>&#34; 如果没有权限保存，试试这个命令
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>ZZ                      &#34;</span> 两个大写的 Z，没有修改直接退出，有修改保存后退出
-</span></span><span style=display:flex><span>:w newfilename          <span style=color:#e6db74>&#34; 另存为新文件
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>:1, 10 w newfilename    &#34;</span> 将 <span style=color:#ae81ff>1</span> 到 <span style=color:#ae81ff>10</span> 行的内容另存为新文件
-</span></span><span style=display:flex><span>:1, <span style=color:#ae81ff>10</span> w &gt;&gt; filename    <span style=color:#e6db74>&#34; 将 1 到 10 行的内容另存为新文件
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>:r filename             &#34;</span> 将目标文件的内容追加到当前光标下一行
-</span></span><span style=display:flex><span>:3 r filename           <span style=color:#e6db74>&#34; 将目标文件的内容追加到第 3 行一下
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>:! ls                   &#34;</span> 暂时离开 Vim 查看当前目录的文件，回车后返回 Vim
+<a class=anchor href=#%e5%86%99%e5%85%a5%e4%bf%9d%e5%ad%98%e9%80%80%e5%87%ba>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>:q<span class=o>[</span>uit<span class=o>]</span>                 <span class=s2>&#34; 退出
+</span></span></span><span class=line><span class=cl><span class=s2>:q!                     &#34;</span> 强制退出
+</span></span><span class=line><span class=cl>:w<span class=o>[</span>rite<span class=o>]</span>                <span class=s2>&#34; 保存
+</span></span></span><span class=line><span class=cl><span class=s2>:w!                     &#34;</span> 强制保存，能不能保存成功取决于用户对文件的权限
+</span></span><span class=line><span class=cl>:w ! sudo tee %         <span class=s2>&#34; 如果没有权限保存，试试这个命令
+</span></span></span><span class=line><span class=cl><span class=s2>ZZ                      &#34;</span> 两个大写的 Z，没有修改直接退出，有修改保存后退出
+</span></span><span class=line><span class=cl>:w newfilename          <span class=s2>&#34; 另存为新文件
+</span></span></span><span class=line><span class=cl><span class=s2>:1, 10 w newfilename    &#34;</span> 将 <span class=m>1</span> 到 <span class=m>10</span> 行的内容另存为新文件
+</span></span><span class=line><span class=cl>:1, <span class=m>10</span> w &gt;&gt; filename    <span class=s2>&#34; 将 1 到 10 行的内容另存为新文件
+</span></span></span><span class=line><span class=cl><span class=s2>:r filename             &#34;</span> 将目标文件的内容追加到当前光标下一行
+</span></span><span class=line><span class=cl>:3 r filename           <span class=s2>&#34; 将目标文件的内容追加到第 3 行一下
+</span></span></span><span class=line><span class=cl><span class=s2>:! ls                   &#34;</span> 暂时离开 Vim 查看当前目录的文件，回车后返回 Vim
 </span></span></code></pre></div><h2 id=光标移动-1>光标移动
-<a class=anchor href=#%e5%85%89%e6%a0%87%e7%a7%bb%e5%8a%a8-1>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>h           <span style=color:#e6db74>&#34; 方向键 ←
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>j           &#34;</span> 方向键 ↓
-</span></span><span style=display:flex><span>k           <span style=color:#e6db74>&#34; 方向键 ↑
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>l           &#34;</span> 方向键 →
-</span></span><span style=display:flex><span><span style=color:#ae81ff>0</span>           <span style=color:#e6db74>&#34; 移动到行首
-</span></span></span><span style=display:flex><span><span style=color:#e6db74></span>$<span style=color:#e6db74>           &#34;</span> 移动到行尾的回车符
-</span></span><span style=display:flex><span>g_          <span style=color:#e6db74>&#34; 移动到行尾最后一个非空字符
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>gg          &#34;</span> 移动到第一行
-</span></span><span style=display:flex><span>G           <span style=color:#e6db74>&#34; 移动到最后一行&#34;</span>
-</span></span><span style=display:flex><span>w           <span style=color:#e6db74>&#34; 移动到下一个单词开头
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>e           &#34;</span> 移动到单词的结尾
-</span></span><span style=display:flex><span>b           <span style=color:#e6db74>&#34; 移动到单词的开头
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>&#34;</span> 不常用
-</span></span><span style=display:flex><span>nh          <span style=color:#e6db74>&#34; 向左移动 n 格，n 为数字
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>nl          &#34;</span> 向右移动 n 格
-</span></span><span style=display:flex><span>nj          <span style=color:#e6db74>&#34; 向下移动 n 行
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>nk          &#34;</span> 向上移动 n 行
-</span></span><span style=display:flex><span>n&lt;space&gt;    <span style=color:#e6db74>&#34; 向右移动 n 格，同 nl
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>H            &#34;</span> 移动到当前屏幕第一行的第一个字符
-</span></span><span style=display:flex><span>M            <span style=color:#e6db74>&#34; 移动到当前屏幕中间行的第一个字符
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>L            &#34;</span> 移动到当前屏幕最后一行的第一个字符
-</span></span><span style=display:flex><span>+            <span style=color:#e6db74>&#34; 移动到非空白字符的下一行
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>-            &#34;</span> 移动到非空白字符的上一行
-</span></span><span style=display:flex><span>:n&lt;cr&gt;      <span style=color:#e6db74>&#34; 跳转到第 n 行h           &#34;</span> 方向键 ←
-</span></span><span style=display:flex><span>j           <span style=color:#e6db74>&#34; 方向键 ↓
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>k           &#34;</span> 方向键 ↑
-</span></span><span style=display:flex><span>l           <span style=color:#e6db74>&#34; 方向键 →
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>0           &#34;</span> 移动到行首
-</span></span><span style=display:flex><span>$           <span style=color:#e6db74>&#34; 移动到行尾的回车符
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>g_          &#34;</span> 移动到行尾最后一个非空字符
-</span></span><span style=display:flex><span>gg          <span style=color:#e6db74>&#34; 移动到第一行
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>G           &#34;</span> 移动到最后一行<span style=color:#e6db74>&#34;
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>w           &#34;</span> 移动到下一个单词开头
-</span></span><span style=display:flex><span>e           <span style=color:#e6db74>&#34; 移动到单词的结尾
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>b           &#34;</span> 移动到单词的开头
-</span></span><span style=display:flex><span><span style=color:#e6db74>&#34; 不常用
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>nh          &#34;</span> 向左移动 n 格，n 为数字
-</span></span><span style=display:flex><span>nl          <span style=color:#e6db74>&#34; 向右移动 n 格
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>nj          &#34;</span> 向下移动 n 行
-</span></span><span style=display:flex><span>nk          <span style=color:#e6db74>&#34; 向上移动 n 行
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>n&lt;space&gt;    &#34;</span> 向右移动 n 格，同 nl
-</span></span><span style=display:flex><span>H            <span style=color:#e6db74>&#34; 移动到当前屏幕第一行的第一个字符
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>M            &#34;</span> 移动到当前屏幕中间行的第一个字符
-</span></span><span style=display:flex><span>L            <span style=color:#e6db74>&#34; 移动到当前屏幕最后一行的第一个字符
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>+            &#34;</span> 移动到非空白字符的下一行
-</span></span><span style=display:flex><span>-            <span style=color:#e6db74>&#34; 移动到非空白字符的上一行
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>:n&lt;cr&gt;      &#34;</span> 跳转到第 n 行
+<a class=anchor href=#%e5%85%89%e6%a0%87%e7%a7%bb%e5%8a%a8-1>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>h           <span class=s2>&#34; 方向键 ←
+</span></span></span><span class=line><span class=cl><span class=s2>j           &#34;</span> 方向键 ↓
+</span></span><span class=line><span class=cl>k           <span class=s2>&#34; 方向键 ↑
+</span></span></span><span class=line><span class=cl><span class=s2>l           &#34;</span> 方向键 →
+</span></span><span class=line><span class=cl><span class=m>0</span>           <span class=s2>&#34; 移动到行首
+</span></span></span><span class=line><span class=cl><span class=s2></span>$<span class=s2>           &#34;</span> 移动到行尾的回车符
+</span></span><span class=line><span class=cl>g_          <span class=s2>&#34; 移动到行尾最后一个非空字符
+</span></span></span><span class=line><span class=cl><span class=s2>gg          &#34;</span> 移动到第一行
+</span></span><span class=line><span class=cl>G           <span class=s2>&#34; 移动到最后一行&#34;</span>
+</span></span><span class=line><span class=cl>w           <span class=s2>&#34; 移动到下一个单词开头
+</span></span></span><span class=line><span class=cl><span class=s2>e           &#34;</span> 移动到单词的结尾
+</span></span><span class=line><span class=cl>b           <span class=s2>&#34; 移动到单词的开头
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;</span> 不常用
+</span></span><span class=line><span class=cl>nh          <span class=s2>&#34; 向左移动 n 格，n 为数字
+</span></span></span><span class=line><span class=cl><span class=s2>nl          &#34;</span> 向右移动 n 格
+</span></span><span class=line><span class=cl>nj          <span class=s2>&#34; 向下移动 n 行
+</span></span></span><span class=line><span class=cl><span class=s2>nk          &#34;</span> 向上移动 n 行
+</span></span><span class=line><span class=cl>n&lt;space&gt;    <span class=s2>&#34; 向右移动 n 格，同 nl
+</span></span></span><span class=line><span class=cl><span class=s2>H            &#34;</span> 移动到当前屏幕第一行的第一个字符
+</span></span><span class=line><span class=cl>M            <span class=s2>&#34; 移动到当前屏幕中间行的第一个字符
+</span></span></span><span class=line><span class=cl><span class=s2>L            &#34;</span> 移动到当前屏幕最后一行的第一个字符
+</span></span><span class=line><span class=cl>+            <span class=s2>&#34; 移动到非空白字符的下一行
+</span></span></span><span class=line><span class=cl><span class=s2>-            &#34;</span> 移动到非空白字符的上一行
+</span></span><span class=line><span class=cl>:n&lt;cr&gt;      <span class=s2>&#34; 跳转到第 n 行h           &#34;</span> 方向键 ←
+</span></span><span class=line><span class=cl>j           <span class=s2>&#34; 方向键 ↓
+</span></span></span><span class=line><span class=cl><span class=s2>k           &#34;</span> 方向键 ↑
+</span></span><span class=line><span class=cl>l           <span class=s2>&#34; 方向键 →
+</span></span></span><span class=line><span class=cl><span class=s2>0           &#34;</span> 移动到行首
+</span></span><span class=line><span class=cl>$           <span class=s2>&#34; 移动到行尾的回车符
+</span></span></span><span class=line><span class=cl><span class=s2>g_          &#34;</span> 移动到行尾最后一个非空字符
+</span></span><span class=line><span class=cl>gg          <span class=s2>&#34; 移动到第一行
+</span></span></span><span class=line><span class=cl><span class=s2>G           &#34;</span> 移动到最后一行<span class=s2>&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>w           &#34;</span> 移动到下一个单词开头
+</span></span><span class=line><span class=cl>e           <span class=s2>&#34; 移动到单词的结尾
+</span></span></span><span class=line><span class=cl><span class=s2>b           &#34;</span> 移动到单词的开头
+</span></span><span class=line><span class=cl><span class=s2>&#34; 不常用
+</span></span></span><span class=line><span class=cl><span class=s2>nh          &#34;</span> 向左移动 n 格，n 为数字
+</span></span><span class=line><span class=cl>nl          <span class=s2>&#34; 向右移动 n 格
+</span></span></span><span class=line><span class=cl><span class=s2>nj          &#34;</span> 向下移动 n 行
+</span></span><span class=line><span class=cl>nk          <span class=s2>&#34; 向上移动 n 行
+</span></span></span><span class=line><span class=cl><span class=s2>n&lt;space&gt;    &#34;</span> 向右移动 n 格，同 nl
+</span></span><span class=line><span class=cl>H            <span class=s2>&#34; 移动到当前屏幕第一行的第一个字符
+</span></span></span><span class=line><span class=cl><span class=s2>M            &#34;</span> 移动到当前屏幕中间行的第一个字符
+</span></span><span class=line><span class=cl>L            <span class=s2>&#34; 移动到当前屏幕最后一行的第一个字符
+</span></span></span><span class=line><span class=cl><span class=s2>+            &#34;</span> 移动到非空白字符的下一行
+</span></span><span class=line><span class=cl>-            <span class=s2>&#34; 移动到非空白字符的上一行
+</span></span></span><span class=line><span class=cl><span class=s2>:n&lt;cr&gt;      &#34;</span> 跳转到第 n 行
 </span></span></code></pre></div><h2 id=翻页-1>翻页
-<a class=anchor href=#%e7%bf%bb%e9%a1%b5-1>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>&lt;c-f&gt;   <span style=color:#e6db74>&#34; 向下移动一页
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>&lt;c-d&gt;   &#34;</span> 向下移动半页
-</span></span><span style=display:flex><span>&lt;c-b&gt;   <span style=color:#e6db74>&#34; 向上移动一页
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>&lt;c-u&gt;   &#34;</span> 向上移动半页
+<a class=anchor href=#%e7%bf%bb%e9%a1%b5-1>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>&lt;c-f&gt;   <span class=s2>&#34; 向下移动一页
+</span></span></span><span class=line><span class=cl><span class=s2>&lt;c-d&gt;   &#34;</span> 向下移动半页
+</span></span><span class=line><span class=cl>&lt;c-b&gt;   <span class=s2>&#34; 向上移动一页
+</span></span></span><span class=line><span class=cl><span class=s2>&lt;c-u&gt;   &#34;</span> 向上移动半页
 </span></span></code></pre></div><h2 id=查找与替换-1>查找与替换
-<a class=anchor href=#%e6%9f%a5%e6%89%be%e4%b8%8e%e6%9b%bf%e6%8d%a2-1>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>/word   <span style=color:#e6db74>&#34; 从光标位置向下搜索 word 单词
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>?word   &#34;</span> 从光标位置向上搜索 word 单词
-</span></span><span style=display:flex><span>n       <span style=color:#e6db74>&#34; 英文字母 n，根据 / 或 ? 搜索的方向定位到下一个匹配目标
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>N       &#34;</span> 与 n 相反，定位匹配目标
-</span></span><span style=display:flex><span>:n1,n2s/word1/word2/g   <span style=color:#e6db74>&#34; n1, n2 表示数字，替换 n1 行到 n2 行的单词
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>:1,</span>$s<span style=color:#e6db74>/word1/word2/g     &#34;</span> 全文替换，也可以写成 :%s/word1/word2/g
-</span></span><span style=display:flex><span>:1,$s/word1/word2/gc    <span style=color:#e6db74>&#34; 全文替换，并出现确认提示
+<a class=anchor href=#%e6%9f%a5%e6%89%be%e4%b8%8e%e6%9b%bf%e6%8d%a2-1>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>/word   <span class=s2>&#34; 从光标位置向下搜索 word 单词
+</span></span></span><span class=line><span class=cl><span class=s2>?word   &#34;</span> 从光标位置向上搜索 word 单词
+</span></span><span class=line><span class=cl>n       <span class=s2>&#34; 英文字母 n，根据 / 或 ? 搜索的方向定位到下一个匹配目标
+</span></span></span><span class=line><span class=cl><span class=s2>N       &#34;</span> 与 n 相反，定位匹配目标
+</span></span><span class=line><span class=cl>:n1,n2s/word1/word2/g   <span class=s2>&#34; n1, n2 表示数字，替换 n1 行到 n2 行的单词
+</span></span></span><span class=line><span class=cl><span class=s2>:1,</span><span class=nv>$s</span><span class=s2>/word1/word2/g     &#34;</span> 全文替换，也可以写成 :%s/word1/word2/g
+</span></span><span class=line><span class=cl>:1,<span class=nv>$s</span>/word1/word2/gc    <span class=s2>&#34; 全文替换，并出现确认提示
 </span></span></span></code></pre></div><h2 id=复制粘贴删除>复制、粘贴、删除
-<a class=anchor href=#%e5%a4%8d%e5%88%b6%e7%b2%98%e8%b4%b4%e5%88%a0%e9%99%a4>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>x           <span style=color:#e6db74>&#34; 向后删除一个字符
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>nx          &#34;</span> 向后删除 n 个字符
-</span></span><span style=display:flex><span>X           <span style=color:#e6db74>&#34; 向前删除一个字符
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>nX          &#34;</span> 向前删除 n 个字符
-</span></span><span style=display:flex><span>dd          <span style=color:#e6db74>&#34; 删除当前行
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>ndd         &#34;</span> 向下删除 n 行
-</span></span><span style=display:flex><span>d1G / dgg   <span style=color:#e6db74>&#34; 删除第一行到当前行的数据
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>dG          &#34;</span> 删除当前行到最后一行的数据
-</span></span><span style=display:flex><span>d$          <span style=color:#e6db74>&#34; 删除当前字符到行尾
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>D           &#34;</span> 删除当前字符到行尾
-</span></span><span style=display:flex><span>d0          <span style=color:#e6db74>&#34; 从行首删除到当前字符
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>yy          &#34;</span> 复制当前行
-</span></span><span style=display:flex><span>Y           <span style=color:#e6db74>&#34; 复制当前行
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>nyy         &#34;</span> 从当前行开始复制 n 行
-</span></span><span style=display:flex><span>y1G / ygg   <span style=color:#e6db74>&#34; 从第一行复制到当前行
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>yG          &#34;</span> 从当前行复制到最后一行
-</span></span><span style=display:flex><span>y0          <span style=color:#e6db74>&#34; 从行首复制到当前字符
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>y</span>$<span style=color:#e6db74>          &#34;</span> 从当前字符复制到行尾
-</span></span><span style=display:flex><span>p, P        <span style=color:#e6db74>&#34; 黏贴，p 黏贴到光标下一行，P 黏贴到光标上一行
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>yyp         &#34;</span> 复制并粘贴
-</span></span><span style=display:flex><span>ddp         <span style=color:#e6db74>&#34; 删除并粘贴，相当于下移当前行
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>&#34;</span>+y         <span style=color:#e6db74>&#34; 复制本文到系统剪切板
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>&#34;</span>+p         <span style=color:#e6db74>&#34; 粘贴系统剪切板到 Vim（不会影响文本格式）
+<a class=anchor href=#%e5%a4%8d%e5%88%b6%e7%b2%98%e8%b4%b4%e5%88%a0%e9%99%a4>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>x           <span class=s2>&#34; 向后删除一个字符
+</span></span></span><span class=line><span class=cl><span class=s2>nx          &#34;</span> 向后删除 n 个字符
+</span></span><span class=line><span class=cl>X           <span class=s2>&#34; 向前删除一个字符
+</span></span></span><span class=line><span class=cl><span class=s2>nX          &#34;</span> 向前删除 n 个字符
+</span></span><span class=line><span class=cl>dd          <span class=s2>&#34; 删除当前行
+</span></span></span><span class=line><span class=cl><span class=s2>ndd         &#34;</span> 向下删除 n 行
+</span></span><span class=line><span class=cl>d1G / dgg   <span class=s2>&#34; 删除第一行到当前行的数据
+</span></span></span><span class=line><span class=cl><span class=s2>dG          &#34;</span> 删除当前行到最后一行的数据
+</span></span><span class=line><span class=cl>d$          <span class=s2>&#34; 删除当前字符到行尾
+</span></span></span><span class=line><span class=cl><span class=s2>D           &#34;</span> 删除当前字符到行尾
+</span></span><span class=line><span class=cl>d0          <span class=s2>&#34; 从行首删除到当前字符
+</span></span></span><span class=line><span class=cl><span class=s2>yy          &#34;</span> 复制当前行
+</span></span><span class=line><span class=cl>Y           <span class=s2>&#34; 复制当前行
+</span></span></span><span class=line><span class=cl><span class=s2>nyy         &#34;</span> 从当前行开始复制 n 行
+</span></span><span class=line><span class=cl>y1G / ygg   <span class=s2>&#34; 从第一行复制到当前行
+</span></span></span><span class=line><span class=cl><span class=s2>yG          &#34;</span> 从当前行复制到最后一行
+</span></span><span class=line><span class=cl>y0          <span class=s2>&#34; 从行首复制到当前字符
+</span></span></span><span class=line><span class=cl><span class=s2>y</span>$<span class=s2>          &#34;</span> 从当前字符复制到行尾
+</span></span><span class=line><span class=cl>p, P        <span class=s2>&#34; 黏贴，p 黏贴到光标下一行，P 黏贴到光标上一行
+</span></span></span><span class=line><span class=cl><span class=s2>yyp         &#34;</span> 复制并粘贴
+</span></span><span class=line><span class=cl>ddp         <span class=s2>&#34; 删除并粘贴，相当于下移当前行
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;</span>+y         <span class=s2>&#34; 复制本文到系统剪切板
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;</span>+p         <span class=s2>&#34; 粘贴系统剪切板到 Vim（不会影响文本格式）
 </span></span></span></code></pre></div><h2 id=插入>插入
-<a class=anchor href=#%e6%8f%92%e5%85%a5>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>i   <span style=color:#e6db74>&#34; 在光标前进入 insert 模式
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>I   &#34;</span> 在当前行左边第一个非空字符前进入 insert 模式，类似其他编辑器的 &lt;c-a&gt; 快捷键
-</span></span><span style=display:flex><span>a   <span style=color:#e6db74>&#34; 在光标后进入 insert 模式
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>A   &#34;</span> 在当前行右边第一个非空字符前进入 insert 模式，类似其他编辑器的 &lt;c-e&gt; 快捷键
-</span></span><span style=display:flex><span>o   <span style=color:#e6db74>&#34; 在光标的下一行插入
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>O   &#34;</span> 在光标的上一行插入
-</span></span><span style=display:flex><span>s   <span style=color:#e6db74>&#34; 删除当前字符，并进入 insert 模式
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>S   &#34;</span> 删除当前行，并进入插入模式
-</span></span><span style=display:flex><span>vc  <span style=color:#e6db74>&#34; 删除当前字符，并进入 insert 模式
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>cc  &#34;</span> 删除当前行，并进入插入模式
-</span></span><span style=display:flex><span>c0  <span style=color:#e6db74>&#34; 删除光标位置到行首，并进入 insert 模式
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>cg_ &#34;</span> 删除光标位置到行尾最后一个非空字符，并进入 insert 模式
-</span></span><span style=display:flex><span>ce  <span style=color:#e6db74>&#34; 删除光标位置到单词末尾，并进入 insert 模式
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>cw  &#34;</span> 删除光标位置到单词末尾，并进入 insert 模式
-</span></span><span style=display:flex><span>ciw <span style=color:#e6db74>&#34; 删除当前单词，并进入 insert 模式
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>cip &#34;</span> 删除整个段落，并进入 insert 模式
-</span></span><span style=display:flex><span>ci<span style=color:#f92672>(</span> <span style=color:#e6db74>&#34; 删除当前括号内的内容，并进入 insert 模式 适用于 ([{&lt;&#39;` 等所有成对的标签
+<a class=anchor href=#%e6%8f%92%e5%85%a5>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>i   <span class=s2>&#34; 在光标前进入 insert 模式
+</span></span></span><span class=line><span class=cl><span class=s2>I   &#34;</span> 在当前行左边第一个非空字符前进入 insert 模式，类似其他编辑器的 &lt;c-a&gt; 快捷键
+</span></span><span class=line><span class=cl>a   <span class=s2>&#34; 在光标后进入 insert 模式
+</span></span></span><span class=line><span class=cl><span class=s2>A   &#34;</span> 在当前行右边第一个非空字符前进入 insert 模式，类似其他编辑器的 &lt;c-e&gt; 快捷键
+</span></span><span class=line><span class=cl>o   <span class=s2>&#34; 在光标的下一行插入
+</span></span></span><span class=line><span class=cl><span class=s2>O   &#34;</span> 在光标的上一行插入
+</span></span><span class=line><span class=cl>s   <span class=s2>&#34; 删除当前字符，并进入 insert 模式
+</span></span></span><span class=line><span class=cl><span class=s2>S   &#34;</span> 删除当前行，并进入插入模式
+</span></span><span class=line><span class=cl>vc  <span class=s2>&#34; 删除当前字符，并进入 insert 模式
+</span></span></span><span class=line><span class=cl><span class=s2>cc  &#34;</span> 删除当前行，并进入插入模式
+</span></span><span class=line><span class=cl>c0  <span class=s2>&#34; 删除光标位置到行首，并进入 insert 模式
+</span></span></span><span class=line><span class=cl><span class=s2>cg_ &#34;</span> 删除光标位置到行尾最后一个非空字符，并进入 insert 模式
+</span></span><span class=line><span class=cl>ce  <span class=s2>&#34; 删除光标位置到单词末尾，并进入 insert 模式
+</span></span></span><span class=line><span class=cl><span class=s2>cw  &#34;</span> 删除光标位置到单词末尾，并进入 insert 模式
+</span></span><span class=line><span class=cl>ciw <span class=s2>&#34; 删除当前单词，并进入 insert 模式
+</span></span></span><span class=line><span class=cl><span class=s2>cip &#34;</span> 删除整个段落，并进入 insert 模式
+</span></span><span class=line><span class=cl>ci<span class=o>(</span> <span class=s2>&#34; 删除当前括号内的内容，并进入 insert 模式 适用于 ([{&lt;&#39;` 等所有成对的标签
 </span></span></span></code></pre></div><h2 id=撤销重做>撤销重做
-<a class=anchor href=#%e6%92%a4%e9%94%80%e9%87%8d%e5%81%9a>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>u       <span style=color:#e6db74>&#34; 撤销
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>&lt;c-r&gt;   &#34;</span> 重做
-</span></span><span style=display:flex><span>.       <span style=color:#e6db74>&#34; 重复完成操作
+<a class=anchor href=#%e6%92%a4%e9%94%80%e9%87%8d%e5%81%9a>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>u       <span class=s2>&#34; 撤销
+</span></span></span><span class=line><span class=cl><span class=s2>&lt;c-r&gt;   &#34;</span> 重做
+</span></span><span class=line><span class=cl>.       <span class=s2>&#34; 重复完成操作
 </span></span></span></code></pre></div><h2 id=替换-1>替换
-<a class=anchor href=#%e6%9b%bf%e6%8d%a2-1>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>r   <span style=color:#e6db74>&#34; 替换单个字符，自动返回 normal 模式
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>R   &#34;</span> 连续替换多个字符，手动 &lt;esc&gt; 返回 normal 模式
+<a class=anchor href=#%e6%9b%bf%e6%8d%a2-1>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>r   <span class=s2>&#34; 替换单个字符，自动返回 normal 模式
+</span></span></span><span class=line><span class=cl><span class=s2>R   &#34;</span> 连续替换多个字符，手动 &lt;esc&gt; 返回 normal 模式
 </span></span></code></pre></div><h2 id=大小写>大小写
-<a class=anchor href=#%e5%a4%a7%e5%b0%8f%e5%86%99>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>~       <span style=color:#e6db74>&#34; 当前字符大小写反转
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>g~~     &#34;</span> 正行字符大小写反转
-</span></span><span style=display:flex><span>vu      <span style=color:#e6db74>&#34; 当前字符小写
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>vU      &#34;</span> 当前字符大写
-</span></span><span style=display:flex><span>vU      <span style=color:#e6db74>&#34; 当前字符大写
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>viwu    &#34;</span> 当前字符小写
-</span></span><span style=display:flex><span>viwU    <span style=color:#e6db74>&#34; 当前字符大写
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>ggguG   &#34;</span> 文本所有字符小写
-</span></span><span style=display:flex><span>gggUG   <span style=color:#e6db74>&#34; 文本所有字符大写
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>:%s/\&lt;./\u&amp;/g       &#34;</span> 将所有单词首字母大写（需要使用 :nohls 去掉高亮）
-</span></span><span style=display:flex><span>:%s/<span style=color:#ae81ff>\&lt;</span>./<span style=color:#ae81ff>\l</span>&amp;/g       <span style=color:#e6db74>&#34; 将所有单词首字母小写
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>:%s/.*/\u&amp;          &#34;</span> 将每行第一个字母大写
-</span></span><span style=display:flex><span>:%s/.*/<span style=color:#ae81ff>\l</span>&amp;          <span style=color:#e6db74>&#34; 将每行第一个字母小写
+<a class=anchor href=#%e5%a4%a7%e5%b0%8f%e5%86%99>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>~       <span class=s2>&#34; 当前字符大小写反转
+</span></span></span><span class=line><span class=cl><span class=s2>g~~     &#34;</span> 正行字符大小写反转
+</span></span><span class=line><span class=cl>vu      <span class=s2>&#34; 当前字符小写
+</span></span></span><span class=line><span class=cl><span class=s2>vU      &#34;</span> 当前字符大写
+</span></span><span class=line><span class=cl>vU      <span class=s2>&#34; 当前字符大写
+</span></span></span><span class=line><span class=cl><span class=s2>viwu    &#34;</span> 当前字符小写
+</span></span><span class=line><span class=cl>viwU    <span class=s2>&#34; 当前字符大写
+</span></span></span><span class=line><span class=cl><span class=s2>ggguG   &#34;</span> 文本所有字符小写
+</span></span><span class=line><span class=cl>gggUG   <span class=s2>&#34; 文本所有字符大写
+</span></span></span><span class=line><span class=cl><span class=s2>:%s/\&lt;./\u&amp;/g       &#34;</span> 将所有单词首字母大写（需要使用 :nohls 去掉高亮）
+</span></span><span class=line><span class=cl>:%s/<span class=se>\&lt;</span>./<span class=se>\l</span><span class=p>&amp;</span>/g       <span class=s2>&#34; 将所有单词首字母小写
+</span></span></span><span class=line><span class=cl><span class=s2>:%s/.*/\u&amp;          &#34;</span> 将每行第一个字母大写
+</span></span><span class=line><span class=cl>:%s/.*/<span class=se>\l</span><span class=p>&amp;</span>          <span class=s2>&#34; 将每行第一个字母小写
 </span></span></span></code></pre></div><h2 id=多窗口操作>多窗口操作
-<a class=anchor href=#%e5%a4%9a%e7%aa%97%e5%8f%a3%e6%93%8d%e4%bd%9c>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>:sp filename        <span style=color:#e6db74>&#34; 上下分割窗口
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>:vs[p] filename     &#34;</span> 左右分割窗口
-</span></span><span style=display:flex><span>&lt;c-w&gt;h<span style=color:#f92672>[</span>j<span style=color:#f92672>[</span>k<span style=color:#f92672>[</span>l<span style=color:#f92672>]]]</span>     <span style=color:#e6db74>&#34; 根据方向键移动光标到该方向的窗口上
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>&lt;c-w&gt;[N]&gt;           &#34;</span> N 位数字，可选，增加当前窗口 N 列宽<span style=color:#e6db74>&#34;
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>&lt;c-w&gt;[N]&lt;           &#34;</span> N 位数字，可选，减少当前窗口 N 列宽<span style=color:#e6db74>&#34;
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>&lt;c-w&gt;[N]+           &#34;</span> N 位数字，可选，增加当前窗口 N 行高<span style=color:#e6db74>&#34;
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>&lt;c-w&gt;[N]-           &#34;</span> N 位数字，可选，减少当前窗口 N 行高<span style=color:#e6db74>&#34;
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>&lt;c-w&gt;=              &#34;</span> 将所有窗口设置等宽高
-</span></span><span style=display:flex><span>&lt;c-w&gt;<span style=color:#f92672>[</span>N<span style=color:#f92672>]</span>n           <span style=color:#e6db74>&#34; N 位数字，可选，打开一个新窗口 N 行高，默认为整个窗口的一半&#34;</span>
-</span></span><span style=display:flex><span>&lt;c-w&gt;<span style=color:#f92672>[</span>N<span style=color:#f92672>]</span>s           <span style=color:#e6db74>&#34; N 位数字，可选，将当前窗口垂直分割为上下两个窗口展示&#34;</span>
-</span></span><span style=display:flex><span>                    <span style=color:#e6db74>&#34; 新窗口可以为 N 行高，默认为整个窗口的一半&#34;</span>
-</span></span><span style=display:flex><span>                    <span style=color:#e6db74>&#34; 类似于 :sp current_file&#34;</span>
-</span></span><span style=display:flex><span>&lt;c-w&gt;<span style=color:#f92672>[</span>N<span style=color:#f92672>]</span>v           <span style=color:#e6db74>&#34; N 位数字，可选，将当前窗口水平分割为左右两个窗口展示&#34;</span>
-</span></span><span style=display:flex><span>                    <span style=color:#e6db74>&#34; 新窗口可以为 N 列宽，默认为整个窗口的一半&#34;</span>
-</span></span><span style=display:flex><span>                    <span style=color:#e6db74>&#34; 类似于 :vs current_file&#34;</span>
-</span></span><span style=display:flex><span>&lt;c-w&gt;o              <span style=color:#e6db74>&#34; 关闭除当前窗口外的所有窗口
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>&lt;c-w&gt;r              &#34;</span> 顺时针转动窗口
-</span></span><span style=display:flex><span>&lt;c-w&gt;R              <span style=color:#e6db74>&#34; 逆时针转动窗口
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>&lt;c-w&gt;x              &#34;</span> 对调左右或上下两个对应的窗口
-</span></span><span style=display:flex><span>&lt;c-w&gt;q              <span style=color:#e6db74>&#34; 退出窗口
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>:q                  &#34;</span> 退出窗口
+<a class=anchor href=#%e5%a4%9a%e7%aa%97%e5%8f%a3%e6%93%8d%e4%bd%9c>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>:sp filename        <span class=s2>&#34; 上下分割窗口
+</span></span></span><span class=line><span class=cl><span class=s2>:vs[p] filename     &#34;</span> 左右分割窗口
+</span></span><span class=line><span class=cl>&lt;c-w&gt;h<span class=o>[</span>j<span class=o>[</span>k<span class=o>[</span>l<span class=o>]]]</span>     <span class=s2>&#34; 根据方向键移动光标到该方向的窗口上
+</span></span></span><span class=line><span class=cl><span class=s2>&lt;c-w&gt;[N]&gt;           &#34;</span> N 位数字，可选，增加当前窗口 N 列宽<span class=s2>&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>&lt;c-w&gt;[N]&lt;           &#34;</span> N 位数字，可选，减少当前窗口 N 列宽<span class=s2>&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>&lt;c-w&gt;[N]+           &#34;</span> N 位数字，可选，增加当前窗口 N 行高<span class=s2>&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>&lt;c-w&gt;[N]-           &#34;</span> N 位数字，可选，减少当前窗口 N 行高<span class=s2>&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>&lt;c-w&gt;=              &#34;</span> 将所有窗口设置等宽高
+</span></span><span class=line><span class=cl>&lt;c-w&gt;<span class=o>[</span>N<span class=o>]</span>n           <span class=s2>&#34; N 位数字，可选，打开一个新窗口 N 行高，默认为整个窗口的一半&#34;</span>
+</span></span><span class=line><span class=cl>&lt;c-w&gt;<span class=o>[</span>N<span class=o>]</span>s           <span class=s2>&#34; N 位数字，可选，将当前窗口垂直分割为上下两个窗口展示&#34;</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34; 新窗口可以为 N 行高，默认为整个窗口的一半&#34;</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34; 类似于 :sp current_file&#34;</span>
+</span></span><span class=line><span class=cl>&lt;c-w&gt;<span class=o>[</span>N<span class=o>]</span>v           <span class=s2>&#34; N 位数字，可选，将当前窗口水平分割为左右两个窗口展示&#34;</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34; 新窗口可以为 N 列宽，默认为整个窗口的一半&#34;</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34; 类似于 :vs current_file&#34;</span>
+</span></span><span class=line><span class=cl>&lt;c-w&gt;o              <span class=s2>&#34; 关闭除当前窗口外的所有窗口
+</span></span></span><span class=line><span class=cl><span class=s2>&lt;c-w&gt;r              &#34;</span> 顺时针转动窗口
+</span></span><span class=line><span class=cl>&lt;c-w&gt;R              <span class=s2>&#34; 逆时针转动窗口
+</span></span></span><span class=line><span class=cl><span class=s2>&lt;c-w&gt;x              &#34;</span> 对调左右或上下两个对应的窗口
+</span></span><span class=line><span class=cl>&lt;c-w&gt;q              <span class=s2>&#34; 退出窗口
+</span></span></span><span class=line><span class=cl><span class=s2>:q                  &#34;</span> 退出窗口
 </span></span></code></pre></div><h2 id=多文件编辑>多文件编辑
-<a class=anchor href=#%e5%a4%9a%e6%96%87%e4%bb%b6%e7%bc%96%e8%be%91>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>vim file1 file2     <span style=color:#e6db74>&#34; 同时打开两个文件
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>:files              &#34;</span> 查看现在编辑的文件列表，%a 代表正在操作哪个文件
-</span></span><span style=display:flex><span>  <span style=color:#ae81ff>1</span> %a   <span style=color:#e6db74>&#34;file1&#34;</span>                        line <span style=color:#ae81ff>1</span>
-</span></span><span style=display:flex><span>  <span style=color:#ae81ff>2</span>      <span style=color:#e6db74>&#34;file2&#34;</span>                        line <span style=color:#ae81ff>0</span>
-</span></span><span style=display:flex><span>:n                  <span style=color:#e6db74>&#34; 跳到下一个文件，这里的 n 就是字母
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>:N                  &#34;</span> 跳到上一个文件
+<a class=anchor href=#%e5%a4%9a%e6%96%87%e4%bb%b6%e7%bc%96%e8%be%91>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>vim file1 file2     <span class=s2>&#34; 同时打开两个文件
+</span></span></span><span class=line><span class=cl><span class=s2>:files              &#34;</span> 查看现在编辑的文件列表，%a 代表正在操作哪个文件
+</span></span><span class=line><span class=cl>  <span class=m>1</span> %a   <span class=s2>&#34;file1&#34;</span>                        line <span class=m>1</span>
+</span></span><span class=line><span class=cl>  <span class=m>2</span>      <span class=s2>&#34;file2&#34;</span>                        line <span class=m>0</span>
+</span></span><span class=line><span class=cl>:n                  <span class=s2>&#34; 跳到下一个文件，这里的 n 就是字母
+</span></span></span><span class=line><span class=cl><span class=s2>:N                  &#34;</span> 跳到上一个文件
 </span></span></code></pre></div><hr><p><a href=/linux/tee-keep-stderr/>« tee 保存 stderr 到文件</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
 <span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/linux/vim-common-commands.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
 <span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#设置>设置</a></li><li><a href=#vim删除所有行>vim删除所有行</a><ul><li><a href=#撤销>撤销</a></li><li><a href=#查找>查找</a></li><li><a href=#光标移动>光标移动</a></li><li><a href=#替换>替换</a></li><li><a href=#翻页>翻页</a></li><li><a href=#行操作>行操作</a></li><li><a href=#退出>退出</a></li></ul></li><li><a href=#查找-1>查找</a><ul><li><a href=#大小写敏感查找>大小写敏感查找</a></li><li><a href=#大小写敏感配置>大小写敏感配置</a></li><li><a href=#查找当前单词>查找当前单词</a></li><li><a href=#其他设置>其他设置</a></li></ul></li><li><a href=#查找与替换>查找与替换</a><ul><li><a href=#作用范围>作用范围</a></li><li><a href=#替换标志>替换标志</a></li></ul></li><li><a href=#高亮设置>高亮设置</a><ul><li><a href=#高亮颜色设置>高亮颜色设置</a></li><li><a href=#禁用启用高亮>禁用/启用高亮</a></li></ul></li><li><a href=#参考阅读>参考阅读</a></li><li><a href=#写入保存退出>写入、保存、退出</a></li><li><a href=#光标移动-1>光标移动</a></li><li><a href=#翻页-1>翻页</a></li><li><a href=#查找与替换-1>查找与替换</a></li><li><a href=#复制粘贴删除>复制、粘贴、删除</a></li><li><a href=#插入>插入</a></li><li><a href=#撤销重做>撤销重做</a></li><li><a href=#替换-1>替换</a></li><li><a href=#大小写>大小写</a></li><li><a href=#多窗口操作>多窗口操作</a></li><li><a href=#多文件编辑>多文件编辑</a></li></ul></nav></div></aside></main></body></html>

@@ -9,49 +9,49 @@ openssl # openssl 常用于生成证书、签名、加密等操作。它是一�
 openssl：命令行工具 libcrypto：加密算法库 libssl：加密模块应用库，实现了 SSL 和 TLS 协议 对称加密 # echo test > test.txt # 加密 openssl enc -e -des3 -a -salt -in test.txt -out test.txt.enc # 解密 openssl enc -d -des3 -a -salt -in test.txt.enc -out test.txt.dec -salt：加盐，增加破解难度，使用 openssl 默认盐值 -S [salt]：指定盐值
 非对称加密 # 生成密钥对
 openssl genrsa -out rsa_private_key.pem 2048 openssl rsa -in rsa_private_key.pem -pubout -out rsa_public_key.pem 加密（公钥加密，私钥解密）"><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="os"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Openssl | 我的博客</title>
-<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/os/openssl/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/os/openssl/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.ffd7553d42e9860dbcfbc6775c0f6c9895736a50f5383929cc725dc0a9b61715.js integrity="sha256-/9dVPULphg28+8Z3XA9smJVzalD1ODkpzHJdwKm2FxU=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
 <input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
 </label><strong>Openssl</strong>
 <label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#对称加密>对称加密</a></li><li><a href=#非对称加密>非对称加密</a></li><li><a href=#ca-证书--颁发证书>CA 证书 & 颁发证书</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
 <a href=/os/>操作系统</a> / openssl</p><h1 id=openssl>openssl
 <a class=anchor href=#openssl>#</a></h1><p>openssl 常用于生成证书、签名、加密等操作。它是一个开源的工具，可以在 Linux、Windows、MacOS 等操作系统上运行。</p><p>包含三个组件：</p><ul><li>openssl：命令行工具</li><li>libcrypto：加密算法库</li><li>libssl：加密模块应用库，实现了 SSL 和 TLS 协议</li></ul><h2 id=对称加密>对称加密
-<a class=anchor href=#%e5%af%b9%e7%a7%b0%e5%8a%a0%e5%af%86>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>echo test &gt; test.txt
-</span></span><span style=display:flex><span><span style=color:#75715e># 加密</span>
-</span></span><span style=display:flex><span>openssl enc -e -des3 -a -salt -in test.txt -out test.txt.enc
-</span></span><span style=display:flex><span><span style=color:#75715e># 解密</span>
-</span></span><span style=display:flex><span>openssl enc -d -des3 -a -salt -in test.txt.enc -out test.txt.dec
+<a class=anchor href=#%e5%af%b9%e7%a7%b0%e5%8a%a0%e5%af%86>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nb>echo</span> <span class=nb>test</span> &gt; test.txt
+</span></span><span class=line><span class=cl><span class=c1># 加密</span>
+</span></span><span class=line><span class=cl>openssl enc -e -des3 -a -salt -in test.txt -out test.txt.enc
+</span></span><span class=line><span class=cl><span class=c1># 解密</span>
+</span></span><span class=line><span class=cl>openssl enc -d -des3 -a -salt -in test.txt.enc -out test.txt.dec
 </span></span></code></pre></div><blockquote><p>-salt：加盐，增加破解难度，使用 openssl 默认盐值
 -S [salt]：指定盐值</p></blockquote><h2 id=非对称加密>非对称加密
-<a class=anchor href=#%e9%9d%9e%e5%af%b9%e7%a7%b0%e5%8a%a0%e5%af%86>#</a></h2><p>生成密钥对</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>openssl genrsa -out rsa_private_key.pem <span style=color:#ae81ff>2048</span>
-</span></span><span style=display:flex><span>openssl rsa -in rsa_private_key.pem -pubout -out rsa_public_key.pem
-</span></span></code></pre></div><p>加密（公钥加密，私钥解密）</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>echo test &gt; test.txt
-</span></span><span style=display:flex><span><span style=color:#75715e># 加密</span>
-</span></span><span style=display:flex><span>openssl rsautl -encrypt -inkey rsa_public_key.pem -pubin -in test.txt -out test.txt.enc
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 解密</span>
-</span></span><span style=display:flex><span>openssl rsautl -decrypt -inkey rsa_private_key.pem -in test.txt.enc -out test.txt.dec
-</span></span></code></pre></div><p>数字签名（私钥签名，公钥验证）</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>echo test &gt; test.txt
-</span></span><span style=display:flex><span><span style=color:#75715e># 签名</span>
-</span></span><span style=display:flex><span>openssl dgst -sha256 -sign rsa_private_key.pem -out test.txt.sign test.txt
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 验证</span>
-</span></span><span style=display:flex><span>openssl dgst -sha256 -verify rsa_public_key.pem -signature test.txt.sign test.txt
+<a class=anchor href=#%e9%9d%9e%e5%af%b9%e7%a7%b0%e5%8a%a0%e5%af%86>#</a></h2><p>生成密钥对</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>openssl genrsa -out rsa_private_key.pem <span class=m>2048</span>
+</span></span><span class=line><span class=cl>openssl rsa -in rsa_private_key.pem -pubout -out rsa_public_key.pem
+</span></span></code></pre></div><p>加密（公钥加密，私钥解密）</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nb>echo</span> <span class=nb>test</span> &gt; test.txt
+</span></span><span class=line><span class=cl><span class=c1># 加密</span>
+</span></span><span class=line><span class=cl>openssl rsautl -encrypt -inkey rsa_public_key.pem -pubin -in test.txt -out test.txt.enc
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 解密</span>
+</span></span><span class=line><span class=cl>openssl rsautl -decrypt -inkey rsa_private_key.pem -in test.txt.enc -out test.txt.dec
+</span></span></code></pre></div><p>数字签名（私钥签名，公钥验证）</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nb>echo</span> <span class=nb>test</span> &gt; test.txt
+</span></span><span class=line><span class=cl><span class=c1># 签名</span>
+</span></span><span class=line><span class=cl>openssl dgst -sha256 -sign rsa_private_key.pem -out test.txt.sign test.txt
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 验证</span>
+</span></span><span class=line><span class=cl>openssl dgst -sha256 -verify rsa_public_key.pem -signature test.txt.sign test.txt
 </span></span></code></pre></div><h2 id=ca-证书--颁发证书>CA 证书 & 颁发证书
-<a class=anchor href=#ca-%e8%af%81%e4%b9%a6--%e9%a2%81%e5%8f%91%e8%af%81%e4%b9%a6>#</a></h2><p>生成 CA 私钥和证书</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 至少需要输入 4 位密码口令</span>
-</span></span><span style=display:flex><span>openssl req -new -x509 -days <span style=color:#ae81ff>3650</span> -keyout ca.key -out ca.crt
-</span></span></code></pre></div><p>生成服务端私钥和证书</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 服务端私钥</span>
-</span></span><span style=display:flex><span>openssl genrsa -out server.key <span style=color:#ae81ff>2048</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 服务端证书签署请求（csr）</span>
-</span></span><span style=display:flex><span>openssl req -new -key server.key -out server.csr
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 服务端证书</span>
-</span></span><span style=display:flex><span>openssl x509 -req -days <span style=color:#ae81ff>3650</span> -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt
-</span></span></code></pre></div><p>查看证书信息</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e># 查看 CA 证书</span>
-</span></span><span style=display:flex><span>openssl x509 -in ca.crt -noout -text
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 查看服务端证书</span>
-</span></span><span style=display:flex><span>openssl x509 -in server.crt -noout -text
+<a class=anchor href=#ca-%e8%af%81%e4%b9%a6--%e9%a2%81%e5%8f%91%e8%af%81%e4%b9%a6>#</a></h2><p>生成 CA 私钥和证书</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 至少需要输入 4 位密码口令</span>
+</span></span><span class=line><span class=cl>openssl req -new -x509 -days <span class=m>3650</span> -keyout ca.key -out ca.crt
+</span></span></code></pre></div><p>生成服务端私钥和证书</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 服务端私钥</span>
+</span></span><span class=line><span class=cl>openssl genrsa -out server.key <span class=m>2048</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 服务端证书签署请求（csr）</span>
+</span></span><span class=line><span class=cl>openssl req -new -key server.key -out server.csr
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 服务端证书</span>
+</span></span><span class=line><span class=cl>openssl x509 -req -days <span class=m>3650</span> -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt
+</span></span></code></pre></div><p>查看证书信息</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 查看 CA 证书</span>
+</span></span><span class=line><span class=cl>openssl x509 -in ca.crt -noout -text
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 查看服务端证书</span>
+</span></span><span class=line><span class=cl>openssl x509 -in server.crt -noout -text
 </span></span></code></pre></div><hr><p><a href=/os/ohmyzsh/>« ohmyzsh</a></p><p><a href=/os/ubuntu/>» Ubuntu</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
 <span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/os/openssl.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
 <span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#对称加密>对称加密</a></li><li><a href=#非对称加密>非对称加密</a></li><li><a href=#ca-证书--颁发证书>CA 证书 & 颁发证书</a></li></ul></nav></div></aside></main></body></html>

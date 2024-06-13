@@ -29,206 +29,206 @@ Tag Value的值是什么不重要，主要是需要这两个Tag Key来识别是�
 添加Policy # 创建IAM策略，将新创建的策略Attach到集群节点绑定的IAM role上，让你的集群节点拥有自动伸缩的能力。
 IAM策略Json内容：
 { "Version": "2012-10-17", "Statement": [ { "Action": [ "autoscaling:DescribeAutoScalingGroups", "autoscaling:DescribeAutoScalingInstances", "autoscaling:DescribeLaunchConfigurations", "autoscaling:DescribeTags", "autoscaling:SetDesiredCapacity", "autoscaling:TerminateInstanceInAutoScalingGroup", "ec2:DescribeLaunchTemplateVersions" ], "Resource": "*", "Effect": "Allow" } ] } 部署Cluster AutoScaler # 在集群中部署Cluster AutoScaler，准备资源清单文件cluster-autoscaler.'><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="aws"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Cluster Autoscaler | 我的博客</title>
-<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/aws/cluster-autoscaler/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/aws/cluster-autoscaler/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.ffd7553d42e9860dbcfbc6775c0f6c9895736a50f5383929cc725dc0a9b61715.js integrity="sha256-/9dVPULphg28+8Z3XA9smJVzalD1ODkpzHJdwKm2FxU=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
 <input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
 </label><strong>Cluster Autoscaler</strong>
 <label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#nodegroup添加tag>NodeGroup添加Tag</a></li><li><a href=#添加policy>添加Policy</a></li><li><a href=#部署cluster-autoscaler>部署Cluster AutoScaler</a></li><li><a href=#查看cluster-autoscaler>查看Cluster AutoScaler</a></li><li><a href=#分析原理>分析原理</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
 <a href=/aws/>AWS</a> / Cluster AutoScaler</p><h1 id=cluster-autoscaler>Cluster AutoScaler
 <a class=anchor href=#cluster-autoscaler>#</a></h1><p><img src=https://fs.poneding.com/images/eks.jpg alt=eks.jpg></p><p>我当前已经有了一个EKS服务搭建起来的K8s集群，我现在希望我的集群拥有自动伸缩（体现在节点的扩缩）的能力。</p><p>当我的集群资源充足，而我部署在集群中的应用只使用到了很少量的资源，我希望集群回收资源以节省费用；当我的应用服务越来越多，当前集群资源不足时，我希望集群能增加节点，以满足应用的部署条件。</p><p>那么本篇就是介绍如何通过使用<strong>Kubernetes Cluster Autoscaler</strong>让你的集群拥有自动伸缩的能力，而不用你时刻关注集群的资源是否过于宽松或紧张。</p><h2 id=nodegroup添加tag>NodeGroup添加Tag
 <a class=anchor href=#nodegroup%e6%b7%bb%e5%8a%a0tag>#</a></h2><p>我们创建EKS时，需要定义NodeGroup，一般在这个NodeGroup中定义:</p><ul><li><p>asg_desired_capacity：期望创建的Node数量；</p></li><li><p>asg_max_size：最小Node数量，默认为1；</p></li><li><p>asg_min_size：最大Node数量。</p></li></ul><p>定义的NodeGroup会生成Auto Scaling Group资源，并且由Auto Scaling Group来管理Node的创建。</p><p><img src=https://fs.poneding.com/images/image-20200709094437775.png alt=image-20200709094437775></p><p>现在需要做的就是为你的Auto Scaling Group添加Tag。</p><p>tag键值：</p><table><thead><tr><th>Tag Key</th><th>Tag Value</th></tr></thead><tbody><tr><td>k8s.io/cluster-autoscaler/&lt;your_cluster_name></td><td>owned</td></tr><tr><td>k8s.io/cluster-autoscaler/enabled</td><td>true</td></tr></tbody></table><blockquote><p>第一个Tag Key中的集群名&lt;your_cluster_name>需要替换；</p><p>Tag Value的值是什么不重要，主要是需要这两个Tag Key来识别是否对这个集群开启Auto Scaling的能力。</p></blockquote><h2 id=添加policy>添加Policy
-<a class=anchor href=#%e6%b7%bb%e5%8a%a0policy>#</a></h2><p>创建IAM策略，将新创建的策略Attach到集群节点绑定的IAM role上，让你的集群节点拥有自动伸缩的能力。</p><p>IAM策略Json内容：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;Version&#34;</span>: <span style=color:#e6db74>&#34;2012-10-17&#34;</span>,
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;Statement&#34;</span>: [
-</span></span><span style=display:flex><span>        {
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;Action&#34;</span>: [
-</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#34;autoscaling:DescribeAutoScalingGroups&#34;</span>,
-</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#34;autoscaling:DescribeAutoScalingInstances&#34;</span>,
-</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#34;autoscaling:DescribeLaunchConfigurations&#34;</span>,
-</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#34;autoscaling:DescribeTags&#34;</span>,
-</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#34;autoscaling:SetDesiredCapacity&#34;</span>,
-</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#34;autoscaling:TerminateInstanceInAutoScalingGroup&#34;</span>,
-</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#34;ec2:DescribeLaunchTemplateVersions&#34;</span>
-</span></span><span style=display:flex><span>            ],
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;Resource&#34;</span>: <span style=color:#e6db74>&#34;*&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;Effect&#34;</span>: <span style=color:#e6db74>&#34;Allow&#34;</span>
-</span></span><span style=display:flex><span>        }
-</span></span><span style=display:flex><span>    ]
-</span></span><span style=display:flex><span>}
+<a class=anchor href=#%e6%b7%bb%e5%8a%a0policy>#</a></h2><p>创建IAM策略，将新创建的策略Attach到集群节点绑定的IAM role上，让你的集群节点拥有自动伸缩的能力。</p><p>IAM策略Json内容：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;Version&#34;</span><span class=p>:</span> <span class=s2>&#34;2012-10-17&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;Statement&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Action&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;autoscaling:DescribeAutoScalingGroups&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;autoscaling:DescribeAutoScalingInstances&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;autoscaling:DescribeLaunchConfigurations&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;autoscaling:DescribeTags&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;autoscaling:SetDesiredCapacity&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;autoscaling:TerminateInstanceInAutoScalingGroup&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;ec2:DescribeLaunchTemplateVersions&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=p>],</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Resource&#34;</span><span class=p>:</span> <span class=s2>&#34;*&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Effect&#34;</span><span class=p>:</span> <span class=s2>&#34;Allow&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
 </span></span></code></pre></div><h2 id=部署cluster-autoscaler>部署Cluster AutoScaler
-<a class=anchor href=#%e9%83%a8%e7%bd%b2cluster-autoscaler>#</a></h2><p>在集群中部署Cluster AutoScaler，准备资源清单文件cluster-autoscaler.yaml：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span>---
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ServiceAccount</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>k8s-addon</span>: <span style=color:#ae81ff>cluster-autoscaler.addons.k8s.io</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>k8s-app</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
-</span></span><span style=display:flex><span>---
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRole</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>k8s-addon</span>: <span style=color:#ae81ff>cluster-autoscaler.addons.k8s.io</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>k8s-app</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>rules</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>apiGroups</span>: [<span style=color:#e6db74>&#34;&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resources</span>: [<span style=color:#e6db74>&#34;events&#34;</span>, <span style=color:#e6db74>&#34;endpoints&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>verbs</span>: [<span style=color:#e6db74>&#34;create&#34;</span>, <span style=color:#e6db74>&#34;patch&#34;</span>]
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>apiGroups</span>: [<span style=color:#e6db74>&#34;&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resources</span>: [<span style=color:#e6db74>&#34;pods/eviction&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>verbs</span>: [<span style=color:#e6db74>&#34;create&#34;</span>]
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>apiGroups</span>: [<span style=color:#e6db74>&#34;&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resources</span>: [<span style=color:#e6db74>&#34;pods/status&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>verbs</span>: [<span style=color:#e6db74>&#34;update&#34;</span>]
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>apiGroups</span>: [<span style=color:#e6db74>&#34;&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resources</span>: [<span style=color:#e6db74>&#34;endpoints&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resourceNames</span>: [<span style=color:#e6db74>&#34;cluster-autoscaler&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>verbs</span>: [<span style=color:#e6db74>&#34;get&#34;</span>, <span style=color:#e6db74>&#34;update&#34;</span>]
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>apiGroups</span>: [<span style=color:#e6db74>&#34;&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resources</span>: [<span style=color:#e6db74>&#34;nodes&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>verbs</span>: [<span style=color:#e6db74>&#34;watch&#34;</span>, <span style=color:#e6db74>&#34;list&#34;</span>, <span style=color:#e6db74>&#34;get&#34;</span>, <span style=color:#e6db74>&#34;update&#34;</span>]
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>apiGroups</span>: [<span style=color:#e6db74>&#34;&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resources</span>:
-</span></span><span style=display:flex><span>      - <span style=color:#e6db74>&#34;pods&#34;</span>
-</span></span><span style=display:flex><span>      - <span style=color:#e6db74>&#34;services&#34;</span>
-</span></span><span style=display:flex><span>      - <span style=color:#e6db74>&#34;replicationcontrollers&#34;</span>
-</span></span><span style=display:flex><span>      - <span style=color:#e6db74>&#34;persistentvolumeclaims&#34;</span>
-</span></span><span style=display:flex><span>      - <span style=color:#e6db74>&#34;persistentvolumes&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>verbs</span>: [<span style=color:#e6db74>&#34;watch&#34;</span>, <span style=color:#e6db74>&#34;list&#34;</span>, <span style=color:#e6db74>&#34;get&#34;</span>]
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>apiGroups</span>: [<span style=color:#e6db74>&#34;extensions&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resources</span>: [<span style=color:#e6db74>&#34;replicasets&#34;</span>, <span style=color:#e6db74>&#34;daemonsets&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>verbs</span>: [<span style=color:#e6db74>&#34;watch&#34;</span>, <span style=color:#e6db74>&#34;list&#34;</span>, <span style=color:#e6db74>&#34;get&#34;</span>]
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>apiGroups</span>: [<span style=color:#e6db74>&#34;policy&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resources</span>: [<span style=color:#e6db74>&#34;poddisruptionbudgets&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>verbs</span>: [<span style=color:#e6db74>&#34;watch&#34;</span>, <span style=color:#e6db74>&#34;list&#34;</span>]
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>apiGroups</span>: [<span style=color:#e6db74>&#34;apps&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resources</span>: [<span style=color:#e6db74>&#34;statefulsets&#34;</span>, <span style=color:#e6db74>&#34;replicasets&#34;</span>, <span style=color:#e6db74>&#34;daemonsets&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>verbs</span>: [<span style=color:#e6db74>&#34;watch&#34;</span>, <span style=color:#e6db74>&#34;list&#34;</span>, <span style=color:#e6db74>&#34;get&#34;</span>]
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>apiGroups</span>: [<span style=color:#e6db74>&#34;storage.k8s.io&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resources</span>: [<span style=color:#e6db74>&#34;storageclasses&#34;</span>, <span style=color:#e6db74>&#34;csinodes&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>verbs</span>: [<span style=color:#e6db74>&#34;watch&#34;</span>, <span style=color:#e6db74>&#34;list&#34;</span>, <span style=color:#e6db74>&#34;get&#34;</span>]
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>apiGroups</span>: [<span style=color:#e6db74>&#34;batch&#34;</span>, <span style=color:#e6db74>&#34;extensions&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resources</span>: [<span style=color:#e6db74>&#34;jobs&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>verbs</span>: [<span style=color:#e6db74>&#34;get&#34;</span>, <span style=color:#e6db74>&#34;list&#34;</span>, <span style=color:#e6db74>&#34;watch&#34;</span>, <span style=color:#e6db74>&#34;patch&#34;</span>]
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>apiGroups</span>: [<span style=color:#e6db74>&#34;coordination.k8s.io&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resources</span>: [<span style=color:#e6db74>&#34;leases&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>verbs</span>: [<span style=color:#e6db74>&#34;create&#34;</span>]
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>apiGroups</span>: [<span style=color:#e6db74>&#34;coordination.k8s.io&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resourceNames</span>: [<span style=color:#e6db74>&#34;cluster-autoscaler&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resources</span>: [<span style=color:#e6db74>&#34;leases&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>verbs</span>: [<span style=color:#e6db74>&#34;get&#34;</span>, <span style=color:#e6db74>&#34;update&#34;</span>]
-</span></span><span style=display:flex><span>---
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Role</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>k8s-addon</span>: <span style=color:#ae81ff>cluster-autoscaler.addons.k8s.io</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>k8s-app</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>rules</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>apiGroups</span>: [<span style=color:#e6db74>&#34;&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resources</span>: [<span style=color:#e6db74>&#34;configmaps&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>verbs</span>: [<span style=color:#e6db74>&#34;create&#34;</span>, <span style=color:#e6db74>&#34;list&#34;</span>, <span style=color:#e6db74>&#34;watch&#34;</span>]
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>apiGroups</span>: [<span style=color:#e6db74>&#34;&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resources</span>: [<span style=color:#e6db74>&#34;configmaps&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resourceNames</span>:
-</span></span><span style=display:flex><span>      [<span style=color:#e6db74>&#34;cluster-autoscaler-status&#34;</span>, <span style=color:#e6db74>&#34;cluster-autoscaler-priority-expander&#34;</span>]
-</span></span><span style=display:flex><span>    <span style=color:#f92672>verbs</span>: [<span style=color:#e6db74>&#34;delete&#34;</span>, <span style=color:#e6db74>&#34;get&#34;</span>, <span style=color:#e6db74>&#34;update&#34;</span>, <span style=color:#e6db74>&#34;watch&#34;</span>]
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>---
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRoleBinding</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>k8s-addon</span>: <span style=color:#ae81ff>cluster-autoscaler.addons.k8s.io</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>k8s-app</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>roleRef</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>apiGroup</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRole</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>subjects</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ServiceAccount</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>---
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>RoleBinding</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>k8s-addon</span>: <span style=color:#ae81ff>cluster-autoscaler.addons.k8s.io</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>k8s-app</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>roleRef</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>apiGroup</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Role</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>subjects</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ServiceAccount</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>---
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>apps/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Deployment</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>kube-system</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>replicas</span>: <span style=color:#ae81ff>1</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>selector</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>matchLabels</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>app</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>template</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>app</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>annotations</span>:
-</span></span><span style=display:flex><span>        <span style=color:#f92672>prometheus.io/scrape</span>: <span style=color:#e6db74>&#34;true&#34;</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>prometheus.io/port</span>: <span style=color:#e6db74>&#34;8085&#34;</span>
-</span></span><span style=display:flex><span>        <span style=color:#f92672>cluster-autoscaler.kubernetes.io/safe-to-evict</span>: <span style=color:#e6db74>&#34;false&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>spec</span>:
-</span></span><span style=display:flex><span>      <span style=color:#f92672>serviceAccountName</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>containers</span>:
-</span></span><span style=display:flex><span>        - <span style=color:#f92672>image</span>: <span style=color:#ae81ff>us.gcr.io/k8s-artifacts-prod/autoscaling/cluster-autoscaler:v1.16.5</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>name</span>: <span style=color:#ae81ff>cluster-autoscaler</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>resources</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>limits</span>:
-</span></span><span style=display:flex><span>              <span style=color:#f92672>cpu</span>: <span style=color:#ae81ff>100m</span>
-</span></span><span style=display:flex><span>              <span style=color:#f92672>memory</span>: <span style=color:#ae81ff>300Mi</span>
-</span></span><span style=display:flex><span>            <span style=color:#f92672>requests</span>:
-</span></span><span style=display:flex><span>              <span style=color:#f92672>cpu</span>: <span style=color:#ae81ff>100m</span>
-</span></span><span style=display:flex><span>              <span style=color:#f92672>memory</span>: <span style=color:#ae81ff>300Mi</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>command</span>:
-</span></span><span style=display:flex><span>            - <span style=color:#ae81ff>./cluster-autoscaler</span>
-</span></span><span style=display:flex><span>            - --<span style=color:#ae81ff>v=4</span>
-</span></span><span style=display:flex><span>            - --<span style=color:#ae81ff>stderrthreshold=info</span>
-</span></span><span style=display:flex><span>            - --<span style=color:#ae81ff>cloud-provider=aws</span>
-</span></span><span style=display:flex><span>            - --<span style=color:#ae81ff>skip-nodes-with-local-storage=false</span>
-</span></span><span style=display:flex><span>            - --<span style=color:#ae81ff>expander=least-waste</span>
-</span></span><span style=display:flex><span>            - --<span style=color:#ae81ff>node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/&lt;your_cluster_name&gt;</span>
-</span></span><span style=display:flex><span>            - --<span style=color:#ae81ff>balance-similar-node-groups</span>
-</span></span><span style=display:flex><span>            - --<span style=color:#ae81ff>skip-nodes-with-system-pods=false</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>volumeMounts</span>:
-</span></span><span style=display:flex><span>            - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>ssl-certs</span>
-</span></span><span style=display:flex><span>              <span style=color:#f92672>mountPath</span>: <span style=color:#ae81ff>/etc/ssl/certs/ca-certificates.crt</span>
-</span></span><span style=display:flex><span>              <span style=color:#f92672>readOnly</span>: <span style=color:#66d9ef>true</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>imagePullPolicy</span>: <span style=color:#e6db74>&#34;Always&#34;</span>
-</span></span><span style=display:flex><span>      <span style=color:#f92672>volumes</span>:
-</span></span><span style=display:flex><span>        - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>ssl-certs</span>
-</span></span><span style=display:flex><span>          <span style=color:#f92672>hostPath</span>:
-</span></span><span style=display:flex><span>            <span style=color:#f92672>path</span>: <span style=color:#e6db74>&#34;/etc/ssl/certs/ca-bundle.crt&#34;</span>
-</span></span></code></pre></div><p>资源清单内容比较长，但是需要注意的是 cluster-autoscaler 的 Deployment 资源中定义的 command 中，有一行你会觉得眼熟，没错就是我们上面为 Auto Scale Group 添加的 Tag，这里你也需要替换你的集群名 &lt;your_cluster_name>，此外你可能需要替换使用到的镜像，你可以在
-<a href=https://github.com/kubernetes/autoscaler/releases>Cluster AutoScaler 发版页面</a>去找对应的镜像版本。例如我的K8s集群是1.16，那么我需要找一个1.16.x版本的镜像。上面资源清单里就是使用了 <code>us.gcr.io/k8s-artifacts-prod/autoscaling/cluster-autoscaler:v1.16.5</code> 的镜像。</p><p><img src=https://fs.poneding.com/images/image-20200709101706463.png alt=image-20200709101706463></p><p>使用下面的命令创建 Cluster AutoScaler 资源：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl apply -f cluster-autoscaler.yaml
+<a class=anchor href=#%e9%83%a8%e7%bd%b2cluster-autoscaler>#</a></h2><p>在集群中部署Cluster AutoScaler，准备资源清单文件cluster-autoscaler.yaml：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ServiceAccount</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>k8s-addon</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler.addons.k8s.io</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>k8s-app</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ClusterRole</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>k8s-addon</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler.addons.k8s.io</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>k8s-app</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>rules</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resources</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;events&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;endpoints&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>verbs</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;create&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;patch&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resources</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;pods/eviction&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>verbs</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;create&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resources</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;pods/status&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>verbs</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;update&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resources</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;endpoints&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resourceNames</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;cluster-autoscaler&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>verbs</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;get&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;update&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resources</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;nodes&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>verbs</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;watch&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;list&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;get&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;update&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resources</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=s2>&#34;pods&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=s2>&#34;services&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=s2>&#34;replicationcontrollers&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=s2>&#34;persistentvolumeclaims&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=s2>&#34;persistentvolumes&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>verbs</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;watch&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;list&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;get&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;extensions&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resources</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;replicasets&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;daemonsets&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>verbs</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;watch&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;list&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;get&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;policy&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resources</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;poddisruptionbudgets&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>verbs</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;watch&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;list&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;apps&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resources</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;statefulsets&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;replicasets&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;daemonsets&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>verbs</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;watch&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;list&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;get&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;storage.k8s.io&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resources</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;storageclasses&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;csinodes&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>verbs</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;watch&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;list&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;get&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;batch&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;extensions&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resources</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;jobs&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>verbs</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;get&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;list&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;watch&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;patch&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;coordination.k8s.io&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resources</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;leases&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>verbs</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;create&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;coordination.k8s.io&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resourceNames</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;cluster-autoscaler&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resources</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;leases&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>verbs</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;get&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;update&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Role</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>k8s-addon</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler.addons.k8s.io</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>k8s-app</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>rules</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resources</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;configmaps&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>verbs</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;create&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;list&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;watch&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resources</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;configmaps&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resourceNames</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=p>[</span><span class=s2>&#34;cluster-autoscaler-status&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;cluster-autoscaler-priority-expander&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>verbs</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;delete&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;get&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;update&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;watch&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ClusterRoleBinding</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>k8s-addon</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler.addons.k8s.io</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>k8s-app</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>roleRef</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>apiGroup</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ClusterRole</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>subjects</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ServiceAccount</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>RoleBinding</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>k8s-addon</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler.addons.k8s.io</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>k8s-app</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>roleRef</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>apiGroup</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Role</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>subjects</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ServiceAccount</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>apps/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Deployment</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>replicas</span><span class=p>:</span><span class=w> </span><span class=m>1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>selector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>matchLabels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>template</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>annotations</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>prometheus.io/scrape</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;true&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>prometheus.io/port</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;8085&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>cluster-autoscaler.kubernetes.io/safe-to-evict</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;false&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>serviceAccountName</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>us.gcr.io/k8s-artifacts-prod/autoscaling/cluster-autoscaler:v1.16.5</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>resources</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>limits</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>cpu</span><span class=p>:</span><span class=w> </span><span class=l>100m</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>memory</span><span class=p>:</span><span class=w> </span><span class=l>300Mi</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>requests</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>cpu</span><span class=p>:</span><span class=w> </span><span class=l>100m</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>memory</span><span class=p>:</span><span class=w> </span><span class=l>300Mi</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>command</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=l>./cluster-autoscaler</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- --<span class=l>v=4</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- --<span class=l>stderrthreshold=info</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- --<span class=l>cloud-provider=aws</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- --<span class=l>skip-nodes-with-local-storage=false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- --<span class=l>expander=least-waste</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- --<span class=l>node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/&lt;your_cluster_name&gt;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- --<span class=l>balance-similar-node-groups</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- --<span class=l>skip-nodes-with-system-pods=false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>volumeMounts</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>ssl-certs</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>mountPath</span><span class=p>:</span><span class=w> </span><span class=l>/etc/ssl/certs/ca-certificates.crt</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>readOnly</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>imagePullPolicy</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Always&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>volumes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>ssl-certs</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>hostPath</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>path</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;/etc/ssl/certs/ca-bundle.crt&#34;</span><span class=w>
+</span></span></span></code></pre></div><p>资源清单内容比较长，但是需要注意的是 cluster-autoscaler 的 Deployment 资源中定义的 command 中，有一行你会觉得眼熟，没错就是我们上面为 Auto Scale Group 添加的 Tag，这里你也需要替换你的集群名 &lt;your_cluster_name>，此外你可能需要替换使用到的镜像，你可以在
+<a href=https://github.com/kubernetes/autoscaler/releases>Cluster AutoScaler 发版页面</a>去找对应的镜像版本。例如我的K8s集群是1.16，那么我需要找一个1.16.x版本的镜像。上面资源清单里就是使用了 <code>us.gcr.io/k8s-artifacts-prod/autoscaling/cluster-autoscaler:v1.16.5</code> 的镜像。</p><p><img src=https://fs.poneding.com/images/image-20200709101706463.png alt=image-20200709101706463></p><p>使用下面的命令创建 Cluster AutoScaler 资源：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl apply -f cluster-autoscaler.yaml
 </span></span></code></pre></div><h2 id=查看cluster-autoscaler>查看Cluster AutoScaler
-<a class=anchor href=#%e6%9f%a5%e7%9c%8bcluster-autoscaler>#</a></h2><p>我们部署完成之后，Cluster 默认每 10s 检查一次集群的资源情况，并根据资源情况判断是否需要扩缩容。</p><p>使用命令查看Cluster AutoScaler的检查情况：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl logs -f deployment.apps/cluster-autoscaler -n kube-system
+<a class=anchor href=#%e6%9f%a5%e7%9c%8bcluster-autoscaler>#</a></h2><p>我们部署完成之后，Cluster 默认每 10s 检查一次集群的资源情况，并根据资源情况判断是否需要扩缩容。</p><p>使用命令查看Cluster AutoScaler的检查情况：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl logs -f deployment.apps/cluster-autoscaler -n kube-system
 </span></span></code></pre></div><p><img src=https://fs.poneding.com/images/image-20200709102312935.png alt=image-20200709102312935></p><h2 id=分析原理>分析原理
 <a class=anchor href=#%e5%88%86%e6%9e%90%e5%8e%9f%e7%90%86>#</a></h2><p>你可以通过突然增加Pod示例数量，并且增加 Pod 的 <code>resource.request.cpu/memory</code> 设置为较高的值，这样来模拟集群资源紧张的场景，观察集群节点是否会自动扩容，之后将增加的 Pod 资源删除，再观察集群节点是否自动回收。这里我已经实践过了，由于演示起来比较复杂，可能会耗费很长的篇幅，所以这里就省去了，你可以亲自动手实践尝试。</p><p>相信有一个疑问一直环绕着，Cluster AutoScaler是怎么做到自动伸缩的呢，我们也没有给出类似于CPU超过75%就扩容的伸缩条件。我没有深入去研究，但是我自己根据Cluster AutoScaler的日志输出理解了一下。</p><p>Pod的申请的资源（resources.requests）与现有节点资源作比较，如果发现集群资源超出申请的资源能够使得我们移除一个节点的话，那么Cluster AutoScaler便会修改Auto Scaling Group的asg_desired_capacity值，例如-1，但是不会小于asg_max_size。当有新Pod部署，发现集群资源达不到新Pod申请的资源时，那么Cluster AutoScaler便会修改Auto Scaling Group的asg_desired_capacity值，例如+1，但是不会大于asg_max_size。只要修改了Auto Scaling Group的asg_desired_capacity值，那么集群节点便会自动伸缩。</p><hr><p><a href=/aws/build-eks-cluster/>« 搭建EKS集群</a></p><p><a href=/aws/create-eks-cluster/>» 创建 EKS 集群</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
 <span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/aws/cluster-autoscaler.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>

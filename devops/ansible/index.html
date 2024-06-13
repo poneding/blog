@@ -37,7 +37,7 @@ Ansible配置 # ​ 配置文件位置：/etc/ansible/ansible.cfg，为ini格式
 配置示例 # ​ inventory：主机清单配置文件位置，在使用Ansible命令时，也开始-i <path>指定；
 ​ host_key_checking：当know_hosts中不存在的主机（即尚未访问过的主机，是否需要输入密钥）；
 ​ become_user：sudo用户；"><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="devops"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Ansible | 我的博客</title>
-<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/devops/ansible/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/devops/ansible/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.ffd7553d42e9860dbcfbc6775c0f6c9895736a50f5383929cc725dc0a9b61715.js integrity="sha256-/9dVPULphg28+8Z3XA9smJVzalD1ODkpzHJdwKm2FxU=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
 <input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
 </label><strong>Ansible</strong>
 <label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#介绍>介绍</a><ul><li><a href=#特点>特点</a></li></ul></li><li><a href=#安装>安装</a></li><li><a href=#主要概念>主要概念</a></li><li><a href=#ansible配置>Ansible配置</a><ul><li><a href=#配置示例>配置示例</a></li></ul></li><li><a href=#主机清单inventory>主机清单(Inventory)</a><ul><li><a href=#formats>Formats</a></li><li><a href=#hosts>Hosts</a></li><li><a href=#group>Group</a></li><li><a href=#inventory内置参数>Inventory内置参数</a></li></ul></li><li><a href=#模块modules>模块(Modules)</a><ul><li><a href=#常用模块>常用模块</a></li></ul></li><li><a href=#任务tasks>任务(Tasks)</a></li><li><a href=#ansible用法>Ansible用法</a><ul><li><a href=#ansible命令>ansible命令</a></li><li><a href=#anisble-playbook>Anisble playbook</a></li></ul></li><li><a href=#ansible原理>Ansible原理</a></li><li><a href=#演示>演示</a></li><li><a href=#踩坑记录>踩坑记录</a></li><li><a href=#其他>其他</a><ul><li><a href=#预编译>预编译</a></li><li><a href=#python的版本兼容问题>python的版本兼容问题</a></li><li><a href=#工具对比>工具对比</a></li></ul></li><li><a href=#参考>参考</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
@@ -45,11 +45,11 @@ Ansible配置 # ​ 配置文件位置：/etc/ansible/ansible.cfg，为ini格式
 <a class=anchor href=#ansible>#</a></h1><h2 id=介绍>介绍
 <a class=anchor href=#%e4%bb%8b%e7%bb%8d>#</a></h2><ul><li><p>一款轻量级的自动化运维工具，只需要一台主机安装Ansible，便可以管理其他可连通的Linux服务器。</p></li><li><p>开源</p></li><li><p>python</p></li></ul><h3 id=特点>特点
 <a class=anchor href=#%e7%89%b9%e7%82%b9>#</a></h3><ol><li>自动化引擎，实现管理配置，应用部署，服务编排及其他各种服务器管理需求；</li><li>使用简单，具有客户端的特点；</li><li>基于ssh实现配置管理；</li><li>依赖python；</li><li>功能强大，支持云服务操作。</li></ol><h2 id=安装>安装
-<a class=anchor href=#%e5%ae%89%e8%a3%85>#</a></h2><p>​ 由于Ansible使用Python开发，所以可以直接使用pip安装</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>pip install ansible
-</span></span></code></pre></div><p>​ 也可以使用yum或apt-get安装</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum install ansible -y
-</span></span><span style=display:flex><span>apt-get install ansible -y
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>ansible --version
+<a class=anchor href=#%e5%ae%89%e8%a3%85>#</a></h2><p>​ 由于Ansible使用Python开发，所以可以直接使用pip安装</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>pip install ansible
+</span></span></code></pre></div><p>​ 也可以使用yum或apt-get安装</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>yum install ansible -y
+</span></span><span class=line><span class=cl>apt-get install ansible -y
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>ansible --version
 </span></span></code></pre></div><p>​ 只需要在Control Node上安装即可。</p><h2 id=主要概念>主要概念
 <a class=anchor href=#%e4%b8%bb%e8%a6%81%e6%a6%82%e5%bf%b5>#</a></h2><ul><li><p><strong>Control node</strong>：</p><p>安装了Ansible的主机都可以称之为Control node，反过来说，Ansible安装在Contriol Node上；</p><p>一般为linux机器（注：目前也已经对windows做了支持）。</p></li><li><p><strong>Managed nodes</strong>：</p><p>待管理的网络设备或者服务器；</p><p>linux机器（安装了python）。</p></li><li><p><strong>Inventory</strong>：</p></li><li><p><strong>Modules</strong>：</p></li><li><p><strong>Tasks</strong>：</p><p><img src=https://fs.poneding.com/images/image-20191126103012999.png alt=image-20191126103012999></p></li></ul><h2 id=ansible配置>Ansible配置
 <a class=anchor href=#ansible%e9%85%8d%e7%bd%ae>#</a></h2><p>​ 配置文件位置：/etc/ansible/ansible.cfg，为ini格式文件。</p><h3 id=配置示例>配置示例
@@ -60,48 +60,48 @@ Ansible配置 # ​ 配置文件位置：/etc/ansible/ansible.cfg，为ini格式
 [webservers]
 foo.example.com
 bar.example.com
-</code></pre></li><li><p>yaml</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>all:
-</span></span><span style=display:flex><span>  hosts:
-</span></span><span style=display:flex><span>    mail.example.com:
-</span></span><span style=display:flex><span>  children:
-</span></span><span style=display:flex><span>    webservers:
-</span></span><span style=display:flex><span>      hosts:
-</span></span><span style=display:flex><span>        foo.example.com:
-</span></span><span style=display:flex><span>        bar.example.com:
+</code></pre></li><li><p>yaml</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>all:
+</span></span><span class=line><span class=cl>  hosts:
+</span></span><span class=line><span class=cl>    mail.example.com:
+</span></span><span class=line><span class=cl>  children:
+</span></span><span class=line><span class=cl>    webservers:
+</span></span><span class=line><span class=cl>      hosts:
+</span></span><span class=line><span class=cl>        foo.example.com:
+</span></span><span class=line><span class=cl>        bar.example.com:
 </span></span></code></pre></div></li></ul><h3 id=hosts>Hosts
 <a class=anchor href=#hosts>#</a></h3><p>​ 配置需要管理的主机host name或ip address。</p><h3 id=group>Group
-<a class=anchor href=#group>#</a></h3><p>​ 如果想管理某一批主机，可以将这多个host配置到统一个group下。方便对这组主机的批量管理。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span><span style=color:#f92672>[</span>webserver<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>webserver01.com
-</span></span><span style=display:flex><span>webserver02.com
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>dbserver<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>dbserver01.com
-</span></span><span style=display:flex><span>dbserver02.com
+<a class=anchor href=#group>#</a></h3><p>​ 如果想管理某一批主机，可以将这多个host配置到统一个group下。方便对这组主机的批量管理。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=o>[</span>webserver<span class=o>]</span>
+</span></span><span class=line><span class=cl>webserver01.com
+</span></span><span class=line><span class=cl>webserver02.com
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>[</span>dbserver<span class=o>]</span>
+</span></span><span class=line><span class=cl>dbserver01.com
+</span></span><span class=line><span class=cl>dbserver02.com
 </span></span></code></pre></div><h4 id=group变量>Group变量
-<a class=anchor href=#group%e5%8f%98%e9%87%8f>#</a></h4><p>作用在group上的变量。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span><span style=color:#f92672>[</span>webserver<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>webserver01.com
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>webserver:vars<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>ansible_ssh_user<span style=color:#f92672>=</span>ubuntu
+<a class=anchor href=#group%e5%8f%98%e9%87%8f>#</a></h4><p>作用在group上的变量。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=o>[</span>webserver<span class=o>]</span>
+</span></span><span class=line><span class=cl>webserver01.com
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>[</span>webserver:vars<span class=o>]</span>
+</span></span><span class=line><span class=cl><span class=nv>ansible_ssh_user</span><span class=o>=</span>ubuntu
 </span></span></code></pre></div><h4 id=nested-group>Nested group
-<a class=anchor href=#nested-group>#</a></h4><p>​ 一个组包含其他组。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span><span style=color:#f92672>[</span>allserver:children<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>webserver
-</span></span><span style=display:flex><span>dbserver
+<a class=anchor href=#nested-group>#</a></h4><p>​ 一个组包含其他组。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=o>[</span>allserver:children<span class=o>]</span>
+</span></span><span class=line><span class=cl>webserver
+</span></span><span class=line><span class=cl>dbserver
 </span></span></code></pre></div><h3 id=inventory内置参数>Inventory内置参数
-<a class=anchor href=#inventory%e5%86%85%e7%bd%ae%e5%8f%82%e6%95%b0>#</a></h3><table><thead><tr><th style=text-align:left>参数名</th><th style=text-align:left>参数说明</th></tr></thead><tbody><tr><td style=text-align:left>ansible_ssh_host</td><td style=text-align:left>定义主机的ssh地址</td></tr><tr><td style=text-align:left>ansible_ssh_port</td><td style=text-align:left>定义主机的ssh端口</td></tr><tr><td style=text-align:left>ansible_ssh_user</td><td style=text-align:left>定义主机的ssh认证用户</td></tr><tr><td style=text-align:left>ansible_ssh_pass</td><td style=text-align:left>定义主机的ssh认证密码</td></tr><tr><td style=text-align:left>ansible_sudo</td><td style=text-align:left>定义主机的sudo用户</td></tr><tr><td style=text-align:left>ansible_sudo_pass</td><td style=text-align:left>定义主机的sudo密码</td></tr><tr><td style=text-align:left>ansible_sudo_exe</td><td style=text-align:left>定义主机的sudo路径</td></tr><tr><td style=text-align:left>ansible_connection</td><td style=text-align:left>定义主机连接方式；与主机的连接类型.比如：local，ssh或者paramiko；Ansible 1.2以前默认使用paramiko。1.2以后的版本默认使用‘smart’，‘smart’方式会根据是否支持ControlPersist，来判断ssh方式是否可行</td></tr><tr><td style=text-align:left>ansible_ssh_private_key_file</td><td style=text-align:left>定义主机私钥文件</td></tr><tr><td style=text-align:left>ansible_shell_type</td><td style=text-align:left>定义主机shell类型</td></tr><tr><td style=text-align:left>ansible_python_interpreter</td><td style=text-align:left>定义主机python解释器路径</td></tr></tbody></table><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span><span style=color:#f92672>[</span>webserver<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>webserver01.com
-</span></span><span style=display:flex><span>webserver02.com
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>webserver:vars<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>ansible_ssh_private_key_file<span style=color:#f92672>=</span>~/singapore.pem
+<a class=anchor href=#inventory%e5%86%85%e7%bd%ae%e5%8f%82%e6%95%b0>#</a></h3><table><thead><tr><th style=text-align:left>参数名</th><th style=text-align:left>参数说明</th></tr></thead><tbody><tr><td style=text-align:left>ansible_ssh_host</td><td style=text-align:left>定义主机的ssh地址</td></tr><tr><td style=text-align:left>ansible_ssh_port</td><td style=text-align:left>定义主机的ssh端口</td></tr><tr><td style=text-align:left>ansible_ssh_user</td><td style=text-align:left>定义主机的ssh认证用户</td></tr><tr><td style=text-align:left>ansible_ssh_pass</td><td style=text-align:left>定义主机的ssh认证密码</td></tr><tr><td style=text-align:left>ansible_sudo</td><td style=text-align:left>定义主机的sudo用户</td></tr><tr><td style=text-align:left>ansible_sudo_pass</td><td style=text-align:left>定义主机的sudo密码</td></tr><tr><td style=text-align:left>ansible_sudo_exe</td><td style=text-align:left>定义主机的sudo路径</td></tr><tr><td style=text-align:left>ansible_connection</td><td style=text-align:left>定义主机连接方式；与主机的连接类型.比如：local，ssh或者paramiko；Ansible 1.2以前默认使用paramiko。1.2以后的版本默认使用‘smart’，‘smart’方式会根据是否支持ControlPersist，来判断ssh方式是否可行</td></tr><tr><td style=text-align:left>ansible_ssh_private_key_file</td><td style=text-align:left>定义主机私钥文件</td></tr><tr><td style=text-align:left>ansible_shell_type</td><td style=text-align:left>定义主机shell类型</td></tr><tr><td style=text-align:left>ansible_python_interpreter</td><td style=text-align:left>定义主机python解释器路径</td></tr></tbody></table><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=o>[</span>webserver<span class=o>]</span>
+</span></span><span class=line><span class=cl>webserver01.com
+</span></span><span class=line><span class=cl>webserver02.com
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>[</span>webserver:vars<span class=o>]</span>
+</span></span><span class=line><span class=cl><span class=nv>ansible_ssh_private_key_file</span><span class=o>=</span>~/singapore.pem
 </span></span></code></pre></div><h2 id=模块modules>模块(Modules)
 <a class=anchor href=#%e6%a8%a1%e5%9d%97modules>#</a></h2><p>​ Ansible功能的单元，一个Ansible功能对应有一个Module。</p><h3 id=常用模块>常用模块
 <a class=anchor href=#%e5%b8%b8%e7%94%a8%e6%a8%a1%e5%9d%97>#</a></h3><h4 id=filehttpsdocsansiblecomansiblelatestmodulesfile_modulehtmlfile-module><a href=https://docs.ansible.com/ansible/latest/modules/file_module.html#file-module>file</a>
-<a class=anchor href=#filehttpsdocsansiblecomansiblelatestmodulesfile_modulehtmlfile-module>#</a></h4><p>远程服务器上的文件进行操作。创建删除文件，修改文件权限等。</p><blockquote><ul><li>path：执行文件、目录的路径</li><li>recurse：递归设置文件属性，只对目录有效</li><li>group：定义文件、目录的属组</li><li>mode：定义文件、目录的权限</li><li>owner：定义文件、目录的所有者</li><li>src：要被链接的源文件路径，只应用与state为link的情况</li><li>dest：被链接到的路径，只应用于state为link的情况</li><li>force：在两种情况下会强制创建软链接，一种是源文件不存在但之后会建立的情况；一种是目标软链接已经存在，需要先取消之前的软链接，然后创建新的软链接，默认值 no。</li></ul></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>ansible servers -m file -a <span style=color:#e6db74>&#39;path=~/temp state=directory&#39;</span>  <span style=color:#75715e># 创建目录</span>
-</span></span><span style=display:flex><span>ansible servers -m file -a <span style=color:#e6db74>&#39;path=~/temp/test1.txt state=touch&#39;</span>  <span style=color:#75715e># 创建文件</span>
+<a class=anchor href=#filehttpsdocsansiblecomansiblelatestmodulesfile_modulehtmlfile-module>#</a></h4><p>远程服务器上的文件进行操作。创建删除文件，修改文件权限等。</p><blockquote><ul><li>path：执行文件、目录的路径</li><li>recurse：递归设置文件属性，只对目录有效</li><li>group：定义文件、目录的属组</li><li>mode：定义文件、目录的权限</li><li>owner：定义文件、目录的所有者</li><li>src：要被链接的源文件路径，只应用与state为link的情况</li><li>dest：被链接到的路径，只应用于state为link的情况</li><li>force：在两种情况下会强制创建软链接，一种是源文件不存在但之后会建立的情况；一种是目标软链接已经存在，需要先取消之前的软链接，然后创建新的软链接，默认值 no。</li></ul></blockquote><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>ansible servers -m file -a <span class=s1>&#39;path=~/temp state=directory&#39;</span>  <span class=c1># 创建目录</span>
+</span></span><span class=line><span class=cl>ansible servers -m file -a <span class=s1>&#39;path=~/temp/test1.txt state=touch&#39;</span>  <span class=c1># 创建文件</span>
 </span></span></code></pre></div><h4 id=copy-httpsdocsansiblecomansiblelatestmodulescopy_modulehtmlcopy-module-><a href=https://docs.ansible.com/ansible/latest/modules/copy_module.html#copy-module>copy</a>
-<a class=anchor href=#copy-httpsdocsansiblecomansiblelatestmodulescopy_modulehtmlcopy-module->#</a></h4><p>将Control Node上的目录或文件拷贝至Managed Nodes。</p><blockquote><ul><li>src：指定要复制到远程主机的文件或目录。如果路径以 / 结尾，则只复制目录里的内容，如果没有以 / 结尾，则复制包含目录在内的整个内容</li><li>dest：文件复制的目的地，必须是一个绝对路径，如果源文件是一个目录，那么dest指向的也必须是一个目录</li><li>force：默认取值为yes，表示目标主机包含此文件，但内容不同时，覆盖。</li><li>backup：默认取值为no，如果为yes，在覆盖前将原文件进行备份</li><li>directory_mode：递归设定目录权限，默认为系统默认权限</li><li>others：所有file模块里的选项都可以在这里使用</li></ul></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>touch test2.txt
-</span></span><span style=display:flex><span>ansible servers -m copy -a <span style=color:#e6db74>&#39;src=test2.txt dest=~/temp/test2.txt&#39;</span>  <span style=color:#75715e># 拷贝文件到服务器</span>
+<a class=anchor href=#copy-httpsdocsansiblecomansiblelatestmodulescopy_modulehtmlcopy-module->#</a></h4><p>将Control Node上的目录或文件拷贝至Managed Nodes。</p><blockquote><ul><li>src：指定要复制到远程主机的文件或目录。如果路径以 / 结尾，则只复制目录里的内容，如果没有以 / 结尾，则复制包含目录在内的整个内容</li><li>dest：文件复制的目的地，必须是一个绝对路径，如果源文件是一个目录，那么dest指向的也必须是一个目录</li><li>force：默认取值为yes，表示目标主机包含此文件，但内容不同时，覆盖。</li><li>backup：默认取值为no，如果为yes，在覆盖前将原文件进行备份</li><li>directory_mode：递归设定目录权限，默认为系统默认权限</li><li>others：所有file模块里的选项都可以在这里使用</li></ul></blockquote><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>touch test2.txt
+</span></span><span class=line><span class=cl>ansible servers -m copy -a <span class=s1>&#39;src=test2.txt dest=~/temp/test2.txt&#39;</span>  <span class=c1># 拷贝文件到服务器</span>
 </span></span></code></pre></div><h4 id=commandhttpsdocsansiblecomansiblelatestmodulescommand_modulehtmlcommand-module><a href=https://docs.ansible.com/ansible/latest/modules/command_module.html#command-module>command</a>
 <a class=anchor href=#commandhttpsdocsansiblecomansiblelatestmodulescommand_modulehtmlcommand-module>#</a></h4><p>​ 直接要求主机清单执行命令。</p><pre tabindex=0><code>ansible servers -m command -a &#34;touch ~/temp/test3.txt&#34;
 ansible servers -m command -a &#34;sudo apt update&#34;
@@ -144,98 +144,98 @@ ansible servers -m service -a &#34;name=nginx state=stoped&#34;
 <a class=anchor href=#git>#</a></h4><ul><li><p>Managed需要已经安装git。</p></li><li><p>执行git相关操作。</p></li></ul><h2 id=任务tasks>任务(Tasks)
 <a class=anchor href=#%e4%bb%bb%e5%8a%a1tasks>#</a></h2><p>​ Ansible执行的单元，一般放在Playbook中，多个Task一起执行，使用方便，可复用。</p><p>​ 定义方式：</p><pre tabindex=0><code>-name: names
   module: action 
-</code></pre><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>---
-</span></span><span style=display:flex><span>- name: ansible-playbook demo
-</span></span><span style=display:flex><span>  hosts: servers
-</span></span><span style=display:flex><span>  tasks:
-</span></span><span style=display:flex><span>    - name: create temp dir
-</span></span><span style=display:flex><span>      file:
-</span></span><span style=display:flex><span>        path: ~/temp
-</span></span><span style=display:flex><span>        state: directory
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    - name: create test1.txt
-</span></span><span style=display:flex><span>      file:
-</span></span><span style=display:flex><span>        path: ~/temp/test1.txt
-</span></span><span style=display:flex><span>        state: touch
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    - name: copy test2.txt
-</span></span><span style=display:flex><span>      copy:
-</span></span><span style=display:flex><span>        src: test2.txt
-</span></span><span style=display:flex><span>        dest: ~/temp/test2.txt
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    - name: copy test.sh
-</span></span><span style=display:flex><span>      copy:
-</span></span><span style=display:flex><span>        src: test.sh
-</span></span><span style=display:flex><span>        dest: ~/temp/test.sh 
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    - name: <span style=color:#e6db74>&#39;chmod shell&#39;</span>
-</span></span><span style=display:flex><span>      command: chmod <span style=color:#ae81ff>777</span> ~/temp/test.sh
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    - name: exec shell
-</span></span><span style=display:flex><span>      shell: ~/temp/test.sh
-</span></span><span style=display:flex><span>      args:
-</span></span><span style=display:flex><span>        executable: /bin/bash
+</code></pre><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>---
+</span></span><span class=line><span class=cl>- name: ansible-playbook demo
+</span></span><span class=line><span class=cl>  hosts: servers
+</span></span><span class=line><span class=cl>  tasks:
+</span></span><span class=line><span class=cl>    - name: create temp dir
+</span></span><span class=line><span class=cl>      file:
+</span></span><span class=line><span class=cl>        path: ~/temp
+</span></span><span class=line><span class=cl>        state: directory
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    - name: create test1.txt
+</span></span><span class=line><span class=cl>      file:
+</span></span><span class=line><span class=cl>        path: ~/temp/test1.txt
+</span></span><span class=line><span class=cl>        state: touch
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    - name: copy test2.txt
+</span></span><span class=line><span class=cl>      copy:
+</span></span><span class=line><span class=cl>        src: test2.txt
+</span></span><span class=line><span class=cl>        dest: ~/temp/test2.txt
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    - name: copy test.sh
+</span></span><span class=line><span class=cl>      copy:
+</span></span><span class=line><span class=cl>        src: test.sh
+</span></span><span class=line><span class=cl>        dest: ~/temp/test.sh 
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    - name: <span class=s1>&#39;chmod shell&#39;</span>
+</span></span><span class=line><span class=cl>      command: chmod <span class=m>777</span> ~/temp/test.sh
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    - name: <span class=nb>exec</span> shell
+</span></span><span class=line><span class=cl>      shell: ~/temp/test.sh
+</span></span><span class=line><span class=cl>      args:
+</span></span><span class=line><span class=cl>        executable: /bin/bash
 </span></span></code></pre></div><h2 id=ansible用法>Ansible用法
 <a class=anchor href=#ansible%e7%94%a8%e6%b3%95>#</a></h2><h3 id=ansible命令>ansible命令
-<a class=anchor href=#ansible%e5%91%bd%e4%bb%a4>#</a></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>ansible &lt;hosts&gt; -m &lt;module_name&gt; -a &lt;arguments&gt; -i &lt;hosts_path&gt;
+<a class=anchor href=#ansible%e5%91%bd%e4%bb%a4>#</a></h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>ansible &lt;hosts&gt; -m &lt;module_name&gt; -a &lt;arguments&gt; -i &lt;hosts_path&gt;
 </span></span></code></pre></div><blockquote><p>hosts:</p><ul><li>all 或 *，所有hosts文件中配置的主机</li><li>ip address</li><li>host name</li><li>group name</li><li>多个host或group可用：分隔</li><li>支持正则匹配：如配置了一个webserver的主机，可用ansible ~web* -m ping匹配到</li></ul><p>module_name：例如ping，command，apt的任务模块</p><p>arguments: 执行module的参数，例如 <code>ansible -m command -a "touch hello.txt"</code></p><p>hosts_path：主机清单文件位置，默认/etc/ansible/etc，也可以自己指定</p></blockquote><h4 id=ansible命令参数>Ansible命令参数
-<a class=anchor href=#ansible%e5%91%bd%e4%bb%a4%e5%8f%82%e6%95%b0>#</a></h4><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span><span style=color:#f92672>[</span>-h<span style=color:#f92672>]</span>  <span style=color:#75715e># 帮助</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>--version<span style=color:#f92672>]</span>  <span style=color:#75715e># Ansible版本</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>-v<span style=color:#f92672>]</span>  <span style=color:#75715e># verbost</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>-b<span style=color:#f92672>]</span>  <span style=color:#75715e># sudo运行，可以以sudo权限运行</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>--become-method BECOME_METHOD<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>--become-user BECOME_USER<span style=color:#f92672>]</span> 
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>-K<span style=color:#f92672>]</span>  <span style=color:#75715e># 提示输入sudo密码，当不是NOPASSWD模式时使用</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>-i INVENTORY<span style=color:#f92672>]</span>  <span style=color:#75715e># 指定hosts文件路径，默认default=/etc/ansible/hosts</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>--list-hosts<span style=color:#f92672>]</span> <span style=color:#75715e># 打印有主机列表</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>-o<span style=color:#f92672>]</span>  <span style=color:#75715e># 压缩输出，摘要输出</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>-t TREE<span style=color:#f92672>]</span> 
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>-k<span style=color:#f92672>]</span> <span style=color:#75715e># 提示输入ssh登录密码。当使用密码验证的时候用</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>--private-key PRIVATE_KEY_FILE<span style=color:#f92672>]</span>  <span style=color:#75715e># ssh连接的私钥文件位置</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>-u REMOTE_USER<span style=color:#f92672>]</span> <span style=color:#75715e># ssh连接的用户名，默认用root，ansible.cfg中可以配置</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>-c CONNECTION<span style=color:#f92672>]</span>  <span style=color:#75715e># 连接类型（default=smart），例如还有local</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>-T TIMEOUT<span style=color:#f92672>]</span> <span style=color:#75715e># 超时限制</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>--ask-vault-pass | --vault-password-file VAULT_PASSWORD_FILES<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>-f FORKS<span style=color:#f92672>]</span>   <span style=color:#75715e># fork多少个进程并发处理，默认为5个</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>-M MODULE_PATH<span style=color:#f92672>]</span>  <span style=color:#75715e># 模块的执行文件位置，一般用于扩展模块</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>--playbook-dir BASEDIR<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>-a MODULE_ARGS<span style=color:#f92672>]</span>  <span style=color:#75715e># 模块的参数</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>-m MODULE_NAME<span style=color:#f92672>]</span> <span style=color:#75715e># 要执行的模块，默认为command</span>
+<a class=anchor href=#ansible%e5%91%bd%e4%bb%a4%e5%8f%82%e6%95%b0>#</a></h4><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=o>[</span>-h<span class=o>]</span>  <span class=c1># 帮助</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>--version<span class=o>]</span>  <span class=c1># Ansible版本</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>-v<span class=o>]</span>  <span class=c1># verbost</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>-b<span class=o>]</span>  <span class=c1># sudo运行，可以以sudo权限运行</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>--become-method BECOME_METHOD<span class=o>]</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>--become-user BECOME_USER<span class=o>]</span> 
+</span></span><span class=line><span class=cl><span class=o>[</span>-K<span class=o>]</span>  <span class=c1># 提示输入sudo密码，当不是NOPASSWD模式时使用</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>-i INVENTORY<span class=o>]</span>  <span class=c1># 指定hosts文件路径，默认default=/etc/ansible/hosts</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>--list-hosts<span class=o>]</span> <span class=c1># 打印有主机列表</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>-o<span class=o>]</span>  <span class=c1># 压缩输出，摘要输出</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>-t TREE<span class=o>]</span> 
+</span></span><span class=line><span class=cl><span class=o>[</span>-k<span class=o>]</span> <span class=c1># 提示输入ssh登录密码。当使用密码验证的时候用</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>--private-key PRIVATE_KEY_FILE<span class=o>]</span>  <span class=c1># ssh连接的私钥文件位置</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>-u REMOTE_USER<span class=o>]</span> <span class=c1># ssh连接的用户名，默认用root，ansible.cfg中可以配置</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>-c CONNECTION<span class=o>]</span>  <span class=c1># 连接类型（default=smart），例如还有local</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>-T TIMEOUT<span class=o>]</span> <span class=c1># 超时限制</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>--ask-vault-pass <span class=p>|</span> --vault-password-file VAULT_PASSWORD_FILES<span class=o>]</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>-f FORKS<span class=o>]</span>   <span class=c1># fork多少个进程并发处理，默认为5个</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>-M MODULE_PATH<span class=o>]</span>  <span class=c1># 模块的执行文件位置，一般用于扩展模块</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>--playbook-dir BASEDIR<span class=o>]</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>-a MODULE_ARGS<span class=o>]</span>  <span class=c1># 模块的参数</span>
+</span></span><span class=line><span class=cl><span class=o>[</span>-m MODULE_NAME<span class=o>]</span> <span class=c1># 要执行的模块，默认为command</span>
 </span></span></code></pre></div><h3 id=anisble-playbook>Anisble playbook
-<a class=anchor href=#anisble-playbook>#</a></h3><p>​ 预先定义好所有需要执行的操作，形成一个脚本文件，执行该脚本文件即可，方便管理和复用。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>ansible-playbook -i &lt;hosts_path&gt; &lt;playbook_path&gt;
-</span></span></code></pre></div><blockquote><p>hosts_path：主机清单文件位置</p><p>playbook_path: playbook yaml文件位置</p><p>-C：加在ansible-playbook命令后，用于验证palybook文件是否有误</p></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>---
-</span></span><span style=display:flex><span>- name: Install prometheus on ubuntu
-</span></span><span style=display:flex><span>  hosts: prometheus
-</span></span><span style=display:flex><span>  become: yes
-</span></span><span style=display:flex><span>  tasks:
-</span></span><span style=display:flex><span>    - name: <span style=color:#e6db74>&#34;Step 1: Import prometheus public GPG Key&#34;</span>
-</span></span><span style=display:flex><span>      apt_key:
-</span></span><span style=display:flex><span>        url: https://s3-eu-west-1.amazonaws.com/deb.robustperception.io/41EFC99D.gpg
-</span></span><span style=display:flex><span>        state: present
-</span></span><span style=display:flex><span>    - name: <span style=color:#e6db74>&#34;Step 2: Reload local package database&#34;</span>
-</span></span><span style=display:flex><span>      apt: 
-</span></span><span style=display:flex><span>        update_cache: yes
-</span></span><span style=display:flex><span>    - name: <span style=color:#e6db74>&#34;Step 3: Install prometheus&#34;</span>
-</span></span><span style=display:flex><span>      apt:
-</span></span><span style=display:flex><span>        name: prometheus
-</span></span><span style=display:flex><span>        update_cache: yes
-</span></span><span style=display:flex><span>    - name: <span style=color:#e6db74>&#34;Step 4: Install prometheus-node-exporter&#34;</span>
-</span></span><span style=display:flex><span>      apt:
-</span></span><span style=display:flex><span>        name: prometheus-node-exporter
-</span></span><span style=display:flex><span>        update_cache: yes
-</span></span><span style=display:flex><span>    - name: <span style=color:#e6db74>&#34;Step 5: Install prometheus-pushgateway&#34;</span>
-</span></span><span style=display:flex><span>      apt:
-</span></span><span style=display:flex><span>        name: prometheus-pushgateway
-</span></span><span style=display:flex><span>        update_cache: yes
-</span></span><span style=display:flex><span>    - name: <span style=color:#e6db74>&#34;Step 6: Install prometheus-alertmanager&#34;</span>
-</span></span><span style=display:flex><span>      apt:
-</span></span><span style=display:flex><span>        name: prometheus-alertmanager
-</span></span><span style=display:flex><span>        update_cache: yes
-</span></span><span style=display:flex><span>    - name: <span style=color:#e6db74>&#34;Step 7: Start prometheus service&#34;</span>
-</span></span><span style=display:flex><span>      service:
-</span></span><span style=display:flex><span>        name: prometheus
-</span></span><span style=display:flex><span>        enabled: yes
-</span></span><span style=display:flex><span>        state: started
+<a class=anchor href=#anisble-playbook>#</a></h3><p>​ 预先定义好所有需要执行的操作，形成一个脚本文件，执行该脚本文件即可，方便管理和复用。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>ansible-playbook -i &lt;hosts_path&gt; &lt;playbook_path&gt;
+</span></span></code></pre></div><blockquote><p>hosts_path：主机清单文件位置</p><p>playbook_path: playbook yaml文件位置</p><p>-C：加在ansible-playbook命令后，用于验证palybook文件是否有误</p></blockquote><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>---
+</span></span><span class=line><span class=cl>- name: Install prometheus on ubuntu
+</span></span><span class=line><span class=cl>  hosts: prometheus
+</span></span><span class=line><span class=cl>  become: yes
+</span></span><span class=line><span class=cl>  tasks:
+</span></span><span class=line><span class=cl>    - name: <span class=s2>&#34;Step 1: Import prometheus public GPG Key&#34;</span>
+</span></span><span class=line><span class=cl>      apt_key:
+</span></span><span class=line><span class=cl>        url: https://s3-eu-west-1.amazonaws.com/deb.robustperception.io/41EFC99D.gpg
+</span></span><span class=line><span class=cl>        state: present
+</span></span><span class=line><span class=cl>    - name: <span class=s2>&#34;Step 2: Reload local package database&#34;</span>
+</span></span><span class=line><span class=cl>      apt: 
+</span></span><span class=line><span class=cl>        update_cache: yes
+</span></span><span class=line><span class=cl>    - name: <span class=s2>&#34;Step 3: Install prometheus&#34;</span>
+</span></span><span class=line><span class=cl>      apt:
+</span></span><span class=line><span class=cl>        name: prometheus
+</span></span><span class=line><span class=cl>        update_cache: yes
+</span></span><span class=line><span class=cl>    - name: <span class=s2>&#34;Step 4: Install prometheus-node-exporter&#34;</span>
+</span></span><span class=line><span class=cl>      apt:
+</span></span><span class=line><span class=cl>        name: prometheus-node-exporter
+</span></span><span class=line><span class=cl>        update_cache: yes
+</span></span><span class=line><span class=cl>    - name: <span class=s2>&#34;Step 5: Install prometheus-pushgateway&#34;</span>
+</span></span><span class=line><span class=cl>      apt:
+</span></span><span class=line><span class=cl>        name: prometheus-pushgateway
+</span></span><span class=line><span class=cl>        update_cache: yes
+</span></span><span class=line><span class=cl>    - name: <span class=s2>&#34;Step 6: Install prometheus-alertmanager&#34;</span>
+</span></span><span class=line><span class=cl>      apt:
+</span></span><span class=line><span class=cl>        name: prometheus-alertmanager
+</span></span><span class=line><span class=cl>        update_cache: yes
+</span></span><span class=line><span class=cl>    - name: <span class=s2>&#34;Step 7: Start prometheus service&#34;</span>
+</span></span><span class=line><span class=cl>      service:
+</span></span><span class=line><span class=cl>        name: prometheus
+</span></span><span class=line><span class=cl>        enabled: yes
+</span></span><span class=line><span class=cl>        state: started
 </span></span></code></pre></div><h4 id=playbook-参数>playbook 参数
 <a class=anchor href=#playbook-%e5%8f%82%e6%95%b0>#</a></h4><blockquote><p><strong>name</strong> ：标识plaoybook文件执行内容</p><p><strong>hosts</strong>: inventory</p><p><strong>become</strong>: yes/no，默认no，是否使用sudo执行</p><p><strong>tasks</strong> : 预先定义好的ansible命令，managed node将从上到下执行</p><p><strong>handles</strong>: 使用notify触发</p><pre tabindex=0><code> # 修改nginx配置后，设置重启
  - name: write the nginx config file
@@ -249,34 +249,34 @@ ansible servers -m service -a &#34;name=nginx state=stoped&#34;
   - name: &#34;shut down Debian flavored systems&#34;
     command: /sbin/shutdown -t now
     when: ansible_os_family == &#34;Debian&#34;
-</code></pre></blockquote><p>常用用法**：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span><span style=color:#75715e># --list-hosts(简写为--list)</span>
-</span></span><span style=display:flex><span>ansible webserver --list-hosts 
+</code></pre></blockquote><p>常用用法**：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=c1># --list-hosts(简写为--list)</span>
+</span></span><span class=line><span class=cl>ansible webserver --list-hosts 
 </span></span></code></pre></div><h2 id=ansible原理>Ansible原理
 <a class=anchor href=#ansible%e5%8e%9f%e7%90%86>#</a></h2><p><img src=https://fs.poneding.com/images/image-20191128160037603.png alt=image-20191128160037603></p><blockquote><p>ansible命令</p><p>ansible命令所使用的模块，参数</p></blockquote><h2 id=演示>演示
-<a class=anchor href=#%e6%bc%94%e7%a4%ba>#</a></h2><ul><li>ansible.cfg</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>host_key_checking <span style=color:#f92672>=</span> False
-</span></span><span style=display:flex><span>remote_tmp <span style=color:#f92672>=</span> /tmp/.ansible-<span style=color:#e6db74>${</span>USER<span style=color:#e6db74>}</span>/tmp
-</span></span></code></pre></div><ul><li>hosts主机清单</li></ul><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span><span style=color:#f92672>[</span>ubuntu:vars<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>ansible_ssh_private_key_file<span style=color:#f92672>=</span>~/singapore.pem
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>ubuntu<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>172.30.2.252 ansible_ssh_user<span style=color:#f92672>=</span>ubuntu
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>mysql:vars<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>ansible_private_key_file<span style=color:#f92672>=</span>~/dev-mysql.pem
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>mysql<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>172.31.22.159 ansible_ssh_user<span style=color:#f92672>=</span>ubuntu
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#f92672>[</span>servers:children<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>ubuntu
-</span></span><span style=display:flex><span>mysql
-</span></span></code></pre></div><ul><li>ansible操作</li></ul><p><a href=https://docs.ansible.com/ansible/latest/modules/list_of_files_modules.html>文件操作</a></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span><span style=color:#75715e># 创建目录</span>
-</span></span><span style=display:flex><span>ansible servers -m file -a <span style=color:#e6db74>&#39;path=~/temp state=directory mode=0755&#39;</span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 创建文件</span>
-</span></span><span style=display:flex><span>ansible servers -m file -a <span style=color:#e6db74>&#39;path=~/temp/test1.txt state=touch&#39;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e># Control Node分发文件至Managed Nodes</span>
-</span></span><span style=display:flex><span>ansible servers -m copy -a <span style=color:#e6db74>&#39;src=index.html dest=~/temp/test2.txt&#39;</span>
+<a class=anchor href=#%e6%bc%94%e7%a4%ba>#</a></h2><ul><li>ansible.cfg</li></ul><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=nv>host_key_checking</span> <span class=o>=</span> False
+</span></span><span class=line><span class=cl><span class=nv>remote_tmp</span> <span class=o>=</span> /tmp/.ansible-<span class=si>${</span><span class=nv>USER</span><span class=si>}</span>/tmp
+</span></span></code></pre></div><ul><li>hosts主机清单</li></ul><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=o>[</span>ubuntu:vars<span class=o>]</span>
+</span></span><span class=line><span class=cl><span class=nv>ansible_ssh_private_key_file</span><span class=o>=</span>~/singapore.pem
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>[</span>ubuntu<span class=o>]</span>
+</span></span><span class=line><span class=cl>172.30.2.252 <span class=nv>ansible_ssh_user</span><span class=o>=</span>ubuntu
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>[</span>mysql:vars<span class=o>]</span>
+</span></span><span class=line><span class=cl><span class=nv>ansible_private_key_file</span><span class=o>=</span>~/dev-mysql.pem
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>[</span>mysql<span class=o>]</span>
+</span></span><span class=line><span class=cl>172.31.22.159 <span class=nv>ansible_ssh_user</span><span class=o>=</span>ubuntu
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>[</span>servers:children<span class=o>]</span>
+</span></span><span class=line><span class=cl>ubuntu
+</span></span><span class=line><span class=cl>mysql
+</span></span></code></pre></div><ul><li>ansible操作</li></ul><p><a href=https://docs.ansible.com/ansible/latest/modules/list_of_files_modules.html>文件操作</a></p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=c1># 创建目录</span>
+</span></span><span class=line><span class=cl>ansible servers -m file -a <span class=s1>&#39;path=~/temp state=directory mode=0755&#39;</span>
+</span></span><span class=line><span class=cl><span class=c1># 创建文件</span>
+</span></span><span class=line><span class=cl>ansible servers -m file -a <span class=s1>&#39;path=~/temp/test1.txt state=touch&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Control Node分发文件至Managed Nodes</span>
+</span></span><span class=line><span class=cl>ansible servers -m copy -a <span class=s1>&#39;src=index.html dest=~/temp/test2.txt&#39;</span>
 </span></span></code></pre></div><h2 id=踩坑记录>踩坑记录
 <a class=anchor href=#%e8%b8%a9%e5%9d%91%e8%ae%b0%e5%bd%95>#</a></h2><ul><li><p>问题1</p><p>连接aws的linux实例时，需要在/etc/ansible/hosts定义的参数</p><pre tabindex=0><code>[ubuntu:vars]
 ansible_private_key_file=/home/ubuntu/singapore.pem
@@ -285,13 +285,13 @@ ansible_private_key_file=/home/ubuntu/singapore.pem
 192.168.0.1 ansible_ssh_user=ubuntu
 </code></pre></li><li><p>问题2</p><p>使用docker创建可以ssh连接的ubuntu容器，无法使用root连接，但是使用其他user时，在<code>ansible local -m ping</code>时也会出现以下问题。</p><pre tabindex=0><code>Authentication or permission failure.  In some cases, you may have been able to authenticate and did not have permissions on the remote directory. Consider changing the remote temp path in ansible.cfg to a path rooted in &#34;/tmp&#34;....
 </code></pre><p>其实上面的信息已经有了一些提示，修改/etc/ansible/ansible.cfg的remote_tmp配置</p><pre tabindex=0><code>remote_tmp     = /tmp/.ansible-${USER}/tmp
-</code></pre></li><li><p>问题3</p><p>如果在使用pem文件连接服务器时遇到<code>Permissions 0664 for '/home/ubuntu/dev-mysql.pem' are too open.\r\nIt is required that your private key files are NOT accessible by others.</code>问题。</p><p>修改文件权限即可</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>sudo chmod <span style=color:#ae81ff>400</span> /path/to/file.pem
+</code></pre></li><li><p>问题3</p><p>如果在使用pem文件连接服务器时遇到<code>Permissions 0664 for '/home/ubuntu/dev-mysql.pem' are too open.\r\nIt is required that your private key files are NOT accessible by others.</code>问题。</p><p>修改文件权限即可</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>sudo chmod <span class=m>400</span> /path/to/file.pem
 </span></span></code></pre></div></li><li><p>问题4</p><p>Failed to lock apt for exclusive operation</p><p>添加</p><pre tabindex=0><code>become: yes
 </code></pre></li></ul><h2 id=其他>其他
 <a class=anchor href=#%e5%85%b6%e4%bb%96>#</a></h2><h3 id=预编译>预编译
 <a class=anchor href=#%e9%a2%84%e7%bc%96%e8%af%91>#</a></h3><h3 id=python的版本兼容问题>python的版本兼容问题
-<a class=anchor href=#python%e7%9a%84%e7%89%88%e6%9c%ac%e5%85%bc%e5%ae%b9%e9%97%ae%e9%a2%98>#</a></h3><p>ansible v2.7及更高版本默认优先支持python3，如果对特定的host支持单独的python版本，可以通过设置<code>ansible_python_interpreter</code> inventory参数设置。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span><span style=color:#f92672>[</span>webservers<span style=color:#f92672>]</span>
-</span></span><span style=display:flex><span>webserver1.com ansible_python_interpreter<span style=color:#f92672>=</span>/usr/bin/python2.4
+<a class=anchor href=#python%e7%9a%84%e7%89%88%e6%9c%ac%e5%85%bc%e5%ae%b9%e9%97%ae%e9%a2%98>#</a></h3><p>ansible v2.7及更高版本默认优先支持python3，如果对特定的host支持单独的python版本，可以通过设置<code>ansible_python_interpreter</code> inventory参数设置。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=o>[</span>webservers<span class=o>]</span>
+</span></span><span class=line><span class=cl>webserver1.com <span class=nv>ansible_python_interpreter</span><span class=o>=</span>/usr/bin/python2.4
 </span></span></code></pre></div><h3 id=工具对比>工具对比
 <a class=anchor href=#%e5%b7%a5%e5%85%b7%e5%af%b9%e6%af%94>#</a></h3><h2 id=参考>参考
 <a class=anchor href=#%e5%8f%82%e8%80%83>#</a></h2><p><a href=https://juejin.im/entry/5c48751fe51d45731470c6eb>Ansible入门</a></p><p><a href=https://docs.ansible.com/ansible/latest/index.html>Ansible Docs</a></p><hr><p><a href=/devops/agile/>« Agile</a></p><p><a href=/devops/bule-green-rollback-gray/>» 蓝绿部署、滚动部署和灰度部署</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>

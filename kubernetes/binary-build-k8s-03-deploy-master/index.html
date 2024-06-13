@@ -7,350 +7,350 @@ cd /root/kubernetes/resources/ tar -zxvf ./kubernetes-server-linux-amd64.tar.gz 
 机器准备： 部署 etcd 集群： 部署 Master： 部署 Node： 我们已经知道在 K8s 的 Master 上存在着 kube-apiserver、kube-controller-manager、kube-scheduler 三大组件。本篇介绍在 Master 机器安装这些组件，除此之外，如果想在 Master 机器上操作集群，还需要安装 kubectl 工具。
 安装 kubectl # kubernetes 的安装包里已经将 kubectl 包含进去了，部署很简单：
 cd /root/kubernetes/resources/ tar -zxvf ./kubernetes-server-linux-amd64.tar.gz cp kubernetes/server/bin/kubectl /usr/bin kubectl api-versions 制作 kubernetes 证书 # mkdir /root/kubernetes/resources/cert/kubernetes /etc/kubernetes/{ssl,bin} -p cp kubernetes/server/bin/kube-apiserver kubernetes/server/bin/kube-controller-manager kubernetes/server/bin/kube-scheduler /etc/kubernetes/bin cd /root/kubernetes/resources/cert/kubernetes 接下来都在 Master 机器上执行，编辑 ca-config."><meta property="og:locale" content="cn"><meta property="og:type" content="article"><meta property="article:section" content="kubernetes"><meta property="article:modified_time" content="2024-06-12T20:56:33+08:00"><title>Binary Build K8s 03 Deploy Master | 我的博客</title>
-<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/binary-build-k8s-03-deploy-master/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.9a4e139e0d8feaf510bf71d73a0aec5d39827736ac52bd00d9005a09fd84a9fc.js integrity="sha256-mk4Tng2P6vUQv3HXOgrsXTmCdzasUr0A2QBaCf2Eqfw=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
+<link rel=manifest href=/manifest.json><link rel=icon href=/logo.png><link rel=canonical href=https://blog.poneding.com/kubernetes/binary-build-k8s-03-deploy-master/><link rel=stylesheet href=/book.min.4964903a822a7acb10dac6d1ab524833c97fb5f99b141976bcb8a47d539be9c0.css integrity="sha256-SWSQOoIqessQ2sbRq1JIM8l/tfmbFBl2vLikfVOb6cA=" crossorigin=anonymous><script defer src=/fuse.min.js></script><script defer src=/cn.search.min.ffd7553d42e9860dbcfbc6775c0f6c9895736a50f5383929cc725dc0a9b61715.js integrity="sha256-/9dVPULphg28+8Z3XA9smJVzalD1ODkpzHJdwKm2FxU=" crossorigin=anonymous></script><script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk=" crossorigin=anonymous></script></head><body dir=ltr><input type=checkbox class="hidden toggle" id=menu-control>
 <input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><div class=book-menu-content><nav><h2 class=book-brand><a class="flex align-center" href=/><img src=/logo.png alt=Logo><span>我的博客</span></a></h2><div class="book-search hidden"><input type=text id=book-search-input placeholder=搜索 aria-label=搜索 maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><script>document.querySelector(".book-search").classList.remove("hidden")</script><ul><li><a href=https://github.com/poneding target=_blank rel=noopener>Github</a></li></ul></nav><script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></div></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu>
 </label><strong>Binary Build K8s 03 Deploy Master</strong>
 <label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#写在前面>写在前面</a></li><li><a href=#安装-kubectl>安装 kubectl</a></li><li><a href=#制作-kubernetes-证书>制作 kubernetes 证书</a></li><li><a href=#创建-tlsbootstrapping-token>创建 TLSBootstrapping Token</a></li><li><a href=#安装-kube-apiserver>安装 kube-apiserver</a></li><li><a href=#安装-kube-controller-manager>安装 kube-controller-manager</a></li><li><a href=#安装-kube-scheduler>安装 kube-scheduler</a></li><li><a href=#kubelet-bootstrap-授权>kubelet-bootstrap 授权</a></li><li><a href=#apiserver-授权-kubelet>apiserver 授权 kubelet</a></li></ul></nav></aside></header><article class="markdown book-article"><p><a href=/>我的博客</a> /
 <a href=/kubernetes/>Kubernetes</a> / 二进制搭建 K8s - 3 部署 Master</p><h1 id=二进制搭建-k8s---3-部署-master>二进制搭建 K8s - 3 部署 Master
 <a class=anchor href=#%e4%ba%8c%e8%bf%9b%e5%88%b6%e6%90%ad%e5%bb%ba-k8s---3-%e9%83%a8%e7%bd%b2-master>#</a></h1><h2 id=写在前面>写在前面
 <a class=anchor href=#%e5%86%99%e5%9c%a8%e5%89%8d%e9%9d%a2>#</a></h2><p>记录和分享使用二进制搭建 K8s 集群的详细过程，由于操作比较冗长，大概会分四篇写完：</p><ol><li><strong><a href=/kubernetes/binary-build-k8s-01-prepare-nodes/>机器准备</a></strong>：</li><li><strong><a href=/kubernetes/binary-build-k8s-02-deploy-etcd/>部署 etcd 集群</a></strong>：</li><li><strong><a href=/kubernetes/binary-build-k8s-03-deploy-master/>部署 Master</a></strong>：</li><li><strong><a href=/kubernetes/binary-build-k8s-04-deploy-worker/>部署 Node</a></strong>：</li></ol><p>我们已经知道在 K8s 的 Master 上存在着 kube-apiserver、kube-controller-manager、kube-scheduler 三大组件。本篇介绍在 Master 机器安装这些组件，除此之外，如果想在 Master 机器上操作集群，还需要安装 kubectl 工具。</p><h2 id=安装-kubectl>安装 kubectl
-<a class=anchor href=#%e5%ae%89%e8%a3%85-kubectl>#</a></h2><p>kubernetes 的安装包里已经将 kubectl 包含进去了，部署很简单：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>cd /root/kubernetes/resources/
-</span></span><span style=display:flex><span>tar -zxvf ./kubernetes-server-linux-amd64.tar.gz
-</span></span><span style=display:flex><span>cp kubernetes/server/bin/kubectl /usr/bin
-</span></span><span style=display:flex><span>kubectl api-versions
+<a class=anchor href=#%e5%ae%89%e8%a3%85-kubectl>#</a></h2><p>kubernetes 的安装包里已经将 kubectl 包含进去了，部署很简单：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nb>cd</span> /root/kubernetes/resources/
+</span></span><span class=line><span class=cl>tar -zxvf ./kubernetes-server-linux-amd64.tar.gz
+</span></span><span class=line><span class=cl>cp kubernetes/server/bin/kubectl /usr/bin
+</span></span><span class=line><span class=cl>kubectl api-versions
 </span></span></code></pre></div><h2 id=制作-kubernetes-证书>制作 kubernetes 证书
-<a class=anchor href=#%e5%88%b6%e4%bd%9c-kubernetes-%e8%af%81%e4%b9%a6>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>mkdir /root/kubernetes/resources/cert/kubernetes /etc/kubernetes/<span style=color:#f92672>{</span>ssl,bin<span style=color:#f92672>}</span> -p
-</span></span><span style=display:flex><span>cp kubernetes/server/bin/kube-apiserver kubernetes/server/bin/kube-controller-manager kubernetes/server/bin/kube-scheduler /etc/kubernetes/bin
-</span></span><span style=display:flex><span>cd /root/kubernetes/resources/cert/kubernetes
-</span></span></code></pre></div><p>接下来都在 Master 机器上执行，编辑 ca-config.json</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>vim ca-config.json
-</span></span></code></pre></div><p>写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
-</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;signing&#34;</span>: {
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;default&#34;</span>: {
-</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;expiry&#34;</span>: <span style=color:#e6db74>&#34;87600h&#34;</span>
-</span></span><span style=display:flex><span>    },
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;profiles&#34;</span>: {
-</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;kubernetes&#34;</span>: {
-</span></span><span style=display:flex><span>         <span style=color:#f92672>&#34;expiry&#34;</span>: <span style=color:#e6db74>&#34;87600h&#34;</span>,
-</span></span><span style=display:flex><span>         <span style=color:#f92672>&#34;usages&#34;</span>: [
-</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#34;signing&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#34;key encipherment&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#34;server auth&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#34;client auth&#34;</span>
-</span></span><span style=display:flex><span>        ]
-</span></span><span style=display:flex><span>      }
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>  }
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p>编辑 ca-csr.json：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>vim ca-csr.json
-</span></span></code></pre></div><p>写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;CN&#34;</span>: <span style=color:#e6db74>&#34;kubernetes&#34;</span>,
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;key&#34;</span>: {
-</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;algo&#34;</span>: <span style=color:#e6db74>&#34;rsa&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;size&#34;</span>: <span style=color:#ae81ff>2048</span>
-</span></span><span style=display:flex><span>    },
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;names&#34;</span>: [
-</span></span><span style=display:flex><span>        {
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;C&#34;</span>: <span style=color:#e6db74>&#34;CN&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;L&#34;</span>: <span style=color:#e6db74>&#34;Hunan&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;ST&#34;</span>: <span style=color:#e6db74>&#34;Changsha&#34;</span>,            
-</span></span><span style=display:flex><span>           <span style=color:#f92672>&#34;O&#34;</span>: <span style=color:#e6db74>&#34;kubernetes&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;OU&#34;</span>: <span style=color:#e6db74>&#34;System&#34;</span>
-</span></span><span style=display:flex><span>        }
-</span></span><span style=display:flex><span>    ]
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p>生成 ca 证书和密钥：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>cfssl gencert -initca ca-csr.json | cfssljson -bare ca
-</span></span></code></pre></div><p>制作 kube-apiserver、kube-proxy、admin 证书，编辑 kube-apiserver-csr.json：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim kube-apiserver-csr.json
-</span></span></code></pre></div><p>写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;CN&#34;</span>: <span style=color:#e6db74>&#34;kubernetes&#34;</span>,
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;hosts&#34;</span>: [
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;10.0.0.1&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;127.0.0.1&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;kubernetes&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;kubernetes.default&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;kubernetes.default.svc&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;kubernetes.default.svc.cluster&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;kubernetes.default.svc.cluster.local&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;192.168.115.131&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;192.168.115.132&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;192.168.115.133&#34;</span>
-</span></span><span style=display:flex><span>        ],
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;key&#34;</span>: {
-</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;algo&#34;</span>: <span style=color:#e6db74>&#34;rsa&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;size&#34;</span>: <span style=color:#ae81ff>2048</span>
-</span></span><span style=display:flex><span>    },
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;names&#34;</span>: [
-</span></span><span style=display:flex><span>        {
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;C&#34;</span>: <span style=color:#e6db74>&#34;CN&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;L&#34;</span>: <span style=color:#e6db74>&#34;Hunan&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;ST&#34;</span>: <span style=color:#e6db74>&#34;Changsha&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;O&#34;</span>: <span style=color:#e6db74>&#34;kubernetes&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;OU&#34;</span>: <span style=color:#e6db74>&#34;System&#34;</span>
-</span></span><span style=display:flex><span>        }
-</span></span><span style=display:flex><span>    ]
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p>编辑 kube-proxy-csr.json：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim kube-proxy-csr.json
-</span></span></code></pre></div><p>写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;CN&#34;</span>: <span style=color:#e6db74>&#34;system:kube-proxy&#34;</span>,
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;hosts&#34;</span>: [],
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;key&#34;</span>: {
-</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;algo&#34;</span>: <span style=color:#e6db74>&#34;rsa&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;size&#34;</span>: <span style=color:#ae81ff>2048</span>
-</span></span><span style=display:flex><span>    },
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;names&#34;</span>: [
-</span></span><span style=display:flex><span>        {
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;C&#34;</span>: <span style=color:#e6db74>&#34;CN&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;L&#34;</span>: <span style=color:#e6db74>&#34;Hunan&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;ST&#34;</span>: <span style=color:#e6db74>&#34;Changsha&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;O&#34;</span>: <span style=color:#e6db74>&#34;kubernetes&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;OU&#34;</span>: <span style=color:#e6db74>&#34;System&#34;</span>
-</span></span><span style=display:flex><span>        }
-</span></span><span style=display:flex><span>    ]
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p>编辑 admin-csr.json：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim admin-csr.json
-</span></span></code></pre></div><p>写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;CN&#34;</span>: <span style=color:#e6db74>&#34;admin&#34;</span>,
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;hosts&#34;</span>: [],
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;key&#34;</span>: {
-</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;algo&#34;</span>: <span style=color:#e6db74>&#34;rsa&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;size&#34;</span>: <span style=color:#ae81ff>2048</span>
-</span></span><span style=display:flex><span>    },
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;names&#34;</span>: [
-</span></span><span style=display:flex><span>        {
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;C&#34;</span>: <span style=color:#e6db74>&#34;CN&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;L&#34;</span>: <span style=color:#e6db74>&#34;Hunan&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;ST&#34;</span>: <span style=color:#e6db74>&#34;Changsha&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;O&#34;</span>: <span style=color:#e6db74>&#34;system:masters&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;OU&#34;</span>: <span style=color:#e6db74>&#34;System&#34;</span>
-</span></span><span style=display:flex><span>        }
-</span></span><span style=display:flex><span>    ]
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p>生成证书和密钥</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>cfssl gencert -ca<span style=color:#f92672>=</span>ca.pem -ca-key<span style=color:#f92672>=</span>ca-key.pem -config<span style=color:#f92672>=</span>ca-config.json -profile<span style=color:#f92672>=</span>kubernetes kube-apiserver-csr.json | cfssljson -bare kube-apiserver
-</span></span><span style=display:flex><span>cfssl gencert -ca<span style=color:#f92672>=</span>ca.pem -ca-key<span style=color:#f92672>=</span>ca-key.pem -config<span style=color:#f92672>=</span>ca-config.json -profile<span style=color:#f92672>=</span>kubernetes kube-proxy-csr.json | cfssljson -bare kube-proxy
-</span></span><span style=display:flex><span>cfssl gencert -ca<span style=color:#f92672>=</span>ca.pem -ca-key<span style=color:#f92672>=</span>ca-key.pem -config<span style=color:#f92672>=</span>ca-config.json -profile<span style=color:#f92672>=</span>kubernetes admin-csr.json | cfssljson -bare admin
-</span></span><span style=display:flex><span><span style=color:#75715e># 此时目录下生成的文件</span>
-</span></span><span style=display:flex><span>ll
-</span></span><span style=display:flex><span>-rw-r--r--. <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>1001</span> May <span style=color:#ae81ff>28</span> 00:32 admin.csr
-</span></span><span style=display:flex><span>-rw-r--r--. <span style=color:#ae81ff>1</span> root root  <span style=color:#ae81ff>282</span> May <span style=color:#ae81ff>28</span> 00:32 admin-csr.json
-</span></span><span style=display:flex><span>-rw-------. <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>1679</span> May <span style=color:#ae81ff>28</span> 00:32 admin-key.pem
-</span></span><span style=display:flex><span>-rw-r--r--. <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>1407</span> May <span style=color:#ae81ff>28</span> 00:32 admin.pem
-</span></span><span style=display:flex><span>-rw-r--r--. <span style=color:#ae81ff>1</span> root root  <span style=color:#ae81ff>294</span> May <span style=color:#ae81ff>28</span> 00:30 ca-config.json
-</span></span><span style=display:flex><span>-rw-r--r--. <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>1013</span> May <span style=color:#ae81ff>28</span> 00:31 ca.csr
-</span></span><span style=display:flex><span>-rw-r--r--. <span style=color:#ae81ff>1</span> root root  <span style=color:#ae81ff>284</span> May <span style=color:#ae81ff>28</span> 00:30 ca-csr.json
-</span></span><span style=display:flex><span>-rw-------. <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>1675</span> May <span style=color:#ae81ff>28</span> 00:31 ca-key.pem
-</span></span><span style=display:flex><span>-rw-r--r--. <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>1383</span> May <span style=color:#ae81ff>28</span> 00:31 ca.pem
-</span></span><span style=display:flex><span>-rw-r--r--. <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>1273</span> May <span style=color:#ae81ff>28</span> 00:32 kube-apiserver.csr
-</span></span><span style=display:flex><span>-rw-r--r--. <span style=color:#ae81ff>1</span> root root  <span style=color:#ae81ff>597</span> May <span style=color:#ae81ff>28</span> 00:31 kube-apiserver-csr.json
-</span></span><span style=display:flex><span>-rw-------. <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>1679</span> May <span style=color:#ae81ff>28</span> 00:32 kube-apiserver-key.pem
-</span></span><span style=display:flex><span>-rw-r--r--. <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>1655</span> May <span style=color:#ae81ff>28</span> 00:32 kube-apiserver.pem
-</span></span><span style=display:flex><span>-rw-r--r--. <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>1009</span> May <span style=color:#ae81ff>28</span> 00:32 kube-proxy.csr
-</span></span><span style=display:flex><span>-rw-r--r--. <span style=color:#ae81ff>1</span> root root  <span style=color:#ae81ff>287</span> May <span style=color:#ae81ff>28</span> 00:31 kube-proxy-csr.json
-</span></span><span style=display:flex><span>-rw-------. <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>1679</span> May <span style=color:#ae81ff>28</span> 00:32 kube-proxy-key.pem
-</span></span><span style=display:flex><span>-rw-r--r--. <span style=color:#ae81ff>1</span> root root <span style=color:#ae81ff>1411</span> May <span style=color:#ae81ff>28</span> 00:32 kube-proxy.pem
-</span></span></code></pre></div><p>将 kube-proxy 证书拷贝到 Node：</p><p>前提，需要在 Node 机器创建目录，以下命令在 Node 机器上执行：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>mkdir /etc/kubernetes/ -p
-</span></span></code></pre></div><p>然后再在Master机器执行拷贝操作。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>cp ca.pem ca-key.pem kube-apiserver.pem kube-apiserver-key.pem kube-proxy.pem kube-proxy-key.pem /etc/kubernetes/ssl
-</span></span><span style=display:flex><span>scp -r /etc/kubernetes/ssl 192.168.115.132:/etc/kubernetes
-</span></span><span style=display:flex><span>scp -r /etc/kubernetes/ssl 192.168.115.133:/etc/kubernetes
+<a class=anchor href=#%e5%88%b6%e4%bd%9c-kubernetes-%e8%af%81%e4%b9%a6>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>mkdir /root/kubernetes/resources/cert/kubernetes /etc/kubernetes/<span class=o>{</span>ssl,bin<span class=o>}</span> -p
+</span></span><span class=line><span class=cl>cp kubernetes/server/bin/kube-apiserver kubernetes/server/bin/kube-controller-manager kubernetes/server/bin/kube-scheduler /etc/kubernetes/bin
+</span></span><span class=line><span class=cl><span class=nb>cd</span> /root/kubernetes/resources/cert/kubernetes
+</span></span></code></pre></div><p>接下来都在 Master 机器上执行，编辑 ca-config.json</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>vim ca-config.json
+</span></span></code></pre></div><p>写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;signing&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;default&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;expiry&#34;</span><span class=p>:</span> <span class=s2>&#34;87600h&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;profiles&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;kubernetes&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>         <span class=nt>&#34;expiry&#34;</span><span class=p>:</span> <span class=s2>&#34;87600h&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>         <span class=nt>&#34;usages&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;signing&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;key encipherment&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;server auth&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;client auth&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>]</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>编辑 ca-csr.json：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>vim ca-csr.json
+</span></span></code></pre></div><p>写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;CN&#34;</span><span class=p>:</span> <span class=s2>&#34;kubernetes&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;key&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;algo&#34;</span><span class=p>:</span> <span class=s2>&#34;rsa&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;size&#34;</span><span class=p>:</span> <span class=mi>2048</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;names&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;C&#34;</span><span class=p>:</span> <span class=s2>&#34;CN&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;L&#34;</span><span class=p>:</span> <span class=s2>&#34;Hunan&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;ST&#34;</span><span class=p>:</span> <span class=s2>&#34;Changsha&#34;</span><span class=p>,</span>            
+</span></span><span class=line><span class=cl>           <span class=nt>&#34;O&#34;</span><span class=p>:</span> <span class=s2>&#34;kubernetes&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;OU&#34;</span><span class=p>:</span> <span class=s2>&#34;System&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>生成 ca 证书和密钥：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>cfssl gencert -initca ca-csr.json <span class=p>|</span> cfssljson -bare ca
+</span></span></code></pre></div><p>制作 kube-apiserver、kube-proxy、admin 证书，编辑 kube-apiserver-csr.json：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>vim kube-apiserver-csr.json
+</span></span></code></pre></div><p>写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;CN&#34;</span><span class=p>:</span> <span class=s2>&#34;kubernetes&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;hosts&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;10.0.0.1&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;127.0.0.1&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;kubernetes&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;kubernetes.default&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;kubernetes.default.svc&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;kubernetes.default.svc.cluster&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;kubernetes.default.svc.cluster.local&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;192.168.115.131&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;192.168.115.132&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;192.168.115.133&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>],</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;key&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;algo&#34;</span><span class=p>:</span> <span class=s2>&#34;rsa&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;size&#34;</span><span class=p>:</span> <span class=mi>2048</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;names&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;C&#34;</span><span class=p>:</span> <span class=s2>&#34;CN&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;L&#34;</span><span class=p>:</span> <span class=s2>&#34;Hunan&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;ST&#34;</span><span class=p>:</span> <span class=s2>&#34;Changsha&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;O&#34;</span><span class=p>:</span> <span class=s2>&#34;kubernetes&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;OU&#34;</span><span class=p>:</span> <span class=s2>&#34;System&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>编辑 kube-proxy-csr.json：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>vim kube-proxy-csr.json
+</span></span></code></pre></div><p>写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;CN&#34;</span><span class=p>:</span> <span class=s2>&#34;system:kube-proxy&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;hosts&#34;</span><span class=p>:</span> <span class=p>[],</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;key&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;algo&#34;</span><span class=p>:</span> <span class=s2>&#34;rsa&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;size&#34;</span><span class=p>:</span> <span class=mi>2048</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;names&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;C&#34;</span><span class=p>:</span> <span class=s2>&#34;CN&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;L&#34;</span><span class=p>:</span> <span class=s2>&#34;Hunan&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;ST&#34;</span><span class=p>:</span> <span class=s2>&#34;Changsha&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;O&#34;</span><span class=p>:</span> <span class=s2>&#34;kubernetes&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;OU&#34;</span><span class=p>:</span> <span class=s2>&#34;System&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>编辑 admin-csr.json：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>vim admin-csr.json
+</span></span></code></pre></div><p>写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;CN&#34;</span><span class=p>:</span> <span class=s2>&#34;admin&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;hosts&#34;</span><span class=p>:</span> <span class=p>[],</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;key&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;algo&#34;</span><span class=p>:</span> <span class=s2>&#34;rsa&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;size&#34;</span><span class=p>:</span> <span class=mi>2048</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;names&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;C&#34;</span><span class=p>:</span> <span class=s2>&#34;CN&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;L&#34;</span><span class=p>:</span> <span class=s2>&#34;Hunan&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;ST&#34;</span><span class=p>:</span> <span class=s2>&#34;Changsha&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;O&#34;</span><span class=p>:</span> <span class=s2>&#34;system:masters&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;OU&#34;</span><span class=p>:</span> <span class=s2>&#34;System&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>生成证书和密钥</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>cfssl gencert -ca<span class=o>=</span>ca.pem -ca-key<span class=o>=</span>ca-key.pem -config<span class=o>=</span>ca-config.json -profile<span class=o>=</span>kubernetes kube-apiserver-csr.json <span class=p>|</span> cfssljson -bare kube-apiserver
+</span></span><span class=line><span class=cl>cfssl gencert -ca<span class=o>=</span>ca.pem -ca-key<span class=o>=</span>ca-key.pem -config<span class=o>=</span>ca-config.json -profile<span class=o>=</span>kubernetes kube-proxy-csr.json <span class=p>|</span> cfssljson -bare kube-proxy
+</span></span><span class=line><span class=cl>cfssl gencert -ca<span class=o>=</span>ca.pem -ca-key<span class=o>=</span>ca-key.pem -config<span class=o>=</span>ca-config.json -profile<span class=o>=</span>kubernetes admin-csr.json <span class=p>|</span> cfssljson -bare admin
+</span></span><span class=line><span class=cl><span class=c1># 此时目录下生成的文件</span>
+</span></span><span class=line><span class=cl>ll
+</span></span><span class=line><span class=cl>-rw-r--r--. <span class=m>1</span> root root <span class=m>1001</span> May <span class=m>28</span> 00:32 admin.csr
+</span></span><span class=line><span class=cl>-rw-r--r--. <span class=m>1</span> root root  <span class=m>282</span> May <span class=m>28</span> 00:32 admin-csr.json
+</span></span><span class=line><span class=cl>-rw-------. <span class=m>1</span> root root <span class=m>1679</span> May <span class=m>28</span> 00:32 admin-key.pem
+</span></span><span class=line><span class=cl>-rw-r--r--. <span class=m>1</span> root root <span class=m>1407</span> May <span class=m>28</span> 00:32 admin.pem
+</span></span><span class=line><span class=cl>-rw-r--r--. <span class=m>1</span> root root  <span class=m>294</span> May <span class=m>28</span> 00:30 ca-config.json
+</span></span><span class=line><span class=cl>-rw-r--r--. <span class=m>1</span> root root <span class=m>1013</span> May <span class=m>28</span> 00:31 ca.csr
+</span></span><span class=line><span class=cl>-rw-r--r--. <span class=m>1</span> root root  <span class=m>284</span> May <span class=m>28</span> 00:30 ca-csr.json
+</span></span><span class=line><span class=cl>-rw-------. <span class=m>1</span> root root <span class=m>1675</span> May <span class=m>28</span> 00:31 ca-key.pem
+</span></span><span class=line><span class=cl>-rw-r--r--. <span class=m>1</span> root root <span class=m>1383</span> May <span class=m>28</span> 00:31 ca.pem
+</span></span><span class=line><span class=cl>-rw-r--r--. <span class=m>1</span> root root <span class=m>1273</span> May <span class=m>28</span> 00:32 kube-apiserver.csr
+</span></span><span class=line><span class=cl>-rw-r--r--. <span class=m>1</span> root root  <span class=m>597</span> May <span class=m>28</span> 00:31 kube-apiserver-csr.json
+</span></span><span class=line><span class=cl>-rw-------. <span class=m>1</span> root root <span class=m>1679</span> May <span class=m>28</span> 00:32 kube-apiserver-key.pem
+</span></span><span class=line><span class=cl>-rw-r--r--. <span class=m>1</span> root root <span class=m>1655</span> May <span class=m>28</span> 00:32 kube-apiserver.pem
+</span></span><span class=line><span class=cl>-rw-r--r--. <span class=m>1</span> root root <span class=m>1009</span> May <span class=m>28</span> 00:32 kube-proxy.csr
+</span></span><span class=line><span class=cl>-rw-r--r--. <span class=m>1</span> root root  <span class=m>287</span> May <span class=m>28</span> 00:31 kube-proxy-csr.json
+</span></span><span class=line><span class=cl>-rw-------. <span class=m>1</span> root root <span class=m>1679</span> May <span class=m>28</span> 00:32 kube-proxy-key.pem
+</span></span><span class=line><span class=cl>-rw-r--r--. <span class=m>1</span> root root <span class=m>1411</span> May <span class=m>28</span> 00:32 kube-proxy.pem
+</span></span></code></pre></div><p>将 kube-proxy 证书拷贝到 Node：</p><p>前提，需要在 Node 机器创建目录，以下命令在 Node 机器上执行：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>mkdir /etc/kubernetes/ -p
+</span></span></code></pre></div><p>然后再在Master机器执行拷贝操作。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>cp ca.pem ca-key.pem kube-apiserver.pem kube-apiserver-key.pem kube-proxy.pem kube-proxy-key.pem /etc/kubernetes/ssl
+</span></span><span class=line><span class=cl>scp -r /etc/kubernetes/ssl 192.168.115.132:/etc/kubernetes
+</span></span><span class=line><span class=cl>scp -r /etc/kubernetes/ssl 192.168.115.133:/etc/kubernetes
 </span></span></code></pre></div><h2 id=创建-tlsbootstrapping-token>创建 TLSBootstrapping Token
-<a class=anchor href=#%e5%88%9b%e5%bb%ba-tlsbootstrapping-token>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>cd /etc/kubernetes
-</span></span><span style=display:flex><span>head -c <span style=color:#ae81ff>16</span> /dev/urandom | od -An -t x | tr -d <span style=color:#e6db74>&#39; &#39;</span>
-</span></span><span style=display:flex><span><span style=color:#75715e># 执行上一步会得到一个 token，例如 d5c5d767b64db39db132b433e9c45fbc，编辑文件 token.csv 时需要</span>
-</span></span><span style=display:flex><span>vim token.csv
-</span></span></code></pre></div><p>写入文件内容，替换生成的 token</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>d5c5d767b64db39db132b433e9c45fbc,kubelet-bootstrap,10001,<span style=color:#e6db74>&#34;system:node-bootstrapper&#34;</span>
+<a class=anchor href=#%e5%88%9b%e5%bb%ba-tlsbootstrapping-token>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nb>cd</span> /etc/kubernetes
+</span></span><span class=line><span class=cl>head -c <span class=m>16</span> /dev/urandom <span class=p>|</span> od -An -t x <span class=p>|</span> tr -d <span class=s1>&#39; &#39;</span>
+</span></span><span class=line><span class=cl><span class=c1># 执行上一步会得到一个 token，例如 d5c5d767b64db39db132b433e9c45fbc，编辑文件 token.csv 时需要</span>
+</span></span><span class=line><span class=cl>vim token.csv
+</span></span></code></pre></div><p>写入文件内容，替换生成的 token</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>d5c5d767b64db39db132b433e9c45fbc,kubelet-bootstrap,10001,<span class=s2>&#34;system:node-bootstrapper&#34;</span>
 </span></span></code></pre></div><h2 id=安装-kube-apiserver>安装 kube-apiserver
-<a class=anchor href=#%e5%ae%89%e8%a3%85-kube-apiserver>#</a></h2><p>准备 kube-apiserver 配置文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim apiserver
-</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-tex data-lang=tex><span style=display:flex><span>KUBE_API_ARGS=&#34;--logtostderr=false <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--v=2 <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--log-dir=/var/log/kubernetes <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--etcd-servers=https://192.168.115.131:2379,https://192.168.115.132:2379,https://192.168.115.133:2379 <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--bind-address=192.168.115.131 <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--secure-port=6443 <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--advertise-address=192.168.115.131 <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--allow-privileged=true <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--service-cluster-ip-range=10.0.0.0/24 <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,ResourceQuota,NodeRestriction <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--authorization-mode=RBAC,Node <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--enable-bootstrap-token-auth=true <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--token-auth-file=/etc/kubernetes/token.csv <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--service-node-port-range=30000-32767 <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--kubelet-client-certificate=/etc/kubernetes/ssl/kube-apiserver.pem <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--kubelet-client-key=/etc/kubernetes/ssl/kube-apiserver-key.pem <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--tls-cert-file=/etc/kubernetes/ssl/kube-apiserver.pem  <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--tls-private-key-file=/etc/kubernetes/ssl/kube-apiserver-key.pem <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--client-ca-file=/etc/kubernetes/ssl/ca.pem <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--service-account-key-file=/etc/kubernetes/ssl/ca-key.pem <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--etcd-cafile=/etc/etcd/ssl/ca.pem <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--etcd-certfile=/etc/etcd/ssl/server.pem <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--etcd-keyfile=/etc/etcd/ssl/server-key.pem <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--audit-log-maxage=30 <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--audit-log-maxbackup=3 <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--audit-log-maxsize=100 <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--audit-log-path=/var/logs/kubernetes/k8s-audit.log&#34;
-</span></span></code></pre></div><p>准备 kube-apiserver 服务配置文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim /usr/lib/systemd/system/kube-apiserver.service
-</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#66d9ef>[Unit]</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>Description</span><span style=color:#f92672>=</span><span style=color:#e6db74>Kubernetes API Server</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>Documentation</span><span style=color:#f92672>=</span><span style=color:#e6db74>https://github.com/GoogleCloudPlatform/kubernetes</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>After</span><span style=color:#f92672>=</span><span style=color:#e6db74>etcd.service</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>Wants</span><span style=color:#f92672>=</span><span style=color:#e6db74>etcd.service</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>[Service]</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>Type</span><span style=color:#f92672>=</span><span style=color:#e6db74>notify</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>EnvironmentFile</span><span style=color:#f92672>=</span><span style=color:#e6db74>/etc/kubernetes/apiserver</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ExecStart</span><span style=color:#f92672>=</span><span style=color:#e6db74>/etc/kubernetes/bin/kube-apiserver $KUBE_API_ARGS</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>Restart</span><span style=color:#f92672>=</span><span style=color:#e6db74>on-failure</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>LimitNOFILE</span><span style=color:#f92672>=</span><span style=color:#e6db74>65536</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>[Install]</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>WantedBy</span><span style=color:#f92672>=</span><span style=color:#e6db74>multi-user.target</span>
-</span></span></code></pre></div><p>启动 kube-apiserver:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>systemctl daemon-reload
-</span></span><span style=display:flex><span>systemctl start kube-apiserver
-</span></span><span style=display:flex><span>systemctl enable kube-apiserver
-</span></span><span style=display:flex><span>systemctl status kube-apiserver
+<a class=anchor href=#%e5%ae%89%e8%a3%85-kube-apiserver>#</a></h2><p>准备 kube-apiserver 配置文件</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>vim apiserver
+</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-tex data-lang=tex><span class=line><span class=cl>KUBE<span class=nb>_</span>API<span class=nb>_</span>ARGS=&#34;--logtostderr=false <span class=k>\</span>
+</span></span><span class=line><span class=cl>--v=2 <span class=k>\</span>
+</span></span><span class=line><span class=cl>--log-dir=/var/log/kubernetes <span class=k>\</span>
+</span></span><span class=line><span class=cl>--etcd-servers=https://192.168.115.131:2379,https://192.168.115.132:2379,https://192.168.115.133:2379 <span class=k>\</span>
+</span></span><span class=line><span class=cl>--bind-address=192.168.115.131 <span class=k>\</span>
+</span></span><span class=line><span class=cl>--secure-port=6443 <span class=k>\</span>
+</span></span><span class=line><span class=cl>--advertise-address=192.168.115.131 <span class=k>\</span>
+</span></span><span class=line><span class=cl>--allow-privileged=true <span class=k>\</span>
+</span></span><span class=line><span class=cl>--service-cluster-ip-range=10.0.0.0/24 <span class=k>\</span>
+</span></span><span class=line><span class=cl>--enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,ResourceQuota,NodeRestriction <span class=k>\</span>
+</span></span><span class=line><span class=cl>--authorization-mode=RBAC,Node <span class=k>\</span>
+</span></span><span class=line><span class=cl>--enable-bootstrap-token-auth=true <span class=k>\</span>
+</span></span><span class=line><span class=cl>--token-auth-file=/etc/kubernetes/token.csv <span class=k>\</span>
+</span></span><span class=line><span class=cl>--service-node-port-range=30000-32767 <span class=k>\</span>
+</span></span><span class=line><span class=cl>--kubelet-client-certificate=/etc/kubernetes/ssl/kube-apiserver.pem <span class=k>\</span>
+</span></span><span class=line><span class=cl>--kubelet-client-key=/etc/kubernetes/ssl/kube-apiserver-key.pem <span class=k>\</span>
+</span></span><span class=line><span class=cl>--tls-cert-file=/etc/kubernetes/ssl/kube-apiserver.pem  <span class=k>\</span>
+</span></span><span class=line><span class=cl>--tls-private-key-file=/etc/kubernetes/ssl/kube-apiserver-key.pem <span class=k>\</span>
+</span></span><span class=line><span class=cl>--client-ca-file=/etc/kubernetes/ssl/ca.pem <span class=k>\</span>
+</span></span><span class=line><span class=cl>--service-account-key-file=/etc/kubernetes/ssl/ca-key.pem <span class=k>\</span>
+</span></span><span class=line><span class=cl>--etcd-cafile=/etc/etcd/ssl/ca.pem <span class=k>\</span>
+</span></span><span class=line><span class=cl>--etcd-certfile=/etc/etcd/ssl/server.pem <span class=k>\</span>
+</span></span><span class=line><span class=cl>--etcd-keyfile=/etc/etcd/ssl/server-key.pem <span class=k>\</span>
+</span></span><span class=line><span class=cl>--audit-log-maxage=30 <span class=k>\</span>
+</span></span><span class=line><span class=cl>--audit-log-maxbackup=3 <span class=k>\</span>
+</span></span><span class=line><span class=cl>--audit-log-maxsize=100 <span class=k>\</span>
+</span></span><span class=line><span class=cl>--audit-log-path=/var/logs/kubernetes/k8s-audit.log&#34;
+</span></span></code></pre></div><p>准备 kube-apiserver 服务配置文件</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>vim /usr/lib/systemd/system/kube-apiserver.service
+</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-ini data-lang=ini><span class=line><span class=cl><span class=k>[Unit]</span>
+</span></span><span class=line><span class=cl><span class=na>Description</span><span class=o>=</span><span class=s>Kubernetes API Server</span>
+</span></span><span class=line><span class=cl><span class=na>Documentation</span><span class=o>=</span><span class=s>https://github.com/GoogleCloudPlatform/kubernetes</span>
+</span></span><span class=line><span class=cl><span class=na>After</span><span class=o>=</span><span class=s>etcd.service</span>
+</span></span><span class=line><span class=cl><span class=na>Wants</span><span class=o>=</span><span class=s>etcd.service</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>[Service]</span>
+</span></span><span class=line><span class=cl><span class=na>Type</span><span class=o>=</span><span class=s>notify</span>
+</span></span><span class=line><span class=cl><span class=na>EnvironmentFile</span><span class=o>=</span><span class=s>/etc/kubernetes/apiserver</span>
+</span></span><span class=line><span class=cl><span class=na>ExecStart</span><span class=o>=</span><span class=s>/etc/kubernetes/bin/kube-apiserver $KUBE_API_ARGS</span>
+</span></span><span class=line><span class=cl><span class=na>Restart</span><span class=o>=</span><span class=s>on-failure</span>
+</span></span><span class=line><span class=cl><span class=na>LimitNOFILE</span><span class=o>=</span><span class=s>65536</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>[Install]</span>
+</span></span><span class=line><span class=cl><span class=na>WantedBy</span><span class=o>=</span><span class=s>multi-user.target</span>
+</span></span></code></pre></div><p>启动 kube-apiserver:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>systemctl daemon-reload
+</span></span><span class=line><span class=cl>systemctl start kube-apiserver
+</span></span><span class=line><span class=cl>systemctl <span class=nb>enable</span> kube-apiserver
+</span></span><span class=line><span class=cl>systemctl status kube-apiserver
 </span></span></code></pre></div><h2 id=安装-kube-controller-manager>安装 kube-controller-manager
-<a class=anchor href=#%e5%ae%89%e8%a3%85-kube-controller-manager>#</a></h2><p>准备 kube-controller-manger 配置文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim controller-manager
-</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-tex data-lang=tex><span style=display:flex><span>KUBE_CONTROLLER_MANAGER_ARGS=&#34;--logtostderr=false <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--v=2 <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--log-dir=/var/log/kubernetes <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--leader-elect=true <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--master=127.0.0.1:8080 <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--bind-address=127.0.0.1 <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--allocate-node-cidrs=true <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--cluster-cidr=10.244.0.0/16 <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--service-cluster-ip-range=10.0.0.0/24 <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--cluster-signing-cert-file=/etc/kubernetes/ssl/ca.pem <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--cluster-signing-key-file=/etc/kubernetes/ssl/ca-key.pem  <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--root-ca-file=/etc/kubernetes/ssl/ca.pem <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--service-account-private-key-file=/etc/kubernetes/ssl/ca-key.pem <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--experimental-cluster-signing-duration=87600h0m0s&#34;
-</span></span></code></pre></div><p>准备 kube-controller-manger 服务配置文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim /usr/lib/systemd/system/kube-controller-manager.service
-</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#66d9ef>[Unit]</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>Description</span><span style=color:#f92672>=</span><span style=color:#e6db74>Kubernetes Controller Manager</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>Documentation</span><span style=color:#f92672>=</span><span style=color:#e6db74>https://github.com/GoogleCloudPlatform/kubernetes</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>After</span><span style=color:#f92672>=</span><span style=color:#e6db74>kube-apiserver.service</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>Requires</span><span style=color:#f92672>=</span><span style=color:#e6db74>kube-apiserver.service</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>[Service]</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>EnvironmentFile</span><span style=color:#f92672>=</span><span style=color:#e6db74>/etc/kubernetes/controller-manager</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ExecStart</span><span style=color:#f92672>=</span><span style=color:#e6db74>/etc/kubernetes/bin/kube-controller-manager $KUBE_CONTROLLER_MANAGER_ARGS</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>Restart</span><span style=color:#f92672>=</span><span style=color:#e6db74>on-failure</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>LimitNOFILE</span><span style=color:#f92672>=</span><span style=color:#e6db74>65536</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>[Install]</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>WantedBy</span><span style=color:#f92672>=</span><span style=color:#e6db74>multi-user.target</span>
-</span></span></code></pre></div><p>启动kube-controller-manager:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>systemctl daemon-reload
-</span></span><span style=display:flex><span>systemctl start kube-controller-manager
-</span></span><span style=display:flex><span>systemctl enable kube-controller-manager
-</span></span><span style=display:flex><span>systemctl status kube-controller-manager
+<a class=anchor href=#%e5%ae%89%e8%a3%85-kube-controller-manager>#</a></h2><p>准备 kube-controller-manger 配置文件</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>vim controller-manager
+</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-tex data-lang=tex><span class=line><span class=cl>KUBE<span class=nb>_</span>CONTROLLER<span class=nb>_</span>MANAGER<span class=nb>_</span>ARGS=&#34;--logtostderr=false <span class=k>\</span>
+</span></span><span class=line><span class=cl>--v=2 <span class=k>\</span>
+</span></span><span class=line><span class=cl>--log-dir=/var/log/kubernetes <span class=k>\</span>
+</span></span><span class=line><span class=cl>--leader-elect=true <span class=k>\</span>
+</span></span><span class=line><span class=cl>--master=127.0.0.1:8080 <span class=k>\</span>
+</span></span><span class=line><span class=cl>--bind-address=127.0.0.1 <span class=k>\</span>
+</span></span><span class=line><span class=cl>--allocate-node-cidrs=true <span class=k>\</span>
+</span></span><span class=line><span class=cl>--cluster-cidr=10.244.0.0/16 <span class=k>\</span>
+</span></span><span class=line><span class=cl>--service-cluster-ip-range=10.0.0.0/24 <span class=k>\</span>
+</span></span><span class=line><span class=cl>--cluster-signing-cert-file=/etc/kubernetes/ssl/ca.pem <span class=k>\</span>
+</span></span><span class=line><span class=cl>--cluster-signing-key-file=/etc/kubernetes/ssl/ca-key.pem  <span class=k>\</span>
+</span></span><span class=line><span class=cl>--root-ca-file=/etc/kubernetes/ssl/ca.pem <span class=k>\</span>
+</span></span><span class=line><span class=cl>--service-account-private-key-file=/etc/kubernetes/ssl/ca-key.pem <span class=k>\</span>
+</span></span><span class=line><span class=cl>--experimental-cluster-signing-duration=87600h0m0s&#34;
+</span></span></code></pre></div><p>准备 kube-controller-manger 服务配置文件</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>vim /usr/lib/systemd/system/kube-controller-manager.service
+</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-ini data-lang=ini><span class=line><span class=cl><span class=k>[Unit]</span>
+</span></span><span class=line><span class=cl><span class=na>Description</span><span class=o>=</span><span class=s>Kubernetes Controller Manager</span>
+</span></span><span class=line><span class=cl><span class=na>Documentation</span><span class=o>=</span><span class=s>https://github.com/GoogleCloudPlatform/kubernetes</span>
+</span></span><span class=line><span class=cl><span class=na>After</span><span class=o>=</span><span class=s>kube-apiserver.service</span>
+</span></span><span class=line><span class=cl><span class=na>Requires</span><span class=o>=</span><span class=s>kube-apiserver.service</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>[Service]</span>
+</span></span><span class=line><span class=cl><span class=na>EnvironmentFile</span><span class=o>=</span><span class=s>/etc/kubernetes/controller-manager</span>
+</span></span><span class=line><span class=cl><span class=na>ExecStart</span><span class=o>=</span><span class=s>/etc/kubernetes/bin/kube-controller-manager $KUBE_CONTROLLER_MANAGER_ARGS</span>
+</span></span><span class=line><span class=cl><span class=na>Restart</span><span class=o>=</span><span class=s>on-failure</span>
+</span></span><span class=line><span class=cl><span class=na>LimitNOFILE</span><span class=o>=</span><span class=s>65536</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>[Install]</span>
+</span></span><span class=line><span class=cl><span class=na>WantedBy</span><span class=o>=</span><span class=s>multi-user.target</span>
+</span></span></code></pre></div><p>启动kube-controller-manager:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>systemctl daemon-reload
+</span></span><span class=line><span class=cl>systemctl start kube-controller-manager
+</span></span><span class=line><span class=cl>systemctl <span class=nb>enable</span> kube-controller-manager
+</span></span><span class=line><span class=cl>systemctl status kube-controller-manager
 </span></span></code></pre></div><h2 id=安装-kube-scheduler>安装 kube-scheduler
-<a class=anchor href=#%e5%ae%89%e8%a3%85-kube-scheduler>#</a></h2><p>准备 kube-scheduler 配置文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim scheduler
-</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-tex data-lang=tex><span style=display:flex><span>KUBE_SCHEDULER_ARGS=&#34;--logtostderr=false <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--v=2 <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--log-dir=/var/log/kubernetes <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--master=127.0.0.1:8080 <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--leader-elect <span style=color:#66d9ef>\</span>
-</span></span><span style=display:flex><span>--bind-address=127.0.0.1&#34;
-</span></span></code></pre></div><p>准备 kube-scheduler 服务配置文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vim /usr/lib/systemd/system/kube-scheduler.service
-</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#66d9ef>[Unit]</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>Description</span><span style=color:#f92672>=</span><span style=color:#e6db74>Kubernetes Scheduler</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>Documentation</span><span style=color:#f92672>=</span><span style=color:#e6db74>https://github.com/GoogleCloudPlatform/kubernetes</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>After</span><span style=color:#f92672>=</span><span style=color:#e6db74>kube-apiserver.service</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>Requires</span><span style=color:#f92672>=</span><span style=color:#e6db74>kube-apiserver.service</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>[Service]</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>EnvironmentFile</span><span style=color:#f92672>=</span><span style=color:#e6db74>/etc/kubernetes/scheduler</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>ExecStart</span><span style=color:#f92672>=</span><span style=color:#e6db74>/etc/kubernetes/bin/kube-scheduler $KUBE_SCHEDULER_ARGS</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>Restart</span><span style=color:#f92672>=</span><span style=color:#e6db74>on-failure</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>LimitNOFILE</span><span style=color:#f92672>=</span><span style=color:#e6db74>65536</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>[Install]</span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>WantedBy</span><span style=color:#f92672>=</span><span style=color:#e6db74>multi-user.target</span>
-</span></span></code></pre></div><p>启动 kube-scheduler:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>systemctl daemon-reload
-</span></span><span style=display:flex><span>systemctl start kube-scheduler
-</span></span><span style=display:flex><span>systemctl enable kube-scheduler
-</span></span><span style=display:flex><span>systemctl status kube-scheduler
+<a class=anchor href=#%e5%ae%89%e8%a3%85-kube-scheduler>#</a></h2><p>准备 kube-scheduler 配置文件</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>vim scheduler
+</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-tex data-lang=tex><span class=line><span class=cl>KUBE<span class=nb>_</span>SCHEDULER<span class=nb>_</span>ARGS=&#34;--logtostderr=false <span class=k>\</span>
+</span></span><span class=line><span class=cl>--v=2 <span class=k>\</span>
+</span></span><span class=line><span class=cl>--log-dir=/var/log/kubernetes <span class=k>\</span>
+</span></span><span class=line><span class=cl>--master=127.0.0.1:8080 <span class=k>\</span>
+</span></span><span class=line><span class=cl>--leader-elect <span class=k>\</span>
+</span></span><span class=line><span class=cl>--bind-address=127.0.0.1&#34;
+</span></span></code></pre></div><p>准备 kube-scheduler 服务配置文件</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>vim /usr/lib/systemd/system/kube-scheduler.service
+</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-ini data-lang=ini><span class=line><span class=cl><span class=k>[Unit]</span>
+</span></span><span class=line><span class=cl><span class=na>Description</span><span class=o>=</span><span class=s>Kubernetes Scheduler</span>
+</span></span><span class=line><span class=cl><span class=na>Documentation</span><span class=o>=</span><span class=s>https://github.com/GoogleCloudPlatform/kubernetes</span>
+</span></span><span class=line><span class=cl><span class=na>After</span><span class=o>=</span><span class=s>kube-apiserver.service</span>
+</span></span><span class=line><span class=cl><span class=na>Requires</span><span class=o>=</span><span class=s>kube-apiserver.service</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>[Service]</span>
+</span></span><span class=line><span class=cl><span class=na>EnvironmentFile</span><span class=o>=</span><span class=s>/etc/kubernetes/scheduler</span>
+</span></span><span class=line><span class=cl><span class=na>ExecStart</span><span class=o>=</span><span class=s>/etc/kubernetes/bin/kube-scheduler $KUBE_SCHEDULER_ARGS</span>
+</span></span><span class=line><span class=cl><span class=na>Restart</span><span class=o>=</span><span class=s>on-failure</span>
+</span></span><span class=line><span class=cl><span class=na>LimitNOFILE</span><span class=o>=</span><span class=s>65536</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>[Install]</span>
+</span></span><span class=line><span class=cl><span class=na>WantedBy</span><span class=o>=</span><span class=s>multi-user.target</span>
+</span></span></code></pre></div><p>启动 kube-scheduler:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>systemctl daemon-reload
+</span></span><span class=line><span class=cl>systemctl start kube-scheduler
+</span></span><span class=line><span class=cl>systemctl <span class=nb>enable</span> kube-scheduler
+</span></span><span class=line><span class=cl>systemctl status kube-scheduler
 </span></span></code></pre></div><h2 id=kubelet-bootstrap-授权>kubelet-bootstrap 授权
-<a class=anchor href=#kubelet-bootstrap-%e6%8e%88%e6%9d%83>#</a></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl create clusterrolebinding kubelet-bootstrap <span style=color:#ae81ff>\
-</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>--clusterrole<span style=color:#f92672>=</span>system:node-bootstrapper <span style=color:#ae81ff>\
-</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>--user<span style=color:#f92672>=</span>kubelet-bootstrap
-</span></span></code></pre></div><p>查看 Master 状态</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl get cs
-</span></span></code></pre></div><p>如果 Master 部署成功，应该输出：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>NAME                 STATUS    MESSAGE             ERROR
-</span></span><span style=display:flex><span>scheduler            Healthy   ok                  
-</span></span><span style=display:flex><span>controller-manager   Healthy   ok                  
-</span></span><span style=display:flex><span>etcd-2               Healthy   <span style=color:#f92672>{</span><span style=color:#e6db74>&#34;health&#34;</span>:<span style=color:#e6db74>&#34;true&#34;</span><span style=color:#f92672>}</span>   
-</span></span><span style=display:flex><span>etcd-1               Healthy   <span style=color:#f92672>{</span><span style=color:#e6db74>&#34;health&#34;</span>:<span style=color:#e6db74>&#34;true&#34;</span><span style=color:#f92672>}</span>   
-</span></span><span style=display:flex><span>etcd-0               Healthy   <span style=color:#f92672>{</span><span style=color:#e6db74>&#34;health&#34;</span>:<span style=color:#e6db74>&#34;true&#34;</span><span style=color:#f92672>}</span>
+<a class=anchor href=#kubelet-bootstrap-%e6%8e%88%e6%9d%83>#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl create clusterrolebinding kubelet-bootstrap <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>--clusterrole<span class=o>=</span>system:node-bootstrapper <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>--user<span class=o>=</span>kubelet-bootstrap
+</span></span></code></pre></div><p>查看 Master 状态</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl get cs
+</span></span></code></pre></div><p>如果 Master 部署成功，应该输出：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>NAME                 STATUS    MESSAGE             ERROR
+</span></span><span class=line><span class=cl>scheduler            Healthy   ok                  
+</span></span><span class=line><span class=cl>controller-manager   Healthy   ok                  
+</span></span><span class=line><span class=cl>etcd-2               Healthy   <span class=o>{</span><span class=s2>&#34;health&#34;</span>:<span class=s2>&#34;true&#34;</span><span class=o>}</span>   
+</span></span><span class=line><span class=cl>etcd-1               Healthy   <span class=o>{</span><span class=s2>&#34;health&#34;</span>:<span class=s2>&#34;true&#34;</span><span class=o>}</span>   
+</span></span><span class=line><span class=cl>etcd-0               Healthy   <span class=o>{</span><span class=s2>&#34;health&#34;</span>:<span class=s2>&#34;true&#34;</span><span class=o>}</span>
 </span></span></code></pre></div><h2 id=apiserver-授权-kubelet>apiserver 授权 kubelet
-<a class=anchor href=#apiserver-%e6%8e%88%e6%9d%83-kubelet>#</a></h2><p>准备 apiserver-to-kubelet-rbac.yaml 文件</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>cd /root/kubernetes/resources
-</span></span><span style=display:flex><span>vim apiserver-to-kubelet-rbac.yaml 
-</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRole</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>annotations</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>rbac.authorization.kubernetes.io/autoupdate</span>: <span style=color:#e6db74>&#34;true&#34;</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>kubernetes.io/bootstrapping</span>: <span style=color:#ae81ff>rbac-defaults</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>system:kube-apiserver-to-kubelet</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>rules</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>apiGroups</span>:
-</span></span><span style=display:flex><span>      - <span style=color:#e6db74>&#34;&#34;</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>resources</span>:
-</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>nodes/proxy</span>
-</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>nodes/stats</span>
-</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>nodes/log</span>
-</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>nodes/spec</span>
-</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>nodes/metrics</span>
-</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>pods/log</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>verbs</span>:
-</span></span><span style=display:flex><span>      - <span style=color:#e6db74>&#34;*&#34;</span>
-</span></span><span style=display:flex><span>---
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRoleBinding</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>system:kube-apiserver</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>namespace</span>: <span style=color:#e6db74>&#34;&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>roleRef</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>apiGroup</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRole</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>system:kube-apiserver-to-kubelet</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>subjects</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#f92672>apiGroup</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>User</span>
-</span></span><span style=display:flex><span>    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>kubernetes</span>
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span><span style=color:#75715e># This role allows full access to the kubelet API</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRole</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>kubelet-api-admin</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>addonmanager.kubernetes.io/mode</span>: <span style=color:#ae81ff>Reconcile</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>rules</span>:
-</span></span><span style=display:flex><span>- <span style=color:#f92672>apiGroups</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#e6db74>&#34;&#34;</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>resources</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>nodes/proxy</span>
-</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>nodes/log</span>
-</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>nodes/stats</span>
-</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>nodes/metrics</span>
-</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>nodes/spec</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>verbs</span>:
-</span></span><span style=display:flex><span>  - <span style=color:#e6db74>&#34;*&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#75715e># This binding gives the kube-apiserver user full access to the kubelet API</span>
-</span></span><span style=display:flex><span>---
-</span></span><span style=display:flex><span><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io/v1</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRoleBinding</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>metadata</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>kube-apiserver-kubelet-api-admin</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>labels</span>:
-</span></span><span style=display:flex><span>    <span style=color:#f92672>addonmanager.kubernetes.io/mode</span>: <span style=color:#ae81ff>Reconcile</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>roleRef</span>:
-</span></span><span style=display:flex><span>  <span style=color:#f92672>apiGroup</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRole</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>kubelet-api-admin</span>
-</span></span><span style=display:flex><span><span style=color:#f92672>subjects</span>:
-</span></span><span style=display:flex><span>- <span style=color:#f92672>apiGroup</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>User</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>kube-apiserver    </span>
-</span></span></code></pre></div><p>执行以下命令：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>kubectl apply -f apiserver-to-kubelet-rbac.yaml 
+<a class=anchor href=#apiserver-%e6%8e%88%e6%9d%83-kubelet>#</a></h2><p>准备 apiserver-to-kubelet-rbac.yaml 文件</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=nb>cd</span> /root/kubernetes/resources
+</span></span><span class=line><span class=cl>vim apiserver-to-kubelet-rbac.yaml 
+</span></span></code></pre></div><p>执行上行命令，写入文件内容如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ClusterRole</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>annotations</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>rbac.authorization.kubernetes.io/autoupdate</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;true&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>kubernetes.io/bootstrapping</span><span class=p>:</span><span class=w> </span><span class=l>rbac-defaults</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>system:kube-apiserver-to-kubelet</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>rules</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=s2>&#34;&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resources</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>nodes/proxy</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>nodes/stats</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>nodes/log</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>nodes/spec</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>nodes/metrics</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>pods/log</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>verbs</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=s2>&#34;*&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ClusterRoleBinding</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>system:kube-apiserver</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>roleRef</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>apiGroup</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ClusterRole</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>system:kube-apiserver-to-kubelet</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>subjects</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>apiGroup</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>User</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>kubernetes</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c># This role allows full access to the kubelet API</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ClusterRole</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>kubelet-api-admin</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>addonmanager.kubernetes.io/mode</span><span class=p>:</span><span class=w> </span><span class=l>Reconcile</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>rules</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=s2>&#34;&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>resources</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>nodes/proxy</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>nodes/log</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>nodes/stats</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>nodes/metrics</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>nodes/spec</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>verbs</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=s2>&#34;*&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c># This binding gives the kube-apiserver user full access to the kubelet API</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ClusterRoleBinding</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>kube-apiserver-kubelet-api-admin</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>addonmanager.kubernetes.io/mode</span><span class=p>:</span><span class=w> </span><span class=l>Reconcile</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>roleRef</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>apiGroup</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ClusterRole</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>kubelet-api-admin</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>subjects</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>apiGroup</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>User</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>kube-apiserver    </span><span class=w>
+</span></span></span></code></pre></div><p>执行以下命令：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl apply -f apiserver-to-kubelet-rbac.yaml 
 </span></span></code></pre></div><p>第三段落<strong>部署 Master</strong>顺利结束。</p><hr><p><a href=/kubernetes/binary-build-k8s-02-deploy-etcd/>« 二进制搭建 K8s - 2 部署 etcd 集群</a></p><p><a href=/kubernetes/binary-build-k8s-04-deploy-worker/>» 二进制搭建 K8s - 4 部署 Node</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/poneding/blog/commit/d558b4f864a8b9cf1df3c1afab2835a56d2f733c title='最后修改者 poneding | 2024/06/12' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt>
 <span>2024/06/12</span></a></div><div><a class="flex align-center" href=https://github.com/poneding/blog/edit/master/content/kubernetes/binary-build-k8s-03-deploy-master.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt>
 <span>编辑本页</span></a></div></div><script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script></footer><div class=book-comments><script src=https://giscus.app/client.js data-repo=poneding/blog data-repo-id=R_kgDOMITIHg data-category=General data-category-id=DIC_kwDOMITIHs4CgB4x data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=preferred_color_scheme data-lang=zh-CN data-loading=lazy crossorigin=anonymous async></script></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><div class=book-toc-content><nav id=TableOfContents><ul><li><a href=#写在前面>写在前面</a></li><li><a href=#安装-kubectl>安装 kubectl</a></li><li><a href=#制作-kubernetes-证书>制作 kubernetes 证书</a></li><li><a href=#创建-tlsbootstrapping-token>创建 TLSBootstrapping Token</a></li><li><a href=#安装-kube-apiserver>安装 kube-apiserver</a></li><li><a href=#安装-kube-controller-manager>安装 kube-controller-manager</a></li><li><a href=#安装-kube-scheduler>安装 kube-scheduler</a></li><li><a href=#kubelet-bootstrap-授权>kubelet-bootstrap 授权</a></li><li><a href=#apiserver-授权-kubelet>apiserver 授权 kubelet</a></li></ul></nav></div></aside></main></body></html>
