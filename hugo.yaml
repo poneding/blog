@@ -17,8 +17,9 @@ markup:
     endLevel: 3
     # ordered: true
 
-  # highlight:
-  #   style: monokai
+  highlight:
+    noClasses: false
+    # style: monokai
 
 menu:
   main:

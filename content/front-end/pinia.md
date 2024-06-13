@@ -165,6 +165,6 @@ export const useCounterStore = defineStore('counter', ()=>{
 ```
 
 ---
-[« SEO](build-site-seo-config.md)
+[« 搭建博客站点](build-blog-site.md)
 
 [» VitePress](vitepress.md)

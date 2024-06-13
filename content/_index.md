@@ -77,7 +77,7 @@
 
 ## 前端技术
 
-- [SEO](front-end/build-site-seo-config.md)
+- [搭建博客站点](front-end/build-blog-site.md)
 - [Pinia 入门](front-end/pinia.md)
 - [VitePress](front-end/vitepress.md)
 - [认识Vue3](front-end/vue3.md)

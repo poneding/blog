@@ -2,7 +2,7 @@
 
 # 前端技术
 
-[SEO](build-site-seo-config.md)
+[搭建博客站点](build-blog-site.md)
 
 [Pinia 入门](pinia.md)
 
