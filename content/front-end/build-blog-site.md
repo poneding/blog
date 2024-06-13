@@ -183,7 +183,7 @@ echo '<link rel="stylesheet" href="/css/syntax.css">' >> layouts/partials/docs/h
 
 ### 2.5 Logo
 
-将 logo.png 图片放到 `static` 目录下。
+将 `logo.png` 图片放到 `static` 目录下。
 
 ## 3. 部署
 
