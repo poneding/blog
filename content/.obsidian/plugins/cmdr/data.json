@@ -6,15 +6,9 @@
   "fileMenu": [],
   "leftRibbon": [
     {
-      "id": "cmdr:macro-0",
+      "id": "obsidian-shellcommands:shell-command-fhrsa4uuo3",
       "icon": "upload-cloud",
       "name": "Sync",
-      "mode": "any"
-    },
-    {
-      "id": "terminal:open-terminal.integrated.root",
-      "icon": "terminal",
-      "name": "终端: 在终端开啟根目录：整合式",
       "mode": "any"
     }
   ],
