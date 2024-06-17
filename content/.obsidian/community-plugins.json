@@ -1,5 +1,6 @@
 [
   "obsidian-image-auto-upload-plugin",
   "terminal",
-  "obsidian-git"
+  "obsidian-git",
+  "obsidian-linter"
 ]

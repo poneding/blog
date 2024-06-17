@@ -93,6 +93,14 @@ cargo publish
 cargo publish --allow-dirty
 ```
 
+## 依赖管理
+
+依赖的来源
+
+- crate.io：Rust 官方 registry，包含大量开源的 Rust 库；
+- git：rust 版本的 git 仓库，适用于未发布或者开发阶段；
+- local crate：本地 rust 库，可用于调试。
+
 ## 添加依赖
 
 ```bash
@@ -200,12 +208,6 @@ cargo build
 # 构建单个工作区成员
 cargo build -p hello_world
 ```
-
-## 依赖管理
-
-- crate.io
-- git
-- loca
 
 ---
 [» Rust 开发环境配置](dev-env-config.md)
