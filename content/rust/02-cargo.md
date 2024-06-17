@@ -124,6 +124,8 @@ cargo publish --allow-dirty
 - git：rust 版本的 git 仓库，适用于未发布或者开发阶段；
 - local crate：本地 rust 库，可用于调试。
 
+## 版本格式
+
 依赖的版本范围规则参考如下，基于这样的规则，rust 会使用版本范围内最大版本号作为依赖的最终版本，例如如果定义版本为 `some_crate = "1.2.3"` 但是 `some_crate` 当前最高版本为 `1.8.9`，那么 Cargo 会自动使用 ·1.8.9· 版本作为依赖。
 
 ```toml
@@ -152,6 +154,14 @@ some_crate = "1.2.*" => 版本范围[1.2.0, 1.3.0)
 some_crate = ">=1.2, < 1.5" => 版本范围[1.2.0, 1.5.0)
 ```
 
+使用别名引入两个版本不同的库：
+
+```toml
+[dependencies]
+some_crate_v1 = { version = "1.0.0", package = "rand" }
+some_crate_v2 = { version = "2.0.0", package = "rand" }
+```
+
 ## 添加依赖
 
 ```bash
@@ -161,6 +171,9 @@ cargo add hello-world
 
 # 添加依赖并使用 features
 cargo add serde --features derive,serde_derive
+
+# 添加 git 仓库依赖，Cargo.toml 依赖信息中会包含 git 地址
+cargo add myrlib --git https://github.com/poneding/myrlib.git
 
 # 添加本地依赖
 cargo add hello-world --path ../hello-world
@@ -264,4 +277,6 @@ cargo build -p hello_world
 ```
 
 ---
-[» Rust 入门](getting-started.md)
+[« Rust 入门](01-getting-started.md)
+
+[» 查看根目录](rust-programming.md)

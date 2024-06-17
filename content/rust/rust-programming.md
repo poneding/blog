@@ -36,6 +36,6 @@ let s2 = s1.as_ref();
 设置 `RUST_BACKTRACE=1` 环境变量值，可以追踪到 panic 位置，例如：
 
 ---
-[« Rust 入门](getting-started.md)
+[« Cargo 管理工具](02-cargo.md)
 
 [» Rust VSCode 调试](vscode-debugging.md)

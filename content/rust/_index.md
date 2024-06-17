@@ -2,9 +2,9 @@
 
 # Rust 编程
 
-[Cargo 管理工具](cargo.md)
+[Rust 入门](01-getting-started.md)
 
-[Rust 入门](getting-started.md)
+[Cargo 管理工具](02-cargo.md)
 
 [查看根目录](rust-programming.md)
 

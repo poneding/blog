@@ -105,6 +105,4 @@ rustup self uninstall
 ```
 
 ---
-[« Cargo 管理工具](cargo.md)
-
-[» 查看根目录](rust-programming.md)
+[» Cargo 管理工具](02-cargo.md)
