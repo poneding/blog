@@ -1,6 +1,6 @@
 [🏠 首页](../_index.md) / [Rust 编程](_index.md) / Rust cargo 管理工具
 
-# Rust cargo 管理工具
+# Cargo 管理工具
 
 cargo 是 Rust 的构建系统和包管理器。
 
