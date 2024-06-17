@@ -201,5 +201,11 @@ cargo build
 cargo build -p hello_world
 ```
 
+## 依赖管理
+
+- crate.io
+- git
+- loca
+
 ---
 [» Rust 开发环境配置](dev-env-config.md)
