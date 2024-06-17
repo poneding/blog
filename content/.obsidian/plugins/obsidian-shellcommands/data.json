@@ -49,7 +49,7 @@
         }
       },
       "output_wrappers": {
-        "stdout": null,
+        "stdout": "z383zz63rk",
         "stderr": null
       },
       "output_channel_order": "stdout-first",
@@ -90,5 +90,11 @@
     "output_assignment": true
   },
   "custom_shells": [],
-  "output_wrappers": []
+  "output_wrappers": [
+    {
+      "id": "z383zz63rk",
+      "title": "Sync",
+      "content": "Ok!"
+    }
+  ]
 }
