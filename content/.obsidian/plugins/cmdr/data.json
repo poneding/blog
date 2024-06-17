@@ -6,7 +6,7 @@
   "fileMenu": [],
   "leftRibbon": [
     {
-      "id": "obsidian-git:commit",
+      "id": "cmdr:macro-0",
       "icon": "upload-cloud",
       "name": "Sync",
       "mode": "any"
@@ -16,7 +16,27 @@
   "titleBar": [],
   "statusBar": [],
   "pageHeader": [],
-  "macros": [],
+  "macros": [
+    {
+      "macro": [
+        {
+          "action": 0,
+          "commandId": "obsidian-git:pull"
+        },
+        {
+          "action": 0,
+          "commandId": "obsidian-git:commit"
+        },
+        {
+          "action": 0,
+          "commandId": "obsidian-git:push2"
+        }
+      ],
+      "name": "Sync",
+      "icon": "upload-cloud",
+      "startup": false
+    }
+  ],
   "explorer": [],
   "hide": {
     "statusbar": [],
