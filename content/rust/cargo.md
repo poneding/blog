@@ -4,6 +4,29 @@
 
 cargo 是 Rust 的构建系统和包管理器。
 
+## 配置国内 rsproxy 源
+
+```bash
+vim ~/.cargo/config
+```
+
+```toml
+[source.crates-io]
+replace-with = 'rsproxy-sparse'
+
+[source.rsproxy]
+registry = "https://rsproxy.cn/crates.io-index"
+
+[source.rsproxy-sparse]
+registry = "sparse+https://rsproxy.cn/index/"
+
+[registries.rsproxy]
+index = "https://rsproxy.cn/crates.io-index"
+
+[net]
+git-fetch-with-cli = true
+```
+
 ## 创建项目
 
 ```bash
@@ -101,12 +124,43 @@ cargo publish --allow-dirty
 - git：rust 版本的 git 仓库，适用于未发布或者开发阶段；
 - local crate：本地 rust 库，可用于调试。
 
+依赖的版本范围规则参考如下，基于这样的规则，rust 会使用版本范围内最大版本号作为依赖的最终版本，例如如果定义版本为 `some_crate = "1.2.3"` 但是 `some_crate` 当前最高版本为 `1.8.9`，那么 Cargo 会自动使用 ·1.8.9· 版本作为依赖。
+
+```toml
+[dependencies]
+some_crate = "1.2.3" => 版本范围[1.2.3, 2.0.0)
+some_crate = "1.2" => 版本范围[1.2.0, 2.0.0)
+some_crate = "1" => 版本范围[1.0.0, 2.0.0)
+  
+some_crate = "0.2.3" => 版本范围[0.2.3, 0.3.0)
+some_crate = "0.2" => 版本范围[0.2.0, 0.3.0)
+some_crate = "0" => 版本范围[0.0.0, 1.0.0)
+  
+some_crate = "0.0" => 版本范围[0.0.0, 0.1.0)
+some_crate = "0.0.3" => 版本范围[0.0.3, 0.0.4)
+
+some_crate = "^1.2.3" => 版本范围[1.2.3]
+  
+some_crate = "~1.2.3" => 版本范围[1.2.3, 1.3.0)
+some_crate = "~1.2" => 版本范围[1.2.0, 1.3.0)
+some_crate = "~1" => 版本范围[1.0.0, 2.0.0)
+
+some_crate = "*" => 版本范围[0.0.0, )
+some_crate = "1.*" => 版本范围[1.0.0, 2.0.0)
+some_crate = "1.2.*" => 版本范围[1.2.0, 1.3.0)
+
+some_crate = ">=1.2, < 1.5" => 版本范围[1.2.0, 1.5.0)
+```
+
 ## 添加依赖
 
 ```bash
 cargo add rand
 
 cargo add hello-world
+
+# 添加依赖并使用 features
+cargo add serde --features derive,serde_derive
 
 # 添加本地依赖
 cargo add hello-world --path ../hello-world
@@ -210,4 +264,4 @@ cargo build -p hello_world
 ```
 
 ---
-[» Rust 开发环境配置](dev-env-config.md)
+[» Rust 入门](getting-started.md)

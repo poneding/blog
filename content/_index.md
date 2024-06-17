@@ -238,7 +238,6 @@
 ## Rust 编程
 
 - [Cargo 管理工具](rust/cargo.md)
-- [Rust 开发环境配置](rust/dev-env-config.md)
 - [Rust 入门](rust/getting-started.md)
 - [查看根目录](rust/rust-programming.md)
 - [Rust VSCode 调试](rust/vscode-debugging.md)

@@ -4,8 +4,6 @@
 
 [Cargo 管理工具](cargo.md)
 
-[Rust 开发环境配置](dev-env-config.md)
-
 [Rust 入门](getting-started.md)
 
 [查看根目录](rust-programming.md)
