@@ -83,6 +83,6 @@ exec zsh
 ```
 
 ---
-[« Rust cargo 管理工具](cargo.md)
+[« Cargo 管理工具](cargo.md)
 
 [» Rust 入门](getting-started.md)

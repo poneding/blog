@@ -1,4 +1,4 @@
-[🏠 首页](../_index.md) / [Rust 编程](_index.md) / Rust cargo 管理工具
+[🏠 首页](../_index.md) / [Rust 编程](_index.md) / Cargo 管理工具
 
 # Cargo 管理工具
 

@@ -2,5 +2,6 @@
   "obsidian-image-auto-upload-plugin",
   "terminal",
   "obsidian-git",
-  "obsidian-linter"
+  "obsidian-linter",
+  "obsidian-shellcommands"
 ]
