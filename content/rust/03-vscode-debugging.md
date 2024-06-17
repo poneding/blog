@@ -1,6 +1,6 @@
-[🏠 首页](../_index.md) / [Rust 编程](_index.md) / Rust VSCode 调试
+[🏠 首页](../_index.md) / [Rust 编程](_index.md) / VSCode 调试
 
-# Rust VSCode 调试
+# VSCode 调试
 
 ## 1. 安装插件
 
@@ -51,6 +51,6 @@
 > 支持 Wrokspace 下多 Rust 项目调试。
 
 ---
-[« 查看根目录](rust-programming.md)
+[« Cargo 管理工具](02-cargo.md)
 
-[» Rust WASM 编程](wasm-programming.md)
+[» Rust WASM 编程](04-wasm-programming.md)

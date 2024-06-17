@@ -62,4 +62,4 @@ wasm-pack build --scope [npm-username]
 ```
 
 ---
-[« Rust VSCode 调试](vscode-debugging.md)
+[« VSCode 调试](03-vscode-debugging.md)

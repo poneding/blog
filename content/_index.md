@@ -239,6 +239,5 @@
 
 - [Rust 入门](rust/01-getting-started.md)
 - [Cargo 管理工具](rust/02-cargo.md)
-- [查看根目录](rust/rust-programming.md)
-- [Rust VSCode 调试](rust/vscode-debugging.md)
-- [Rust WASM 编程](rust/wasm-programming.md)
+- [VSCode 调试](rust/03-vscode-debugging.md)
+- [Rust WASM 编程](rust/04-wasm-programming.md)

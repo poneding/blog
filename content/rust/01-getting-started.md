@@ -104,5 +104,20 @@ rustup update
 rustup self uninstall
 ```
 
+## 高级姿势
+
+安装 rust 后，查看一些重要的目录：
+
+```bash
+# 查看根目录
+rustc --print sysroot
+
+# 二进制程序位置
+$(rustc --print sysroot)/bin
+
+# 源码位置 
+$(rustc --print sysroot)/lib/rustlib/src/
+```
+
 ---
 [» Cargo 管理工具](02-cargo.md)

@@ -279,4 +279,4 @@ cargo build -p hello_world
 ---
 [« Rust 入门](01-getting-started.md)
 
-[» 查看根目录](rust-programming.md)
+[» VSCode 调试](03-vscode-debugging.md)

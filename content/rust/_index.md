@@ -6,8 +6,6 @@
 
 [Cargo 管理工具](02-cargo.md)
 
-[查看根目录](rust-programming.md)
+[VSCode 调试](03-vscode-debugging.md)
 
-[Rust VSCode 调试](vscode-debugging.md)
-
-[Rust WASM 编程](wasm-programming.md)
+[Rust WASM 编程](04-wasm-programming.md)
