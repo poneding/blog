@@ -69,7 +69,12 @@ tee 保存 stderr 到文件 # tee命令是将 stdout 写入到某文件当中，
 1.sh
 echo exec 1.sh start! &amp;amp;&amp;amp; \ cat hello.txt &amp;amp;&amp;amp; \ echo exec 1.sh end! 假如 hello.txt 文件不存在，执行 1.sh 文件中的 cat 命令将报错。如果我们想将执行 1.sh 文件的输出写入到一个 log 文件，例如：
 sh 1.sh | tee 1.log 执行以上命令，控制台的输出是：
-$ sh 1.sh | tee 1.log exec 1.sh start! cat: hello.txt: No such file or directory 但是写入到 1.</description></item><item><title/><link>https://blog.poneding.com/linux/vim-common-commands/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/vim-common-commands/</guid><description>🏠 首页 / Linux / vim 使用
+$ sh 1.sh | tee 1.log exec 1.sh start! cat: hello.txt: No such file or directory 但是写入到 1.</description></item><item><title/><link>https://blog.poneding.com/linux/transfer-files-between-server-and-client/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/transfer-files-between-server-and-client/</guid><description>🏠 首页 / Linux / 服务端与客户端传输文件
+服务端与客户端传输文件 # scp # # 客户端 &amp;lt;= 服务端 scp server_user@server_ip:/server_path /client_path # 客户端 =&amp;gt; 服务端 scp /client_path server_user@server_ip:/server_path # 传输目录：scp -r sftp # 客户端与服务端的远程文件传输工具。
+第一步，连接服务端：
+sftp server_user@server_ip -i ssh_key_file 第二步，传输文件：
+# 客户端 &amp;lt;= 服务端 get /server_path /client_path # 将客户端文件传输到服务端 put /client_/file/_path /server_path # 传输文件夹：get -r，put -r « tee 保存 stderr 到文件
+» vim 使用</description></item><item><title/><link>https://blog.poneding.com/linux/vim-common-commands/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/vim-common-commands/</guid><description>🏠 首页 / Linux / vim 使用
 vim 使用 # 设置 # vim /etc/vim/vimrc 或者当前环境设置
 :set paste :set nopaste :set number :set nonumber :set hlsearch :set nohlsearch :set cursorline :set nocursorline vim删除所有行 # ggdG 撤销 # u ctrl+r 查找 # 大小写问题：
 默认大小写敏感。
