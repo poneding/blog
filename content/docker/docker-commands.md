@@ -69,6 +69,7 @@ sudo docker rmi $(sudo docker images | grep "^<none>" | awk "{print $3}")
 ```bash
 docker rmi $(docker images | grep 'query' | awk '{print $3}')
 ```
+
 ## 操作容器命令
 
 ### 查看已经退出的容器
@@ -108,6 +109,31 @@ kubectl delete po <pod-name> -n <namespace> --force --grace-period=0
 ```
 
 grace-period 表示过渡存活期，默认 30s，在删除 Pod 之前允许 Pod 慢慢终止其上的容器进程，从而优雅退出，0 表示立即终止 Pod。
+
+## 打包镜像
+
+基于已有 Docker 镜像打包成一个压缩文件：
+
+```bash
+docker save -o nginx.tar nginx
+
+# 载入镜像，docker load 不能指定载入的镜像名
+docker load -i nginx.tar
+```
+
+## 导出镜像
+
+基于运行的容器，导出一个压缩文件：
+
+```bash
+# 运行一个容器
+docker run --name nginx-server -d nginx
+
+docker export nginx.tar nginx-server
+
+# 导入容器，docker import 可以指定镜像名
+docker import nginx.tar mynginx
+```
 
 ---
 [« docker buildx](docker-buildx.md)

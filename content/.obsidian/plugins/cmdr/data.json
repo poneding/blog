@@ -10,6 +10,12 @@
       "icon": "upload-cloud",
       "name": "Sync",
       "mode": "any"
+    },
+    {
+      "id": "file-explorer:open",
+      "icon": "files",
+      "name": "文件列表: 显示文件列表",
+      "mode": "any"
     }
   ],
   "rightRibbon": [],
