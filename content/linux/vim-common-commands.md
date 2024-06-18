@@ -499,4 +499,4 @@ vim file1 file2     " 同时打开两个文件
 ```
 
 ---
-[« tee 保存 stderr 到文件](tee-keep-stderr.md)
+[« 服务端与客户端传输文件](transfer-files-between-server-and-client.md)

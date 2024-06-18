@@ -211,6 +211,7 @@
 - [shell 基础](linux/shell.md)
 - [使用 SSH Tunnel 连接中间件](linux/ssh-tunnel-connect-middleware.md)
 - [tee 保存 stderr 到文件](linux/tee-keep-stderr.md)
+- [服务端与客户端传输文件](linux/transfer-files-between-server-and-client.md)
 - [vim 使用](linux/vim-common-commands.md)
 
 ## 数据中间件
