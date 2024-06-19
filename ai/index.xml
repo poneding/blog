@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>秋河落叶</title><link>https://blog.poneding.com/ai/</link><description>Recent content on 秋河落叶</description><generator>Hugo</generator><language>cn</language><atom:link href="https://blog.poneding.com/ai/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>https://blog.poneding.com/ai/llama/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/ai/llama/</guid><description> 🏠 首页 / ai / llama
+llama # 安装 # MacOS：
+brew install ollama Linux：
+curl -sSL https://ollama.com/install.sh | sh 安装完成之后，查看安装版本：
+ollama -v 启动 # ollama start # 通过注入 OLLAMA_HOST 环境变量设置监听地址 # OLLAMA_HOST=0.0.0.0 ollama start 下载并运行大模型 # Llama3 目前可供下载的大模型有两个版本：8B 和 70B，本地运行容量有限，选择 8B 版本即可，大小大概 5G 左右。
+ollama run llama3 执行完成后，会直接进入一个交互界面，可以直接进行对话了。
+执行生成命令 # curl http://localhost:11434/api/generate -d &amp;#39;{ &amp;#34;model&amp;#34;: &amp;#34;llama3&amp;#34;, &amp;#34;prompt&amp;#34;: &amp;#34;Why is the sky blue?&amp;#34;, &amp;#34;stream&amp;#34;: false }&amp;#39;</description></item></channel></rss>
