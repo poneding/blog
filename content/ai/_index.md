@@ -1,5 +1,5 @@
-[🏠 首页](../_index.md) / ai
+[🏠 首页](../_index.md) / AI
 
-# ai
+# AI
 
 [llama](llama.md)

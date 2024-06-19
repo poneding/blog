@@ -1,4 +1,4 @@
-[🏠 首页](../_index.md) / [ai](_index.md) / llama
+[🏠 首页](../_index.md) / [AI](_index.md) / llama
 
 # llama
 

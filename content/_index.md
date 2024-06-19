@@ -1,6 +1,6 @@
 # 秋河落叶
 
-## ai
+## AI
 
 - [llama](ai/llama.md)
 
@@ -45,7 +45,7 @@
 
 - [CI/CD](design-pattern/cicd.md)
 
-## dev
+## 开发
 
 - [Apifox 导入 Kubernetes API](dev/Apifox%20导入%20Kubernetes%20API.md)
 
