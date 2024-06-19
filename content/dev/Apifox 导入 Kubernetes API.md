@@ -11,7 +11,7 @@ Apifox 直接以 Url 方式导入，导入地址如下：
 第一步，本地代理：
 
 ```bash
-kubectl proxy --address 0.0.0.0 --accept-hosts '^*$
+kubectl proxy --address 0.0.0.0 --accept-hosts '^*$'
 ```
 
 第二步，提取 API json 文件至本地：
