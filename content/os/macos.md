@@ -2,6 +2,12 @@
 
 # MacOS
 
+## 静态壁纸位置
+
+历史系统壁纸: `/Users/dp/Library/Application Support/com.apple.mobileAssetDesktop`
+当前系统壁纸：`/System/Library/Desktop Pictures`
+动态壁纸：`/Library/Application Support/com.apple.idleassetsd/Customer/4KSDR240FPS`
+
 ## Git 忽略 .DS_Store 文件
 
 ```bash
@@ -111,7 +117,7 @@ vim .oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 找到并配置：`ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=10'`
 
-```
+```txt
 exec zsh
 ```
 
