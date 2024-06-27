@@ -7,7 +7,7 @@ cargo 是 Rust 的构建系统和包管理器。
 ## 配置国内 rsproxy 源
 
 ```bash
-vim ~/.cargo/config
+vim ~/.cargo/config.toml
 ```
 
 ```toml
