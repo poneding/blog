@@ -131,5 +131,20 @@ exec zsh
 go install github.com/go-delve/delve/cmd/dlv@latest
 ```
 
+## 卸载程序文件权限问题
+
+在参照 Docker 官方文档[卸载 Docker Desktop](https://docs.docker.com/desktop/uninstall/) 时，遇到了程序文件删除问题：
+
+```bash
+$ rm -rf ~/Library/Containers/com.docker.docker
+
+rm: /Users/dp/Library/Containers/com.docker.docker/.com.apple.containermanagerd.metadata.plist: Operation not permitted
+rm: /Users/dp/Library/Containers/com.docker.docker: Operation not permitted
+```
+
+解决方案：
+
+进入系统设置 => 隐私与安全性 => 完全磁盘访问权限，添加终端程序如 `iTerm` 访问权限。再次执行删除命令，OK～
+
 ---
 [» ohmyzsh](ohmyzsh.md)
