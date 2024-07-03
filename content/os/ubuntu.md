@@ -49,7 +49,7 @@ sudo vim /etc/fonts/conf.avail/64-language-selector-prefer.conf
 sudo vim /etc/fonts/conf.d/64-language-selector-cjk-prefer.conf
 ```
 
-```
+```txt
 
 将 `JP` 和 `KR` 所在行往下调整即可，调整成如下所示：
 
@@ -202,6 +202,35 @@ sudo apt install gnome-tweak -y
 配置：
 
 1. 在 2K 分辨率屏幕下可以调整配置：字体 -> Scaling Factor -> 调整为 1.2；
+
+## Ulauncher
+
+安装：
+
+```bash
+export VERSION=$(curl -s https://api.github.com/repos/Ulauncher/Ulauncher/releases/latest | jq -r .tag_name)
+
+wget https://github.com/Ulauncher/Ulauncher/releases/download/${VERSION}/ulauncher_${VERSION}_all.deb
+
+sudo dpkg -i ulauncher_${VERSION}_all.deb
+
+# 如果遇到依赖问题，则运行以下命令：
+sudo apt install --fix-broken
+```
+
+配置 `Alt+Space` 快捷键：
+
+Setting => Keyboard => Keyboard Shortcuts => View and Customize Shortcuts
+
+第一步，先通过输入 `Alt+Space` 查询当前快捷键冲突，删除当前快捷键使用；
+
+第二步，添加新的自定义快捷键：
+
+```txt
+Name：Ulauncher
+Command：ulauncher-toggle
+Shortcut：Alt+Space
+```
 
 ---
 [« openssl](openssl.md)
