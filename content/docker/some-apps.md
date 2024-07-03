@@ -92,4 +92,4 @@ docker run -d --name transfer \
 ```
 
 ---
-[« 非 root 账号获取 docker 权限](non-root-account-get-docker-permission.md)
+[« Mac 重装 Docker Desktop](reinstall-docker-desktop-on-mac.md)

@@ -23,4 +23,4 @@ sudo chmod a+rw /var/run/docker.sock
 ---
 [« Linux 容器](linux-container.md)
 
-[» some-apps.md](some-apps.md)
+[» Mac 重装 Docker Desktop](reinstall-docker-desktop-on-mac.md)
