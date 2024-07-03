@@ -71,6 +71,12 @@ cgroup # namespace # mount：文件系统隔离 uts：hostname domain pid：1号
 sudo usermod -aG docker $USER 第二步，授权
 sudo chmod a+rw /var/run/docker.sock 快去试试吧。
 « Linux 容器
+» Mac 重装 Docker Desktop</description></item><item><title/><link>https://blog.poneding.com/docker/reinstall-docker-desktop-on-mac/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/reinstall-docker-desktop-on-mac/</guid><description>🏠 首页 / Docker / Mac 重装 Docker Desktop
+Mac 重装 Docker Desktop # 在使用 Docker Desktop 的过程中，突然遇到程序崩溃 Invalid virtual machine configuration. The storage device attachment is invalid，在重启以及简单重装无果后，我们试用以下方式重装。
+第一步，卸载 Docker Desktop，打开终端，执行以下命令：
+# 卸载 /Applications/Docker.app/Contents/MacOS/uninstall # 删除剩余文件 rm -rf ~/Library/Group\ Containers/group.com.docker rm -rf ~/Library/Containers/com.docker.docker rm -rf ~/.docker 第二步，重启 Mac，重启后，打开活动监视器，查看是否存在名为com.docker.vmnetd 的进程，如果存在，结束该进程（如果无法正常结束，那么尝试强制结束进程）。
+第三步，重装 Docker Desktop。
+« 非 root 账号获取 docker 权限
 » some-apps.md</description></item><item><title/><link>https://blog.poneding.com/docker/some-apps/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/docker/some-apps/</guid><description>🏠 首页 / Docker / some-apps.md
 Docker 应用
 Cloudreve # 项目地址： https://github.com/cloudreve/Cloudreve
