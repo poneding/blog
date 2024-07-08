@@ -79,7 +79,7 @@ echo "export PATH=$PATH:~/.dev/bin"
 
 ## Mac 缓存清理
 
-### Go 缓存清理
+### go 缓存清理
 
 ```bash
 go clean -cache
