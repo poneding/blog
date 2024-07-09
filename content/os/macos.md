@@ -146,7 +146,7 @@ rm: /Users/dp/Library/Containers/com.docker.docker: Operation not permitted
 
 进入系统设置 => 隐私与安全性 => 完全磁盘访问权限，添加终端程序如 `iTerm` 访问权限。再次执行删除命令，OK～
 
-# 设置 Dock 栏显示速度
+## 设置 Dock 栏显示速度
 
 ```bash
 defaults write com.apple.dock autohide-delay -float 0 && defaults write com.apple.dock autohide-time-modifier -float 0.2 && killall Dock
@@ -156,6 +156,16 @@ defaults write com.apple.dock autohide-delay -float 0 && defaults write com.appl
 
 ```bash
 defaults delete com.apple.dock autohide-delay && defaults delete com.apple.dock autohide-time-modifier && killall Dock
+```
+
+## python
+
+在 Mac 上卸载了老版本的 python，并安装了新版本的 python3 后，执行命令提示：env: python: No such file or directory
+
+解决方式：
+
+```bash
+sudo ln -s -f /usr/local/bin/python3 /usr/local/bin/python
 ```
 
 ---
