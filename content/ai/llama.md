@@ -54,3 +54,6 @@ curl http://localhost:11434/api/generate -d '{
   "stream": false
 }'
 ```
+
+---
+[« 动手学深度学习](d2l.md)

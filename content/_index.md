@@ -2,6 +2,7 @@
 
 ## AI
 
+- [动手学深度学习](ai/d2l.md)
 - [llama](ai/llama.md)
 
 ## 数据结构与算法
