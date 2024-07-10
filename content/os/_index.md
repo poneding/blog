@@ -11,5 +11,3 @@
 [Ubuntu](ubuntu.md)
 
 [Windows 使用姿势](windows.md)
-
-[卸载 Docker Desktop.md](卸载%20Docker%20Desktop.md)

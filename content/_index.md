@@ -239,7 +239,6 @@
 - [openssl](os/openssl.md)
 - [Ubuntu](os/ubuntu.md)
 - [Windows 使用姿势](os/windows.md)
-- [卸载 Docker Desktop.md](os/卸载%20Docker%20Desktop.md)
 
 ## 阅读
 
