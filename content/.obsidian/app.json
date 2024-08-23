@@ -3,7 +3,7 @@
   "foldHeading": false,
   "foldIndent": false,
   "showIndentGuide": false,
-  "newLinkFormat": "relative",
+  "newLinkFormat": "absolute",
   "showInlineTitle": false,
   "newFileLocation": "current",
   "useMarkdownLinks": true,
