@@ -232,6 +232,23 @@ Command：ulauncher-toggle
 Shortcut：Alt+Space
 ```
 
+## ssh 解锁桌面登陆
+
+首先在终端通过 ssh 连接目标主机
+
+```bash
+ssh user@server
+```
+
+```bash
+loginctl list-sessions
+
+# 找到 IDLE 为 yes 的输出行的 SESSION，例如为 1
+loginctl unlock-session 1
+```
+
+成功之后，再通过例如 Microsoft Remote Desktop 工具登陆桌面。
+
 ---
 [« openssl](openssl.md)
 
