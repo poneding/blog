@@ -2,6 +2,15 @@
 
 # MacOS
 
+## CursorUIViewService 未响应
+
+```bash
+sudo defaults write /Library/Preferences/FeatureFlags/Domain/UIKit.plist redesigned_text_cursor -dict-add Enabled -bool NO
+
+# 改回
+sudo defaults write /Library/Preferences/FeatureFlags/Domain/UIKit.plist redesigned_text_cursor -dict-add Enabled -bool YES
+```
+
 ## 静态壁纸位置
 
 历史系统壁纸: `/Users/dp/Library/Application Support/com.apple.mobileAssetDesktop`
