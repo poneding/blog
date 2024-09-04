@@ -10,6 +10,10 @@
 - [堆排序](algo/堆排序.md)
 - [快速排序](algo/快速排序.md)
 
+## architechture
+
+- [缓存设计](architechture/cache-design.md)
+
 ## AWS
 
 - [搭建EKS集群](aws/build-eks-cluster.md)
