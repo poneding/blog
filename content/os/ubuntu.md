@@ -243,8 +243,8 @@ ssh user@server
 ```bash
 loginctl list-sessions
 
-# 找到 IDLE 为 yes 的输出行的 SESSION，例如为 1
-loginctl unlock-session 1
+# 找到 STATE 为 active 的输出行的 SESSION，例如为 5481
+loginctl unlock-session 5481
 ```
 
 成功之后，再通过例如 Microsoft Remote Desktop 工具登陆桌面。
