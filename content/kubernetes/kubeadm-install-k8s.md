@@ -70,6 +70,25 @@ sudo systemctl enable --now containerd.service
 sudo systemctl restart containerd.service
 ```
 
+K8s V1.24 或更高版本，kubelet 默认使用 systemd 作为 cgroup 驱动，我们需要确保 containerd cgroup 驱动与其保持一致：
+
+```txt
+# 如果没有 /etc/containerd/config.toml 文件，需要手动创建目录
+mkdir -p /etc/containerd
+
+# 生成 containerd 默认配置文件
+containerd config default | tee /etc/containerd/config.toml
+
+# 修改配置文件
+vim /etc/containerd/config.toml
+
+# 找到 [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]，找到并修改配置项 SystemdCgroup 为 true
+ SystemdCgroup = true
+
+# 重启 containerd
+systemctl restart containerd
+```
+
 ## 安装 kubeadm、kubelet 和 kubectl
 
 ```bash
@@ -137,6 +156,39 @@ kubectl get nodes
 
 ```bash
 kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+```
+
+## 集群 VIP
+
+使用 kube-vip 为集群 api-server 配置负载均衡。
+
+```bash
+export VIP=172.16.246.147 # VIP，与集群master节点处于同一网段，并且没有被占用
+export INTERFACE=ens160 # 可以通过 ip addr 查看
+
+KVVERSION=$(curl -sL https://api.github.com/repos/kube-vip/kube-vip/releases | jq -r ".[0].name")
+
+alias kube-vip="ctr image pull ghcr.io/kube-vip/kube-vip:$KVVERSION; ctr run --rm --net-host ghcr.io/kube-vip/kube-vip:$KVVERSION vip /kube-vip"
+
+kube-vip manifest pod \
+    --interface $INTERFACE \
+    --address $VIP \
+    --controlplane \
+    --services \
+    --arp \
+    --leaderElection | tee /etc/kubernetes/manifests/kube-vip.yaml
+```
+
+执行完成后，将在 /etc/kubernetes/manifests/kube-vip.yaml 目录下生成部署清单文件，将该文件同步到其他 master 节点即可。
+
+使用 vip 作为 control-plane-endpoint，并且使用需要额外的 --upload-certs 参数：
+
+```bash
+kubeadm init \
+  --pod-network-cidr 10.244.0.0/16 \
+  --kubernetes-version 1.29.0 \
+  --control-plane-endpoint=$VIP:6443 \
+  --upload-certs
 ```
 
 ## 安装网络插件
