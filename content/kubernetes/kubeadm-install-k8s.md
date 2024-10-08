@@ -21,7 +21,7 @@ Notes:
 
 ```bash
 # 临时禁用交换分区
-sudo swapoff -a
+swapoff -a
 
 vim /etc/fstab
 # 注释掉 swap 分区的配置
@@ -35,8 +35,8 @@ overlay
 br_netfilter
 EOF
 
-sudo modprobe overlay
-sudo modprobe br_netfilter
+modprobe overlay
+modprobe br_netfilter
 
 # sysctl params required by setup, params persist across reboots
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
@@ -46,7 +46,7 @@ net.ipv4.ip_forward                 = 1
 EOF
 
 # Apply sysctl params without reboot
-sudo sysctl --system
+sysctl --system
 ```
 
 ## 安装 containerd

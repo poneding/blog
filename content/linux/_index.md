@@ -14,6 +14,8 @@
 
 [Linux-安全登录](linux-secure-login.md)
 
+[Linux 挂载磁盘](mount-disk.md)
+
 [shell 命令间隔符](shell-command-interval-character.md)
 
 [shell 基础](shell.md)

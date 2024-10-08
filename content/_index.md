@@ -221,6 +221,7 @@
 - [Linux常用命令](linux/linux-common-commands.md)
 - [Linux 启用 crontab 日志](linux/linux-enable-crontab-log.md)
 - [Linux-安全登录](linux/linux-secure-login.md)
+- [Linux 挂载磁盘](linux/mount-disk.md)
 - [shell 命令间隔符](linux/shell-command-interval-character.md)
 - [shell 基础](linux/shell.md)
 - [使用 SSH Tunnel 连接中间件](linux/ssh-tunnel-connect-middleware.md)

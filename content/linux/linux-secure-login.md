@@ -86,4 +86,4 @@ ssh-keygen -t rsa -C poneding@gmail.com -f ~/.ssh/id_rsa_poneding
 ---
 [« Linux 启用 crontab 日志](linux-enable-crontab-log.md)
 
-[» shell 命令间隔符](shell-command-interval-character.md)
+[» Linux 挂载磁盘](mount-disk.md)

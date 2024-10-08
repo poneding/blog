@@ -64,6 +64,6 @@ echo "Hello World" >> hello.txt
 ```
 
 ---
-[« Linux-安全登录](linux-secure-login.md)
+[« Linux 挂载磁盘](mount-disk.md)
 
 [» shell 基础](shell.md)
