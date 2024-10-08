@@ -841,8 +841,8 @@ cat &amp;lt;&amp;lt;EOF | sudo tee /etc/modules-load.</description></item><item>
 kubeadm 安装 k8s (containerd) # 使用 kubeadm 安装 k8s 集群，是社区推荐的安装方式，本文档将介绍使用 kubeadm 安装 k8s 集群的详细过程。
 Notes:
 随着 kubeadm &amp;amp; k8s 版本的更新，安装过程可能会有所不同，截至目前，本文档使用的是 kubeadm v1.28.3 &amp;amp; k8s v1.28.3 版本； 本文档使用的操作系统是 Ubuntu 22.04，其他操作系统可能会有所不同。 要求 # 至少一台物理机或虚拟机（例如：Ubuntu 22.04）作为集群节点，最少 2 核 2G 内存； 多节点之前网络互通，且节点主机名不冲突； Master 节点需要开放以下端口：6443、2379-2380、10250、10251、10252； 准备工作 # 禁用交换分区：
-# 临时禁用交换分区 sudo swapoff -a vim /etc/fstab # 注释掉 swap 分区的配置 配置系统：
-cat &amp;lt;&amp;lt;EOF | sudo tee /etc/modules-load.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubeadm-upgrade/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubeadm-upgrade/</guid><description>🏠 首页 / Kubernetes / Kubeadm 升级 K8s
+# 临时禁用交换分区 swapoff -a vim /etc/fstab # 注释掉 swap 分区的配置 配置系统：
+cat &amp;lt;&amp;lt;EOF | sudo tee /etc/modules-load.d/k8s.conf overlay br_netfilter EOF modprobe overlay modprobe br_netfilter # sysctl params required by setup, params persist across reboots cat &amp;lt;&amp;lt;EOF | sudo tee /etc/sysctl.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/kubeadm-upgrade/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/kubeadm-upgrade/</guid><description>🏠 首页 / Kubernetes / Kubeadm 升级 K8s
 Kubeadm 升级 K8s # 本篇以升级 1.29.0（旧版本：1.28.x ） 版本为例，介绍如何通过 kubeadm 工具来升级 K8s 集群。
 注意：
 不支持跨主版本升级，如 1.27.x 升级到 1.29.x，中间必须先升级到 1.28.x 主版本更新必须先升级到最新的次版本，如 1.28.3 升级到 1.28.4，然后再升级到 1.29.x 升级步骤 # 控制节点（control plane node）升级 工作节点（worker node）升级 升级过程 # 1、升级至当前主版本的最新次版本 # sudo apt update sudo apt-cache madison kubeadm 以上命令后，将可以得到类似如下输出：
@@ -1023,7 +1023,19 @@ root 是 linux 系统默认的最高权限账号 linux 系统默认的 ssh 端�
 1. 禁用 root 账号登录 # 禁用 root 账号，那么我们就必须创建其他登录账号，这里建议账号名不要为 admin 这类常见用户名。
 创建用户（以下都基于 ubuntu 系统操作） adduser dp 用户赋权 此时创建的用户不能使用 sudo 权限，考虑将用户加入 sudo 组
 usermod -a -G sudo dp 并且，为了避免使用 sudo 权限需要时不时的输入密码的麻烦，进行免密设置。在 /etc/sudoers 文件中新增行。
-dp ALL=(ALL) NOPASSWD: ALL 到了这一步，应该尝试使用新用户登录系统，如果成功登录再往下继续。 禁用 root 登录 打开 /etc/ssh/sshd_config 文件，找到 PermitRootLogin 项，修改该项成如下：</description></item><item><title/><link>https://blog.poneding.com/linux/shell-command-interval-character/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/shell-command-interval-character/</guid><description>🏠 首页 / Linux / shell 命令间隔符
+dp ALL=(ALL) NOPASSWD: ALL 到了这一步，应该尝试使用新用户登录系统，如果成功登录再往下继续。 禁用 root 登录 打开 /etc/ssh/sshd_config 文件，找到 PermitRootLogin 项，修改该项成如下：</description></item><item><title/><link>https://blog.poneding.com/linux/mount-disk/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/mount-disk/</guid><description>🏠 首页 / Linux / Linux 挂载磁盘
+Linux 挂载磁盘 # 在 VMware 界面添加额外的虚拟硬盘。 在 Linux 系统中识别并挂载这个新硬盘。 以下是详细的步骤：
+识别新磁盘 # 登录 Linux 系统，使用 lsblk 或 fdisk 命令检查新添加的磁盘设备。
+lsblk 或
+sudo fdisk -l 你应该能看到一个新的设备，例如 /dev/sdb（根据你实际的设备名称）。
+分区新磁盘 # 如果磁盘是全新的，需要先为其创建分区。
+使用 fdisk 为新磁盘创建分区： sudo fdisk /dev/sdb 按以下步骤操作： • 输入 n 创建新分区。
+• 输入 p 创建主分区。
+• 输入分区号（通常是 1）。
+• 选择分区大小，默认值可以将整个磁盘用于一个分区。
+• 输入 w 写入更改并退出。
+格式化新分区 # 使用 mkfs 命令格式化新创建的分区，例如格式化为 ext4 文件系统：
+sudo mkfs.ext4 /dev/sdb1 /dev/sdb1 是刚刚创建的分区，根据实际情况修改。</description></item><item><title/><link>https://blog.poneding.com/linux/shell-command-interval-character/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/shell-command-interval-character/</guid><description>🏠 首页 / Linux / shell 命令间隔符
 shell 命令间隔符 # 我们经常能看到Shell命令间有很多中间隔符：|，||，&amp;amp;&amp;amp; 等，它们到底有着什么样的作用呢？一一来看：
 1. |：
 间隔符 | 起着管道的作用，是将上一条命令的 stdout 作为下一条命令的 stdin：
