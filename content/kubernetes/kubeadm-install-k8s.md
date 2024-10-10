@@ -142,8 +142,8 @@ Notes:
 
 ```bash
 mkdir -p ~/.kube
-sudo cp -i /etc/kubernetes/admin.conf ~/.kube/config
-sudo chown $(id -u):$(id -g) $HOME/.kube/config
+cp -i /etc/kubernetes/admin.conf ~/.kube/config
+chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
 查看集群节点状态：
@@ -186,7 +186,6 @@ kube-vip manifest pod \
 ```bash
 kubeadm init \
   --pod-network-cidr 10.244.0.0/16 \
-  --kubernetes-version 1.29.0 \
   --control-plane-endpoint=$VIP:6443 \
   --upload-certs
 ```
