@@ -1023,7 +1023,15 @@ root 是 linux 系统默认的最高权限账号 linux 系统默认的 ssh 端�
 1. 禁用 root 账号登录 # 禁用 root 账号，那么我们就必须创建其他登录账号，这里建议账号名不要为 admin 这类常见用户名。
 创建用户（以下都基于 ubuntu 系统操作） adduser dp 用户赋权 此时创建的用户不能使用 sudo 权限，考虑将用户加入 sudo 组
 usermod -a -G sudo dp 并且，为了避免使用 sudo 权限需要时不时的输入密码的麻烦，进行免密设置。在 /etc/sudoers 文件中新增行。
-dp ALL=(ALL) NOPASSWD: ALL 到了这一步，应该尝试使用新用户登录系统，如果成功登录再往下继续。 禁用 root 登录 打开 /etc/ssh/sshd_config 文件，找到 PermitRootLogin 项，修改该项成如下：</description></item><item><title/><link>https://blog.poneding.com/linux/mount-disk/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/mount-disk/</guid><description>🏠 首页 / Linux / Linux 挂载磁盘
+dp ALL=(ALL) NOPASSWD: ALL 到了这一步，应该尝试使用新用户登录系统，如果成功登录再往下继续。 禁用 root 登录 打开 /etc/ssh/sshd_config 文件，找到 PermitRootLogin 项，修改该项成如下：</description></item><item><title/><link>https://blog.poneding.com/linux/make-bootable-udisk/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/make-bootable-udisk/</guid><description>🏠 首页 / Linux / 制作 Linux 系统启动 U 盘
+制作 Linux 系统启动 U 盘 # 以制作 Ubuntu 启动 U 盘为例：已经下载了 Ubuntu 镜像文件：ubuntu-22.04.5-live-server-arm64.iso
+Windows 系统下制作 # 使用 Rufus 工具。
+Mac 系统下制作 # hdiutil convert -format UDRW -o ubuntu-2204 查看 U 盘名称：
+diskutil list 卸载 U 盘：
+diskutil unmountDisk /dev/disk2 制作盘：
+sudo dd if=ubuntu-18.04.dmg of=/dev/rdisk2 bs=1m 注意，这里 /dev/rdisk2 U 盘名称前加了一个 r，制作速度会更快。
+等待制作完成，弹出 U 盘：
+diskutil eject /dev/disk2 Linux 系统下制作 # 与 Mac 系统下制作类似，首先查看 U 盘名称：</description></item><item><title/><link>https://blog.poneding.com/linux/mount-disk/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/linux/mount-disk/</guid><description>🏠 首页 / Linux / Linux 挂载磁盘
 Linux 挂载磁盘 # 在 VMware 界面添加额外的虚拟硬盘。 在 Linux 系统中识别并挂载这个新硬盘。 以下是详细的步骤：
 识别新磁盘 # 登录 Linux 系统，使用 lsblk 或 fdisk 命令检查新添加的磁盘设备。
 lsblk 或
