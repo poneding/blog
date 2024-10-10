@@ -60,14 +60,14 @@ LATEST=${LATEST#v}
 
 wget https://github.com/containerd/containerd/releases/download/v$LATEST/containerd-$LATEST-linux-amd64.tar.gz
 
-sudo tar Cxzvf /usr/local containerd-$LATEST-linux-amd64.tar.gz
+tar Cxzvf /usr/local containerd-$LATEST-linux-amd64.tar.gz
 
 # systemd 配置
-sudo wget https://raw.githubusercontent.com/containerd/containerd/main/containerd.service -O /lib/systemd/system/containerd.service
+wget https://raw.githubusercontent.com/containerd/containerd/main/containerd.service -O /lib/systemd/system/containerd.service
 
-sudo systemctl daemon-reload
-sudo systemctl enable --now containerd.service
-sudo systemctl restart containerd.service
+systemctl daemon-reload
+systemctl enable --now containerd.service
+systemctl restart containerd.service
 ```
 
 K8s V1.24 或更高版本，kubelet 默认使用 systemd 作为 cgroup 驱动，我们需要确保 containerd cgroup 驱动与其保持一致：
@@ -92,24 +92,24 @@ systemctl restart containerd
 ## 安装 kubeadm、kubelet 和 kubectl
 
 ```bash
-sudo apt-get update
-sudo apt-get install -y apt-transport-https ca-certificates curl
+apt update
+apt install -y apt-transport-https ca-certificates curl
 
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
 # 国内网络使用下面命令替换
 # curl -fsSL https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add -
 
-echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list
 
 # 国内网络使用下面命令替换
 # cat << EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
 # deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
 # EOF
 
-sudo apt-get update
-sudo apt-get install -y kubelet kubeadm kubectl
-sudo apt-mark hold kubelet kubeadm kubectl
+apt update
+apt install -y kubelet kubeadm kubectl
+apt-mark hold kubelet kubeadm kubectl
 ```
 
 > 早于 Debian 12 和 Ubuntu 22.04 的版本，/etc/apt/keyrings 目录默认不存在，需要手动创建：`sudo mkdir -m 755 /etc/apt/keyrings`
