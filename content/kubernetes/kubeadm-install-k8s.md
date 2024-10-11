@@ -54,6 +54,8 @@ sysctl --system
 参照 [containerd 安装](https://github.com/containerd/containerd/blob/main/docs/getting-started.md)。
 
 ```bash
+apt install jq -y
+
 export LATEST=$(curl -s https://api.github.com/repos/containerd/containerd/releases/latest | jq -r .tag_name)
 
 LATEST=${LATEST#v}
@@ -163,12 +165,17 @@ kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 使用 kube-vip 为集群 api-server 配置负载均衡。
 
 ```bash
-export VIP=172.16.246.147 # VIP，与集群master节点处于同一网段，并且没有被占用
-export INTERFACE=ens160 # 可以通过 ip addr 查看
+# VIP，与集群master节点处于同一网段，并且没有被占用
+export VIP=172.16.246.147
+# 可以通过 ip addr 查看
+export INTERFACE=ens160
 
 KVVERSION=$(curl -sL https://api.github.com/repos/kube-vip/kube-vip/releases | jq -r ".[0].name")
 
 alias kube-vip="ctr image pull ghcr.io/kube-vip/kube-vip:$KVVERSION; ctr run --rm --net-host ghcr.io/kube-vip/kube-vip:$KVVERSION vip /kube-vip"
+
+# 安装 runc
+apt install runc -y
 
 kube-vip manifest pod \
     --interface $INTERFACE \
