@@ -17,7 +17,7 @@ hdiutil convert -format UDRW -o ubuntu-2204
 查看 U 盘名称：
 
 ```bash
-		diskutil list
+diskutil list
 ```
 
 卸载 U 盘：
