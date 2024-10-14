@@ -177,12 +177,11 @@ defaults delete com.apple.dock autohide-delay && defaults delete com.apple.dock 
 sudo ln -s -f /usr/local/bin/python3 /usr/local/bin/python
 ```
 
-## ITerm2 配置
-
+## iTerm2 配置
 
 ![image.png](https://images.poneding.com/2024/10/20241013092641.png)
-![image.png](https://images.poneding.com/2024/10/20241013092858.png)
 
+![image.png](https://images.poneding.com/2024/10/20241013092858.png)
 
 ---
 [» ohmyzsh](ohmyzsh.md)
