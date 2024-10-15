@@ -183,5 +183,28 @@ sudo ln -s -f /usr/local/bin/python3 /usr/local/bin/python
 
 ![image.png](https://images.poneding.com/2024/10/20241013092858.png)
 
+## clash-verge-rev
+
+开启服务模式和 TUN 模式后，关闭后，DNS 无法恢复，导致内网环境无法访问问题。
+
+订阅 => 全局扩展配置：
+
+```bash
+# Profile Enhancement Merge Template for Clash Verge
+
+profile:
+store-selected: true
+
+dns:
+default-nameserver:
+- 192.168.141.155
+- 192.168.141.157
+- 223.5.5.5
+- 114.114.114.114
+nameserver:
+- 192.168.141.155
+- 192.168.141.157
+```
+
 ---
 [» ohmyzsh](ohmyzsh.md)
