@@ -32,4 +32,4 @@ CGO_ENABLED=0 GOOS=windows GOARCH=arm64 go build main.go
 ---
 [« Golang 密钥对、数字签名和证书管理](go-cert-management.md)
 
-[» Golang 生成证书](go-gen-cert.md)
+[» Golang 守护进程](go-daemon.md)

@@ -183,6 +183,6 @@ func DomainSign(ips []string, domains ...string) ([]byte, []byte, []byte, error)
 ```
 
 ---
-[« Golang 不同平台架构编译](go-cross-complie.md)
+[« Golang 守护进程](go-daemon.md)
 
 [» go:linkname 指令](go-linkname.md)

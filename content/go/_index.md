@@ -10,6 +10,8 @@
 
 [Golang 不同平台架构编译](go-cross-complie.md)
 
+[Golang 守护进程](go-daemon.md)
+
 [Golang 生成证书](go-gen-cert.md)
 
 [go:linkname 指令](go-linkname.md)

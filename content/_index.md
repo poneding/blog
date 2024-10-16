@@ -115,6 +115,7 @@
 - [Golang 函数可选参数模式](go/function-optional-pattern.md)
 - [Golang 密钥对、数字签名和证书管理](go/go-cert-management.md)
 - [Golang 不同平台架构编译](go/go-cross-complie.md)
+- [Golang 守护进程](go/go-daemon.md)
 - [Golang 生成证书](go/go-gen-cert.md)
 - [go:linkname 指令](go/go-linkname.md)
 - [Golang 列表转树](go/go-list-to-tree.md)
