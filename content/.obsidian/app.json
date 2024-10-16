@@ -11,5 +11,6 @@
   "showRibbon": true,
   "userIgnoreFilters": [
     "menu/"
-  ]
+  ],
+  "autoConvertHtml": false
 }
