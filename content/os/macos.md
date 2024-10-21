@@ -206,5 +206,11 @@ nameserver:
 - 192.168.141.157
 ```
 
+## Lens
+
+UI 改版之前最后一个版本下载地址：
+
+[Lens-2024.8.291605](https://api.k8slens.dev/binaries/Lens-2024.8.291605-latest-arm64.dmg)
+
 ---
 [» ohmyzsh](ohmyzsh.md)
