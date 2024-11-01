@@ -259,3 +259,4 @@
 - [Cargo 管理工具](rust/02-cargo.md)
 - [VSCode 调试](rust/03-vscode-debugging.md)
 - [Rust WASM 编程](rust/04-wasm-programming.md)
+- [String 还是 &str](rust/string-&str.md)

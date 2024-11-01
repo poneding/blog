@@ -9,3 +9,5 @@
 [VSCode 调试](03-vscode-debugging.md)
 
 [Rust WASM 编程](04-wasm-programming.md)
+
+[String 还是 &str](string-&str.md)
