@@ -270,7 +270,5 @@ PUT /_cluster/settings
 curl -XPUT $CLUSTER_URL/_cluster/settings -H 'Content-type: application/json' --data-binary $'{"persistent":{"action.destructive_requires_name":"false"}}'
 ```
 
-/table
-
 ---
 [» MongoDB](mongodb.md)
