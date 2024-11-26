@@ -105,6 +105,7 @@ spec:
     backendRefs:
     - name: nginx
       port: 80
+EOF
 ```
 
 ### TLS 网关路由：CertManager + Let's Encrypt
