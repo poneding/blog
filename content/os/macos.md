@@ -212,5 +212,18 @@ UI 改版之前最后一个版本下载地址：
 
 [Lens-2024.8.291605](https://api.k8slens.dev/binaries/Lens-2024.8.291605-latest-arm64.dmg)
 
+安装之后为了避免其自动升级，添加 hosts dns 映射：
+
+```txt
+127.0.0.1	api.k8slens.dev
+127.0.0.1	downloads.k8slens.dev
+```
+
+并且在 clash-verge 中系统代理绕过设置中添加：
+
+```txt
+*.k8slens.dev
+```
+
 ---
 [» ohmyzsh](ohmyzsh.md)
