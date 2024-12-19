@@ -247,6 +247,10 @@
 - [Ubuntu](os/ubuntu.md)
 - [Windows 使用姿势](os/windows.md)
 
+## qa
+
+- [vscode-terminal-chinese.md](qa/vscode-terminal-chinese.md)
+
 ## 阅读
 
 - [云原生应用开发：Operator原理与实践](reading/云原生应用开发：Operator原理与实践.md)
