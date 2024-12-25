@@ -247,10 +247,6 @@
 - [Ubuntu](os/ubuntu.md)
 - [Windows 使用姿势](os/windows.md)
 
-## qa
-
-- [vscode-terminal-chinese.md](qa/vscode-terminal-chinese.md)
-
 ## 阅读
 
 - [云原生应用开发：Operator原理与实践](reading/云原生应用开发：Operator原理与实践.md)
@@ -264,3 +260,8 @@
 - [VSCode 调试](rust/03-vscode-debugging.md)
 - [Rust WASM 编程](rust/04-wasm-programming.md)
 - [String 还是 &str](rust/string-&str.md)
+
+## qa
+
+- [dbeaver-password.md](solutions/dbeaver-password.md)
+- [vscode-terminal-chinese.md](solutions/vscode-terminal-chinese.md)
