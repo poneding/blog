@@ -261,7 +261,7 @@
 - [Rust WASM 编程](rust/04-wasm-programming.md)
 - [String 还是 &str](rust/string-&str.md)
 
-## qa
+## solutions
 
 - [dbeaver-password.md](solutions/dbeaver-password.md)
 - [vscode-terminal-chinese.md](solutions/vscode-terminal-chinese.md)

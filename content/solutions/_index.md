@@ -1,7 +1,9 @@
-[🏠 首页](../_index.md) / qa
+[🏠 首页](../_index.md) / solutions
 
-# qa
+# solutions
 
 [dbeaver-password.md](dbeaver-password.md)
+
+[MacOS 删除很慢](macos-slow-delete.md)
 
 [vscode-terminal-chinese.md](vscode-terminal-chinese.md)

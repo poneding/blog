@@ -1,11 +1,22 @@
-[🏠 首页](../_index.md) / [qa](_index.md) / dbeaver-password.md
+[🏠 首页](../_index.md) / [solutions](_index.md) / dbeaver-password.md
 
 查看 `dbeaver` 已保存的数据库密码：
 
-1. 获取工作空间路径
+1、获取工作空间路径
+
 ![image.png](https://images.poneding.com/2024/10/202412251140789.png)
 
-	1. 使用工作空间路径，查找到数据库连接认证信息文件，例如：`/Users/dp/Library/DBeaverData/workspace6/General/.dbeaver/credentials-config.json`
+2、使用工作空间路径，查找到数据库连接认证信息文件，例如：`/Users/dp/Library/DBeaverData/workspace6/General/.dbeaver/credentials-config.json`
+
+3、使用以下命令解析密码：
+
+```bash
+openssl aes-128-cbc -d \
+  -K babb4a9f774ab853c96c2d653dfe544a \
+  -iv 00000000000000000000000000000000 \
+  -in /Users/dp/Library/DBeaverData/workspace6/General/.dbeaver/credentials-config.json | dd bs=1 skip=16
+ 2>/dev/null
+```
 
 ---
-[» vscode-terminal-chinese.md](vscode-terminal-chinese.md)
+[» MacOS 删除很慢](macos-slow-delete.md)
