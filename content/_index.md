@@ -186,6 +186,7 @@
 - [简单介绍 K8s](kubernetes/k8s-get-started.md)
 - [kubeadm 安装 Kubernetes (Docker)](kubernetes/kubeadm-install-k8s-docker.md)
 - [kubeadm 安装 k8s (containerd)](kubernetes/kubeadm-install-k8s.md)
+- [kubeadm 更新证书](kubernetes/kubeadm-renew-certs.md)
 - [Kubeadm 升级 K8s](kubernetes/kubeadm-upgrade.md)
 - [kubebuilder 实战](kubernetes/kubebuilder-inaction.md)
 - [kubectl](kubernetes/kubectl.md)
@@ -259,9 +260,13 @@
 - [Cargo 管理工具](rust/02-cargo.md)
 - [VSCode 调试](rust/03-vscode-debugging.md)
 - [Rust WASM 编程](rust/04-wasm-programming.md)
+- [Rust Pin 和 Unpin](rust/rust-pin-unpin.md)
 - [String 还是 &str](rust/string-&str.md)
 
 ## solutions
 
-- [dbeaver-password.md](solutions/dbeaver-password.md)
+- [dbeaver 查看已创建连接密码](solutions/dbeaver-password.md)
+- [KubeConfig Warning](solutions/kubeconfig-warning.md)
+- [MacOS 删除很慢](solutions/macos-slow-delete.md)
+- [终端 Last Login 提示](solutions/terminal-last-login.md)
 - [vscode-terminal-chinese.md](solutions/vscode-terminal-chinese.md)

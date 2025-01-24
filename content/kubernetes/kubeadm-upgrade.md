@@ -91,6 +91,6 @@ sudo sed -i 's/1.28/1.29/g' /etc/apt/sources.list.d/kubernetes.list
 - [Upgrading kubeadm clusters](https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/)
 
 ---
-[« kubeadm 安装 k8s (containerd)](kubeadm-install-k8s.md)
+[« kubeadm 更新证书](kubeadm-renew-certs.md)
 
 [» kubebuilder 实战](kubebuilder-inaction.md)

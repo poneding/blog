@@ -64,6 +64,8 @@
 
 [kubeadm 安装 k8s (containerd)](kubeadm-install-k8s.md)
 
+[kubeadm 更新证书](kubeadm-renew-certs.md)
+
 [Kubeadm 升级 K8s](kubeadm-upgrade.md)
 
 [kubebuilder 实战](kubebuilder-inaction.md)

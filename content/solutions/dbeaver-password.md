@@ -1,4 +1,6 @@
-[🏠 首页](../_index.md) / [solutions](_index.md) / dbeaver-password.md
+[🏠 首页](../_index.md) / [solutions](_index.md) / dbeaver 查看已创建连接密码
+
+# dbeaver 查看已创建连接密码
 
 查看 `dbeaver` 已保存的数据库密码：
 
@@ -19,4 +21,4 @@ openssl aes-128-cbc -d \
 ```
 
 ---
-[» MacOS 删除很慢](macos-slow-delete.md)
+[» KubeConfig Warning](kubeconfig-warning.md)

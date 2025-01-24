@@ -9,6 +9,6 @@
 ![](https://images.poneding.com/2024/10/202412272246286.png)
 
 ---
-[« dbeaver-password.md](dbeaver-password.md)
+[« KubeConfig Warning](kubeconfig-warning.md)
 
-[» vscode-terminal-chinese.md](vscode-terminal-chinese.md)
+[» 终端 Last Login 提示](terminal-last-login.md)

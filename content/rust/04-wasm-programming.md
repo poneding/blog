@@ -64,4 +64,4 @@ wasm-pack build --scope [npm-username]
 ---
 [« VSCode 调试](03-vscode-debugging.md)
 
-[» String 还是 &str](string-&str.md)
+[» Rust Pin 和 Unpin](rust-pin-unpin.md)

@@ -10,4 +10,6 @@
 
 [Rust WASM 编程](04-wasm-programming.md)
 
+[Rust Pin 和 Unpin](rust-pin-unpin.md)
+
 [String 还是 &str](string-&str.md)

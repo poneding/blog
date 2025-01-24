@@ -251,4 +251,4 @@ kubectl expose deployment nginx --name=nginx --port=80 --target-port=80 --type=N
 ---
 [« kubeadm 安装 Kubernetes (Docker)](kubeadm-install-k8s-docker.md)
 
-[» Kubeadm 升级 K8s](kubeadm-upgrade.md)
+[» kubeadm 更新证书](kubeadm-renew-certs.md)

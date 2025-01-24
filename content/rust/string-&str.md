@@ -11,4 +11,4 @@
 遵循以上的规则，大部分场景你将很好的避开 `String &str` 使用困难，即使有问题，编译器会告知你问题所在。
 
 ---
-[« Rust WASM 编程](04-wasm-programming.md)
+[« Rust Pin 和 Unpin](rust-pin-unpin.md)
