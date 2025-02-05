@@ -83,7 +83,7 @@
 - [Linux 容器](docker/linux-container.md)
 - [非 root 账号获取 docker 权限](docker/non-root-account-get-docker-permission.md)
 - [Mac 重装 Docker Desktop](docker/reinstall-docker-desktop-on-mac.md)
-- [some-apps.md](docker/some-apps.md)
+- [nginx](docker/some-apps.md)
 
 ## EBPF
 

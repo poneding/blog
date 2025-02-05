@@ -23,4 +23,4 @@ rm -rf ~/.docker
 ---
 [« 非 root 账号获取 docker 权限](non-root-account-get-docker-permission.md)
 
-[» some-apps.md](some-apps.md)
+[» nginx](some-apps.md)

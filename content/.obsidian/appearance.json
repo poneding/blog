@@ -9,5 +9,6 @@
     "extended-colorschemes"
   ],
   "showViewHeader": true,
-  "translucency": true
+  "translucency": true,
+  "showRibbon": true
 }

@@ -8,7 +8,6 @@
   "newFileLocation": "current",
   "useMarkdownLinks": true,
   "alwaysUpdateLinks": true,
-  "showRibbon": true,
   "userIgnoreFilters": [
     "menu/"
   ],

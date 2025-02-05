@@ -30,4 +30,4 @@
 
 [Mac 重装 Docker Desktop](reinstall-docker-desktop-on-mac.md)
 
-[some-apps.md](some-apps.md)
+[nginx](some-apps.md)

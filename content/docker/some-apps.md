@@ -1,4 +1,4 @@
-[🏠 首页](../_index.md) / [Docker](_index.md) / some-apps.md
+[🏠 首页](../_index.md) / [Docker](_index.md) / nginx
 
 Docker 应用
 
@@ -89,6 +89,30 @@ docker run -d --name redis \
 docker run -d --name transfer \
 	-p 7080:8080 \
 	dutchcoders/transfer.sh:latest --provider local --basedir /tmp/
+```
+
+# nginx
+
+```bash
+docker run -d \
+  --name nginx \
+  --publish 80:80 \
+  --volume /Users/dp/OneDrive/AppData/nginx/webapps.conf:/etc/nginx/webapps.conf:ro \
+  --volume /Users/dp/OneDrive/AppData/nginx/nginx.conf:/etc/nginx/nginx.conf:ro \
+  nginx
+```
+
+# Memos
+
+本地部署
+
+```bash
+docker run -d \
+  --init \
+  --name memos \
+  --publish 5230:5230 \
+  --volume /Users/dp/OneDrive/AppData/memos:/var/opt/memos \
+  neosmemo/memos:stable
 ```
 
 ---
