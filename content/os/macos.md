@@ -225,5 +225,16 @@ UI 改版之前最后一个版本下载地址：
 *.k8slens.dev
 ```
 
+## 终端录制 GIF
+
+```bash
+brew install asciinema imagemagick ffmpeg agg
+
+# 准备命令脚本，例如：my_demo.sh
+asciinema rec my_demo.cast --command ./my_demo.sh
+
+agg my_demo.cast my_demo.gif
+```
+
 ---
 [» ohmyzsh](ohmyzsh.md)
