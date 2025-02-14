@@ -270,3 +270,5 @@
 - [MacOS 删除很慢](solutions/macos-slow-delete.md)
 - [终端 Last Login 提示](solutions/terminal-last-login.md)
 - [vscode-terminal-chinese.md](solutions/vscode-terminal-chinese.md)
+
+[云原生 DevOps 应知应会](cloud-native-devops.md.md)
