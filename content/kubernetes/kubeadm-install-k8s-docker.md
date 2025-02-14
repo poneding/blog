@@ -6,7 +6,7 @@
 
 Notes:
 
-1. 随着 kubeadm & k8s 版本的更新，安装过程可能会有所不同，截至目前，本文档使用的是 kubeadm v1.28.3 & k8s v1.28.3 版本；
+1. 随着 kubeadm & k8s 版本的更新，安装过程可能会有所不同，截至目前，本文档使用的是 kubeadm v1.32.2 & k8s v1.32.2 版本；
 2. 本文档使用的操作系统是 Ubuntu 22.04，其他操作系统可能会有所不同。
 
 ## 要求
@@ -80,8 +80,8 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 ## 安装 cri-dockerd
 
 ```bash
-wget https://github.com/Mirantis/cri-dockerd/releases/download/v0.3.8/cri-dockerd-0.3.8.amd64.tgz
-tar -xzvf cri-dockerd-0.3.8.amd64.tgz
+wget https://github.com/Mirantis/cri-dockerd/releases/download/v0.3.16/cri-dockerd-0.3.16.amd64.tgz
+tar -xzvf cri-dockerd-0.3.16.amd64.tgz
 sudo install -m 0755 -o root -g root -t /usr/local/bin cri-dockerd/cri-dockerd
 
 wget https://raw.githubusercontent.com/Mirantis/cri-dockerd/master/packaging/systemd/cri-docker.service
@@ -103,12 +103,12 @@ sudo systemctl start cri-docker.service
 sudo apt-get update
 sudo apt-get install -y apt-transport-https ca-certificates curl
 
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
 # 国内网络使用下面命令替换
 # curl -fsSL https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add -
 
-echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
 # 国内网络使用下面命令替换
 # cat << EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
@@ -162,11 +162,11 @@ Environment="KUBELET_EXTRA_ARGS=--cgroup-driver=systemd"
 
 ## 安装集群
 
-国内网络提前拉取 `registry.k8s.io/pause:3.9` 镜像：
+国内网络提前拉取 `registry.k8s.io/pause:3.10` 镜像：
 
 ```bash
-docker pull registry.aliyuncs.com/google_containers/pause:3.9
-docker tag registry.aliyuncs.com/google_containers/pause:3.9 registry.k8s.io/pause:3.9
+docker pull registry.aliyuncs.com/google_containers/pause:3.10
+docker tag registry.aliyuncs.com/google_containers/pause:3.10 registry.k8s.io/pause:3.10
 ```
 
 使用 `kubeadm init` 初始化集群：
@@ -174,7 +174,7 @@ docker tag registry.aliyuncs.com/google_containers/pause:3.9 registry.k8s.io/pau
 ```bash
 sudo kubeadm init \
   --pod-network-cidr 10.244.0.0/16 \
-  --kubernetes-version 1.28.3 \
+  --kubernetes-version 1.32.2 \
   --control-plane-endpoint=<EXTERNAL_IP>:6443 \
   --ignore-preflight-errors=Swap \
   --cri-socket=unix:///var/run/cri-dockerd.sock
