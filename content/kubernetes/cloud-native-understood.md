@@ -17,6 +17,6 @@
 云原生本身不能称为是一种架构，它首先是一种基础设施，运行在其上的应用称作云原生应用，只有符合云原生设计哲学的应用架构才叫云原生应用架构。
 
 ---
-[« 二进制搭建 K8s - 4 部署 Node](binary-build-k8s-04-deploy-worker.md)
+[« 云原生 DevOps 应知应会](cloud-native-devops.md)
 
 [» 集群联邦](cluster-federation.md)

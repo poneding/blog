@@ -1,6 +1,8 @@
-[🏠 首页](_index.md) / 云原生 DevOps 应知应会
+[🏠 首页](../_index.md) / [Kubernetes](_index.md) / 云原生 DevOps 应知应会
 
 # 云原生 DevOps 应知应会
+
+![云原生 DevOps 路线图](./cloudnative-devops-roadmap.png)
 
 ## 1. 容器基础  
 
@@ -27,10 +29,16 @@
 ### 1.4 容器存储  
 
 - Volume、Bind Mount、OverlayFS  
+- 存储方案：
+  - [Longhorn](https://longhorn.io/)
+  - [Ceph](https://ceph.io/)
 
 ---
 
-## 2. Kubernetes 运行基础  
+## 2. Kubernetes 运行基础
+
+Kubernetes 架构：
+![alt text](./kubernetes-arch.png)
 
 ### 2.1 核心组件  
 
@@ -57,21 +65,30 @@
 - Service（ClusterIP, NodePort, LoadBalancer, Headless）  
 - Ingress & Ingress Controller（Nginx, Traefik, Istio）
 
-[Kubernetes 网络策略入门：概念、示例和最佳实践](<https://cloudnativecn.com/blog/understanding-kubernetes-network-policies/>)
-
 ---
 
 ## 3. Kubernetes 运维管理  
 
 ### 3.1 集群安装与配置  
 
-- Kubeadm / K3s / RKE  
+- Kubeadm：快速部署 Kubernetes 集群
+- MiniKube：本地单节点 Kubernetes
+- Kind：在 Docker 容器中运行 Kubernetes
+- K3s：轻量级 Kubernetes 集群
+- Rancher：企业级 Kubernetes 管理平台
+
+在线体验 Kubernetes：
+
+- [Play with Kubernetes](https://labs.play-with-k8s.com/)
+- [killercoda](https://killercoda.com/kubernetes)
 
 ### 3.2 监控与日志  
 
-- Prometheus + Grafana（监控）  
-- EFK / Loki（日志收集）  
-- Jaeger / OpenTelemetry（链路追踪）  
+- Prometheus + Grafana（监控）：[prometheus+grafana监控系统教程](https://jerrydevs.com/post/35)
+- ELK
+- Loki（日志收集）：[Loki 日志收集系统](https://docs.youdianzhishi.com/k8s/logging/loki/overview/)
+- Jaeger
+- OpenTelemetry（链路追踪）  [OpenTelemetry 实战：从零实现分布式链路追踪](https://crossoverjie.top/2024/08/20/ob/OpenTelemetry-01-trace/)
 
 ### 3.3 资源调优  
 
@@ -92,15 +109,19 @@
 
 ### 4.2 备份与恢复  
 
-- etcd 备份与恢复  
-- Velero（集群数据备份）  
-- ArgoCD / GitOps 实践  
+- [etcd 备份与恢复](https://www.zhaowenyu.com/etcd-doc/ops/data-backup-restore.html)  
+- [Velero（集群数据备份）](https://velero.io/docs/v1.15/)  
+- ArgoCD
+- [GitLab CI 实践](https://juejin.cn/post/7428032840288305192)
+- [GitOps 实践](https://chinalhr.github.io/post/gitops-argo-cd/)  
 
 ### 4.3 故障排查  
 
 - kubectl describe / logs / exec  
 - 网络排查（Service / Ingress / CNI）  
 - 存储排查（PV / PVC / CSI）  
+
+Kubernetes 故障排查图谱：![alt text](./kubernetes-ts.png)
 
 ---
 
@@ -113,12 +134,12 @@
 
 ### 5.2 资源管理工具  
 
-- Helm（应用打包与部署）  
+- Helm（应用打包与部署） ：[Helm 快速入门指南](https://helm.sh/zh/docs/intro/quickstart/)
 - Kustomize（YAML 资源管理）  
 
 ### 5.3 混沌工程  
 
-- Chaos Mesh  
+- [Chaos Mesh](https://chaos-mesh.org/website-zh/docs/next/)  
 - LitmusChaos  
 
 ---
@@ -180,8 +201,6 @@
 | 网站           | 内容          | 链接                            |
 | ---------------- | --------------- | --------------------------------- |
 | Kubernetes 官方文档  | Kubernetes 官方教程 | <https://kubernetes.io/docs>      |
-| CNCF 官方网站        | 云原生基金会          | <https://www.cncf.io/>            |
-| KubeAcademy      | Kubernetes 免费学习 | <https://kube.academy/>           |
 | Learn Kubernetes | 深入 Kubernetes   | <https://learnk8s.io/>            |
 | Prometheus 文档    | 监控系统教程          | <https://prometheus.io/docs/>     |
 | Istio 官方文档       | Service Mesh 教程 | <https://istio.io/latest/docs/>   |
@@ -192,3 +211,8 @@
 ## 总结
 
 文档涵盖了 Kubernetes 运维的方方面面，包括基础知识、运维管理、高级运维、最佳实践和工具推荐。你可以根据需求重点学习某些章节，并结合实践操作。  
+
+---
+[« 二进制搭建 K8s - 4 部署 Node](binary-build-k8s-04-deploy-worker.md)
+
+[» Kubernetes 0-1 尝试理解云原生](cloud-native-understood.md)

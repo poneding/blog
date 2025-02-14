@@ -495,4 +495,4 @@ Commercial support is available at
 ---
 [« 二进制搭建 K8s - 3 部署 Master](binary-build-k8s-03-deploy-master.md)
 
-[» Kubernetes 0-1 尝试理解云原生](cloud-native-understood.md)
+[» 云原生 DevOps 应知应会](cloud-native-devops.md)

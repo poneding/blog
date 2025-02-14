@@ -162,6 +162,7 @@
 - [二进制搭建 K8s - 2 部署 etcd 集群](kubernetes/binary-build-k8s-02-deploy-etcd.md)
 - [二进制搭建 K8s - 3 部署 Master](kubernetes/binary-build-k8s-03-deploy-master.md)
 - [二进制搭建 K8s - 4 部署 Node](kubernetes/binary-build-k8s-04-deploy-worker.md)
+- [云原生 DevOps 应知应会](kubernetes/cloud-native-devops.md)
 - [Kubernetes 0-1 尝试理解云原生](kubernetes/cloud-native-understood.md)
 - [集群联邦](kubernetes/cluster-federation.md)
 - [了解 ConfigMap](kubernetes/configmap-understood.md)
@@ -270,5 +271,3 @@
 - [MacOS 删除很慢](solutions/macos-slow-delete.md)
 - [终端 Last Login 提示](solutions/terminal-last-login.md)
 - [vscode-terminal-chinese.md](solutions/vscode-terminal-chinese.md)
-
-[云原生 DevOps 应知应会](cloud-native-devops.md.md)

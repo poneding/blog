@@ -16,6 +16,8 @@
 
 [二进制搭建 K8s - 4 部署 Node](binary-build-k8s-04-deploy-worker.md)
 
+[云原生 DevOps 应知应会](cloud-native-devops.md)
+
 [Kubernetes 0-1 尝试理解云原生](cloud-native-understood.md)
 
 [集群联邦](cluster-federation.md)
