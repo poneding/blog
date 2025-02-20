@@ -71,6 +71,10 @@ spec:
         name: virtiocontainerdisk
 ```
 
+参考：
+
+- [KubeVirt: installing Microsoft Windows 11 from an ISO](https://kubevirt.io/2022/KubeVirt-installing_Microsoft_Windows_11_from_an_iso.html)
+
 ---
 [« Kuberentes](kubernetes.md)
 
