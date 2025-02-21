@@ -36,16 +36,16 @@ ServerAliveInterval 60
 
 ### 密钥文件进行SSH连接
 
- ```
+ ```txt
  Host aliyun
    HostName 11.11.11.11
    User root
    IdentityFile ~/.ssh/aliyun_key
  ```
- 
+
 ### 用户密码进行SSH连接
 
-```
+```txt
 Host ubuntu
   HostName 192.168.11.11
   User dp
@@ -72,7 +72,7 @@ Remove-Item (Get-PSReadlineOption).HistorySavePath
 
 ## 4. 安装 windows11 虚拟机
 
-安装 windwos 虚拟机跳过网络的方法，按下 Shift+F10 或者是 Fn+Shift+F10 快捷键调出命令提示符窗口，执行命令：
+安装 windows 虚拟机跳过网络的方法，按下 Shift+F10 或者是 Fn+Shift+F10 快捷键调出命令提示符窗口，执行命令：
 
 ```powershell
 oobe\BypassNRO
