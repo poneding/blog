@@ -169,9 +169,9 @@ Agile # 敏捷 交付产品可以看作饭店上菜 顾客点了十个菜 后厨
 Ansible # 介绍 # 一款轻量级的自动化运维工具，只需要一台主机安装Ansible，便可以管理其他可连通的Linux服务器。
 开源
 python
-特点 # 自动化引擎，实现管理配置，应用部署，服务编排及其他各种服务器管理需求； 使用简单，具有客户端的特点； 基于ssh实现配置管理； 依赖python； 功能强大，支持云服务操作。 安装 # ​ 由于Ansible使用Python开发，所以可以直接使用pip安装
-pip install ansible ​ 也可以使用yum或apt-get安装
-yum install ansible -y apt-get install ansible -y ansible --version ​ 只需要在Control Node上安装即可。
+特点 # 自动化引擎，实现管理配置，应用部署，服务编排及其他各种服务器管理需求； 使用简单，具有客户端的特点； 基于ssh实现配置管理； 依赖python； 功能强大，支持云服务操作。 安装 # 由于Ansible使用Python开发，所以可以直接使用pip安装
+pip install ansible 也可以使用yum或apt-get安装
+yum install ansible -y apt-get install ansible -y ansible --version 只需要在Control Node上安装即可。
 主要概念 # Control node：
 安装了Ansible的主机都可以称之为Control node，反过来说，Ansible安装在Contriol Node上；
 一般为linux机器（注：目前也已经对windows做了支持）。
@@ -181,10 +181,11 @@ linux机器（安装了python）。
 Inventory：
 Modules：
 Tasks：
-Ansible配置 # ​ 配置文件位置：/etc/ansible/ansible.cfg，为ini格式文件。
-配置示例 # ​ inventory：主机清单配置文件位置，在使用Ansible命令时，也开始-i &amp;lt;path&amp;gt;指定；
-​ host_key_checking：当know_hosts中不存在的主机（即尚未访问过的主机，是否需要输入密钥）；
-​ become_user：sudo用户；</description></item><item><title/><link>https://blog.poneding.com/devops/bule-green-rollback-gray/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/bule-green-rollback-gray/</guid><description>🏠 首页 / DevOps / 蓝绿部署、滚动部署和灰度部署
+Ansible配置 # 配置文件位置：/etc/ansible/ansible.cfg，为ini格式文件。
+配置示例 # inventory：主机清单配置文件位置，在使用Ansible命令时，也开始-i &amp;lt;path&amp;gt;指定；
+host_key_checking：当know_hosts中不存在的主机（即尚未访问过的主机，是否需要输入密钥）；
+become_user：sudo用户；
+主机清单(Inventory) # 在一个ini或yaml文件中管理Managed nodes清单，默认安装ansible后，在/etc/ansible/hosts文件中管理（后文统一称之为主机清单文件），一般是将maneged nodes的ip address或host name等信息存储到主机清单文件中。</description></item><item><title/><link>https://blog.poneding.com/devops/bule-green-rollback-gray/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/bule-green-rollback-gray/</guid><description>🏠 首页 / DevOps / 蓝绿部署、滚动部署和灰度部署
 蓝绿部署、滚动部署和灰度部署 # 直接举例说明：
 现环境中运行着3个V1版本的实例，计划更新到V2版本。
 蓝绿部署 # 直接使用新的服务资源部署3个V2版本实例（仍然保留3个V1版本），然后将请求流量全部转到V2版本。
@@ -577,7 +578,8 @@ GraphQL 让你的整个应用共享一套 API，而不用被限制于特定存�
 资源定义，请求和响应 # 数据描述：
 type User { name: String phone: String Friends: [User] } 数据请求：
 { user(name: &amp;#34;dp&amp;#34;) { phone } } 请求结果：</description></item><item><title/><link>https://blog.poneding.com/grpc/gRPC/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/grpc/gRPC/</guid><description> 🏠 首页 / Grpc / gRPC 实战
-gRPC 实战 # 准备 # golang 1.13+ Protoc</description></item><item><title/><link>https://blog.poneding.com/istio/aws-acm-tls-management/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/aws-acm-tls-management/</guid><description>🏠 首页 / Istio / 使用 aws-acm 管理 tls 密钥和证书
+gRPC 实战 # 准备 # golang 1.13+ Protoc</description></item><item><title/><link>https://blog.poneding.com/images/CHAJIAN/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/images/CHAJIAN/</guid><description>🏠 首页 / images / CHAJIAN.md
+静态插件（全局、市场插件） # SysPlugin { ID string	Name	string	&amp;#34;不可重复&amp;#34; AliasName	string	&amp;#34;显示名&amp;#34; Category	string	&amp;#34;类型，枚举：一般类型|初始化类型|入口网络|出口网络|出口入口共治网络|性能分析|监控&amp;#34; Image	string	&amp;#34;镜像名&amp;#34; Command	string	&amp;#34;执行命令，可为空；多为初始化容器时使用。&amp;#34; CPU	string	&amp;#34;例如：100m&amp;#34; Memory	string	&amp;#34;例如：128M&amp;#34; Desc	string	&amp;#34;描述信息&amp;#34; ConfigGroups	[]ConfigGroup } PluginConfig =&amp;gt; &amp;#39;plugin_config&amp;#39;{ ID	string Name	string	&amp;#34;配置组名称&amp;#34; ServiceMetaType	string	&amp;#34;un_define|upstream_port|downstream_port&amp;#34; Injection	string	&amp;#34;env|auto&amp;#34; Options	[]PluginConfigOption PluginID	string } PluginConfigOption =&amp;gt; &amp;#39;plugin_config_ption&amp;#39;{ AttrName	string	&amp;#34;配置名&amp;#34; AttrType	string	&amp;#34;string|radio|checkbox&amp;#34; AttrDefaultValue	string	&amp;#34;配置默认值&amp;#34; IsChange	bool	&amp;#34;组件开通插件后，插件配置项的值是否可以修改&amp;#34; AttrAltValue	string	&amp;#34;如果AttrType为radio或checkbox时，radio或checkbox的列表值，例如：RED,GREEN,GRAY&amp;#34; AttrInfo	string	&amp;#34;配置项的描述&amp;#34; Protocol	string	&amp;#34;协议&amp;#34; PluginConfigID	string } 导入导出插件 # 插件导入导出json结构</description></item><item><title/><link>https://blog.poneding.com/istio/aws-acm-tls-management/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/istio/aws-acm-tls-management/</guid><description>🏠 首页 / Istio / 使用 aws-acm 管理 tls 密钥和证书
 使用 aws-acm 管理 tls 密钥和证书 # 参考： https://medium.com/faun/managing-tls-keys-and-certs-in-istio-using-amazons-acm-8ff9a0b99033
 在Ingressgateway service的annotation中添加:
 kind: Service apiVersion: v1 metadata: name: my-ingressgateway namespace: istio-system labels: app: my-ingressgateway annotations: # external-dns.alpha.kubernetes.io/hostname: example.com service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: &amp;#39;3600&amp;#39; service.beta.kubernetes.io/aws-load-balancer-ssl-cert: &amp;gt;- arn:aws:acm:ap-southeast-1:xxxxxxxxxxxx:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx service.beta.kubernetes.io/aws-load-balancer-ssl-ports: https .... service.yaml:
@@ -957,7 +959,7 @@ Prometheus # Intro # 是一个面向云原生应用程序的开源的监控&amp;
 应用监控：
 业务应用暴露端口供Prometheus调用实现监测，比如实时的用户在线人数，数据库的当前连接数等。
 Prometheus优势 # 支持机器资源和动态配置的应用监控； 多维数据收集和查询； 服务独立，少依赖。 Prometheus组件 # Prometheus Server：采集监控数据，存储时序指标，提供数据查询； Prometheus Client SDK：对接开发工具包，提供自定义的指标数据等； Push Gateway：推送指标数据的网关组件； Third-part Exporter：外部指标采集系统，暴露接口供Prometheus采集； AlertManager：指标数据的分析告警管理器； Architecture overview # 上图来源于官网：
-处理流程： 配置资源目标或应用抓取； 抓取资源或应用指标数据； 制定报警规则，推送报警； 灵活查询语言，结合Grafana展示 Installation &amp;amp; Start Up # 1. 以服务进程运行Prometheus # ​ 在ubuntu系统上安装Prometheus，一般有两种方式
+处理流程： 配置资源目标或应用抓取； 抓取资源或应用指标数据； 制定报警规则，推送报警； 灵活查询语言，结合Grafana展示 Installation &amp;amp; Start Up # 1. 以服务进程运行Prometheus # 在ubuntu系统上安装Prometheus，一般有两种方式
 第一种，安装命令如下：
 wget https://github.com/prometheus/prometheus/releases/download/v2.13.1/prometheus-2.13.1.linux-amd64.tar.gz tar xvfz prometheus-2.13.1.linux-amd64.tar.gz # 启动Prometheus cd prometheus-2.</description></item><item><title/><link>https://blog.poneding.com/kubernetes/pvc-expansion/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/kubernetes/pvc-expansion/</guid><description>🏠 首页 / Kubernetes / PVC 扩容
 PVC 扩容 # K8s 部署的 Kafka 程序突然挂了，查看相关日志发现原来是挂日志的磁盘空间不足，那么现在需要对磁盘进行扩容。

@@ -5,9 +5,9 @@ Agile # 敏捷 交付产品可以看作饭店上菜 顾客点了十个菜 后厨
 Ansible # 介绍 # 一款轻量级的自动化运维工具，只需要一台主机安装Ansible，便可以管理其他可连通的Linux服务器。
 开源
 python
-特点 # 自动化引擎，实现管理配置，应用部署，服务编排及其他各种服务器管理需求； 使用简单，具有客户端的特点； 基于ssh实现配置管理； 依赖python； 功能强大，支持云服务操作。 安装 # ​ 由于Ansible使用Python开发，所以可以直接使用pip安装
-pip install ansible ​ 也可以使用yum或apt-get安装
-yum install ansible -y apt-get install ansible -y ansible --version ​ 只需要在Control Node上安装即可。
+特点 # 自动化引擎，实现管理配置，应用部署，服务编排及其他各种服务器管理需求； 使用简单，具有客户端的特点； 基于ssh实现配置管理； 依赖python； 功能强大，支持云服务操作。 安装 # 由于Ansible使用Python开发，所以可以直接使用pip安装
+pip install ansible 也可以使用yum或apt-get安装
+yum install ansible -y apt-get install ansible -y ansible --version 只需要在Control Node上安装即可。
 主要概念 # Control node：
 安装了Ansible的主机都可以称之为Control node，反过来说，Ansible安装在Contriol Node上；
 一般为linux机器（注：目前也已经对windows做了支持）。
@@ -17,10 +17,11 @@ linux机器（安装了python）。
 Inventory：
 Modules：
 Tasks：
-Ansible配置 # ​ 配置文件位置：/etc/ansible/ansible.cfg，为ini格式文件。
-配置示例 # ​ inventory：主机清单配置文件位置，在使用Ansible命令时，也开始-i &amp;lt;path&amp;gt;指定；
-​ host_key_checking：当know_hosts中不存在的主机（即尚未访问过的主机，是否需要输入密钥）；
-​ become_user：sudo用户；</description></item><item><title/><link>https://blog.poneding.com/devops/bule-green-rollback-gray/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/bule-green-rollback-gray/</guid><description>🏠 首页 / DevOps / 蓝绿部署、滚动部署和灰度部署
+Ansible配置 # 配置文件位置：/etc/ansible/ansible.cfg，为ini格式文件。
+配置示例 # inventory：主机清单配置文件位置，在使用Ansible命令时，也开始-i &amp;lt;path&amp;gt;指定；
+host_key_checking：当know_hosts中不存在的主机（即尚未访问过的主机，是否需要输入密钥）；
+become_user：sudo用户；
+主机清单(Inventory) # 在一个ini或yaml文件中管理Managed nodes清单，默认安装ansible后，在/etc/ansible/hosts文件中管理（后文统一称之为主机清单文件），一般是将maneged nodes的ip address或host name等信息存储到主机清单文件中。</description></item><item><title/><link>https://blog.poneding.com/devops/bule-green-rollback-gray/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.poneding.com/devops/bule-green-rollback-gray/</guid><description>🏠 首页 / DevOps / 蓝绿部署、滚动部署和灰度部署
 蓝绿部署、滚动部署和灰度部署 # 直接举例说明：
 现环境中运行着3个V1版本的实例，计划更新到V2版本。
 蓝绿部署 # 直接使用新的服务资源部署3个V2版本实例（仍然保留3个V1版本），然后将请求流量全部转到V2版本。
