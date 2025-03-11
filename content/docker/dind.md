@@ -2,7 +2,7 @@
 
 # Docker in Docker
 
-![docker](https://images.poneding.com/2025/03/202503111822355.png)
+![alt text](https://images.poneding.com/2025/03/202503111822355.png)
 
 `Docker-in-Docker` 的意思是在 Docker 容器中使用 docker，就像和在宿主机上使用 docker 一样，你可以理解为**套娃**。
 
@@ -14,7 +14,7 @@
 
 ## 1. 挂载主机 /var/run/docker.sock
 
-![docker-in-docker-01](https://images.poneding.com/2025/03/202503111822477.png)
+![alt text](https://images.poneding.com/2025/03/202503111822477.png)
 
 **Docker 容器**：
 
@@ -37,7 +37,7 @@ This message shows that your installation appears to be working correctly.
 
 但是，使用 `docker ps -a` 命令可以查看到宿主机的运行容器，这说明容器的权限是很大的，存在一定的安全隐患：
 
-![image-20201208143849939](https://images.poneding.com/2025/03/202503111822957.png)
+![alt text](https://images.poneding.com/2025/03/202503111822957.png)
 
 **Kubernetes Pod**：
 
@@ -71,11 +71,11 @@ kubectl exec -it docker-in-docker -c docker /bin/sh
 
 同样，这种方式也能获取到宿主机的容器。
 
-![image-20210115093238930](https://images.poneding.com/2025/03/202503111822263.png)
+![alt text](https://images.poneding.com/2025/03/202503111822263.png)
 
 ## 2. 使用 Docker-Dind
 
-![docker-in-docker-02](https://images.poneding.com/2025/03/202503111821052.png)
+![alt text](https://images.poneding.com/2025/03/202503111821052.png)
 
 **Docker 容器**：
 
@@ -86,7 +86,7 @@ docker exec -it docker-in-docker /bin/sh
 
 与上面方式不同的是，这种方式运行起来的 docker-in-docker 无法看到宿主机上的容器。
 
-![image-20210115090727784](https://images.poneding.com/2025/03/202503111821799.png)
+![alt text](https://images.poneding.com/2025/03/202503111821799.png)
 
 **Kubernetes Pod**：
 

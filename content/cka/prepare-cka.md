@@ -10,7 +10,7 @@ Affkub95-268483
 
 [Frequently Asked Questions: CKA and CKAD & CKS - T&C DOC (linuxfoundation.org)](https://docs.linuxfoundation.org/tc-docs/certification/faq-cka-ckad-cks#what-are-the-id-requirements-to-take-the-exam)
 
-![image-20210604135020151](https://images.poneding.com/2025/03/202503111821943.png)
+![alt text](https://images.poneding.com/2025/03/202503111821943.png)
 
 ---
 [« 001](001.md)

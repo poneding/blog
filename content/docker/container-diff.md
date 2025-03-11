@@ -2,8 +2,6 @@
 
 # container-diff 工具的使用
 
-![docker](https://images.poneding.com\docker.png)
-
 ## 简介
 
 container-diff 是 google 开源的一款用于分析和比较 Docker 镜像的工具，它可以从多个维度分析一个或者比较两个容器镜像：

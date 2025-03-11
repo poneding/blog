@@ -179,9 +179,9 @@ sudo ln -s -f /usr/local/bin/python3 /usr/local/bin/python
 
 ## iTerm2 配置
 
-![image.png](https://images.poneding.com/2024/10/20241013092641.png)
+![alt text](https://images.poneding.com/2024/10/20241013092641.png)
 
-![image.png](https://images.poneding.com/2024/10/20241013092858.png)
+![alt text](https://images.poneding.com/2024/10/20241013092858.png)
 
 ## clash-verge-rev
 

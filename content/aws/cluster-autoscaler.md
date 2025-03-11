@@ -2,7 +2,7 @@
 
 # Cluster AutoScaler
 
-![eks.jpg](https://images.poneding.com/2025/03/202503111817706.jpg)
+![alt text](https://images.poneding.com/2025/03/202503111817706.jpg)
 
 我当前已经有了一个EKS服务搭建起来的K8s集群，我现在希望我的集群拥有自动伸缩（体现在节点的扩缩）的能力。
 
@@ -22,7 +22,7 @@
 
 定义的NodeGroup会生成Auto Scaling Group资源，并且由Auto Scaling Group来管理Node的创建。
 
-![image-20200709094437775](https://images.poneding.com/2025/03/202503111817865.png)
+![alt text](https://images.poneding.com/2025/03/202503111817865.png)
 
 现在需要做的就是为你的Auto Scaling Group添加Tag。
 
@@ -243,7 +243,7 @@ spec:
 
 资源清单内容比较长，但是需要注意的是 cluster-autoscaler 的 Deployment 资源中定义的 command 中，有一行你会觉得眼熟，没错就是我们上面为 Auto Scale Group 添加的 Tag，这里你也需要替换你的集群名 <your_cluster_name>，此外你可能需要替换使用到的镜像，你可以在 [Cluster AutoScaler 发版页面](https://github.com/kubernetes/autoscaler/releases)去找对应的镜像版本。例如我的K8s集群是1.16，那么我需要找一个1.16.x版本的镜像。上面资源清单里就是使用了 `us.gcr.io/k8s-artifacts-prod/autoscaling/cluster-autoscaler:v1.16.5` 的镜像。
 
-![image-20200709101706463](https://images.poneding.com/2025/03/202503111817682.png)
+![alt text](https://images.poneding.com/2025/03/202503111817682.png)
 
 使用下面的命令创建 Cluster AutoScaler 资源：
 
@@ -261,7 +261,7 @@ kubectl apply -f cluster-autoscaler.yaml
 kubectl logs -f deployment.apps/cluster-autoscaler -n kube-system
 ```
 
-![image-20200709102312935](https://images.poneding.com/2025/03/202503111817732.png)
+![alt text](https://images.poneding.com/2025/03/202503111817732.png)
 
 ## 分析原理
 

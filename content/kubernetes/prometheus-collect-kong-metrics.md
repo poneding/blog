@@ -16,7 +16,7 @@
 - 登录进入Konga；
 - 点击右边菜单栏”PLUGINS“，进入Plugins管理，点击“Analytics & Monitoring”，选择添加Promethus插件
 
-![image-20200228160808152](https://images.poneding.com/2025/03/202503111816758.png)
+![alt text](https://images.poneding.com/2025/03/202503111816758.png)
 
 ## Kong添加metrics接口
 
@@ -25,23 +25,23 @@
 - 登录进入Konga；
 - 点击右边菜单栏”SERVICES“，进入Services管理，点击“ADD NEW SERVICE”
 
-![image-20200228154041421](https://images.poneding.com/2025/03/202503112119854.png)
+![alt text](https://images.poneding.com/2025/03/202503112119854.png)
 
 - 添加页面输入“Name”和“Url”参数即可，例如“Name”=“prometheusService”，“Url”=“<http://localhost:8001/metrics”>
 
-![image-20200228154621208](https://images.poneding.com/2025/03/202503111816871.png)
+![alt text](https://images.poneding.com/2025/03/202503111816871.png)
 
 - 添加完Prometheus Service之后，Service列表选中并点击进入prometheusService，选择”Routes“菜单，点击“ADD ROUTE”
 
-![image-20200228154825910](https://images.poneding.com/2025/03/202503111816628.png)
+![alt text](https://images.poneding.com/2025/03/202503111816628.png)
 
 - 添加页面输入“Paths”参数即可，例如“Paths”=[“/metrics”]（Path必须以“/”为首）
 
-![image-20200228162440174](https://images.poneding.com/2025/03/202503111817351.png)
+![alt text](https://images.poneding.com/2025/03/202503111817351.png)
 
 - 这时候访问“<http://localhost:8000/metrics”，看到页面如下显示，说明已经成功的添加了metrics接口>
 
-![image-20200228162530307](https://images.poneding.com/2025/03/202503111816467.png)
+![alt text](https://images.poneding.com/2025/03/202503111816467.png)
 
 ## Prometheus添加Kong指标收集
 
@@ -60,7 +60,7 @@ scrape_configs配置项下添加如下配置
 
 可以看到一已经生成了很多kong的指标项，如http访问，nginx当前访问量等指标
 
-![image-20200228163048474](https://images.poneding.com/2025/03/202503111817529.png)
+![alt text](https://images.poneding.com/2025/03/202503111817529.png)
 
 ---
 [« Kubernetes 编程](prgramming-kubernetes.md)

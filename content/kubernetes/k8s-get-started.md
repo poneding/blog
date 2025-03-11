@@ -27,7 +27,7 @@ Kubernetes 集群，后面简称为K8s，主要是由控制节点（Master）和
 
 K8s 的组成结构大致如下图：
 
-![image-20200523001832961](https://images.poneding.com/2025/03/202503112116527.png)
+![alt text](https://images.poneding.com/2025/03/202503112116527.png)
 
 ### Master 节点
 

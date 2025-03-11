@@ -2,7 +2,7 @@
 
 # Linux-history 输出附带日期
 
-![202305291417259](https://images.poneding.com/2025/03/202503111823354.jpg)
+![alt text](https://images.poneding.com/2025/03/202503111823354.jpg)
 
 如果我们在 linux 系统中想看历史的命令记录，我们可以通过 command 命令来获取。
 

@@ -56,7 +56,7 @@ ansible --version
 
 - **Tasks**：
 
-  ![image-20191126103012999](https://images.poneding.com/2025/03/202503111819577.png)
+![alt text](https://images.poneding.com/2025/03/202503111819577.png)
 
 ## Ansible配置
 
@@ -70,7 +70,7 @@ ansible --version
 
  become_user：sudo用户；
 
-![image-20191126091436329](https://images.poneding.com/2025/03/202503111819706.png)
+![alt text](https://images.poneding.com/2025/03/202503111819706.png)
 
 ## 主机清单(Inventory)
 
@@ -500,7 +500,7 @@ ansible webserver --list-hosts
 
 ## Ansible原理
 
-![image-20191128160037603](https://images.poneding.com/2025/03/202503111819587.png)
+![alt text](https://images.poneding.com/2025/03/202503111819587.png)
 
 > ansible命令
 >

@@ -2,7 +2,7 @@
 
 # Kubernetes 0-1 Pod中的livenessProbe和readinessProbe解读
 
-![kubernetes](https://images.poneding.com/2025/03/202503111814475.png)
+![alt text](https://images.poneding.com/2025/03/202503111814475.png)
 
 ## 写在前面
 
@@ -28,7 +28,7 @@ K8s对Pod的健康状态可以通过两类探针来检查：livenessProbe和read
 
 livenessProbe和readinessProbe的定义参数是一致的，可以通过`kubectl explain pods.spec.containers.readinessProbe`或`kubectl explain pods.spec.containers.livenessProbe`命令了解：
 
-![image-20200614162236210](https://images.poneding.com/2025/03/202503111814321.png)
+![alt text](https://images.poneding.com/2025/03/202503111814321.png)
 
 就绪探针的几种类型：
 
@@ -83,15 +83,15 @@ livenessProbe:
 
 目前我在docker hub有一个测试镜像：poneding/helloweb:v1，容器启动后，有一个健康检查路由/healthz/return200，访问该路由状态码返回200；有一个检查路由/health/return404，访问该路由状态码返回404。
 
-![image-20200614141140161](https://images.poneding.com/2025/03/202503111820593.png)
+![alt text](https://images.poneding.com/2025/03/202503111820593.png)
 
-![image-20200614141106875](https://images.poneding.com/2025/03/202503111820351.png)
+![alt text](https://images.poneding.com/2025/03/202503111820351.png)
 
 ### readinessProbe示例
 
 在实验之前先了解一下Pod和Service的负载均衡关系：在K8s中，Service作为Pod的负载均衡器，是通过Label Selector匹配Pod的。但是这句话没有说完整，因为还有一个必要条件：Pod当前已经就绪。也就是说，Service通过Label Selector匹配当前就绪的Pod，还未就绪的Pod就算labelSelector匹配上了，也不会出现在Service的endpoints中，请求是不会被转发过去的，如下图示例。
 
-![image-20200106164307228](https://images.poneding.com/2025/03/202503111820877.png)
+![alt text](https://images.poneding.com/2025/03/202503111820877.png)
 
 示例说明：我们使用`poneding/helloweb:v1`镜像启动三个Pod，三个Pod的Label都设置成一样，为了使Service匹配到；三个Pod其中两个readinessProbe使用httpGet探测/health/return200，模拟探测成功，一个readinessProbe使用httpGet探测/health/return404，模拟探测失败。
 
@@ -180,17 +180,17 @@ kubectl apply -f helloweb-readinessProbe.yaml
 
 之后，我们查看Pod的就绪情况：
 
-![image-20200614141813684](https://images.poneding.com/2025/03/202503111829400.png)
+![alt text](https://images.poneding.com/2025/03/202503111829400.png)
 
 可以看到Pod只有helloweb1和helloweb2当前使处于`READY`（就绪）的状态，helloweb3尚未Ready，我们接着查看helloweb service的endpoints：
 
-![image-20200614141750563](https://images.poneding.com/2025/03/202503111829752.png)
+![alt text](https://images.poneding.com/2025/03/202503111829752.png)
 
 可以看到Service的EndPoints只将helloweb1、helloweb2 pod的IP负载上了。
 
 查看日志访问情况：
 
-![image-20200614145627312](https://images.poneding.com/2025/03/202503111829505.png)
+![alt text](https://images.poneding.com/2025/03/202503111829505.png)
 
 可以看到每隔10秒（readniessProbe.periodSeconds默认10s）就会做一次就绪探测。
 
@@ -247,13 +247,13 @@ kubectl apply -f helloweb-livenessProbe.yaml
 
 之后，我们查看Pod的就绪情况：
 
-![image-20200614165017124](https://images.poneding.com/2025/03/202503111829199.png)
+![alt text](https://images.poneding.com/2025/03/202503111829199.png)
 
 可以看到helloweb4的STATUS状态为`Running`，而helloweb5的STATUS状态最终变为`CrashLoopBackOff`，并且一直在重启。
 
 相信到这里，你已经对`readniessProbe`和`livenessProbe`有一个清晰的了解了。
 
-![gzh](https://images.poneding.com/2025/03/202503111829565.png)
+![alt text](https://images.poneding.com/2025/03/202503111829565.png)
 
 ---
 [« Kustomize](kustomize.md)

@@ -27,15 +27,9 @@ field keys:
 
 ## 创建Dashboard
 
-![image](https://images.poneding.com\2020-04-15-08-53-02-image.png)
-
 => Add Query
 
 目前数据源已经配置完成，选择Influxdb_Elb_Logs作为QUuery DataSource，并且开始配置query
-
-![image](https://images.poneding.com\2020-04-15-08-57-46-image.png)
-
-![image](https://images.poneding.com\2020-04-15-09-01-55-image.png)
 
 查询语句可以参考：
 

@@ -2,7 +2,7 @@
 
 # Golang 发布类库 - 2
 
-![golang](https://images.poneding.com/2025/03/202503111823209.png)
+![alt text](https://images.poneding.com/2025/03/202503111823209.png)
 
 本页介绍如何在 Github 上升级我们已发布的 Golang 类库。
 

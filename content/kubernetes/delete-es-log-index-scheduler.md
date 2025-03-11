@@ -107,7 +107,7 @@ PUT /_cluster/settings
 }
 ```
 
-![image-20201105113213441](https://images.poneding.com/2025/03/202503112119950.png)
+![alt text](https://images.poneding.com/2025/03/202503112119950.png)
 
 这时候再次使用通配符执行删除：
 
@@ -120,7 +120,7 @@ PUT /_cluster/settings
 
 追加，貌似可以从这得到答案  => 官方文档：<https://www.elastic.co/guide/en/elasticsearch/reference/current/settings.html>
 
-![image-20201105115131020](https://images.poneding.com/2025/03/202503112119674.png)
+![alt text](https://images.poneding.com/2025/03/202503112119674.png)
 
 ---
 [« 了解 ConfigMap](configmap-understood.md)

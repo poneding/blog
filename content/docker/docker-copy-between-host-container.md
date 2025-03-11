@@ -12,7 +12,7 @@
 sudo docker ps
 ```
 
-![image-20200227102557616](https://images.poneding.com/2025/03/202503112120377.png)
+![alt text](https://images.poneding.com/2025/03/202503112120377.png)
 
 使用以下命令从容器内拷出文件
 

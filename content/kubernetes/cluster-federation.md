@@ -4,7 +4,7 @@
 
 云服务提供商的集群联邦是一种将多个独立的 Kubernetes 集群组合在一起的方法。这种方法允许用户在多个集群之间共享资源，例如 Pods、Services、Deployments 等。集群联邦的目标是在多个集群上引入新的控制面板，提供一个统一的视图，使用户可以在多个集群之间无缝地部署和管理应用程序。
 
-![202406051732153.png](https://images.poneding.com/2024/06/202406051732153.png)
+![alt text](https://images.poneding.com/2024/06/202406051732153.png)
 
 ## 概念
 
@@ -26,13 +26,13 @@
 
 之前由 Kubernetes 官方多集群兴趣小组开发，目前已经停止维护。
 
-![202406052303231.png](https://images.poneding.com/2024/06/202406052303231.png)
+![alt text](https://images.poneding.com/2024/06/202406052303231.png)
 
 架构原理：
 
 将联邦资源（FederationResource）从管理集群同步到工作集群。
 
-![202406052308628.png](https://images.poneding.com/2024/06/202406052308628.png)
+![alt text](https://images.poneding.com/2024/06/202406052308628.png)
 
 这其中通过三个概念来实现：
 
@@ -78,7 +78,7 @@ spec:
 
 - [项目地址](https://github.com/karmada-io/karmada)
 
-![202406052338468.png](https://images.poneding.com/2024/06/202406052338468.png)
+![alt text](https://images.poneding.com/2024/06/202406052338468.png)
 
 管理集群包含三个主要组件：
 
@@ -86,7 +86,7 @@ spec:
 2. ControllerManager：将联邦资源同步到工作集群并管理联邦资源的生命周期。
 3. Scheduler
 
-![202406052341730.png](https://images.poneding.com/2024/06/202406052341730.png)
+![alt text](https://images.poneding.com/2024/06/202406052341730.png)
 
 Karmada 将资源模板转换成成员集群的资源需要经过以下几个步骤：
 
@@ -135,7 +135,7 @@ spec:
               foo: bar
 ```
 
-![202406052347811.png](https://images.poneding.com/2024/06/202406052347811.png)
+![alt text](https://images.poneding.com/2024/06/202406052347811.png)
 
 ---
 [« Kubernetes 0-1 尝试理解云原生](cloud-native-understood.md)

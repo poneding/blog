@@ -2,7 +2,7 @@
 
 # K8s 部署 Postgres
 
-![image-20200316193406394](https://images.poneding.com/2025/03/202503112117123.png)
+![alt text](https://images.poneding.com/2025/03/202503112117123.png)
 
 本篇只涉及 Postgres 的部署操作，不涉及概念知识。
 
@@ -127,7 +127,7 @@ kubectl apply -f postgres-service.yaml
 
 因为我们是在 AWS 的 EKS 集群中创建资源，所以在以上命令执行完成后，我们可以在 AWS 的 Volume 中找到我们创建的存储卷。
 
-![image-20200316195256712](https://images.poneding.com/2025/03/202503112117940.png)
+![alt text](https://images.poneding.com/2025/03/202503112117940.png)
 
 查看该卷信息，发现它其实已经挂载在集群的一个节点上去了。
 
@@ -142,11 +142,11 @@ kubectl get svc -n postgres
 
 输出如下，说明我们的 postgres 已经部署成功
 
-![image-20200316200100309](https://images.poneding.com/2025/03/202503112117333.png)
+![alt text](https://images.poneding.com/2025/03/202503112117333.png)
 
 推荐使用 DBeaver 数据库可视化工具测试连接 postgres，使用的 host 正是输出的 EXTERNAL-IP 列的信息，而其他连接信息在我们的 ConfigMap 中。
 
-![image-20200316200310686](https://images.poneding.com/2025/03/202503112117840.png)
+![alt text](https://images.poneding.com/2025/03/202503112117840.png)
 
 ---
 [« K8s 部署 konga](k8s-deploy-konga.md)
