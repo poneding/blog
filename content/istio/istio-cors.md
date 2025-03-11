@@ -2,7 +2,7 @@
 
 # Istio 0-1 使用Istio实现Cors
 
-![istio](https://fs.poneding.com/images/istio.jpg)
+![istio](https://images.poneding.com/2025/03/202503111822818.jpg)
 
 ## Cors
 
@@ -12,7 +12,7 @@ Cors（Cross-Origin Resource Sharing）：跨域资源共享，是一种基于 H
 
 出于安全性，浏览器限制脚本内发起的跨域 HTTP 请求。 例如，XMLHttpRequest 和 Fetch API 遵循同源策略。 这意味着使用这些 API 的 Web 应用程序只能从加载应用程序的同一个域请求 HTTP 资源，除非响应报文包含了正确 CORS 响应头。
 
-![image-20210524170024751](https://fs.poneding.com/images/image-20210524170024751.png)
+![image-20210524170024751](https://images.poneding.com/2025/03/202503111822782.png)
 
 更多 Cors 知识：[跨域资源共享（CORS）](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CORS)
 

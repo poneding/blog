@@ -2,7 +2,7 @@
 
 # Kubernetes 0-1 Helm Kubernetes 的包管理工具
 
-![image-20210205103617348](https://fs.poneding.com/images/image-20210205103617348.png)
+![image-20210205103617348](https://images.poneding.com/2025/03/202503111830647.png)
 
 Helm is the best way to find, share, and use software built for Kubernetes.
 
@@ -70,13 +70,13 @@ helm repo add stable https://charts.helm.sh/stable
 
 例如你想查找prometheus应用仓库，打开<https://artifacthub.io/站点，在查询输入框中输入prometheus之后，搜索可以得到官方或民间的仓库。>
 
-![image-20210207095836149](https://fs.poneding.com/images/image-20210207095836149.png)
+![image-20210207095836149](https://images.poneding.com/2025/03/202503111830169.png)
 
-![image-20210207095854693](https://fs.poneding.com/images/image-20210207095854693.png)
+![image-20210207095854693](https://images.poneding.com/2025/03/202503111830421.png)
 
 一般选择具有官方标志的仓库，进入该仓库的主页，里面会有charts的基本信息，以及安装命令的帮助。
 
-![image-20210207100040044](https://fs.poneding.com/images/image-20210207100040044.png)
+![image-20210207100040044](https://images.poneding.com/2025/03/202503111830682.png)
 
 添加Prometheus的官方Charts仓库
 
@@ -310,7 +310,7 @@ REVISION: 1
 
 更多了解请前往[官方文档](https://helm.sh/docs/)
 
-![gzh](https://fs.poneding.com/images/gzh.png)
+![gzh](https://images.poneding.com/2025/03/202503111831061.png)
 
 ---
 [« Gateway API 实践](gateway-api-practice.md)

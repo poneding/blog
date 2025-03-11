@@ -60,4 +60,4 @@ dapr init --runtime-version
 
 解决微服务之间通信的问题。
 
-![image-20210412231445037](https://fs.poneding.com/images/image-20210412231445037.png)
+![image-20210412231445037](https://images.poneding.com/2025/03/202503111825519.png)

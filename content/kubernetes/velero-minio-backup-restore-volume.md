@@ -16,17 +16,17 @@ docker run -d --name minio \\
 
 ## 创建 Bucket
 
-![image-20230830182006059](https://fs.poneding.com/images/202308301820108.png)
+![image-20230830182006059](https://images.poneding.com/2025/03/202503111832916.png)
 
 ## 设置 Region
 
-![image-20230830182016337](https://fs.poneding.com/images/202308301820368.png)
+![image-20230830182016337](https://images.poneding.com/2025/03/202503111832894.png)
 
 点击保存后，会出现一个横幅，点击横幅上的 `Restart` 即可。
 
 ## 创建 AccessKey
 
-![image-20230830182026649](https://fs.poneding.com/images/202308301820680.png)
+![image-20230830182026649](https://images.poneding.com/2025/03/202503111832446.png)
 
 保存 AccessKey 和 SecretKey 到文件 `credentials-velero`：
 

@@ -38,7 +38,7 @@
 
 ## Architecture overview
 
- ![Prometheus architecture](https://fs.poneding.com/images/architecture.png)
+ ![Prometheus architecture](https://images.poneding.com/2025/03/202503111818410.png)
 
 *上图来源于官网*：
 
@@ -52,7 +52,7 @@
 
 ### 1. 以服务进程运行Prometheus
 
-​ 在ubuntu系统上安装Prometheus，一般有两种方式
+ 在ubuntu系统上安装Prometheus，一般有两种方式
 
 - 第一种，安装命令如下：
 
@@ -88,7 +88,7 @@
 
 下面的步骤便是将http://{ip/domain-name}:9090代理为http://{ip/domain-name}/prometheus
 
-- ​ **Step 1 配置prometheus**：
+-  **Step 1 配置prometheus**：
 
   - 配置--web.external-url
 
@@ -100,7 +100,7 @@
 
     **如果是第二种方式安装的Prometheus**，则需要在/etc/default/prometheus文件在`ARGS=""`中添加参数`--web.external-url=prometheus`，添加完之后，文件应该是像下面这样的：
 
-    ![image-20191115102431554](https://fs.poneding.com/images/image-20191115102431554.png)
+    ![image-20191115102431554](https://images.poneding.com/2025/03/202503111818954.png)
 
   - 重启prometheus
 
@@ -110,7 +110,7 @@
 
     重启之后，http://{ip/domain-name}:9090/prometheus可以访问。
 
-- ​ **Step 2 配置nginx**：
+-  **Step 2 配置nginx**：
 
   默认服务器已经安装了nginx。
 
@@ -405,7 +405,7 @@ spec:
 
 ## Configuring Prometheus
 
-​ 配置文件为prometheus.yml，文件格式为yaml。
+ 配置文件为prometheus.yml，文件格式为yaml。
 
 ## Concepts
 
@@ -505,7 +505,7 @@ Prometheus 可以通过两种方式来集成远程存储。
 
 用户可以在 Prometheus 配置文件中指定 Remote Write（远程写）的 URL 地址，一旦设置了该配置项，Prometheus 将采集到的样本数据通过 HTTP 的形式发送给适配器（Adaptor）。而用户则可以在适配器中对接外部任意的服务。外部服务可以是真正的存储系统，公有云的存储服务，也可以是消息队列等任意形式。
 
-![img](https://fs.poneding.com/images/IA5eOL.jpg)
+![img](https://images.poneding.com/2025/03/202503111818654.jpg)
 
 #### Remote Read
 
@@ -517,7 +517,7 @@ Prometheus 可以通过两种方式来集成远程存储。
 >
 > 启用远程读设置后，Prometheus 仅从远程存储读取一组时序样本数据（根据标签选择器和时间范围），对于规则文件的处理，以及 Metadata API 的处理都只基于 Prometheus 本地存储完成。这也就意味着远程读在扩展性上有一定的限制，因为所有的样本数据都要首先加载到 Prometheus Server，然后再进行处理。所以 Prometheus 暂时不支持完全分布式处理。
 
-![image](https://fs.poneding.com/images/0irUuL.jpg)
+![image](https://images.poneding.com/2025/03/202503111818235.jpg)
 
 远程读和远程写协议都使用了基于 HTTP 的 snappy 压缩协议的缓冲区编码，目前还不稳定，在以后的版本中可能会被替换成基于 HTTP/2 的 `gRPC` 协议，前提是 Prometheus 和远程存储之间的所有通信都支持 HTTP/2。
 

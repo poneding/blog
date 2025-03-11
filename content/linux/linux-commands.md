@@ -457,7 +457,7 @@ exp1, exp2
 find base_path -print
 ```
 
-![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://fs.poneding.com/images/1-18.png)
+![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://images.poneding.com/2025/03/202503112119852.png)
 
 补充：根据文件名和正则表达式进行搜索，使用选项 -name 或 -iname (忽略大小写)：
 
@@ -467,11 +467,11 @@ find base_path -name ‘xxx’ -print
 find base_path -iname ’xxx‘ -print
 ```
 
-![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://fs.poneding.com/images/2-11.png)
+![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://images.poneding.com/2025/03/202503112119315.png)
 
 **否定参数，可以用 ！排除所指定到的模式**：
 
-![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://fs.poneding.com/images/3-11.png)
+![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://images.poneding.com/2025/03/202503112119672.png)
 
 此处将打印出除 txt 文本文件外的的所有文件。
 
@@ -479,11 +479,11 @@ find base_path -iname ’xxx‘ -print
 
 find 命令指定遍历完所有的子目录。使用 -maxdepth 和-mindefth 可以限制 find 命令遍历的目录深度，并且 find 命令默认不搜索符号链接，可以用 -L 选项改变这种行为。
 
-![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://fs.poneding.com/images/4-9.png)
+![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://images.poneding.com/2025/03/202503112120517.png)
 
 例如-maxdepth的参数为1时，只匹配当前目录下。
 
-![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://fs.poneding.com/images/5-11.png)
+![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://images.poneding.com/2025/03/202503111824171.png)
 
 -mindepth 的参数代表了开始进行匹配的目录到 base_path 的最短距离。
 
@@ -491,7 +491,7 @@ find 命令指定遍历完所有的子目录。使用 -maxdepth 和-mindefth 可
 
 使用 -type 可以指定搜索的文件类型，linux/unix 将所有的的一切都视为文件（文件类型有：普通文件 f，目录 d，符号链接 l，字符设备 c，块设备 b，套接字 s，FIFO-p），使用 -type 选项我们能够对文件类型进行过滤。
 
-![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://fs.poneding.com/images/6-10.png)
+![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://images.poneding.com/2025/03/202503111824383.png)
 
 此处就会只匹配出特定项下的所有普通文件，和目录。
 
@@ -499,13 +499,13 @@ find 命令指定遍历完所有的子目录。使用 -maxdepth 和-mindefth 可
 
 Linux/Unix 文件系统中的每一个文件都有三种时间戳，访问时间（-atime）,修改时间（-mtime）,变化时间（-ctime）,单位为天数，用整数指定，数字前加上+，表示大于这个时间；加上-，表示小于这个天数；不加表示刚好这个天数。
 
-![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://fs.poneding.com/images/7-8.png)
+![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://images.poneding.com/2025/03/202503111824054.png)
 
 此处的文件是我在进行截图之前才创建的，访问，修改，变化时间均小于一天。
 
 当然相应的用分钟作为单位就可以用选项 (-amin）(-mmin)(-cmin)，如下我们测试修改时间
 
-![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://fs.poneding.com/images/8-6.png)
+![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://images.poneding.com/2025/03/202503111824968.png)
 
 **基于文件大小的搜索**：
 
@@ -513,11 +513,11 @@ find 提供了指定文件大小的单位选项进而搜索符合大小文件的
 
 在搜索之前我们先用 ls（list）指令来查看下当前目录下的文件信息：
 
-![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://fs.poneding.com/images/9-5.png)
+![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://images.poneding.com/2025/03/202503111825456.png)
 
 信息的第五列就是各文件目录的大小（字节），我们通过指定匹配条件来搜索：
 
-![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://fs.poneding.com/images/10-4.png)
+![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://images.poneding.com/2025/03/202503111825825.png)
 
 经过测试，在开始目录下，文件类型为普通目录，文件大小大于30个字节的文件就是zl.txt了
 
@@ -527,7 +527,7 @@ find 提供了指定文件大小的单位选项进而搜索符合大小文件的
 
 我们仍然可参考⑥中的所有文件信息的第一列，此处需要掌握一定关于文件权限的知识。如下我们查找权限为 644 的普通文件，即用户可读写，组用户可读，其他可读。
 
-![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://fs.poneding.com/images/11-5.png)
+![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://images.poneding.com/2025/03/202503111825040.png)
 
 也可以用选项 -user,匹配指定用户所拥有的文件，参数为用户名或者UID
 
@@ -535,19 +535,19 @@ find 提供了指定文件大小的单位选项进而搜索符合大小文件的
 
 比如删除文件，使用 -delete 选项;删除测试目录下所有的 .txt 普通文件
 
-![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://fs.poneding.com/images/12-4.png)
+![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://images.poneding.com/2025/03/202503111825034.png)
 
 还可以利用 -exec 选项结合其他命令对文件进行更高效的操作，更改文件的所属权，复制文件等，find 命令使用一对花括号 {} 代表文件名，对于每一个匹配到的文件，find 命令会将{}替换成相应的文件名; 如果 -exec 的命令有多个参数时，需要注意结尾使用 " \; " 或者 "+",前者表示进行转义，不然系统会以为是 find 命令的结尾。
 
 我们将测试目录下的所有的 .txt 文件由用户 lihongbo 转换到用户 litao999，我们必须以 root 用户进行此操作，chown 用于更改权限：
 
-![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://fs.poneding.com/images/13-4.png)
+![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://images.poneding.com/2025/03/202503111825157.png)
 
 **指定 find 跳过特定的目录**：
 
 使用 -prune 选项可以跳过我们在搜寻的的一些明显我们不需要的目录
 
-![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://fs.poneding.com/images/14-4.png)
+![Linux/Unix重要find命令详解Linux/Unix重要find命令详解](https://images.poneding.com/2025/03/202503111825429.png)
 
 跳过了 ./test1 目录
 

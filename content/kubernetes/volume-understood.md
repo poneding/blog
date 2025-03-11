@@ -14,7 +14,7 @@
 
 容器与 Volume 的简单关系：
 
-![image-20200623123450872](https://fs.poneding.com/images/image-20200623123450872.png)
+![image-20200623123450872](https://images.poneding.com/2025/03/202503112117035.png)
 
 ## Volume 定义
 
@@ -90,7 +90,7 @@ volumes:
 
 hostPath 卷指向节点文件系统上的特定文件或目录，如果多个 Pod 运行在同一节点，并且指向相同的卷路径，则他们看的文件是相同的。
 
-![image-20200623145055913](https://fs.poneding.com/images/image-20200623145055913.png)
+![image-20200623145055913](https://images.poneding.com/2025/03/202503112117641.png)
 
 hostPath 类型的 Volume 的生命周期不受Pod限制，Pod 被删除，hostPath 下的文件仍然保留。由于 hostPath 数据只会保留在节点上，当 Pod 被重新调度到其他节点时，相对来说数据是丢失的。一般可以使用 hostPath 作为 DaemonSet（每个匹配节点都调度一个 Pod）管理的 Pod 的 Volume。
 

@@ -2,7 +2,7 @@
 
 # Jaeger
 
-![presentation](https://fs.poneding.com/images/jaeger-logo.a7093b12.svg)
+![presentation](https://images.poneding.com/2025/03/202503111815421.svg)
 
 ## 前言
 
@@ -29,8 +29,6 @@ Jaeger，受Dapper和OpenZipkin启发，由Uber开源的一个分布式跟踪系
 
 ## 基础概念
 
-![Traces And Spans](https://fs.poneding.com/images/spans-traces.png)
-
 - **Span**：
 
   跨度，是跨服务的一次调用。包含名称，开始时间和截止时间，Span之间可以并列，也可以嵌套。
@@ -47,7 +45,7 @@ Jaeger，受Dapper和OpenZipkin启发，由Uber开源的一个分布式跟踪系
 
 ### 组件介绍
 
-![Architecture](https://fs.poneding.com/images/architecture-v1.png)
+![Architecture](https://images.poneding.com/2025/03/202503111815562.png)
 
 - **jaeger-client**：
 

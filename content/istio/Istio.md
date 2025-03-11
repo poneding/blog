@@ -53,7 +53,7 @@ export PATH=$PWD/bin:$PATH
 
 ## 架构
 
-![Istio 应用的整体架构](https://fs.poneding.com/images/arch.svg)
+![Istio 应用的整体架构](https://images.poneding.com/2025/03/202503111822872.svg)
 
 ### 数据面板
 

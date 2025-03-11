@@ -12,25 +12,25 @@
 
 进入Gitlab仓库，依次从左边菜单栏Operations => Kubernetes进入添加页面，点击Add Kubernetes cluster按钮。这种方式添加的K8s集群只对该项目仓库有效。
 
-![image-20200720173119837](https://fs.poneding.com/images/image-20200720173119837.png)
+![image-20200720173119837](https://images.poneding.com/2025/03/202503112117375.png)
 
 **第二种方式，基于Group添加K8s集群**：
 
 进入Gitlab主页，依次从上边菜单栏Groups => Your groups，选择Group进入页面，然后依次从左边菜单栏Kuberentes进入添加页面，点击Add Kubernetes cluster。这种方式添加的K8s集群对该Group下的项目仓库有效。
 
-![image-20200720173146103](https://fs.poneding.com/images/image-20200720173146103.png)
+![image-20200720173146103](https://images.poneding.com/2025/03/202503112118063.png)
 
 **第三种方式，基于全局添加K8s集群**：
 
 这种方式需要用到gitlab的root权限。进入Gitlab主页，从上边菜单栏Admin Area(扳手图标) 进入页面，然后依次从左边菜单栏Kuberentes进入添加页面，点击Add Kubernetes cluster。这种方式添加的K8s集群对所有项目仓库有效。
 
-![image-20200722175155838](https://fs.poneding.com/images/image-20200722175155838.png)
+![image-20200722175155838](https://images.poneding.com/2025/03/202503112118932.png)
 
 ### 添加步骤
 
 添加已有的K8s集群，按照如下步骤获取到对应的值填入表单即可。
 
-![image-20200722175602233](https://fs.poneding.com/images/image-20200722175602233.png)
+![image-20200722175602233](https://images.poneding.com/2025/03/202503112118135.png)
 
 - **Cluster Name**：
 
@@ -94,11 +94,11 @@ kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | gre
 
 添加完K8s集群之后，在集群中安装Helm Tiller。
 
-![image-20200723162157505](https://fs.poneding.com/images/image-20200723162157505.png)
+![image-20200723162157505](https://images.poneding.com/2025/03/202503112118832.png)
 
 安装完Helm Tiller之后，再安装Helm TIller下面的Runner。
 
-![image-20200723162635775](https://fs.poneding.com/images/image-20200723162635775.png)
+![image-20200723162635775](https://images.poneding.com/2025/03/202503112118258.png)
 
 之后，你可以发现K8s资源中多了一个`gitlab-managed-apps`命令空间，并且在该命名空间下，包含了tiller和runner的一些资源。
 
@@ -108,13 +108,13 @@ kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | gre
 
 在Group或项目仓库下都可以，Settings => CI / CD => Runners 获取到Url和Token。
 
-![image-20200729154127626](https://fs.poneding.com/images/image-20200729154127626.png)
+![image-20200729154127626](https://images.poneding.com/2025/03/202503112118656.png)
 
 从这里下载values.yaml文件：<https://gitlab.com/gitlab-org/charts/gitlab-runner/blob/master/values.yaml>
 
 下载完之后，将上面获取到的Url和Token替换文件中gitlabUrl和runnerRegistrationToken值。
 
-![image-20200729154743876](https://fs.poneding.com/images/image-20200729154743876.png)
+![image-20200729154743876](https://images.poneding.com/2025/03/202503112118281.png)
 
 然后使用helm命令安装Gitlab Runner：
 
@@ -128,11 +128,11 @@ helm install -n gitlab-managed-apps <gitlab-runner-name> -f values.yaml gitlab/g
 
 在安装了之后，查看安装的Gitlab Runner：
 
-![image-20200730174432289](https://fs.poneding.com/images/image-20200730174432289.png)
+![image-20200730174432289](https://images.poneding.com/2025/03/202503112118127.png)
 
 此时，进入Gitlab Group页面 Setting => CI / CD => Runners下可以看到有一个可用的Group Runner。
 
-![image-20200730174330210](https://fs.poneding.com/images/image-20200730174330210.png)
+![image-20200730174330210](https://images.poneding.com/2025/03/202503112118073.png)
 
 ## 一些经验
 
@@ -142,7 +142,7 @@ helm install -n gitlab-managed-apps <gitlab-runner-name> -f values.yaml gitlab/g
 
    同一个K8s集群可以被同一个Gitlab服务多次添加，但是Helm Tiller和Runner是不能多次安装的，这是因为安装Helm Tiller和Gitlab Runner创建K8s资源（gitlab-managed-apps命名空间下的Deployment）会冲突。
 
-![image-20200729113424514](https://fs.poneding.com/images/image-20200729113424514.png)
+![image-20200729113424514](https://images.poneding.com/2025/03/202503112118144.png)
 
 2. Gitlab Runner的作用域
 
@@ -156,7 +156,7 @@ helm install -n gitlab-managed-apps <gitlab-runner-name> -f values.yaml gitlab/g
 
    如果使用Root权限基于全局添加了一个K8s集群，并且安装了Gitlab Runner之后，随便进入一个项目仓库 Settings => CI / CD => Runners下面可以看到Shared Runners下面会有一个可用的Runner，如下图所示。你可能注意到了这个Runner默认有两个Tag：`cluster`，`kubernetes`，这两个Tag的作用下次将会使用到。
 
-   ![image-20200729114046476](https://fs.poneding.com/images/image-20200729114046476.png)
+   ![image-20200729114046476](https://images.poneding.com/2025/03/202503112118678.png)
 
 ## 结束语
 

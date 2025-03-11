@@ -38,7 +38,7 @@ const addCount = ()=> count.value++
 
 ## 2. Vue3更多的优势
 
-![image.png](https://fs.poneding.com/images/202308300812214.png)
+![image.png](https://images.poneding.com/2025/03/202503111813196.png)
 
 # 使用create-vue搭建Vue3项目
 
@@ -46,7 +46,7 @@ const addCount = ()=> count.value++
 
 > create-vue是Vue官方新的脚手架工具，底层切换到了 vite （下一代前端工具链），为开发提供极速响应
 
-![image.png](https://fs.poneding.com/images/202308300812251.png)
+![image.png](https://images.poneding.com/2025/03/202503111813320.png)
 
 ## 2. 使用create-vue创建项目
 
@@ -58,11 +58,11 @@ const addCount = ()=> count.value++
 npm init vue@latest
 ```
 
-![image.png](https://fs.poneding.com/images/202308300812276.png)
+![image.png](https://images.poneding.com/2025/03/202503111813545.png)
 
 # 熟悉项目和关键文件
 
-![image.png](https://fs.poneding.com/images/202308300812369.png)
+![image.png](https://images.poneding.com/2025/03/202503111814789.png)
 
 # 组合式API - setup选项
 
@@ -87,7 +87,7 @@ npm init vue@latest
 
 > 在beforeCreate钩子之前执行
 
-![image.png](https://fs.poneding.com/images/202308300812435.png)
+![image.png](https://images.poneding.com/2025/03/202503111814747.png)
 
 ## 2. setup中写代码的特点
 
@@ -293,7 +293,7 @@ const filterList = computed(item=>item > 2)
 
 ## 1. 选项式对比组合式
 
-![image.png](https://fs.poneding.com/images/202308300812487.png)
+![image.png](https://images.poneding.com/2025/03/202503111819869.png)
 
 ## 2. 生命周期函数基本使用
 
@@ -335,7 +335,7 @@ onMounted(()=>{
 > 1. 父组件中给子组件绑定属性
 > 2. 子组件内部通过props选项接收数据
 
-![image.png](https://fs.poneding.com/images/202308300812783.png)
+![image.png](https://images.poneding.com/2025/03/202503111819668.png)
 
 ## 2. 子传父
 
@@ -344,7 +344,7 @@ onMounted(()=>{
 > 1. 父组件中给子组件标签通过@绑定事件
 > 2. 子组件内部通过 emit 方法触发事件
 
-![image.png](https://fs.poneding.com/images/202308300812819.png)
+![image.png](https://images.poneding.com/2025/03/202503111819602.png)
 
 # 组合式API - 模版引用
 
@@ -357,14 +357,14 @@ onMounted(()=>{
 > 1. 调用ref函数生成一个ref对象
 > 2. 通过ref标识绑定ref对象到标签
 
-![image.png](https://fs.poneding.com/images/202308300812872.png)
+![image.png](https://images.poneding.com/2025/03/202503111820141.png)
 
 ## 2. defineExpose
 
 > 默认情况下在 `<script setup>` 语法糖下组件内部的属性和方法是不开放给父组件访问的，可以通过defineExpose编译宏指定哪些属性和方法容许访问
 > 说明：指定testMessage属性可以被访问到
 
-![image.png](https://fs.poneding.com/images/202308300812887.png)
+![image.png](https://images.poneding.com/2025/03/202503111820688.png)
 
 # 组合式API - provide和inject
 
@@ -372,7 +372,7 @@ onMounted(()=>{
 
 > 顶层组件向任意的底层组件传递数据和方法，实现跨层组件通信
 
-![image.png](https://fs.poneding.com/images/202308300812925.png)
+![image.png](https://images.poneding.com/2025/03/202503111820323.png)
 
 ## 2. 跨层传递普通数据
 
@@ -381,23 +381,23 @@ onMounted(()=>{
 > 1. 顶层组件通过 `provide` 函数提供数据
 > 2. 底层组件通过 `inject` 函数提供数据
 
-![image.png](https://fs.poneding.com/images/202308300812989.png)
+![image.png](https://images.poneding.com/2025/03/202503111820873.png)
 
 ## 3. 跨层传递响应式数据
 
 > 在调用provide函数时，第二个参数设置为ref对象
 
-![image.png](https://fs.poneding.com/images/202308300812275.png)
+![image.png](https://images.poneding.com/2025/03/202503111820827.png)
 
 ## 4. 跨层传递方法
 
 > 顶层组件可以向底层组件传递方法，底层组件调用方法修改顶层组件的数据
 
-![202308300812363](https://fs.poneding.com/images/202308300812363.png)
+![202308300812363](https://images.poneding.com/2025/03/202503111820765.png)
 
 # 综合案例
 
-![image.png](https://fs.poneding.com/images/202308300812389.png)
+![image.png](https://images.poneding.com/2025/03/202503111820808.png)
 
 ## 1. 项目地址
 

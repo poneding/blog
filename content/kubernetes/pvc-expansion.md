@@ -12,7 +12,7 @@ kubectl edit pvc <pvc-name> -n <namespace>
 
 执行过程中发现，无法对该 PVC 进行动态扩容，需要分配 PVC 存储的 StorageClass 支持动态扩容。
 
-![image-20200905152418894](https://fs.poneding.com/images/image-20200905152418894.png)
+![image-20200905152418894](https://images.poneding.com/2025/03/202503111832997.png)
 
 那么怎么是的 StorageClass 支持动态扩容呢，很简单，更新 StorageClass 即可。
 

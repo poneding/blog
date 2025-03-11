@@ -249,8 +249,6 @@ PING www.baidu.com (14.215.177.39): 56 data bytes
 
 可以正常解析。
 
-![image](https://fs.poneding.com/images/white.jpg)
-
 ---
 [« K3s](k3s.md)
 

@@ -37,7 +37,7 @@ localtion [ = | ~ | ~* | ^~] uri {
 
 将负载分摊到不同的服务单元，保证服务的快速响应，高可用。
 
-![image-20200216174849571](https://fs.poneding.com/images/image-20200216174849571.png)
+![image-20200216174849571](https://images.poneding.com/2025/03/202503111815006.png)
 
 ```nginx
 upstream myserver {
@@ -113,7 +113,7 @@ server {
  }
 ```
 
-![image-20200610124408207](https://fs.poneding.com/images/image-20200610124408207.png)
+![image-20200610124408207](https://images.poneding.com/2025/03/202503111815237.png)
 
 ## Nginx常用命令
 

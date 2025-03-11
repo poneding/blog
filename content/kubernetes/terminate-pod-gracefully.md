@@ -2,7 +2,7 @@
 
 # Kubernetes 0-1 使用preStop优雅终止Pod
 
-![image](https://fs.poneding.com/images/kubernetes.png)
+![image](https://images.poneding.com/2025/03/202503111830216.png)
 
 Kubernetes允许Pod终止之前，执行自定义逻辑。
 
@@ -130,7 +130,7 @@ Pod的终止过程：
 
 删除Pod => Pod被标记为Terminating状态 => Service移除该Pod的endpoint => kubelet甄别Terminating状态的pod，执行pod的preStop钩子 => 如果执行preStop超时（grace period） ，kubelet发送SIGTERM并等待2秒 => ...
 
-![gzh](https://fs.poneding.com/images/gzh.png)
+![gzh](https://images.poneding.com/2025/03/202503111830984.png)
 
 ---
 [« Telepresence](telepresence.md)

@@ -2,7 +2,7 @@
 
 # Kubernetes 0-1 K8s部署EFK
 
-![image](https://fs.poneding.com/images/k8s-efk.png)
+![image](https://images.poneding.com/2025/03/202503112119520.png)
 
 ## 写在前面
 
@@ -12,7 +12,7 @@ EFK是由ElasticSearch，Fluentd，Kibane组成的一套目前比较主流的日
 
 EFK简单的工作原理可以参考下图。通过fluentd的agent收集日志数据，写入es，kibana从es中读取日志数据展示到ui。
 
-![image-20200527093705849](https://fs.poneding.com/images/image-20200527093705849.png)
+![image-20200527093705849](https://images.poneding.com/2025/03/202503112119800.png)
 
 ## 部署ElasticSearch
 

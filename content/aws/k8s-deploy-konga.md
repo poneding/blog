@@ -2,7 +2,7 @@
 
 # K8s 部署 konga
 
-![image](https://fs.poneding.com/images/konga-logo.png)
+![image](https://images.poneding.com/2025/03/202503111812495.png)
 
 本篇只涉及 konga 的部署操作，不涉及概念知识。
 
@@ -32,9 +32,9 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/ngin
 
 Step 2. 针对我们使用的 AWS 服务，并且根据你想配置的 ELB 类型选择层（L4或L7），执行以下命令
 
-​ # Layer 4: use TCP as the listener protocol for ports 80 and 443.
+ # Layer 4: use TCP as the listener protocol for ports 80 and 443.
 
-​ # Layer 7: use HTTP as the listener protocol for port 80 and terminate TLS in the ELB
+ # Layer 7: use HTTP as the listener protocol for port 80 and terminate TLS in the ELB
 
 ```shell
 # FOR Layer 4
@@ -86,7 +86,7 @@ debug: Database migrations completed!
 
 可以连接postgres发现你的数据库中多出了下面这些表
 
-![image-20200316134405073](https://fs.poneding.com/images/image-20200316134405073.png)
+![image-20200316134405073](https://images.poneding.com/2025/03/202503111812709.png)
 
 ## K8s 资源文件
 
@@ -210,9 +210,9 @@ kubectl apply -f konga-ingress.yaml
 
 在以上创建命令执行后大概1-2分钟，浏览器访问 <http://konga.example.com，出现konga注册页面说明已经部署成功。>
 
-![image-20200316171055384](https://fs.poneding.com/images/image-20200316171055384.png)
+![image-20200316171055384](https://images.poneding.com/2025/03/202503111825159.png)
 
-![image-20200316124621295](https://fs.poneding.com/images/image-20200316124621295.png)
+![image-20200316124621295](https://images.poneding.com/2025/03/202503111825831.png)
 
 ---
 [« K8s 部署 Kong 服务](k8s-deploy-kong.md)

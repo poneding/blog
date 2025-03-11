@@ -34,7 +34,7 @@
    sudo mongo
    ```
 
-   ![1571038757101](https://fs.poneding.com/images/1571038757101.png)
+   ![1571038757101](https://images.poneding.com/2025/03/202503111821763.png)
 
    使用 db.createUser 命令创建 dba 用户,为 dba 用户添加所有 database 的管理员权限；
 
@@ -63,11 +63,11 @@
    sudo vim /etc/mongod.conf
    ```
 
-   mongod.conf 文件原始内容：![1571038597551](https://fs.poneding.com/images/1571038597551.png)
+   mongod.conf 文件原始内容：![1571038597551](https://images.poneding.com/2025/03/202503111821215.png)
 
    mongod.conf 修改后内容：
 
-   ![1571039525063](https://fs.poneding.com/images/1571039525063.png)
+   ![1571039525063](https://images.poneding.com/2025/03/202503111821409.png)
 
    > 注意：如果仅仅是将 bindIPAll 配置为 true，即允许外部网络网络，而没有开启权限验证，那么外部对 mongodb 拥有很大的操作权限，存在很大的安全问题。
 
@@ -119,7 +119,7 @@
    >db.temp.insert({"name":"devops.mongodb"})
    ```
 
-   ![1571046400329](https://fs.poneding.com/images/1571046400329.png)
+   ![1571046400329](https://images.poneding.com/2025/03/202503111821212.png)
 
    > 注意：
    >
@@ -150,7 +150,7 @@ db.getCollection('test').find({"name":{$regex:/dp/i}})
 /dp/i 忽略大小写
 ```
 
-​ python mongo 查询
+ python mongo 查询
 
 ```sql
 test._get_collection().find(
@@ -165,7 +165,7 @@ test._get_collection().find(
 db.getCollection('test').find({"name":{$not:/dp/i}}) 
 ```
 
-​ python mongo 查询
+ python mongo 查询
 
 ```python
 import re

@@ -22,7 +22,7 @@ kubectl create configmap first-config --from-literal=user=admin
 
 创建完成之后，使用 `kubectl describe configmap first-config` 查看，可以看到这个 configmap 的键值内容。
 
-![image-20200703102551743](https://fs.poneding.com/images/image-20200703102551743.png)
+![image-20200703102551743](https://images.poneding.com/2025/03/202503111831207.png)
 
 > 可以使用多组 `--from-literal=<key>=<value>` 参数，在 configmap 中定义多组键值对。
 
@@ -45,7 +45,7 @@ kubectl create configmap second-config --from-file=app.json
 
 创建完成之后，使用 `kubectl describe configmap second-config` 查看 configmap 的键值内容：
 
-![image-20200703114012333](https://fs.poneding.com/images/image-20200703114012333.png)
+![image-20200703114012333](https://images.poneding.com/2025/03/202503111831141.png)
 
 > 默认使用文件名称 app.json 作为键值对的 key，也可以通过 `--from-file=app_config=app.json` 指定key为 `app_config`；
 >
@@ -263,13 +263,13 @@ kubectl apply -f mockapi-pod.yaml
 
 等待 mockapi 的 Pod 起来之后，我们调用 `http://<pod-ip>/configuration/mysettings` 查看挂载的配置文件是否生效：
 
-![image-20200703145347110](https://fs.poneding.com/images/image-20200703145347110.png)
+![image-20200703145347110](https://images.poneding.com/2025/03/202503111831964.png)
 
 >mockapi 应用访问 `/configuration/mysettings` 会获取 app.json 和 secret.json 里面的总共四个配置项，然后输出到客户端。
 
 可以看到，已经获取到了 ConfigMap 里面的配置，进入容器也可以看到里面的问题件内容：
 
-![image-20200703145553692](https://fs.poneding.com/images/image-20200703145553692.png)
+![image-20200703145553692](https://images.poneding.com/2025/03/202503111831239.png)
 
 **修改 ConfigMap 自动更新挂载文件**：
 
@@ -301,7 +301,7 @@ kubectl apply -f mockapi-mysettings.yaml
 
 配置文件的更新需要 1-2 分钟的时间，我们可以连续观察文件的更新情况：
 
-![image-20200703150408425](https://fs.poneding.com/images/image-20200703150408425.png)
+![image-20200703150408425](https://images.poneding.com/2025/03/202503111831636.png)
 
 可以看到，过段时间后配置文件更新了。
 
@@ -332,11 +332,11 @@ kubectl apply -f mockapi-mysettings.yaml
 
 这时候，我们继续访问 `/configuration/mysettings`：
 
-![image-20200703165501675](https://fs.poneding.com/images/image-20200703165501675.png)
+![image-20200703165501675](https://images.poneding.com/2025/03/202503111831736.png)
 
 很遗憾的发现，我们的 `app.json` 的配置项都失效了，我们接着去容器中一探究竟：
 
-![image-20200703165644716](https://fs.poneding.com/images/image-20200703165644716.png)
+![image-20200703165644716](https://images.poneding.com/2025/03/202503111831387.png)
 
 原来，app.json 文件已经不存在了。
 
@@ -378,7 +378,7 @@ kubectl apply -f mockapi-pod.yaml
 
 等待Pod运行后，我们访问 `/configuration/mysettings`，并查看 mysettings 目录下文件：
 
-![image-20200703170634355](https://fs.poneding.com/images/image-20200703170634355.png)
+![image-20200703170634355](https://images.poneding.com/2025/03/202503111831822.png)
 
 可以看到成功的挂载 `secret.json` 文件而没有挂载 `app.json` 文件，[From ConfigMap] 就是证明。
 

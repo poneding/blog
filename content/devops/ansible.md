@@ -19,13 +19,13 @@
 
 ## 安装
 
-​ 由于Ansible使用Python开发，所以可以直接使用pip安装
+ 由于Ansible使用Python开发，所以可以直接使用pip安装
 
 ```shell
 pip install ansible
 ```
 
-​ 也可以使用yum或apt-get安装
+ 也可以使用yum或apt-get安装
 
 ```shell
 yum install ansible -y
@@ -34,7 +34,7 @@ apt-get install ansible -y
 ansible --version
 ```
 
-​ 只需要在Control Node上安装即可。
+ 只需要在Control Node上安装即可。
 
 ## 主要概念
 
@@ -56,29 +56,29 @@ ansible --version
 
 - **Tasks**：
 
-  ![image-20191126103012999](https://fs.poneding.com/images/image-20191126103012999.png)
+  ![image-20191126103012999](https://images.poneding.com/2025/03/202503111819577.png)
 
 ## Ansible配置
 
-​ 配置文件位置：/etc/ansible/ansible.cfg，为ini格式文件。
+ 配置文件位置：/etc/ansible/ansible.cfg，为ini格式文件。
 
 ### 配置示例
 
-​ inventory：主机清单配置文件位置，在使用Ansible命令时，也开始`-i <path>`指定；
+ inventory：主机清单配置文件位置，在使用Ansible命令时，也开始`-i <path>`指定；
 
-​ host_key_checking：当know_hosts中不存在的主机（即尚未访问过的主机，是否需要输入密钥）；
+ host_key_checking：当know_hosts中不存在的主机（即尚未访问过的主机，是否需要输入密钥）；
 
-​ become_user：sudo用户；
+ become_user：sudo用户；
 
-![image-20191126091436329](https://fs.poneding.com/images/image-20191126091436329.png)
+![image-20191126091436329](https://images.poneding.com/2025/03/202503111819706.png)
 
 ## 主机清单(Inventory)
 
-​ 在一个ini或yaml文件中管理`Managed nodes`清单，默认安装`ansible`后，在`/etc/ansible/hosts`文件中管理（后文统一称之为主机清单文件），一般是将`maneged nodes`的ip address或host name等信息存储到主机清单文件中。
+ 在一个ini或yaml文件中管理`Managed nodes`清单，默认安装`ansible`后，在`/etc/ansible/hosts`文件中管理（后文统一称之为主机清单文件），一般是将`maneged nodes`的ip address或host name等信息存储到主机清单文件中。
 
 ### Formats
 
-​ 主机清单文件格式兼容两种：
+ 主机清单文件格式兼容两种：
 
 - ini，因为配置方便简单，一般常选。
 
@@ -105,11 +105,11 @@ ansible --version
 
 ### Hosts
 
-​ 配置需要管理的主机host name或ip address。
+ 配置需要管理的主机host name或ip address。
 
 ### Group
 
-​ 如果想管理某一批主机，可以将这多个host配置到统一个group下。方便对这组主机的批量管理。
+ 如果想管理某一批主机，可以将这多个host配置到统一个group下。方便对这组主机的批量管理。
 
 ```shell
 [webserver]
@@ -135,7 +135,7 @@ ansible_ssh_user=ubuntu
 
 #### Nested group
 
-​ 一个组包含其他组。
+ 一个组包含其他组。
 
 ```shell
 [allserver:children]
@@ -170,7 +170,7 @@ ansible_ssh_private_key_file=~/singapore.pem
 
 ## 模块(Modules)
 
-​ Ansible功能的单元，一个Ansible功能对应有一个Module。
+ Ansible功能的单元，一个Ansible功能对应有一个Module。
 
 ### 常用模块
 
@@ -210,7 +210,7 @@ ansible servers -m copy -a 'src=test2.txt dest=~/temp/test2.txt'  # 拷贝文件
 
 #### [command](https://docs.ansible.com/ansible/latest/modules/command_module.html#command-module)
 
-​ 直接要求主机清单执行命令。
+ 直接要求主机清单执行命令。
 
 ```
 ansible servers -m command -a "touch ~/temp/test3.txt"
@@ -223,7 +223,7 @@ ansible servers -m command -a "sudo apt autoremove nginx -y"
 
 #### [shell](https://docs.ansible.com/ansible/latest/modules/shell_module.html#shell-module)
 
-​ 可以先编辑shell脚本，然后要求主机清单执行shell脚本里的命令。
+ 可以先编辑shell脚本，然后要求主机清单执行shell脚本里的命令。
 
 ```
 - name: Execute the command in remote shell; stdout goes to the specified file on the remote.
@@ -244,7 +244,7 @@ ansible servers -m command -a "sudo apt autoremove nginx -y"
 
 #### [apt]( https://docs.ansible.com/ansible/latest/modules/apt_module.html#apt-module )
 
-​ ubuntu/debian 包、应用管理。
+ ubuntu/debian 包、应用管理。
 
 > **update_cache** : yes/no，默认no，操作之前是否 apt-get update
 >
@@ -273,11 +273,11 @@ ansible servers -m apt -a "name=nginx state=absent autoremove=yes autoclean=yes"
 
 #### yum
 
-​ CentOs管理程序包。
+ CentOs管理程序包。
 
 #### [service](https://docs.ansible.com/ansible/latest/modules/service_module.html#service-module)
 
-​  管理服务的模块，用来启动、停止、重启服务。
+  管理服务的模块，用来启动、停止、重启服务。
 
 > **enabled** :yes/no，默认no.是否开机启动。
 >
@@ -306,7 +306,7 @@ ansible servers -m service -a "name=nginx state=stoped"
 
 #### unarchive
 
-​ 解压缩。
+ 解压缩。
 
 #### git
 
@@ -316,9 +316,9 @@ ansible servers -m service -a "name=nginx state=stoped"
 
 ## 任务(Tasks)
 
-​ Ansible执行的单元，一般放在Playbook中，多个Task一起执行，使用方便，可复用。
+ Ansible执行的单元，一般放在Playbook中，多个Task一起执行，使用方便，可复用。
 
-​ 定义方式：
+ 定义方式：
 
 ```
 -name: names
@@ -411,7 +411,7 @@ ansible <hosts> -m <module_name> -a <arguments> -i <hosts_path>
 
 ### Anisble playbook
 
-​ 预先定义好所有需要执行的操作，形成一个脚本文件，执行该脚本文件即可，方便管理和复用。
+ 预先定义好所有需要执行的操作，形成一个脚本文件，执行该脚本文件即可，方便管理和复用。
 
 ```shell
 ansible-playbook -i <hosts_path> <playbook_path>
@@ -500,7 +500,7 @@ ansible webserver --list-hosts
 
 ## Ansible原理
 
-![image-20191128160037603](https://fs.poneding.com/images/image-20191128160037603.png)
+![image-20191128160037603](https://images.poneding.com/2025/03/202503111819587.png)
 
 > ansible命令
 >

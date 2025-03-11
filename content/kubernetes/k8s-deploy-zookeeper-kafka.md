@@ -2,7 +2,7 @@
 
 # Kubernetes 0-1 K8s部署Zookeeper和Kafka
 
-![image](https://fs.poneding.com/images/kubernetes_kafka_1.png)
+![image](https://images.poneding.com/2025/03/202503112116228.png)
 
 按照官方定义，Kafka是一个分布式的流处理平台。更多了解官方文档：<http://kafka.apachecn.org/intro.html>
 
