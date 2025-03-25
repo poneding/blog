@@ -140,10 +140,6 @@
 
 - [gRPC 实战](grpc/gRPC.md)
 
-## images
-
-- [CHAJIAN.md](images/CHAJIAN.md)
-
 ## Istio
 
 - [Istio](istio/Istio.md)
