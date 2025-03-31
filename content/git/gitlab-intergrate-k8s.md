@@ -12,7 +12,7 @@
 
 登入 gitlab 后，进入自己的项目主页，菜单栏 Operations => Kubernetes => Add Kubernetes cluster，选择页签 Add existing cluster。
 
-![alt text](https://images.poneding.com/2025/03/202503111811700.png)
+![alt text](https://images.pding.top/2025/03/202503111811700.png)
 
 我们只需要获取响应的值填录到该表单即可。Kubernetes cluster name 集群名称随意填，Project namespace 可不填。
 

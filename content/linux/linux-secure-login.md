@@ -2,7 +2,7 @@
 
 # Linux-安全登录
 
-![alt text](https://images.poneding.com/2025/03/202503111825245.jpg)
+![alt text](https://images.pding.top/2025/03/202503111825245.jpg)
 
 我们都知道
 

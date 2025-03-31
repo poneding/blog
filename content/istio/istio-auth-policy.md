@@ -6,7 +6,7 @@
 
 由于服务网格的 Sidecar 设计模式，每个工作负载都会有一个 Envoy 代理，而每个代理都运行着授权引擎，以此给请求授权。授权引擎依靠授权策略来鉴定请求权限，返回 `ALLOW` 或 `DENY` 鉴权结果。
 
-![alt text](https://images.poneding.com/2025/03/202503111822468.svg)
+![alt text](https://images.pding.top/2025/03/202503111822468.svg)
 
 ## 授权启用
 

@@ -78,7 +78,7 @@ func TestNewService(t *testing.T) {
 }
 ```
 
-![alt text](https://images.poneding.com/2023/12/202312210911571.png)
+![alt text](https://images.pding.top/2023/12/202312210911571.png)
 
 ---
 [« Go 开发环境配置](dev-env-config.md)

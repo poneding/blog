@@ -95,11 +95,11 @@ go tool pprof -http=:6060 http://127.0.0.1:8080/debug/pprof/goroutine
 
 **内存使用**：
 
-![alt text](https://images.poneding.com/2025/03/202503111822362.png)
+![alt text](https://images.pding.top/2025/03/202503111822362.png)
 
 **goroutine 使用**：
 
-![alt text](https://images.poneding.com/2025/03/202503111822537.png)
+![alt text](https://images.pding.top/2025/03/202503111822537.png)
 
 ---
 [« Mac M1 交叉编译 CGO](mac-appl-silicon-cross-compile-cgo.md)

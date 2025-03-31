@@ -8,7 +8,7 @@
 
 简单理解起来就是，由 Service 提供统一的入口地址，然后将请求负载分发到后端 Pod 的容器应用。
 
-![alt text](https://images.poneding.com/2025/03/202503111830608.png)
+![alt text](https://images.pding.top/2025/03/202503111830608.png)
 
 ### 为什么有 Service
 
@@ -82,7 +82,7 @@ kubectl describe svc nginx
 
 在创建 Sercvice 之前，我已经创建了一个带有 `app: nginx` label 的 Pod，所以可以看到 Service 的 EndPoints 中已经有了一个后端（10.244.1.25）了，Endpoint 也是一种 K8s 资源，可以使用 `kubectl get ep` 命令查看。
 
-![alt text](https://images.poneding.com/2025/03/202503111830706.png)
+![alt text](https://images.pding.top/2025/03/202503111830706.png)
 
 除了以上使用 yaml 定义 Service 之外，还可以使用以下命令创建 Service：
 

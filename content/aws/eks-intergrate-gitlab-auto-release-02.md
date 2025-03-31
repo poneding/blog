@@ -6,7 +6,7 @@
 
 上文中创建的Gitlab Runner会持续存活在EKS集群中，但是它不做具体的Pipeline任务，当有Pipeline任务来临时，由它来创建临时的Runner来执行。而临时拆功创建的Runner使用什么容器环境以及具体执行什么任务是由仓库目录下.gitlab-ci.yml文件定义的。
 
-![alt text](https://images.poneding.com/2025/03/202503111825866.png)
+![alt text](https://images.pding.top/2025/03/202503111825866.png)
 
 ## 制作Temp Runner镜像
 

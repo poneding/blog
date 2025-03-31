@@ -2,7 +2,7 @@
 
 # Jaeger
 
-![alt text](https://images.poneding.com/2025/03/202503111815421.svg)
+![alt text](https://images.pding.top/2025/03/202503111815421.svg)
 
 ## 前言
 
@@ -45,7 +45,7 @@ Jaeger，受Dapper和OpenZipkin启发，由Uber开源的一个分布式跟踪系
 
 ### 组件介绍
 
-![alt text](https://images.poneding.com/2025/03/202503111815562.png)
+![alt text](https://images.pding.top/2025/03/202503111815562.png)
 
 - **jaeger-client**：
 

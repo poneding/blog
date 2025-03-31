@@ -10,7 +10,7 @@
 2. 容量大
 3. 价格便宜
 
-![alt text](https://images.poneding.com/2024/01/202402201633457.png)
+![alt text](https://images.pding.top/2024/01/202402201633457.png)
 
 类型，自上向下分别是寄存器，高速缓存，主存（RAM），磁盘。成本与访问速度负相关。
 

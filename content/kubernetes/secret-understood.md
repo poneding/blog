@@ -17,13 +17,13 @@ Secret 会存储在 Pod 所调度的节点的内存中，而不是写入磁盘�
 
 每个 Pod 都会被自动挂载一个 Secret 卷，只需要使用 `kubectl desribe pod` 命令就能看到一个名称类似 `default-token-n4q6m` 的 Secret，Secret 也是一种 K8s 资源，所以，可以使用 `kubectl get secret` 或 `kubectl describe secret` 获取查看。
 
-![alt text](https://images.poneding.com/2025/03/202503111829748.png)
+![alt text](https://images.pding.top/2025/03/202503111829748.png)
 
-![alt text](https://images.poneding.com/2025/03/202503111829140.png)
+![alt text](https://images.pding.top/2025/03/202503111829140.png)
 
 从上面图例可以看出，Pod 默认生成的 Secret 会包含三个配置项：ca.crt、namespace、token。其实这三个配置项是 Pod 内部安全访问Kubernetes API 服务的所有信息，而在 `kubectl describe pod` 的时候，你可以看到 Secret 所挂载的具体目录在 `/var/run/secrets/kubernetes.io/serviceaccount`.
 
-![alt text](https://images.poneding.com/2025/03/202503111829987.png)
+![alt text](https://images.pding.top/2025/03/202503111829987.png)
 
 每个 Pod 会默认生成 `default-token-xxxxx` 的 Secret，可以通过在Pod 中定义 `pod.spec.automountServiceAccountToken` 为 false 来关闭这种默认行为。
 
@@ -41,7 +41,7 @@ kubectl create secret generic first-secret --from-literal=user=admin --from-lite
 
 创建完成之后，使用 `kubectl describe secret first-secret` 查看，可以看到这个 secret 的键值内容并不会直接打印出来，而是只显示了占用了多少个字节。
 
-![alt text](https://images.poneding.com/2025/03/202503111829827.png)
+![alt text](https://images.pding.top/2025/03/202503111829827.png)
 
 - 创建一个文件内容的 Secret
 
@@ -62,7 +62,7 @@ kubectl create secret generic second-secret --from-file=secret.json
 
 创建完成之后，使用 `kubectl describe secret second-secret` 查看 secret 的键值内容，同样也不会将文件内容显示出来：
 
-![alt text](https://images.poneding.com/2025/03/202503111829224.png)
+![alt text](https://images.pding.top/2025/03/202503111829224.png)
 
 > 默认使用文件名称 secret.json 作为键值对的 key，也可以通过 `--from-file=second_secret=app.json` 指定 key 为 `second_secret`；
 >
@@ -250,7 +250,7 @@ kubectl apply -f mockapi-pod.yaml
 
 一段时间后，可以验证文件是否挂载到容器：
 
-![alt text](https://images.poneding.com/2025/03/202503111829404.png)
+![alt text](https://images.pding.top/2025/03/202503111829404.png)
 
 Yeah！没毛病。
 

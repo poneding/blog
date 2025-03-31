@@ -14,7 +14,7 @@ grafana已经配置了对service.hompartners.com域名下的service访问状态�
 
 该监控面板中可以查看如userapi、emailapi等服务是否正常，当面板的网格视图中出现红点，说明访问对应的服务返回了5xx状态，即服务端异常。开发人员等可以根据该视图及时发现服务异常情况。
 
-![alt text](https://images.poneding.com/2025/03/202503111815448.png)
+![alt text](https://images.pding.top/2025/03/202503111815448.png)
 
 ## 3. Grafana添加监控5xx服务
 
@@ -30,19 +30,19 @@ grafana已经配置了对service.hompartners.com域名下的service访问状态�
 
 按如下操作创建新面板并粘贴视图。
 
-![alt text](https://images.poneding.com/2025/03/202503111816698.png)
+![alt text](https://images.pding.top/2025/03/202503111816698.png)
 
 随后会在页面呈现一个视图，这时可以先编辑面板信息，并新命名，选择面板分类，并保存面板信息。
 
-![alt text](https://images.poneding.com/2025/03/202503111816246.png)
+![alt text](https://images.pding.top/2025/03/202503111816246.png)
 
-![alt text](https://images.poneding.com/2025/03/202503111816741.png)
+![alt text](https://images.pding.top/2025/03/202503111816741.png)
 
 **Step 3 定制xxx.xxx.com http_status_5xx视图**：
 
 保存完成之后，点击左上角的回退箭头图标：<--，回到视图页面，按如下操作编辑视图。
 
-![alt text](https://images.poneding.com/2025/03/202503111818750.png)
+![alt text](https://images.pding.top/2025/03/202503111818750.png)
 
 修改查询sql语句，域名修改为要监控的域名或服务名，比如你想监控`www.example.com`域名下所有服务，那么你可以定制sql如下：
 
@@ -58,11 +58,11 @@ SELECT "service_code" FROM "service_status" WHERE ("health_code" = 500 AND "doma
 
 另外这里的health_code做了格式化，分为200和500，我们默认监控对我们有用的500状态
 
-![alt text](https://images.poneding.com/2025/03/202503111816157.png)
+![alt text](https://images.pding.top/2025/03/202503111816157.png)
 
 修改视图名称，如果有CloudWatch日志连接的需要，可以定制Panel links。
 
-![alt text](https://images.poneding.com/2025/03/202503111818552.png)
+![alt text](https://images.pding.top/2025/03/202503111818552.png)
 
 视图修改完成后，右上角保存面板。
 
@@ -82,7 +82,7 @@ SELECT "service_code" FROM "service_status" WHERE ("health_code" = 500 AND "doma
 
 之后在视图页面，可以通过伸缩视图页面，使展示更合理；通过调整时间段查看想要观察的时间段内的数据。
 
-![alt text](https://images.poneding.com/2025/03/202503111816653.png)
+![alt text](https://images.pding.top/2025/03/202503111816653.png)
 
 如果在定制过程中存在问题，也可以联系DevOps组。
 

@@ -28,6 +28,7 @@ basename $(curl -s -w %{redirect_url} https://github.com/ketches/registry-proxy/
 [![Go Doc](https://pkg.go.dev/badge/github.com/ketches/registry-proxy)](https://pkg.go.dev/github.com/ketches/registry-proxy)
 [![GitHub release](https://img.shields.io/github/v/release/ketches/registry-proxy)](https://img.shields.io/github/v/release/ketches/registry-proxy)
 [![GitHub license](https://img.shields.io/github/license/ketches/registry-proxy)](https://img.shields.io/github/license/ketches/registry-proxy)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=B)](https://github.com/ketches/registry-proxy)
 [![GitHub stars](https://img.shields.io/github/stars/ketches/registry-proxy)](https://img.shields.io/github/stars/ketches/registry-proxy)
 [![GitHub forks](https://img.shields.io/github/forks/ketches/registry-proxy)](https://img.shields.io/github/forks/ketches/registry-proxy)
 
@@ -36,6 +37,7 @@ basename $(curl -s -w %{redirect_url} https://github.com/ketches/registry-proxy/
 [![Go Doc](https://pkg.go.dev/badge/github.com/ketches/registry-proxy)](https://pkg.go.dev/github.com/ketches/registry-proxy)
 [![GitHub release](https://img.shields.io/github/v/release/ketches/registry-proxy)](https://img.shields.io/github/v/release/ketches/registry-proxy)
 [![GitHub license](https://img.shields.io/github/license/ketches/registry-proxy)](https://img.shields.io/github/license/ketches/registry-proxy)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/ketches/registry-proxy)
 [![GitHub stars](https://img.shields.io/github/stars/ketches/registry-proxy)](https://img.shields.io/github/stars/ketches/registry-proxy)
 [![GitHub forks](https://img.shields.io/github/forks/ketches/registry-proxy)](https://img.shields.io/github/forks/ketches/registry-proxy)
 ```

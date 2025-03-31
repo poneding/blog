@@ -84,7 +84,7 @@ kubernetes-dashboard        LoadBalancer   10.0.0.51    192.168.115.141   443:31
 
 > 注意：必须以https方式访问，因为dashboard是默认开启更为安全的https通信。
 
-![alt text](https://images.poneding.com/2025/03/202503111831611.png)
+![alt text](https://images.pding.top/2025/03/202503111831611.png)
 
 需要使用Token登录，使用如下命令获取token：
 
@@ -122,7 +122,7 @@ token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IjYtQW51Z2xPMi1WTmpEZEtIX3BBYXd1YWpGLVU2
 
 拿到token，拷贝到dashboard进行登录。登入后，可以看到K8s的资源信息。
 
-![alt text](https://images.poneding.com/2025/03/202503111831390.png)
+![alt text](https://images.pding.top/2025/03/202503111831390.png)
 
 Kubernetes-Dashboard部署完成。
 

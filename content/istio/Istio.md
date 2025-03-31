@@ -53,7 +53,7 @@ export PATH=$PWD/bin:$PATH
 
 ## 架构
 
-![alt text](https://images.poneding.com/2025/03/202503111822872.svg)
+![alt text](https://images.pding.top/2025/03/202503111822872.svg)
 
 ### 数据面板
 

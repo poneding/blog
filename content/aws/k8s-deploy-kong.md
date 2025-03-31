@@ -2,7 +2,7 @@
 
 # K8s 部署 Kong 服务
 
-![alt text](https://images.poneding.com/2025/03/202503112117352.png)
+![alt text](https://images.pding.top/2025/03/202503112117352.png)
 
 本篇只涉及 Kong 服务在 K8s 集群的部署操作，不涉及概念知识。
 
@@ -71,7 +71,7 @@ kubectl apply -f kong-migrations-job.yaml
 
 如果 kong 数据库初始化成功，你可以在数据库中看到新出现的表
 
-![alt text](https://images.poneding.com/2025/03/202503112117314.png)
+![alt text](https://images.pding.top/2025/03/202503112117314.png)
 
 ## K8s资源文件
 

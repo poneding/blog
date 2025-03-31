@@ -2,13 +2,13 @@
 
 # Golang 发布类库 - 1
 
-![alt text](https://images.poneding.com/2025/03/202503111815499.png)
+![alt text](https://images.pding.top/2025/03/202503111815499.png)
 
 本页介绍如何在 Github 上发布我们自己的 Golang 类库。
 
 **1、创建 github 仓库托管 go 类库代码，例如 common-go：**：
 
-![alt text](https://images.poneding.com/2025/03/202503111815836.png)
+![alt text](https://images.pding.top/2025/03/202503111815836.png)
 
 **2、将仓库克隆至本地：**：
 

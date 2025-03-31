@@ -2,7 +2,7 @@
 
 # 创建 EKS 集群
 
-![alt text](https://images.poneding.com/2025/03/202503111817029.jpg)
+![alt text](https://images.pding.top/2025/03/202503111817029.jpg)
 
 ## 1. EKS简介
 

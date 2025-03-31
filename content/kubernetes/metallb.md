@@ -85,7 +85,7 @@ nginx        LoadBalancer   10.0.0.82    192.168.115.140   80:31610/TCP   8s
 
 可以看到，已经为nginx服务分配了一个`192.168.115.140` 的IP，直接在浏览器中访问，一切正常。
 
-![alt text](https://images.poneding.com/2025/03/202503112119348.png)
+![alt text](https://images.pding.top/2025/03/202503112119348.png)
 
 ---
 [« local 存储卷实践](local-storageclass.md)

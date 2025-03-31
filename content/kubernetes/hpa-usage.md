@@ -17,7 +17,7 @@
 
 HPA（Horizontal Pod Autoscaler，Pod水平自动扩缩），根据Pod的资源利用率自动调整Pod管理器中副本数：Pod资源利用率低，降低Pod副本数，降低资源的使用，节约成本；Pod资源利用率高，增加Pod副本数，提高应用的负载能力。
 
-![alt text](https://images.poneding.com/2025/03/202503111814148.png)
+![alt text](https://images.pding.top/2025/03/202503111814148.png)
 
 ## 示例
 

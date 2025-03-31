@@ -2,7 +2,7 @@
 
 # K8s 部署 konga
 
-![alt text](https://images.poneding.com/2025/03/202503111812495.png)
+![alt text](https://images.pding.top/2025/03/202503111812495.png)
 
 本篇只涉及 konga 的部署操作，不涉及概念知识。
 
@@ -86,7 +86,7 @@ debug: Database migrations completed!
 
 可以连接postgres发现你的数据库中多出了下面这些表
 
-![alt text](https://images.poneding.com/2025/03/202503111812709.png)
+![alt text](https://images.pding.top/2025/03/202503111812709.png)
 
 ## K8s 资源文件
 
@@ -210,9 +210,9 @@ kubectl apply -f konga-ingress.yaml
 
 在以上创建命令执行后大概1-2分钟，浏览器访问 <http://konga.example.com，出现konga注册页面说明已经部署成功。>
 
-![alt text](https://images.poneding.com/2025/03/202503111825159.png)
+![alt text](https://images.pding.top/2025/03/202503111825159.png)
 
-![alt text](https://images.poneding.com/2025/03/202503111825831.png)
+![alt text](https://images.pding.top/2025/03/202503111825831.png)
 
 ---
 [« K8s 部署 Kong 服务](k8s-deploy-kong.md)

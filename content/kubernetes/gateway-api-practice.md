@@ -19,7 +19,7 @@ Gateway API 是一个 Kubernetes 的扩展 API，它定义了一套 API 来管�
 - [BackendTLSPolicy](https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/)
 - [ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/)
 
-![alt text](https://images.poneding.com/2023/11/202311161115426.png)
+![alt text](https://images.pding.top/2023/11/202311161115426.png)
 
 ## 安装 Gateway API
 

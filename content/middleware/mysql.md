@@ -8,7 +8,7 @@
 
 下载 Mysql 安装包：<https://dev.mysql.com/downloads/installer/>
 
-![alt text](https://images.poneding.com/2025/03/202503111821457.png)
+![alt text](https://images.pding.top/2025/03/202503111821457.png)
 
 下载完成后，双击 msi 文件安装。
 

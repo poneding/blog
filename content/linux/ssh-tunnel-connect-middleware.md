@@ -20,15 +20,15 @@
 
 打开DBeaver，选择 Sql Server 连接。
 
-![alt text](https://images.poneding.com/2025/03/202503111824223.png)
+![alt text](https://images.pding.top/2025/03/202503111824223.png)
 
 在连接配置页面 Main，输入 Sql Server 连接的基本信息，这里 host 直接使用原本的数据库 host 即可。
 
-![alt text](https://images.poneding.com/2025/03/202503111824544.png)
+![alt text](https://images.pding.top/2025/03/202503111824544.png)
 
 切至 SSH，勾选 Use SSH Tunnel，输入跳板机的连接配置即可。
 
-![alt text](https://images.poneding.com/2025/03/202503111824640.png)
+![alt text](https://images.pding.top/2025/03/202503111824640.png)
 
 配置完成，Ok连接即可。
 
@@ -40,11 +40,11 @@
 
 打开 Putty 工具，在 Session 创建跳板机的连接。
 
-![alt text](https://images.poneding.com/2025/03/202503111824507.png)
+![alt text](https://images.pding.top/2025/03/202503111824507.png)
 
 并且在 Connection 中配置登录账号和密码（或密钥文件）。
 
-![alt text](https://images.poneding.com/2025/03/202503111823380.png)
+![alt text](https://images.pding.top/2025/03/202503111823380.png)
 
 然后在 Connection=>SSH=>Tunnels 中添加 Sql Server 的 server 信息
 
@@ -56,21 +56,21 @@
 
 完成操作之后你的页面也应是下面这个样子。
 
-![alt text](https://images.poneding.com/2025/03/202503111823070.png)
+![alt text](https://images.pding.top/2025/03/202503111823070.png)
 
 回到 Connection=>SSH，勾选 Don’t start as shell or command at all.
 
-![alt text](https://images.poneding.com/2025/03/202503111823877.png)
+![alt text](https://images.pding.top/2025/03/202503111823877.png)
 
 上面的配置完成后，点击 Open，应该会跳入如下的远程界面。
 
-![alt text](https://images.poneding.com/2025/03/202503111823658.png)
+![alt text](https://images.pding.top/2025/03/202503111823658.png)
 
 > **注意：**如果本机已经安装了 Sql Server 数据库，需要现在 Service 中停掉本机的 SqlServer 服务，否则可能会造成端口冲突。
 
 这时，你可以使用 SSMS 连接数据库服务了。
 
-![alt text](https://images.poneding.com/2025/03/202503111824887.png)
+![alt text](https://images.pding.top/2025/03/202503111824887.png)
 
 > **注意：**SSMS 连接配置页面，Server name 必须是 127.0.0.1 而不是原本的数据库 host。
 
@@ -78,17 +78,17 @@
 
 打开 Robo 3T，新建连接，并在 Connection 页面配置 mongo 的连接信息。
 
-![alt text](https://images.poneding.com/2025/03/202503111823989.png)
+![alt text](https://images.pding.top/2025/03/202503111823989.png)
 
 切至 SSH 页面，勾选 Use SSH Tunnel，输入跳板机的连接配置即可。
 
-![alt text](https://images.poneding.com/2025/03/202503111824810.png)
+![alt text](https://images.pding.top/2025/03/202503111824810.png)
 
 配置完成，Save 后连接即可。
 
 其他例如Redis数据库，可以使用 Redis Desktop Manager SSH Tunnel 连接。
 
-![alt text](https://images.poneding.com/2025/03/202503111824720.png)
+![alt text](https://images.pding.top/2025/03/202503111824720.png)
 
 ---
 [« shell 基础](shell.md)
