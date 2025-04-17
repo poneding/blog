@@ -1,8 +1,8 @@
 {
   "accentColor": "",
   "theme": "system",
-  "monospaceFontFamily": "Menlo,CodeNewRoman Nerd Font Mono",
-  "interfaceFontFamily": "Menlo,CodeNewRoman Nerd Font",
+  "monospaceFontFamily": "Monaco,CodeNewRoman Nerd Font Mono",
+  "interfaceFontFamily": "Monaco,CodeNewRoman Nerd Font",
   "baseFontSize": 16,
   "cssTheme": "",
   "enabledCssSnippets": [

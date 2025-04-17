@@ -33,7 +33,7 @@ git submodule add https://github.com/alex-shpak/hugo-book themes/hugo-book
 ```yaml
 # hugo server --minify --themesDir ../.. --baseURL=http://0.0.0.0:1313/theme/hugo-book/
 
-baseURL: https://blog.poneding.com/
+baseURL: https://blog.pding.top/
 title: 秋河落叶
 theme: hugo-book
 pluralizeListTitles: false
@@ -189,10 +189,10 @@ echo '<link rel="stylesheet" href="/css/syntax.css">' >> layouts/partials/docs/h
 
 ### 3.1 自定义域名
 
-我们已经在 `hugo.yaml` 中配置了 `baseURL: https://blog.poneding.com/`，我们还要创建一个 `CNAME` 文件，内容为 `blog.poneding.com`，然后将该文件放到 `static` 目录下。
+我们已经在 `hugo.yaml` 中配置了 `baseURL: https://blog.pding.top/`，我们还要创建一个 `CNAME` 文件，内容为 `blog.pding.top`，然后将该文件放到 `static` 目录下。
 
 ```bash
-echo "blog.poneding.com" > static/CNAME
+echo "blog.pding.top" > static/CNAME
 ```
 
 ### 3.2 使用 GitHub Actions 自动部署

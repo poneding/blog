@@ -70,7 +70,7 @@ func (c *CA) CreateCert(ips []string, domains ...string) (certPem, certKey []byt
 	cert := &x509.Certificate{
 		SerialNumber: big.NewInt(2019),
 		Subject: pkix.Name{
-			Organization:  []string{"poneding.com"},
+			Organization:  []string{"pding.top"},
 			Country:       []string{"CN"},
 			Province:      []string{"Beijing"},
 			Locality:      []string{"Beijing"},
@@ -116,7 +116,7 @@ func CreateCA() (*CA, error) {
 	ca := &x509.Certificate{
 		SerialNumber: big.NewInt(2019),
 		Subject: pkix.Name{
-			Organization:  []string{"poneding.com"},
+			Organization:  []string{"pding.top"},
 			Country:       []string{"CN"},
 			Province:      []string{"Beijing"},
 			Locality:      []string{"Beijing"},

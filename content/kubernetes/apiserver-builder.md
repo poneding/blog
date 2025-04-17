@@ -16,7 +16,7 @@ go install sigs.k8s.io/apiserver-builder-alpha/cmd/apiserver-boot@v1.23.0
 
 ```bash
 mkdir -p $(go env GOPATH)/src/github.com/poneding/apiserver-demo && cd $(go env GOPATH)/src/github.com/poneding/apiserver-demo
-apiserver-boot init repo --domain k8sdev.poneding.com
+apiserver-boot init repo --domain k8sdev.pding.top
 ```
 
 **创建 API**：

@@ -62,6 +62,9 @@ sudo kill -9 [PID]
 
 ```bash
 rm -rfv ~/Library/Containers/com.charliemonroe.Downie-4/Data/Library/Application\ Support/Downie\ 4
+
+# 最新（能生效，但是所有的配置也会丢失)
+rm -rfv ~/Library/Containers/com.charliemonroe.Downie-4/
 ```
 
 配置快捷命令：

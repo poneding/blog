@@ -18,7 +18,7 @@ cp ./certbot-auto /usr/local/bin
 - 本服务器端口 80、443 处于未被占用的状态，如果 web 服务占用了 80 端口，需要临时关闭。
 
 ```bash
-certbot-auto certonly --standalone --email poneding@gmail.com -d test.poneding.com
+certbot-auto certonly --standalone --email poneding@gmail.com -d test.pding.top
 ```
 
 以上命令执行完成后，将会在 /etc/letsencrypt/live 目录下生成域名证书文件。默认证书有效期为 3 个月。
@@ -31,17 +31,17 @@ certbot-auto certonly --standalone --email poneding@gmail.com -d test.poneding.c
 server {
         listen 80;
         server_name abc.com;
-        rewrite ^(.*) https://test.poneding.com permanent;
+        rewrite ^(.*) https://test.pding.top permanent;
 }
 server{
     listen 443 ssl default_server;
     listen [::]:443 ssl default_server;
 
-    ssl_certificate /etc/letsencrypt/live/test.poneding.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/test.poneding.com/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/test.pding.top/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/test.pding.top/privkey.pem;
 
-    server_name test.poneding.com;
-    root /web/test.poneding.com/;
+    server_name test.pding.top;
+    root /web/test.pding.top/;
 }
 ```
 
